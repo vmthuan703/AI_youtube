@@ -23,7 +23,7 @@ from datetime import datetime, timedelta, timezone
 import requests
 
 API = "https://www.googleapis.com/youtube/v3"
-COST = {"search": 100, "videos": 1, "channels": 1}
+COST = {"search": 100, "videos": 1, "channels": 1, "playlistItems": 1}
 CSV_FIELDS = [
     "keyword", "region", "video_id", "title", "video_url", "published_at",
     "views", "views_per_day", "channel_id", "channel_title", "channel_url",

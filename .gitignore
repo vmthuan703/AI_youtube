@@ -3,3 +3,4 @@ cache.sqlite
 niches*.csv
 __pycache__/
 .pytest_cache/
+out/

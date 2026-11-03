@@ -52,15 +52,16 @@ TABLE_A_FIELDS = [
     "channel", "channel_role", "video_url", "title", "topic", "promise",
     "motivation_primary", "motivation_secondary", "confidence", "ambiguous", "views",
     "age_days", "age_bucket", "baseline_channel", "baseline_n", "relative_performance",
+    "age_adjusted_relative",
     "burst_10x", "burst_robust", "low_base_burst", "ge_100k",
 ]
 TABLE_B_FIELDS = [
     "segment", "name", "viewer_sentence", "n_video", "n_channel", "median_views",
-    "median_relative", "cross_channel_lift", "cross_channel_n", "hit_rate",
+    "median_relative", "median_age_adjusted", "cross_channel_lift", "cross_channel_n", "hit_rate",
     "n_burst_channels", "n_robust_channels", "n_100k", "coverage", "age_bias",
     "gate1", "gate2", "gate3", "score", "score_detail", "decision",
 ]
-UNASSIGNED = {"", "UNCLEAR", "AMBIGUOUS", "NONE"}
+UNASSIGNED = {"", "UNCLEAR", "AMBIGUOUS", "NONE", "OFF"}
 
 
 # ---------------------------------------------------------------- tiện ích
@@ -240,6 +241,17 @@ def normalize(videos, now=None):
             low_base_burst=bool(rel is not None and rel >= BURST_X and b < ROBUST_MIN_BASELINE),
             ge_100k=r["views"] >= 100_000,
         )
+    # Hiệu chỉnh tuổi: chia cho median relative của mọi video cùng nhóm tuổi đăng,
+    # để video mới đăng (chưa kịp tích luỹ view) không bị so với video cũ hơn.
+    by_bucket = {}
+    for r in long_rows:
+        if r["relative_performance"] is not None:
+            by_bucket.setdefault(r["age_bucket"], []).append(r["relative_performance"])
+    bucket_med = {k: median(v) for k, v in by_bucket.items()}
+    for r in long_rows:
+        bm = bucket_med.get(r["age_bucket"])
+        rel = r["relative_performance"]
+        r["age_adjusted_relative"] = rel / bm if rel is not None and bm else None
     return long_rows, baselines
 
 
@@ -270,6 +282,7 @@ def segment_table(rows, segments_cfg):
     for seg, rs in groups.items():
         cfg = segments_cfg.get(seg, {})
         rels = [r["relative_performance"] for r in rs if r["relative_performance"] is not None]
+        adj = [r["age_adjusted_relative"] for r in rs if r.get("age_adjusted_relative") is not None]
         per_ch = {}
         for r in rs:
             if r["relative_performance"] is not None:
@@ -292,6 +305,7 @@ def segment_table(rows, segments_cfg):
             "n_video": len(rs), "n_channel": len({r["channel_name"] for r in rs}),
             "median_views": median(r["views"] for r in rs),
             "median_relative": median(rels) if rels else None,
+            "median_age_adjusted": median(adj) if adj else None,
             "cross_channel_lift": median(lifts) if lifts else None,
             "cross_channel_n": len(lifts),
             "hit_rate": sum(r["burst_10x"] for r in rs) / len(rs),
@@ -350,7 +364,8 @@ def age_matrix(rows):
     return out
 
 
-def run_score(videos_path, labels_path, segments_path, out_dir, now=None):
+def run_score(videos_path, labels_path, segments_path, out_dir, now=None,
+              min_age=0, exclude_roles=(), min_confidence=None):
     long_rows, baselines = normalize(read_csv(videos_path), now)
     if not labels_path or not os.path.exists(labels_path):
         tpl = os.path.join(out_dir, "labels_template.csv")
@@ -365,14 +380,18 @@ def run_score(videos_path, labels_path, segments_path, out_dir, now=None):
         r.update({k: (l.get(k) or "").strip() for k in LABEL_FIELDS[3:]})
         r["motivation_primary"] = r["motivation_primary"].upper()
         a = dict(r, channel=r["channel_name"],
-                 relative_performance=fmt(r["relative_performance"]))
+                 relative_performance=fmt(r["relative_performance"]),
+                 age_adjusted_relative=fmt(r["age_adjusted_relative"]))
         table_a.append(a)
-        if r["motivation_primary"] not in UNASSIGNED:
+        keep = (r["motivation_primary"] not in UNASSIGNED and r["age_days"] >= min_age
+                and r.get("channel_role", "") not in exclude_roles
+                and not (min_confidence == "medium" and r["confidence"] == "low"))
+        if keep:
             labeled.append(r)
     table_a.sort(key=lambda a: (a["channel"], -(a["relative_performance"] or 0)))
     table_b = segment_table(labeled, segs)
     for m in table_b:
-        for k in ("median_relative", "cross_channel_lift", "hit_rate", "coverage"):
+        for k in ("median_relative", "median_age_adjusted", "cross_channel_lift", "hit_rate", "coverage"):
             m[k] = fmt(m[k])
     write_csv(os.path.join(out_dir, "table_A_video.csv"), TABLE_A_FIELDS, table_a)
     write_csv(os.path.join(out_dir, "table_B_audience.csv"), TABLE_B_FIELDS, table_b)
@@ -402,6 +421,9 @@ def main(argv=None):
     s.add_argument("--labels", default="data/labels.csv")
     s.add_argument("--segments", default="data/segments.csv")
     s.add_argument("--out-dir", default="out")
+    s.add_argument("--min-age", type=int, default=0, help="Chỉ tính video >= N ngày tuổi vào tệp")
+    s.add_argument("--exclude-roles", nargs="*", default=[], help="vd: seed control")
+    s.add_argument("--min-confidence", choices=["medium"], help="Bỏ nhãn confidence=low")
     a = p.parse_args(argv)
 
     if a.cmd == "collect":
@@ -434,7 +456,8 @@ def main(argv=None):
               f"{sum(c['observed_videos'] for c in ok)}, video dài hợp lệ "
               f"{sum(c['long_valid'] for c in ok)}. Chi tiết: {a.coverage_out}")
     else:
-        res = run_score(a.videos, a.labels, a.segments, a.out_dir)
+        res = run_score(a.videos, a.labels, a.segments, a.out_dir, min_age=a.min_age,
+                        exclude_roles=set(a.exclude_roles), min_confidence=a.min_confidence)
         if "template" in res:
             print(f"Chưa có nhãn. Đã xuất {res['template']} ({res['n_long']} video dài) — "
                   f"điền nhãn động cơ rồi lưu thành {a.labels}.")
@@ -442,7 +465,7 @@ def main(argv=None):
         print(f"Video dài {res['n_long']}, đã gán tệp {res['n_labeled']}, "
               f"chưa đủ căn cứ {res['n_unassigned']}.")
         for m in res["table_b"]:
-            print(f"{m['segment']:<6}{m['n_video']:>4}v {m['n_channel']:>3}k  medRel={m['median_relative']}"
+            print(f"{m['segment']:<6}{m['n_video']:>4}v {m['n_channel']:>3}k  medRel={m['median_relative']} ageAdj={m['median_age_adjusted']}"
                   f"  bùng={m['n_burst_channels']} robust={m['n_robust_channels']}  điểm={m['score']}  {m['decision']}")
 
 

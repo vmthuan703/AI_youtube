@@ -59,5 +59,9 @@ Quy tắc đã cài: video dài ≥ 4 phút (Shorts, video 3–4 phút, livestre
 thiếu view, trùng đều bị loại và ghi lý do); `baseline = median` video dài của kênh (cần ≥ 3
 video, baseline 0 → không xác định); bùng = ≥ 10× baseline; robust = ≥ 12× và baseline ≥ 1.000;
 đếm kênh bùng theo **kênh khác nhau**; `cross_channel_lift` chỉ tính kênh có ≥ 2 video trong tệp.
-Chỉ có lượt xem tích luỹ nên luôn có cảnh báo tuổi video; xem `table_B2_age_matrix.csv` để
+Chỉ có lượt xem tích luỹ nên luôn có cảnh báo tuổi video và cột `median_age_adjusted`
+(relative chia cho trung vị cùng nhóm tuổi đăng); kiểm tra độ nhạy bằng `--min-age 7`,
+`--exclude-roles seed control`, `--min-confidence medium`; xem `table_B2_age_matrix.csv` để
 so sánh trong cùng nhóm tuổi. Điểm 100 là heuristic, không phải xác suất.
+
+Kết quả nghiên cứu 2026-11-03 (27 kênh, 377 video dài): `reports/2026-11-03/BAO_CAO_TEP_KHAN_GIA.md`.

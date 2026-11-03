@@ -1,9 +1,13 @@
 code,name,viewer_sentence,ideas_count,us_evidence,promise_clear
-T1,Superhuman Advantage,Người xem bấm vì họ muốn tưởng tượng mình vượt trội hơn mọi người xung quanh,,english,yes
-T2,Hidden Truth & Secrets,Người xem bấm vì họ muốn nhìn thấu điều người khác đang giấu,,english,yes
+T1G,Genius / Super Intelligence,Người xem bấm vì họ muốn tưởng tượng mình thông minh vượt trội và thắng mọi người trong bối cảnh quen thuộc,,english,yes
+T1P,Superpower Fantasy,Người xem bấm vì họ muốn sở hữu một năng lực phi thường và xem nó thay đổi cuộc sống ra sao,,english,yes
+T2,Hidden Truth & Secrets,Người xem bấm vì họ muốn nhìn thấu điều người khác đang giấu,21,english,yes
 T3,Loss of Privacy/Control,Người xem bấm vì họ sợ bí mật của chính mình bị lộ hoặc mất quyền kiểm soát,,english,yes
-T4,Control of Time/Fate,Người xem bấm vì họ muốn làm chủ hoặc sửa lại số phận của mình,,english,yes
-T5,Extreme Existence,Người xem bấm vì họ muốn biết hệ quả của việc sống vô hạn hoặc lặp lại,,english,yes
+T4,Control of Time/Fate,Người xem bấm vì họ muốn làm chủ thời gian hoặc sửa lại số phận của mình,22,english,yes
+T5,Extreme Existence,Người xem bấm vì họ muốn biết hệ quả của việc sống vô hạn hoặc cực lâu,,english,yes
 T6,Survival/Isolation,Người xem bấm vì họ tự hỏi mình có sống sót nổi trong một thế giới đảo lộn không,,english,yes
-T7,Belonging/Recognition,"Người xem bấm vì họ muốn được yêu, được chú ý hoặc được công nhận",,english,yes
-T8,Wonder/Impossible Discovery,Người xem bấm vì họ tò mò về một điều bất khả thi mà không cần lợi ích cá nhân,,english,yes
+T7,Love/Recognition,"Người xem bấm vì họ muốn được yêu, được chú ý hoặc được công nhận",20,english,yes
+T8,Wonder/Impossible World,"Người xem bấm vì họ tò mò về một điều bất khả thi của thế giới, không cần lợi ích cá nhân",,english,yes
+T9,Body Limits & Escalation,Người xem bấm vì họ muốn thấy cơ thể mình bị đẩy tới giới hạn và hậu quả kéo theo,,english,yes
+T10,Wealth Shortcut,Người xem bấm vì họ muốn tưởng tượng giàu lên tức thì,,english,yes
+T11,Step Into a World/Role,"Người xem bấm vì họ muốn tự đặt mình vào một thế giới hoặc vai trò quen thuộc (game, SCP, lịch sử)",,english,yes

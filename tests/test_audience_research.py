@@ -88,6 +88,8 @@ def test_normalize_baseline_and_burst_flags():
     assert by["b3"]["burst_10x"] and not by["b3"]["burst_robust"] and by["b3"]["low_base_burst"]
     assert by["c1"]["relative_performance"] is None and by["c1"]["baseline_channel"] == "khong_xac_dinh"
     assert by["d1"]["relative_performance"] is None
+    assert by["d1"]["age_adjusted_relative"] is None
+    assert by["hit"]["age_adjusted_relative"] > 1    # cùng nhóm tuổi, vượt trung vị
 
 
 def labeled(ch, vid, rel, seg, views=1000, burst=None, robust=False, age=10):

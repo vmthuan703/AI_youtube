@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 concurrency:
   group: market-daily
@@ -87,3 +88,24 @@ jobs:
             git pull --rebase origin main || true
           done
           exit 1
+
+      # Lỗi thì mở Issue: GitHub gửi email và thông báo trên app GitHub cho chủ repo.
+      # Đã có Issue lỗi đang mở thì chỉ thêm bình luận, không mở thêm.
+      - name: Báo lỗi bằng Issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          RUN_URL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          NGAY="$(TZ=Asia/Ho_Chi_Minh date +%F)"
+          gh label create workflow-loi --color B60205 --description "Workflow hằng ngày lỗi" 2>/dev/null || true
+          OPEN="$(gh issue list --label workflow-loi --state open --limit 1 --json number --jq '.[0].number')"
+          if [ -n "$OPEN" ]; then
+            gh issue comment "$OPEN" --body "Lỗi tiếp ngày $NGAY: $RUN_URL"
+          else
+            gh issue create --label workflow-loi \
+              --title "Workflow thu thập hằng ngày lỗi ($NGAY)" \
+              --body "Lượt chạy lỗi: $RUN_URL
+
+Nguyên nhân hay gặp: thiếu hoặc sai secret YOUTUBE_API_KEY, hết quota YouTube, nhánh research/reports bị chặn push. Đọc log ở link trên. Sửa xong thì đóng Issue này."
+          fi

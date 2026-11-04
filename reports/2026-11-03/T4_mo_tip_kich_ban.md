@@ -3,7 +3,11 @@
 Lời hứa cốt lõi: **người xem bấm vì họ muốn làm chủ thời gian hoặc sửa lại số phận**
 (biết trước, làm lại, dừng lại, không bao giờ thua).
 
-## 0. Nguồn dữ liệu và giới hạn
+> **Cập nhật 2026-11-04:** đã có transcript của 23/30 video. Kết quả đo lời thoại thật và các
+> chỗ sửa so với bản đầu nằm ở **mục 7**; khi mục 7 khác với các mục 1–3, mục 7 được ưu tiên.
+> Prompt `prompts/T4_script_prompt.md` đã cập nhật theo mục 7.
+
+## 0. Nguồn dữ liệu và giới hạn (bản đầu, trước khi có transcript)
 
 - **Chưa có transcript lời thoại.** Phiên đám mây này không truy cập được `youtube.com`, và
   YouTube Data API chỉ cho tải phụ đề của video mình sở hữu. Phân tích dưới đây dựa trên
@@ -131,3 +135,101 @@ Khi có transcript, tôi sẽ đo:
 - thời điểm xuất hiện luật, cái giá, khủng hoảng;
 
 rồi cập nhật mục 1–2 và prompt.
+
+## 7. Kết quả từ transcript (cập nhật 2026-11-04)
+
+### 7.1 Dữ liệu
+- 23/30 video có phụ đề tự động tiếng Anh (`data/transcripts/T4/*.en.vtt`), được làm sạch bằng
+  `tools/vtt_clean.py`. Số đo: `tools/transcript_stats.py`, `tools/transcript_motifs.py`.
+- **Thiếu đúng 2 video có relative cao nhất**: Could've Been Tales "See 1 Hour Into the Future"
+  (70×) và WhatIf Functions "Reborn With All Your Memories" (52×), cùng 5 video khác (lỗi HTTP 429
+  khi tải). Nếu bổ sung được, nên chạy lại các phép đo.
+- So sánh nhóm "top" (relative ≥ 2, 11 video) với nhóm "thấp" (relative < 2, 12 video). Mẫu nhỏ và
+  phụ đề tự động có lỗi chính tả, nên mọi chênh lệch dưới đây chỉ là **gợi ý**, không phải nhân quả.
+
+### 7.2 Văn phong bề mặt: là chuẩn chung của thể loại, KHÔNG phân biệt video tốt và xấu
+
+| Chỉ số (trung vị) | Top (n=11) | Thấp (n=12) |
+|---|---|---|
+| Tốc độ đọc (từ/phút) | 169 | 165 |
+| Số từ trung bình mỗi câu | 6,6 | 6,8 |
+| Tỷ lệ câu ≤ 6 từ | 54% | 54% |
+| Tỷ lệ từ "you/your" | 9,2% | 9,7% |
+| Tỷ lệ "I/my/me" | 0,4% | 0,4% |
+| Câu hỏi mỗi phút | 1,4 | 1,0 |
+| Con số mỗi phút | 3,0 | 3,3 |
+| Số câu hỏi trong 45 giây cuối | 2 | 2 |
+
+Nghĩa là văn phong "you, thì hiện tại, câu rất ngắn, nhiều con số" (mục 2) là **điều kiện cần**:
+cả video tốt lẫn video xấu đều viết như vậy. Nó không giải thích vì sao một video bùng.
+
+### 7.3 Những gì thật sự khác (đọc kỹ 4 video top và 1 video thấp)
+
+Đọc toàn bộ: Twivio "Stop Time" (29×), OTHERWISE "Reborn" (11×). Đọc phần mở đầu: Price of If
+"10 Seconds" (5,8×), Jeremy Bearimy "Control Your Luck" (5,4×). Đối chiếu: ConChaser "10 Seconds"
+(0,51×), cùng năng lực với Price of If nhưng relative chỉ bằng một phần mười.
+
+1. **Báo trước cái giá ngay trong 45 giây đầu, bằng một câu ngắn.**
+   - Jeremy (30 giây): "But luck always collects."
+   - Price of If (45 giây): "The future you see includes you… Remember that. It matters later."
+   - Twivio (47 giây): "So you get one breath. That's the rule."
+   - ConChaser (0,51×) không có câu báo trước. Nó giải thích cơ chế ("here's the interesting part")
+     và mãi tới 108 giây mới nêu luật.
+2. **Gieo một câu hoặc đồ vật, rồi trả ở cao trào (setup → payoff).** Đây là mô típ rõ nhất.
+   - Twivio: cô em Lily dặn "Don't panic, Kai. Panic eats your air" ở 227 giây. Ở cao trào
+     (314 giây), câu đó vang lên trong đầu nhân vật và cứu cả hai.
+   - OTHERWISE: "The third line, you underline until the pencil snaps" (295 giây). Sau đó là
+     chuỗi gợi ý: học CPR năm 12 tuổi, máy khử rung tim năm 13 tuổi, bác sĩ tim năm 16 tuổi.
+     Cuối cùng mới lộ ra dòng thứ ba là cứu tim bố.
+   - Price of If: "Remember that. It matters later."
+3. **Cái giá tích lũy trên cơ thể hoặc thời gian, nói bằng con số, và có một câu chủ đề lặp lại.**
+   - Twivio: "Add it all up and you've lived four extra days nobody else lived." / "You look
+     tired, mate. Like grandpa tired." / Câu chủ đề "You can't keep time. You can only borrow it.
+     And borrowed things always get paid back." xuất hiện ở 205 giây và **lặp lại ở 345 giây**
+     để chốt truyện.
+4. **Khoa học gắn vào cảnh, mỗi lần một con số, không tách thành bài giảng.**
+   - "From 10 m it hits the ground in about 1.5 seconds", "Sound… 340 m per second", "five spins
+     in a row, about one in 79 million", "your brain takes about a tenth of a second".
+   - Số lần nhắc khoa học: top 0,55 lần/phút, thấp 0,36 lần/phút.
+5. **Thế giới phản ứng bằng câu thoại cực ngắn của nhân vật phụ có tên.** Mỗi câu đánh dấu một
+   nấc leo thang.
+   - "Dude, you were behind me." / "Mate, that's creepy. Thank you, but creepy." / "Sir, you're
+     done for tonight." / "Bro, how are you always right?"
+   - Số tên riêng: top trung vị 17, thấp 10.
+6. **Cao trào là phép đếm cùng một lựa chọn nhị phân.**
+   - Twivio: "One. Two. Five. Eight. 10… Two people left. A stranger and Lily." → "Breathe or
+     reach them."
+   - Sau đó **từ chối lời mời trục lợi**: Mr. Grant bảo "Do it again, slower for the cameras",
+     và nhân vật trả lời "No."
+7. **Kết = kiểm chứng thực tế, cộng móc phần tiếp, cộng một lời kêu gọi.**
+   - Twivio: "Is any of this real? Stopping time, no… but the breath part is real" (kỷ lục nín
+     thở 11 phút). Sau đó là cảnh kim giây đứng yên và "someone else is walking down your street".
+8. **Với truyện tái sinh hoặc làm lại:** mở đầu bằng một vết thương cảm xúc, rồi gói mục tiêu vào
+   một câu.
+   - OTHERWISE: chết ở tuổi 82, nhớ "one call in particular" → "This time I'm picking up."
+
+**Hai phong cách cùng hiệu quả trong nhóm top:**
+- **(A) Truyện có nhân vật tên riêng và cốt truyện trọn vẹn:** Twivio, OTHERWISE. Đây là hai video
+  có relative cao nhất trong 23 video.
+- **(B) Chuỗi tình huống ngôi "you" xen khoa học:** Jeremy, IFOLOGY, Price of If. Phong cách này
+  mạnh ở các kênh nền cao.
+
+Cả hai phong cách đều dùng mô típ 1 (báo trước cái giá) và mô típ 2 (gieo rồi trả).
+
+### 7.4 Sửa lại các nhận định trong bản đầu
+
+| Bản đầu (mục 1–3) | Transcript cho thấy | Sửa |
+|---|---|---|
+| "Sounds perfect… until" là trục chuyển (mục 2.3) | Câu này chỉ có trong **mô tả**, không video nào đọc nguyên văn. Lời dẫn dùng "The catch?", "And there's a cost", "But luck always collects". Video có câu chuyển: top 8/11, thấp 7/12, gần như ngang nhau | Giữ ý chuyển sang cái giá; đổi cách nói và **đưa lên sớm** dưới dạng câu báo trước (mô típ 1) |
+| Nhịp 2 "câu premise" ngay ~0:25 | Chỉ 2/23 video mở bằng "What if"; câu hỏi tiêu đề được nhắc lại ở 13–60 giây, sau màn trình diễn năng lực | Giữ nguyên, nhấn mạnh **không** mở bằng "What if" |
+| Giới thiệu người thân sớm, trong 1/3 đầu (prompt, self-check 4) | Nhóm **thấp** nhắc người thân sớm hơn (trung vị 32 giây, so với 68 giây ở nhóm top) và nhiều hơn (0,85 so với 0,5 lần/phút) | Người thân xuất hiện **sau** khi năng lực đã thành hình (khoảng 1–4 phút), và đi kèm **một câu hoặc đồ vật được gieo** |
+| Kết bằng đúng 1 câu hỏi | Cả hai nhóm đều có khoảng 2 câu hỏi trong 45 giây cuối | Không phải yếu tố phân biệt; giữ quy tắc 1 câu hỏi đạo đức cho gọn |
+
+### 7.5 Bốn kịch bản ưu tiên, bổ sung các trường mới của prompt
+
+| # | Tiêu đề | Gieo (plant) → trả (payoff) | Câu chủ đề (lặp 2 lần) | Kẻ cám dỗ |
+|---|---|---|---|---|
+| 2 | What If Your Phone Showed Tomorrow's Notifications Today? | Mẹ đặt chế độ "favorite" cho số của bạn, nói "So I always get through." → ở cao trào, chỉ cuộc gọi đó xuyên qua được chế độ im lặng | "You can read tomorrow. You can't answer it." | Một startup muốn mua điện thoại của bạn |
+| 4 | What If You Could Freeze Time, But You Aged Twice as Fast While It Was Frozen? | Ông nội chỉ cho bạn cách đo tuổi bằng vạch trên khung cửa → cao trào: vạch mới cao hơn vạch của ông | "Time isn't free. It's just quiet about the bill." | Huấn luyện viên đội tuyển thuê bạn "freeze" mọi trận đấu |
+| 1 | What If You Could Undo One Decision Every Day? | Bố nói "Don't waste it on small stuff" và đặt nam châm hình đồng hồ lên tủ lạnh → cao trào: undo đã dùng hết, nam châm nhắc bạn gọi điện trước 6 giờ chiều | "Every undo is a choice you made twice." | Bạn cùng lớp trả tiền để bạn undo giúp |
+| 3 | What If You Woke Up on Your First Day of High School With Every Memory? | Lá thư viết dở cho người bạn thân từ tương lai cũ → cao trào: gửi thư thay vì đổi thêm một ký ức | "Knowing the ending doesn't mean you get to keep it." | Một quỹ đầu tư phát hiện bạn đoán trúng mọi cổ phiếu |

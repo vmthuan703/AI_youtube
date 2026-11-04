@@ -1,5 +1,9 @@
 # AI_youtube
 
+<!-- KE_HOACH_MOI_NHAT:START -->
+> **Kế hoạch nội dung tuần tới:** đang chuẩn bị · [các tuần trước](ke-hoach/README.md)
+<!-- KE_HOACH_MOI_NHAT:END -->
+
 ## Tự động nghiên cứu thị trường
 
 - **Hằng ngày:** GitHub Actions chạy `market_watch.py daily`, đẩy dữ liệu vào nhánh `research/reports`.

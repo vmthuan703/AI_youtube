@@ -1,0 +1,62 @@
+# Tải thumbnail đối thủ (top + flop mỗi kênh) từ snapshot mới nhất trên research/reports,
+# rồi đẩy ảnh, index.csv và tờ ảnh vào research/reports/thumbnails/<ngày>/.
+# Không tốn quota YouTube API: ảnh lấy thẳng từ i.ytimg.com.
+name: Thu thập thumbnail đối thủ
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/automation-workflow-discovery-mvmp4r]
+    paths:
+      - tools/thumbnails/**
+      - .github/workflows/thumbnails.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: research-reports-write
+  cancel-in-progress: false
+
+jobs:
+  thumbnails:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DATA_BRANCH: research/reports
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Cài Pillow và tesseract (OCR chữ trên thumbnail)
+        run: |
+          pip install pillow
+          sudo apt-get update -qq && sudo apt-get install -y -qq tesseract-ocr fonts-dejavu-core
+
+      - name: Mở nhánh dữ liệu
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin "$DATA_BRANCH"
+          git worktree add -B "$DATA_BRANCH" research "origin/$DATA_BRANCH"
+
+      - name: Tải thumbnail
+        run: python tools/thumbnails/collect_thumbnails.py --root research
+
+      - name: Đẩy lên research/reports
+        run: |
+          cd research
+          git add -A thumbnails
+          if git diff --cached --quiet; then echo "Không có gì mới"; exit 0; fi
+          git commit -m "Thumbnail đối thủ $(TZ=Asia/Ho_Chi_Minh date +%F)"
+          for i in 1 2 3 4; do
+            git push origin "HEAD:$DATA_BRANCH" && exit 0
+            sleep $((2 ** i))
+            git pull --rebase origin "$DATA_BRANCH" || true
+          done
+          exit 1

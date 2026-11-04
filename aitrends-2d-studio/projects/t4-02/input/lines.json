@@ -1,0 +1,758 @@
+[
+ {
+  "i": 0,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 0.0,
+  "end": 7.191,
+  "text": "It's 11:59 p.m. Your phone is face down on the nightstand. It buzzes once. You flip it over."
+ },
+ {
+  "i": 1,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 7.691,
+  "end": 13.196,
+  "text": "Forty-six new notifications. Normal. Except every single one is stamped tomorrow."
+ },
+ {
+  "i": 2,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 13.696,
+  "end": 20.737,
+  "text": "Tomorrow, 7:02 a.m. Mom: Don't forget your lunch. Tomorrow, 10:15 a.m. School alert: Fire drill."
+ },
+ {
+  "i": 3,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 21.237,
+  "end": 25.205,
+  "text": "You go to sleep. At 7:02, a voice comes up the stairs."
+ },
+ {
+  "i": 4,
+  "speaker": "MOM",
+  "note": "",
+  "voice": "af_sarah",
+  "start": 25.705,
+  "end": 27.626,
+  "text": "Maya! Don't forget your lunch!"
+ },
+ {
+  "i": 5,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 28.126,
+  "end": 32.201,
+  "text": "At 10:15, the fire alarm goes off. Exactly on time."
+ },
+ {
+  "i": 6,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 32.701,
+  "end": 40.959,
+  "text": "Your name is Maya. You're sixteen. And your phone just showed you tomorrow. So what if your phone showed tomorrow's notifications today?"
+ },
+ {
+  "i": 7,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 41.459,
+  "end": 58.019,
+  "text": "Here's the rule. Every night at 11:59, tomorrow's notifications land on your lock screen. The time. The sender. The first forty characters. You can't open them. You can't reply. And you'll learn the hard way: tomorrow keeps count."
+ },
+ {
+  "i": 8,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 58.519,
+  "end": 66.711,
+  "text": "One industry study found the average American gets about 46 push notifications a day. You get yours a day early."
+ },
+ {
+  "i": 9,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 67.211,
+  "end": 76.152,
+  "text": "Day one. Tomorrow, 8:05 a.m. Mr. Okafor posted: Pop quiz, chapter seven. So tonight, you read chapter seven. Twice."
+ },
+ {
+  "i": 10,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 76.652,
+  "end": 87.897,
+  "text": "Here's the real part. Without review, most people forget most of something new within a day. Scientists call it the forgetting curve. You reviewed at eleven p.m. Twenty out of twenty."
+ },
+ {
+  "i": 11,
+  "speaker": "JORDAN",
+  "note": "",
+  "voice": "am_liam",
+  "start": 88.397,
+  "end": 90.445,
+  "text": "You studied? On purpose?"
+ },
+ {
+  "i": 12,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 90.945,
+  "end": 98.413,
+  "text": "Mom gets home at seven every morning after a twelve-hour shift at Mercy General. She calls a lot. Like, a lot."
+ },
+ {
+  "i": 13,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 98.913,
+  "end": 100.897,
+  "text": "She holds out her hand for your phone."
+ },
+ {
+  "i": 14,
+  "speaker": "MOM",
+  "note": "",
+  "voice": "af_sarah",
+  "start": 101.397,
+  "end": 106.156,
+  "text": "Put me in your favorites. Do Not Disturb lets favorites through. So I always get through."
+ },
+ {
+  "i": 15,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 106.656,
+  "end": 108.085,
+  "text": "You take the phone back."
+ },
+ {
+  "i": 16,
+  "speaker": "MAYA",
+  "note": "",
+  "voice": "af_bella",
+  "start": 108.585,
+  "end": 109.802,
+  "text": "Mom. Later."
+ },
+ {
+  "i": 17,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 110.302,
+  "end": 114.526,
+  "text": "Your little brother Sam, nine, is eating cereal out of a mixing bowl."
+ },
+ {
+  "i": 18,
+  "speaker": "SAM",
+  "note": "",
+  "voice": "am_puck",
+  "start": 115.026,
+  "end": 115.943,
+  "text": "Later means never."
+ },
+ {
+  "i": 19,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 116.443,
+  "end": 127.518,
+  "text": "Day three. Tomorrow, 3:40 p.m. Weather: Severe thunderstorm warning. Track practice is at 3:30. Outside. The forecast says ten percent chance of rain."
+ },
+ {
+  "i": 20,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 128.018,
+  "end": 139.583,
+  "text": "A five-day forecast is right about ninety percent of the time. A ten-day forecast, about half. Yours is right every time. You bring a rain jacket. At 3:40 the sky opens."
+ },
+ {
+  "i": 21,
+  "speaker": "COACH RIVERA",
+  "note": "",
+  "voice": "am_onyx",
+  "start": 140.083,
+  "end": 143.092,
+  "text": "How did you know? The app said ten percent!"
+ },
+ {
+  "i": 22,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 143.592,
+  "end": 151.786,
+  "text": "Day five. Tomorrow, 9:47 p.m. Ava: hey are you going to the... The preview cuts off. Going to the what?"
+ },
+ {
+  "i": 23,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 152.286,
+  "end": 164.107,
+  "text": "In one study, eighty-nine percent of college students said they'd felt their phone buzz when it hadn't. Phantom vibrations. You never wonder. You already know who's texting. So you ask first."
+ },
+ {
+  "i": 24,
+  "speaker": "AVA",
+  "note": "",
+  "voice": "af_sky",
+  "start": 164.607,
+  "end": 167.275,
+  "text": "Wait. I was literally about to ask you."
+ },
+ {
+  "i": 25,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 167.775,
+  "end": 179.042,
+  "text": "Day six. You start a group chat called Called It. You post tomorrow's alerts a day early. Snow day. Lockdown drill. The cafeteria running out of pizza at 12:14."
+ },
+ {
+  "i": 26,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 179.542,
+  "end": 181.953,
+  "text": "Within a day, two thousand kids follow it."
+ },
+ {
+  "i": 27,
+  "speaker": "TYLER",
+  "note": "",
+  "voice": "am_echo",
+  "start": 182.453,
+  "end": 185.035,
+  "text": "Okay. Who is leaking this?"
+ },
+ {
+  "i": 28,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 185.535,
+  "end": 201.41,
+  "text": "Then a text from Jordan lands a day early. Tomorrow, 2:05 p.m. Jordan: failed my driving test lol. So tonight, you quiz Jordan on parallel parking. For two hours. In the school lot. With traffic cones you borrowed from the gym."
+ },
+ {
+  "i": 29,
+  "speaker": "JORDAN",
+  "note": "",
+  "voice": "am_liam",
+  "start": 201.91,
+  "end": 204.151,
+  "text": "I passed! I actually passed!"
+ },
+ {
+  "i": 30,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 204.651,
+  "end": 209.985,
+  "text": "You've never felt this good. You're not just reading tomorrow anymore. You're editing it."
+ },
+ {
+  "i": 31,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 210.485,
+  "end": 217.697,
+  "text": "The catch? Day seven. Tomorrow, 4:22 p.m. Sam: i fell off my skateboard arm hurts."
+ },
+ {
+  "i": 32,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 218.197,
+  "end": 227.949,
+  "text": "So you hide the skateboard under your bed. Problem solved. At 11:59, the list updates. The skateboard message is gone. In its place, two new ones."
+ },
+ {
+  "i": 33,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 228.449,
+  "end": 235.511,
+  "text": "4:22 p.m. Sam: tripped on the stairs. 4:23 p.m. Mom: Taking Sam to urgent care."
+ },
+ {
+  "i": 34,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 236.011,
+  "end": 247.236,
+  "text": "It's a sprained ankle, not a broken arm. Better. But not gone. That's the cost. Erase one notification, and tomorrow sends back two. Tomorrow keeps count."
+ },
+ {
+  "i": 35,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 247.736,
+  "end": 257.659,
+  "text": "Forty-six becomes forty-eight. Then fifty-two. Then sixty. By day nine, one hundred and four. You can read tomorrow. You can't answer it."
+ },
+ {
+  "i": 36,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 258.159,
+  "end": 277.556,
+  "text": "Every erase is for someone. Jordan's test. Ava's flat tire. Mr. Okafor's coffee spill. And for every one, tomorrow sends back two. Doubling is sneaky. Start with one and double it ten times, and you get one thousand and twenty-four. You do that math at 3 a.m., and then you stop doing math."
+ },
+ {
+  "i": 37,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 278.056,
+  "end": 288.768,
+  "text": "Every night you're up until three, erasing. Teenagers need eight to ten hours of sleep. You're getting four. Nine nights. That's about forty hours you'll never get back."
+ },
+ {
+  "i": 38,
+  "speaker": "JORDAN",
+  "note": "",
+  "voice": "am_liam",
+  "start": 289.268,
+  "end": 292.277,
+  "text": "You look like a raccoon. A tired raccoon."
+ },
+ {
+  "i": 39,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 292.777,
+  "end": 298.473,
+  "text": "Then, tomorrow, 9:00 a.m. Email: Priya Shah, Hindsight Labs. We've been watching Called It..."
+ },
+ {
+  "i": 40,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 298.973,
+  "end": 302.045,
+  "text": "Priya is calm, polite, and very expensive-looking."
+ },
+ {
+  "i": 41,
+  "speaker": "PRIYA",
+  "note": "",
+  "voice": "af_nova",
+  "start": 302.545,
+  "end": 313.065,
+  "text": "We'd like to buy the phone. Two million dollars. Tomorrow, six p.m., our office. At 6:15, it goes into our shielded case for twenty-four hours."
+ },
+ {
+  "i": 42,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 313.565,
+  "end": 315.335,
+  "text": "She already knows everything."
+ },
+ {
+  "i": 43,
+  "speaker": "PRIYA",
+  "note": "",
+  "voice": "af_nova",
+  "start": 315.835,
+  "end": 319.74,
+  "text": "Sixty-three predictions. Sixty-three correct."
+ },
+ {
+  "i": 44,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 320.24,
+  "end": 329.094,
+  "text": "If each one were a coin flip, the odds of guessing all sixty-three are about one in nine quintillion. Hindsight Labs does not believe in luck."
+ },
+ {
+  "i": 45,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 329.594,
+  "end": 343.421,
+  "text": "A shielded case is basically a Faraday cage, a metal box that blocks radio signals. Nothing gets in. Nothing gets out. Not even a phone call. Two million dollars. Mom could stop working doubles."
+ },
+ {
+  "i": 46,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 343.921,
+  "end": 352.264,
+  "text": "That night, Mom falls asleep on the couch in her scrubs, still wearing her shoes. On the table, a pile of envelopes. Two of them are red."
+ },
+ {
+  "i": 47,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 352.764,
+  "end": 366.551,
+  "text": "Day ten. 11:59 p.m. Three hundred and twelve notifications. Your thumb is shaking. You scroll. Spam. School. Tyler. Ava. Then one line that wasn't there before."
+ },
+ {
+  "i": 48,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 367.051,
+  "end": 371.147,
+  "text": "Tomorrow, 6:12 p.m. Missed call: Mom. Fourteen."
+ },
+ {
+  "i": 49,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 371.647,
+  "end": 379.329,
+  "text": "Missed calls from Mom aren't news. She called you nine times last Tuesday about a sweater. Still. In the morning, you call her."
+ },
+ {
+  "i": 50,
+  "speaker": "MOM",
+  "note": "",
+  "voice": "af_sarah",
+  "start": 379.829,
+  "end": 382.988,
+  "text": "I'm fine, honey. Day off. I'm making lasagna."
+ },
+ {
+  "i": 51,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 383.488,
+  "end": 390.53,
+  "text": "Fine. She's fine. And the list won't update until 11:59. Tonight is too late to check."
+ },
+ {
+  "i": 52,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 391.03,
+  "end": 403.663,
+  "text": "At 5:15, you stand at the front door for a full minute. Downtown, or home. In the kitchen, Mom is singing along to the radio. Badly. She's fine. Two million dollars. You go."
+ },
+ {
+  "i": 53,
+  "speaker": "MOM",
+  "note": "",
+  "voice": "af_sarah",
+  "start": 404.163,
+  "end": 405.571,
+  "text": "Bring me back a fancy pen!"
+ },
+ {
+  "i": 54,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 406.071,
+  "end": 411.918,
+  "text": "At six, you're downtown, forty minutes from home. Hindsight Labs. Twenty-second floor."
+ },
+ {
+  "i": 55,
+  "speaker": "PRIYA",
+  "note": "",
+  "voice": "af_nova",
+  "start": 412.418,
+  "end": 416.792,
+  "text": "Phones on Do Not Disturb, please. The lawyers insist."
+ },
+ {
+  "i": 56,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 417.292,
+  "end": 424.847,
+  "text": "Priya turns the pages. Sign here. Initial here. 6:09. 6:10. 6:11."
+ },
+ {
+  "i": 57,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 425.347,
+  "end": 434.567,
+  "text": "6:12. Your phone lights up on the table. No sound. Mom. Do Not Disturb swallows it. Call two. Call three."
+ },
+ {
+  "i": 58,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 435.067,
+  "end": 438.951,
+  "text": "And then you hear it. Not out loud. In your head."
+ },
+ {
+  "i": 59,
+  "speaker": "MOM",
+  "note": "MEMORY",
+  "voice": "af_sarah",
+  "start": 439.451,
+  "end": 442.161,
+  "text": "Put me in your favorites. So I always get through."
+ },
+ {
+  "i": 60,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 442.661,
+  "end": 451.753,
+  "text": "You never did. Under the table, your thumb moves. Contacts. Mom. Add to Favorites. Call five rings. Out loud."
+ },
+ {
+  "i": 61,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 452.253,
+  "end": 456.927,
+  "text": "You answer. Her words are coming out wrong. Slow. Thick."
+ },
+ {
+  "i": 62,
+  "speaker": "MOM",
+  "note": "",
+  "voice": "af_sarah",
+  "start": 457.427,
+  "end": 459.647,
+  "text": "Maya... my arm... can't..."
+ },
+ {
+  "i": 63,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 460.147,
+  "end": 474.061,
+  "text": "Doctors have a word for this. FAST. Face drooping. Arm weakness. Speech difficulty. Time to call 911. During a stroke, the brain can lose around one point nine million neurons every minute."
+ },
+ {
+  "i": 64,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 474.561,
+  "end": 485.039,
+  "text": "6:13. You call 911. One point nine million. 6:14. You call Mrs. Alvarez next door. She has a key. Three point eight million."
+ },
+ {
+  "i": 65,
+  "speaker": "MRS. ALVAREZ",
+  "note": "",
+  "voice": "af_alloy",
+  "start": 485.539,
+  "end": 488.271,
+  "text": "I'm going. I'm going!"
+ },
+ {
+  "i": 66,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 488.771,
+  "end": 489.837,
+  "text": "6:15."
+ },
+ {
+  "i": 67,
+  "speaker": "PRIYA",
+  "note": "",
+  "voice": "af_nova",
+  "start": 490.337,
+  "end": 496.185,
+  "text": "Maya. It's 6:15. The case. Now, or the deal is off."
+ },
+ {
+  "i": 68,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 496.685,
+  "end": 498.05,
+  "text": "The deal, or the call."
+ },
+ {
+  "i": 69,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 498.55,
+  "end": 504.504,
+  "text": "You keep the phone at your ear. Mom can't talk much. But she can hear you. So you talk."
+ },
+ {
+  "i": 70,
+  "speaker": "MAYA",
+  "note": "",
+  "voice": "af_bella",
+  "start": 505.004,
+  "end": 505.473,
+  "text": "No."
+ },
+ {
+  "i": 71,
+  "speaker": "PRIYA",
+  "note": "",
+  "voice": "af_nova",
+  "start": 505.973,
+  "end": 508.661,
+  "text": "You're walking away from two million dollars."
+ },
+ {
+  "i": 72,
+  "speaker": "MAYA",
+  "note": "",
+  "voice": "af_bella",
+  "start": 509.161,
+  "end": 510.569,
+  "text": "I'm walking toward my mom."
+ },
+ {
+  "i": 73,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 511.069,
+  "end": 524.301,
+  "text": "6:17. Mrs. Alvarez: I'm with her. She's awake. Seven point six million. 6:21. Sirens. You can read tomorrow. You can't answer it. But you can answer today."
+ },
+ {
+  "i": 74,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 524.801,
+  "end": 530.093,
+  "text": "Clot-busting drugs work best within about three hours. Mom gets them in fifty-one minutes."
+ },
+ {
+  "i": 75,
+  "speaker": "DOCTOR",
+  "note": "",
+  "voice": "am_eric",
+  "start": 530.593,
+  "end": 532.086,
+  "text": "You got her here in time."
+ },
+ {
+  "i": 76,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 532.586,
+  "end": 535.744,
+  "text": "Mom's words are still slow. But they're hers."
+ },
+ {
+  "i": 77,
+  "speaker": "MOM",
+  "note": "",
+  "voice": "af_sarah",
+  "start": 536.244,
+  "end": 537.93,
+  "text": "Told you. Favorites."
+ },
+ {
+  "i": 78,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 538.43,
+  "end": 550.444,
+  "text": "Sam wakes up and climbs onto the end of the bed. You open your phone. Called It. Two thousand followers. You delete it. Then you open Contacts, and you add Sam to your favorites too."
+ },
+ {
+  "i": 79,
+  "speaker": "SAM",
+  "note": "",
+  "voice": "am_puck",
+  "start": 550.944,
+  "end": 553.505,
+  "text": "See? Later means never. Now means now."
+ },
+ {
+  "i": 80,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 554.005,
+  "end": 571.247,
+  "text": "Is any of this real? A phone that reads tomorrow, no. But favorites that break through Do Not Disturb are real; most phones have them. And FAST is real. In the U.S., someone has a stroke about every forty seconds. If you see the signs, don't wait for tomorrow. Call."
+ },
+ {
+  "i": 81,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 571.747,
+  "end": 576.143,
+  "text": "That night, 11:59. One notification. Just one."
+ },
+ {
+  "i": 82,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 576.643,
+  "end": 580.291,
+  "text": "Tomorrow, 6:00 a.m. Unknown number: I know you can see this."
+ },
+ {
+  "i": 83,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 580.791,
+  "end": 586.573,
+  "text": "If your phone showed you tomorrow, would you read it every night, or turn it off? Tell us in the comments."
+ }
+]

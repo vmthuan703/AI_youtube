@@ -1,0 +1,242 @@
+[
+ {
+  "i": 0,
+  "start": 0.0,
+  "speechStart": 0.0,
+  "speechEnd": 1.615,
+  "text": "It's 11:59 p.m.",
+  "end": 1.465
+ },
+ {
+  "i": 1,
+  "start": 1.465,
+  "speechStart": 1.615,
+  "speechEnd": 7.191,
+  "text": "Your phone is face down on the nightstand. It buzzes once. You flip it over.",
+  "end": 7.541
+ },
+ {
+  "i": 2,
+  "start": 7.541,
+  "speechStart": 7.691,
+  "speechEnd": 10.571,
+  "text": "Forty-six new notifications. Normal.",
+  "end": 10.571
+ },
+ {
+  "i": 3,
+  "start": 10.571,
+  "speechStart": 10.721,
+  "speechEnd": 13.196,
+  "text": "Except every single one is stamped tomorrow.",
+  "end": 13.546
+ },
+ {
+  "i": 4,
+  "start": 13.546,
+  "speechStart": 13.696,
+  "speechEnd": 15.551,
+  "text": "Tomorrow, 7:02 a.m. Mom:",
+  "end": 15.401
+ },
+ {
+  "i": 5,
+  "start": 15.401,
+  "speechStart": 15.551,
+  "speechEnd": 17.131,
+  "text": "Don't forget your lunch.",
+  "end": 17.131
+ },
+ {
+  "i": 6,
+  "start": 17.131,
+  "speechStart": 17.281,
+  "speechEnd": 22.346,
+  "text": "Tomorrow, 10:15 a.m. School alert: Fire drill. You go to sleep.",
+  "end": 22.346
+ },
+ {
+  "i": 7,
+  "start": 22.346,
+  "speechStart": 22.496,
+  "speechEnd": 27.626,
+  "text": "At 7:02, a voice comes up the stairs. Maya! Don't forget your lunch!",
+  "end": 27.976
+ },
+ {
+  "i": 8,
+  "start": 27.976,
+  "speechStart": 28.126,
+  "speechEnd": 30.729,
+  "text": "At 10:15, the fire alarm goes off.",
+  "end": 30.729
+ },
+ {
+  "i": 9,
+  "start": 30.729,
+  "speechStart": 30.879,
+  "speechEnd": 32.201,
+  "text": "Exactly on time.",
+  "end": 32.551
+ },
+ {
+  "i": 10,
+  "start": 32.551,
+  "speechStart": 32.701,
+  "speechEnd": 35.283,
+  "text": "Your name is Maya. You're sixteen.",
+  "end": 35.283
+ },
+ {
+  "i": 11,
+  "start": 35.283,
+  "speechStart": 35.433,
+  "speechEnd": 37.439,
+  "text": "And your phone just showed you tomorrow.",
+  "end": 37.439
+ },
+ {
+  "i": 12,
+  "start": 37.439,
+  "speechStart": 37.589,
+  "speechEnd": 42.59,
+  "text": "So what if your phone showed tomorrow's notifications today? Here's the rule.",
+  "end": 42.59
+ },
+ {
+  "i": 13,
+  "start": 42.59,
+  "speechStart": 42.74,
+  "speechEnd": 49.162,
+  "text": "Every night at 11:59, tomorrow's notifications land on your lock screen. The time.",
+  "end": 49.162
+ },
+ {
+  "i": 14,
+  "start": 49.162,
+  "speechStart": 49.312,
+  "speechEnd": 50.208,
+  "text": "The sender.",
+  "end": 50.208
+ },
+ {
+  "i": 15,
+  "start": 50.208,
+  "speechStart": 50.358,
+  "speechEnd": 51.937,
+  "text": "The first forty characters.",
+  "end": 51.937
+ },
+ {
+  "i": 16,
+  "start": 51.937,
+  "speechStart": 52.087,
+  "speechEnd": 53.431,
+  "text": "You can't open them.",
+  "end": 53.431
+ },
+ {
+  "i": 17,
+  "start": 53.431,
+  "speechStart": 53.581,
+  "speechEnd": 54.839,
+  "text": "You can't reply.",
+  "end": 54.839
+ },
+ {
+  "i": 18,
+  "start": 54.839,
+  "speechStart": 54.989,
+  "speechEnd": 56.746,
+  "text": "And you'll learn the hard way:",
+  "end": 56.596
+ },
+ {
+  "i": 19,
+  "start": 56.596,
+  "speechStart": 56.746,
+  "speechEnd": 58.019,
+  "text": "tomorrow keeps count.",
+  "end": 58.369
+ },
+ {
+  "i": 20,
+  "start": 58.369,
+  "speechStart": 58.519,
+  "speechEnd": 64.94,
+  "text": "One industry study found the average American gets about 46 push notifications a day.",
+  "end": 64.94
+ },
+ {
+  "i": 21,
+  "start": 64.94,
+  "speechStart": 65.09,
+  "speechEnd": 68.065,
+  "text": "You get yours a day early. Day one.",
+  "end": 68.065
+ },
+ {
+  "i": 22,
+  "start": 68.065,
+  "speechStart": 68.215,
+  "speechEnd": 71.419,
+  "text": "Tomorrow, 8:05 a.m. Mr. Okafor posted:",
+  "end": 71.269
+ },
+ {
+  "i": 23,
+  "start": 71.269,
+  "speechStart": 71.419,
+  "speechEnd": 73.057,
+  "text": "Pop quiz, chapter seven.",
+  "end": 73.057
+ },
+ {
+  "i": 24,
+  "start": 73.057,
+  "speechStart": 73.207,
+  "speechEnd": 76.152,
+  "text": "So tonight, you read chapter seven. Twice.",
+  "end": 76.502
+ },
+ {
+  "i": 25,
+  "start": 76.502,
+  "speechStart": 76.652,
+  "speechEnd": 78.081,
+  "text": "Here's the real part.",
+  "end": 78.081
+ },
+ {
+  "i": 26,
+  "start": 78.081,
+  "speechStart": 78.231,
+  "speechEnd": 82.306,
+  "text": "Without review, most people forget most of something new within a day.",
+  "end": 82.306
+ },
+ {
+  "i": 27,
+  "start": 82.306,
+  "speechStart": 82.456,
+  "speechEnd": 84.547,
+  "text": "Scientists call it the forgetting curve.",
+  "end": 84.547
+ },
+ {
+  "i": 28,
+  "start": 84.547,
+  "speechStart": 84.697,
+  "speechEnd": 86.467,
+  "text": "You reviewed at eleven p.m.",
+  "end": 86.317
+ },
+ {
+  "i": 29,
+  "start": 86.317,
+  "speechStart": 86.467,
+  "speechEnd": 90.445,
+  "text": "Twenty out of twenty. You studied? On purpose?",
+  "end": 91.945
+ }
+]

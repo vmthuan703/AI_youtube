@@ -135,10 +135,12 @@ export const EXPRESSIONS = {
 };
 const FACE = { phiSpan: 150 * D2R, thStart: 30 * D2R, thSpan: 125 * D2R, W: 768, H: 640 };
 const _faceTex = new Map();
-function faceTexture(key, draw) {
-  if (_faceTex.has(key)) return _faceTex.get(key);
+function faceTexture(key, draw) {   // LRU cache: long videos create many expression/talk/blink states
+  if (_faceTex.has(key)) { const t = _faceTex.get(key); _faceTex.delete(key); _faceTex.set(key, t); return t; }
   const c = document.createElement('canvas'); c.width = FACE.W; c.height = FACE.H; draw(c.getContext('2d'));
-  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; _faceTex.set(key, t); return t;
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; _faceTex.set(key, t);
+  if (_faceTex.size > 96) { const [k0, t0] = _faceTex.entries().next().value; _faceTex.delete(k0); t0.dispose(); }   // re-uploads if still on screen
+  return t;
 }
 // angle helpers: canvas x from yaw offset (deg, + = viewer's right), canvas y from polar angle (deg from the top)
 const fx = (deg) => FACE.W / 2 + (deg * D2R / FACE.phiSpan) * FACE.W;

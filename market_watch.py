@@ -9,6 +9,7 @@
   weekly           Gom snapshot N ngày (mặc định 7): bảng chấm ô, bảng đối thủ, video bung
                    (>= 10x trung vị của CHÍNH kênh đó), danh sách tiêu đề để đọc tay.
                    -> <root>/reports/YYYY-Www/SO_LIEU.md + CSV, cập nhật reports/INDEX.md
+  prune            Bỏ kênh discovery lệch ngách khỏi danh sách theo dõi (daily cũng tự làm).
   index            Cập nhật reports/INDEX.md (sau khi viết BAO_CAO_DOI_THU.md).
   readme           Ghi báo cáo ngày mới nhất (TOM_TAT.md) và phần kết luận của báo cáo tuần mới nhất
                    vào các khối DAILY / WEEKLY (cặp dấu <!-- X:START --> ... <!-- X:END -->) của README.
@@ -55,11 +56,12 @@ VIDEO_FIELDS = [
 SCORE_FIELDS = [
     "market", "name", "decisive_new_winner", "n_big_videos", "top5_median_age_months",
     "top5_age_source", "top5_median_views_to_subs", "median_big_views", "n_channels_seen",
+    "niche_ok_top5", "gate_niche",
     "gate_decisive", "gate_age", "gate_ratio", "gate_big_count", "gate_median_views",
     "verdict",
 ]
 COMPETITOR_FIELDS = [
-    "market", "channel", "channel_id", "age_days", "age_source", "subscribers", "subs_gain",
+    "market", "channel", "channel_id", "age_days", "age_source", "niche_share", "subscribers", "subs_gain",
     "long_videos", "uploads_in_window", "baseline_median", "max_views", "n_100k", "n_burst",
     "views_gain", "views_gain_per_day", "top_title",
 ]
@@ -95,6 +97,28 @@ def to_int(x):
 
 def truthy(x):
     return str(x).strip().lower() in ("true", "1", "yes")
+
+
+def niche_rx(market):
+    """Regex tiêu đề của ô (config: title_regex). Không có thì mọi tiêu đề đều tính."""
+    pat = market.get("title_regex")
+    return re.compile(pat, re.I) if pat else None
+
+
+def in_niche(market, title):
+    rx = niche_rx(market)
+    return True if rx is None else bool(rx.search(title or ""))
+
+
+def niche_share(market, titles):
+    titles = list(titles)
+    if not titles:
+        return None
+    return sum(in_niche(market, t) for t in titles) / len(titles)
+
+
+def min_share(market, cfg=None):
+    return market.get("min_niche_share", (cfg or {}).get("discovery", {}).get("min_niche_share", 0.5))
 
 
 def days_between(a_iso, ref):
@@ -178,9 +202,15 @@ def update_registry(registry, discovery_rows, market, cfg, snap_date):
     known = {r["channel_id"] for r in registry}
     max_ch = cfg["tracking"]["max_channels"]
     disc = cfg["discovery"]
+    mine = [r for r in discovery_rows if r["market"] == market["id"] and truthy(r["is_long"])]
+    share = {}
+    for r in mine:
+        share.setdefault(r["channel_id"], []).append(r["title"])
     best = {}
-    for r in discovery_rows:
-        if r["market"] != market["id"] or not truthy(r["is_long"]):
+    for r in mine:
+        if not in_niche(market, r["title"]):
+            continue
+        if (niche_share(market, share[r["channel_id"]]) or 0) < min_share(market, cfg):
             continue
         age, views = to_int(r["channel_age_days"]), to_int(r["views"]) or 0
         if age is None or age > disc["new_channel_days"] or views < disc["track_min_views"]:
@@ -322,6 +352,30 @@ def track(client, registry, cfg, snap_date, budget):
     return ch_rows, v_rows, skipped
 
 
+def prune_registry(registry, v_rows, cfg, min_videos=3):
+    """Bỏ kênh do discovery thêm vào nếu < min_niche_share video dài khớp title_regex của ô.
+
+    Kênh mồi (source=seed) không bao giờ bị bỏ. Trả danh sách kênh bị bỏ.
+    """
+    markets = {m["id"]: m for m in cfg["markets"]}
+    titles = {}
+    for v in v_rows:
+        if truthy(v["is_long"]):
+            titles.setdefault(v["channel_id"], []).append(v["title"])
+    keep, removed = [], []
+    for r in registry:
+        m = markets.get(r["market"])
+        t = titles.get(r["channel_id"], [])
+        sh = niche_share(m, t) if m else None
+        if (r["source"] == "discovery" and m and len(t) >= min_videos
+                and sh is not None and sh < min_share(m, cfg)):
+            removed.append({**r, "niche_share": round(sh, 2), "long_videos": len(t)})
+        else:
+            keep.append(r)
+    registry[:] = keep
+    return removed
+
+
 def run_daily(client, cfg, root, snap_date=None, now=None, base_dir="."):
     now = now or datetime.now(timezone.utc)
     snap_date = snap_date or today_vn()
@@ -342,6 +396,11 @@ def run_daily(client, cfg, root, snap_date=None, now=None, base_dir="."):
             "not_added_registry_full": full,
         }
     ch_rows, v_rows, tskip = track(client, registry, cfg, snap_date, budget)
+    pruned = prune_registry(registry, v_rows, cfg)
+    gone = {r["channel_id"] for r in pruned}
+    ch_rows = [r for r in ch_rows if r["channel_id"] not in gone]
+    v_rows = [r for r in v_rows if r["channel_id"] not in gone]
+    log["pruned_off_niche"] = [f"{r['title']} ({r['niche_share']:.0%} khớp)" for r in pruned]
     out = os.path.join(root, "data", snap_date.isoformat())
     write_csv(os.path.join(out, "discovery.csv"), DISCOVERY_FIELDS, all_disc)
     write_csv(os.path.join(out, "channels.csv"), CHANNEL_FIELDS, ch_rows)
@@ -387,7 +446,7 @@ def channel_age(ch, ref):
     return None, ""
 
 
-def scorecard(market, pool_videos, channel_info, ref):
+def scorecard(market, pool_videos, channel_info, ref, cfg=None):
     """Bảng chấm ô theo tài liệu phương pháp.
 
     pool_videos: {video_id: {channel_id, views, is_long}}; channel_info: {channel_id: {age, age_source, subs}}.
@@ -407,7 +466,15 @@ def scorecard(market, pool_videos, channel_info, ref):
     med_age_m = round(median(ages) / 30.4, 1) if ages else None
     med_ratio = round(median(ratios), 1) if ratios else None
     med_big = int(median(v["views"] for v in big)) if big else None
+    shares = [channel_info.get(c, {}).get("niche_share") for c in top5]
+    shares = [x for x in shares if x is not None]
+    n_ok = sum(1 for x in shares if x >= min_share(market, cfg))
+    top5_rows = [(channel_info.get(c, {}).get("title", c), channel_info.get(c, {}).get("age"),
+                  channel_info.get(c, {}).get("subs"), best[c], channel_info.get(c, {}).get("niche_share"))
+                 for c in top5]
     g = {
+        "niche_ok_top5": (f"{n_ok}/{len(shares)} kênh có đủ tiêu đề" if shares else "—"),
+        "gate_niche": "—" if len(shares) < 3 else ("đạt" if n_ok / len(shares) >= 0.8 else "không"),
         "gate_decisive": "đạt" if decisive else "không",
         "gate_age": "—" if med_age_m is None else ("đạt" if med_age_m <= 12 else "không"),
         "gate_ratio": "—" if med_ratio is None else ("đạt" if med_ratio >= 10 else "không"),
@@ -417,7 +484,7 @@ def scorecard(market, pool_videos, channel_info, ref):
             "đạt" if 150_000 <= med_big <= 600_000 else "lệch vùng tốt"),
     }
     if g["gate_decisive"] == "đạt" and g["gate_age"] != "không":
-        verdict = "CỬA MỞ"
+        verdict = "CỬA MỞ" if g["gate_niche"] != "không" else "CẦN THEO DÕI (top 5 lẫn ngách)"
     elif g["gate_age"] == "đạt" or g["gate_ratio"] == "đạt":
         verdict = "CẦN THEO DÕI"
     elif g["gate_age"] == "—" and not big:
@@ -429,16 +496,27 @@ def scorecard(market, pool_videos, channel_info, ref):
         "decisive_new_winner": (", ".join(decisive[:5]) + (f" (+{len(decisive) - 5} kênh)" if len(decisive) > 5 else "")) or "—", "n_big_videos": len(big),
         "top5_median_age_months": med_age_m, "top5_age_source": ", ".join(srcs),
         "top5_median_views_to_subs": med_ratio, "median_big_views": med_big,
-        "n_channels_seen": len(best), **g, "verdict": verdict,
+        "n_channels_seen": len(best), **g, "verdict": verdict, "_top5": top5_rows,
     }
 
 
-def build_pool(snaps, market_id, ref):
-    """Gộp video (discovery + theo dõi) và thông tin kênh mới nhất trong cửa sổ."""
-    pool, info = {}, {}
+def build_pool(snaps, market, ref):
+    """Gộp video (discovery + theo dõi) và thông tin kênh mới nhất trong cửa sổ.
+
+    Chỉ video có tiêu đề khớp title_regex của ô mới vào pool. niche_share của kênh tính trên
+    mọi video dài đã thấy của kênh (trước khi lọc).
+    """
+    market_id = market["id"]
+    excl = {x.lower() for x in market.get("exclude_channels", [])}
+    skip = lambda r: (r["channel_id"].lower() in excl
+                      or (r.get("channel_title") or r.get("title", "")).strip().lower() in excl)
+    pool, info, seen = {}, {}, {}
     for _, s in snaps:                                     # cũ -> mới, mới ghi đè
+        for r in s["videos"]:                              # chỉ kênh theo dõi mới đủ tiêu đề để chấm ngách
+            if r["market"] == market_id and truthy(r["is_long"]):
+                seen.setdefault(r["channel_id"], {})[r["video_id"]] = r["title"]
         for r in s["discovery"]:
-            if r["market"] != market_id:
+            if r["market"] != market_id or not in_niche(market, r["title"]) or skip(r):
                 continue
             pool[r["video_id"]] = {"channel_id": r["channel_id"], "views": to_int(r["views"]),
                                    "is_long": r["is_long"]}
@@ -447,7 +525,7 @@ def build_pool(snaps, market_id, ref):
                 ci.update(title=r["channel_title"], subs=to_int(r["subscribers"]),
                           age=days_between(r["channel_created"], ref), age_source="ngày tạo kênh")
         for r in s["videos"]:
-            if r["market"] == market_id:
+            if r["market"] == market_id and in_niche(market, r["title"]) and not skip(r):
                 pool[r["video_id"]] = {"channel_id": r["channel_id"], "views": to_int(r["views"]),
                                        "is_long": r["is_long"]}
         for r in s["channels"]:
@@ -455,11 +533,17 @@ def build_pool(snaps, market_id, ref):
                 age, src = channel_age(r, ref)
                 info[r["channel_id"]] = {"title": r["title"], "subs": to_int(r["subscribers"]),
                                          "age": age, "age_source": src, "first_upload": True}
+    for cid, t in seen.items():
+        info.setdefault(cid, {})["niche_share"] = niche_share(market, t.values())
     return pool, info
 
 
-def competitors(snaps, market_id, ref, window_start):
-    """Bảng đối thủ + video bung + danh sách tiêu đề từ snapshot theo dõi."""
+def competitors(snaps, market, ref, window_start, seeds=frozenset(), cfg=None):
+    """Bảng đối thủ + video bung + danh sách tiêu đề từ snapshot theo dõi.
+
+    Bỏ kênh không phải kênh mồi nếu tỉ lệ tiêu đề khớp ngách < min_niche_share.
+    """
+    market_id = market["id"]
     first_v, last_v, first_c, last_c = {}, {}, {}, {}
     for d, s in snaps:
         for r in s["videos"]:
@@ -486,6 +570,9 @@ def competitors(snaps, market_id, ref, window_start):
     for cid, vids in by_ch.items():
         ch = last_c.get(cid, (None, {}))[1]
         name = ch.get("title") or vids[0]["channel_title"]
+        share = niche_share(market, (v["title"] for v in vids))
+        if cid not in seeds and share is not None and share < min_share(market, cfg):
+            continue
         views = sorted(v["views"] for v in vids)
         base = median(views) if len(views) >= ar.MIN_VIDEOS_FOR_BASELINE else None
         for v in vids:
@@ -499,7 +586,8 @@ def competitors(snaps, market_id, ref, window_start):
         top = max(vids, key=lambda v: v["views"])
         comp.append({
             "market": market_id, "channel": name, "channel_id": cid, "age_days": age,
-            "age_source": src, "subscribers": subs,
+            "age_source": src, "niche_share": round(share, 2) if share is not None else None,
+            "subscribers": subs,
             "subs_gain": subs - fsubs if subs is not None and fsubs is not None and span else None,
             "long_videos": len(vids),
             "uploads_in_window": sum(1 for v in vids if v["published_at"] and
@@ -547,11 +635,12 @@ LIMITS = """## Giới hạn của số liệu
   Kênh cũ đổi chủ đề hoặc xoá video cũ sẽ trông trẻ hơn thực tế.
 - **Lượt xem là tích luỹ:** video mới đăng chưa kịp lên. Cột tăng trong tuần chỉ có khi có ≥ 2 snapshot.
 - **"Bung = ≥ 10× trung vị của chính kênh"** là ngưỡng tự đặt, không phải chuẩn ngành. Kênh có < 3 video dài thì không tính.
-- **Kênh đúng ngách (≥ 80%)** chưa chấm tự động. Phải đọc 10 tiêu đề gần nhất của từng kênh.
+- **Kênh đúng ngách** chấm tự động bằng bộ lọc tiêu đề (`title_regex`): kênh đúng ngách khi ≥ `min_niche_share`
+  video dài khớp. Bộ lọc dựa trên chữ, vẫn nên đọc tay 10 tiêu đề gần nhất của kênh top.
 """
 
 
-def weekly_numbers(cfg, snaps, end, days, generated):
+def weekly_numbers(cfg, snaps, end, days, generated, seeds=frozenset()):
     ref = end_of_day(end)
     start = end - timedelta(days=days - 1)
     window_start = datetime(start.year, start.month, start.day, tzinfo=VN).astimezone(timezone.utc)
@@ -571,9 +660,9 @@ def weekly_numbers(cfg, snaps, end, days, generated):
                      f"trong {cfg['discovery']['video_age_days']} ngày khi tìm, kênh theo dõi chi tiết bên dưới")
     lines.append("")
     for m in cfg["markets"]:
-        pool, info = build_pool(snaps, m["id"], ref)
-        sc = scorecard(m, pool, info, ref)
-        comp, bursts, titles = competitors(snaps, m["id"], ref, window_start)
+        pool, info = build_pool(snaps, m, ref)
+        sc = scorecard(m, pool, info, ref, cfg)
+        comp, bursts, titles = competitors(snaps, m, ref, window_start, seeds, cfg)
         out["scores"].append(sc)
         out["competitors"] += comp
         out["bursts"] += bursts
@@ -584,7 +673,8 @@ def weekly_numbers(cfg, snaps, end, days, generated):
             f"## {m['name']}",
             "",
             f"Cỡ mẫu: {sc['n_channels_seen']} kênh có video dài · {n_long} video dài ≥ 4 phút (gộp tìm kiếm + theo dõi) · "
-            f"{len(comp)} kênh theo dõi với {n_vid} video dài.",
+            f"{len(comp)} kênh theo dõi với {n_vid} video dài. "
+            f"Bộ lọc tiêu đề: `{m.get('title_regex') or 'không có'}`.",
             "",
             "### Bảng chấm ô",
             "",
@@ -595,8 +685,16 @@ def weekly_numbers(cfg, snaps, end, days, generated):
                 ["view/sub trung vị (5 kênh đó)", "≥ 10×", fmt_num(sc["top5_median_views_to_subs"]), sc["gate_ratio"]],
                 ["Số video dài ≥ 100k", "≥ 8 (cần, không đủ)", sc["n_big_videos"], sc["gate_big_count"]],
                 ["View trung vị của video ≥ 100k", "150k–600k", fmt_num(sc["median_big_views"]), sc["gate_median_views"]],
-                ["Kênh đúng ngách", "≥ 80%", "đọc tay", "chưa chấm"],
+                ["Kênh đúng ngách (top 5, tự động theo tiêu đề)", "≥ 80%",
+                 sc["niche_ok_top5"], sc["gate_niche"]],
             ]),
+            "",
+            "5 kênh có video to nhất (dùng cho 3 dòng tuổi, view/sub, đúng ngách; **cần đọc tay xác minh "
+            "đúng ngách**, kênh sai thì thêm vào `exclude_channels` trong config):",
+            "",
+            md_table(["Kênh", "Tuổi (ngày)", "Sub", "Video to nhất", "Tỉ lệ tiêu đề khớp"],
+                     [[t, fmt_num(a), fmt_num(sb), fmt_num(v), "chưa theo dõi" if sh is None else f"{sh:.0%}"]
+                      for t, a, sb, v, sh in sc["_top5"]]),
             "",
             f"**Kết luận số: {sc['verdict']}.** Tuổi kênh dự báo mạnh nhất. View trung vị càng cao thì cửa càng đóng.",
             "",
@@ -633,12 +731,13 @@ def daily_summary(cfg, snap, log, snap_date):
              f"- Kênh theo dõi: {log.get('tracked_channels')} · video đã chụp: {log.get('tracked_videos')}", ""]
     for m in cfg["markets"]:
         ml = log["markets"].get(m["id"], {})
-        pool, info = build_pool([(snap_date, snap)], m["id"], ref)
-        sc = scorecard(m, pool, info, ref)
+        pool, info = build_pool([(snap_date, snap)], m, ref)
+        sc = scorecard(m, pool, info, ref, cfg)
         lines += [f"## {m['name']}", "",
                   f"- Truy vấn đã chạy: {len(ml.get('queries_run', []))} · bỏ qua: {len(ml.get('queries_skipped', []))}"
                   f" · lỗi: {len(ml.get('errors', []))}",
                   f"- Kênh mới thêm vào theo dõi: {', '.join(ml.get('added', [])) or 'không'}",
+                  f"- Kênh bỏ khỏi theo dõi vì lệch ngách: {', '.join(log.get('pruned_off_niche', [])) or 'không'}",
                   f"- Bảng chấm nhanh (chỉ dữ liệu hôm nay): **{sc['verdict']}** · tuổi trung vị top 5: "
                   f"{fmt_num(sc['top5_median_age_months'])} tháng · video ≥ 100k: {sc['n_big_videos']}", ""]
         nw = new_winners(pool, info)
@@ -665,7 +764,8 @@ def run_weekly(cfg, root, end=None, days=7, generated=None, label=None):
     end = end or today_vn()
     generated = generated or today_vn()
     snaps = load_window(root, end, days)
-    md, out = weekly_numbers(cfg, snaps, end, days, generated)
+    seeds = frozenset(r["channel_id"] for r in load_registry(root) if r.get("source") == "seed")
+    md, out = weekly_numbers(cfg, snaps, end, days, generated, seeds)
     d = os.path.join(root, "reports", label or week_label(end))
     os.makedirs(d, exist_ok=True)
     with open(os.path.join(d, "SO_LIEU.md"), "w", encoding="utf-8") as f:
@@ -801,6 +901,18 @@ def update_readme(root, readme_path, repo=None):
     return day, new != old
 
 
+def prune_snapshot(cfg, root):
+    """Dọn danh sách theo dõi dựa trên snapshot mới nhất trong <root>/data."""
+    base = os.path.join(root, "data")
+    days = sorted(d for d in os.listdir(base) if os.path.exists(os.path.join(base, d, "videos.csv")))
+    if not days:
+        return []
+    registry = load_registry(root)
+    removed = prune_registry(registry, read_csv(os.path.join(base, days[-1], "videos.csv")), cfg)
+    save_registry(root, registry)
+    return removed
+
+
 # ---------------------------------------------------------------- nhập dữ liệu cũ
 def import_snapshot(videos_csv, root, market_id, snap_date):
     """Biến out/videos.csv của audience_research.py thành snapshot (không có sub/ngày tạo kênh)."""
@@ -844,7 +956,7 @@ def load_config(path):
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(dest="cmd", required=True)
-    for name in ("daily", "weekly", "index", "readme", "import-snapshot"):
+    for name in ("daily", "weekly", "index", "readme", "prune", "import-snapshot"):
         s = sub.add_parser(name)
         s.add_argument("--config", default="config/markets.json")
         s.add_argument("--root", default="research", help="Thư mục dữ liệu (worktree của nhánh research/reports)")
@@ -883,6 +995,13 @@ def main(argv=None):
     elif a.cmd == "readme":
         day, changed = update_readme(a.root, a.readme, a.repo)
         print(f"README: báo cáo {day or 'trống'} · {'đã đổi' if changed else 'không đổi'}.")
+
+
+    elif a.cmd == "prune":
+        removed = prune_snapshot(cfg, a.root)
+        print(f"Đã bỏ {len(removed)} kênh lệch ngách khỏi {a.root}/state/channels.csv")
+        for r in removed:
+            print(f"  - {r['title']}: {r['niche_share']:.0%} khớp trên {r['long_videos']} video dài")
     elif a.cmd == "index":
         update_index(a.root)
         print(f"Đã cập nhật {a.root}/reports/INDEX.md")

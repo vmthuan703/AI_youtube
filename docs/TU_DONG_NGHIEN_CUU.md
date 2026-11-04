@@ -29,6 +29,12 @@ Sửa `config/markets.json`:
 - `markets[].queries`: truy vấn tìm kiếm của ô. Mỗi truy vấn tốn 100 đơn vị quota. Theo tài liệu
   phương pháp, mỗi ô cần ≥ 8 truy vấn khác nhau.
 - `markets[].region` / `language`: quốc gia và ngôn ngữ của ô.
+- `markets[].title_regex`: bộ lọc tiêu đề của ô. Chỉ video có tiêu đề khớp mới được tính vào bảng chấm và mới
+  được tự thêm kênh vào danh sách theo dõi.
+- `markets[].exclude_channels`: tên hoặc ID kênh khớp bộ lọc chữ nhưng không làm ngách (vlog thử thách, hài kịch…),
+  bị loại khỏi bảng chấm. Thêm vào đây khi đọc bảng "5 kênh có video to nhất" trong `SO_LIEU.md` thấy kênh sai.
+- `discovery.min_niche_share`: kênh do discovery thêm vào mà có ít hơn tỉ lệ này video dài khớp bộ lọc thì
+  `daily` tự bỏ khỏi danh sách theo dõi (kênh mồi không bao giờ bị bỏ). Dọn tay: `python market_watch.py prune --root research`.
 - `quota_budget`: ngân sách quota mỗi lần chạy (mặc định 6000/10.000). Phần còn lại để bạn dùng tay.
 - `discovery.new_channel_days`, `track_min_views`: điều kiện để tự thêm kênh vào danh sách theo dõi.
 - `tracking.max_channels`: số kênh theo dõi tối đa.

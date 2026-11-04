@@ -11,3 +11,6 @@ aitrends-2d-studio/projects/*/build/
 aitrends-2d-studio/projects/*/out/
 aitrends-2d-studio/projects/*/input/*.mp3
 aitrends-2d-studio/projects/*/input/*.wav
+
+# Cài đặt Claude Code cá nhân
+.claude/settings.local.json

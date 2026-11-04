@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800">
+<defs>
+  <filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="7" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#1b0a4a"/><stop offset=".55" stop-color="#6b21a8"/><stop offset="1" stop-color="#f97316"/></linearGradient>
+  <radialGradient id="av" cx=".5" cy=".42" r=".75">
+    <stop offset="0" stop-color="#7c3aed"/><stop offset=".6" stop-color="#2b0f6b"/><stop offset="1" stop-color="#0f0524"/></radialGradient>
+  <g id="hero">
+    <path d="M-150 215 Q-150 105 -62 92 L62 92 Q150 105 150 215 Z" fill="#7c3aed" stroke="#22e5ff" stroke-width="7" filter="url(#glow)"/>
+    <path d="M-62 92 Q0 150 62 92" fill="none" stroke="#c4b5fd" stroke-width="9" stroke-linecap="round"/>
+    <path d="M-30 128 L-34 175 M30 128 L34 175" stroke="#e9d5ff" stroke-width="6" stroke-linecap="round"/>
+    <ellipse cx="0" cy="0" rx="108" ry="102" fill="#08060f" stroke="#22e5ff" stroke-width="7" filter="url(#glow)"/>
+    <path d="M-14 -100 Q-52 -142 -8 -170 Q-18 -136 18 -102 Z" fill="#08060f" stroke="#22e5ff" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M22 -100 Q8 -134 48 -150 Q34 -126 54 -92 Z" fill="#08060f" stroke="#22e5ff" stroke-width="6" stroke-linejoin="round"/>
+    <circle cx="-40" cy="-6" r="33" fill="#fff"/><circle cx="40" cy="-6" r="33" fill="#fff"/>
+    <circle cx="-28" cy="-2" r="15" fill="#08060f"/><circle cx="52" cy="-2" r="15" fill="#08060f"/>
+    <circle cx="-23" cy="-8" r="5" fill="#fff"/><circle cx="57" cy="-8" r="5" fill="#fff"/>
+    <path d="M-72 -50 Q-40 -66 -12 -50 M12 -50 Q40 -66 72 -50" stroke="#fff" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M-22 56 Q0 74 22 56" stroke="#fff" stroke-width="6" fill="none" stroke-linecap="round"/>
+  </g>
+</defs>
+<rect width="800" height="800" fill="url(#av)"/>
+<g fill="#fde047" opacity=".9"><circle cx="110" cy="120" r="5"/><circle cx="690" cy="170" r="6"/><circle cx="640" cy="640" r="4"/><circle cx="150" cy="620" r="5"/></g>
+<text x="672" y="300" font-family="Impact, 'Arial Black', 'Liberation Sans', 'DejaVu Sans', sans-serif" font-weight="bold" font-size="110" fill="#fde047" stroke="#000" stroke-width="6" paint-order="stroke" text-anchor="middle" transform="rotate(12 672 300)">?</text>
+<use href="#hero" transform="translate(400 430) scale(2.05)"/>
+</svg>

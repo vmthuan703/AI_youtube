@@ -18,7 +18,7 @@
 - Được tự `git commit` và `git push` lên nhánh làm việc mà không cần hỏi.
   Vẫn hỏi trước khi: push lên `main`, force-push, xóa nhánh, mở/đóng/gộp PR.
 - Thay đổi trong `CLAUDE.md` thì commit riêng, không gộp với file khác.
-- Ngoại lệ: tác vụ theo lịch "Báo cáo đối thủ hằng tuần" được tự commit và push
+- Ngoại lệ: tác vụ theo lịch "Báo cáo đối thủ 3 ngày" được tự commit và push
   vào `research/reports`, và vào `main` nhưng chỉ đổi `ke-hoach/` và khối `KE_HOACH_MOI_NHAT` đầu `README.md`.
 
 ## Bảo trì file này

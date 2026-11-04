@@ -7,7 +7,7 @@
 | Hằng ngày 08:17 UTC (15:17 giờ VN) | GitHub Actions (`.github/workflows/market-daily.yml`) | `market_watch.py daily`: chạy truy vấn tìm kiếm, thêm kênh mới thắng vào danh sách theo dõi, chụp snapshot mọi kênh đang theo dõi | nhánh `research/reports`, thư mục `data/YYYY-MM-DD/` |
 | Chủ nhật, cùng lượt trên | GitHub Actions | `market_watch.py weekly`: bảng chấm ô, đối thủ, video bung, danh sách tiêu đề, tín hiệu nội dung (video thắng gần đây, khung tiêu đề, tags, mô tả, độ dài, giờ đăng) | `reports/YYYY-Www/SO_LIEU.md`, `TIN_HIEU_NOI_DUNG.md` + CSV |
 | Hằng ngày, ngay sau lượt thu thập | GitHub Actions | `market_watch.py readme`: chép `TOM_TAT.md` mới nhất vào khối `DAILY` và phần "Kết luận nhanh" của báo cáo tuần mới nhất vào khối `WEEKLY` của `README.md`, rồi commit thẳng vào `main` | `README.md` trên `main` |
-| Chủ nhật 19:47 giờ VN | Tác vụ Claude theo lịch | Viết báo cáo đối thủ theo `prompts/weekly_competitor_report.md`, rồi kế hoạch 5 video tuần tới theo `prompts/weekly_content_plan.md` | `reports/YYYY-Www/BAO_CAO_DOI_THU.md` (research/reports) và `ke-hoach/YYYY-Www.md` + link đầu `README.md` (main) |
+| Ngày 1, 4, 7, 10, … 28 hằng tháng, 19:47 giờ VN (cứ ~3 ngày) | Tác vụ Claude theo lịch "Báo cáo đối thủ 3 ngày" | Tính số liệu 7 ngày gần nhất (`weekly --label <ngày>`), viết báo cáo đối thủ theo `prompts/weekly_competitor_report.md`, rồi kế hoạch 6 video cho 3 ngày tới theo `prompts/content_plan_3_ngay.md` | `reports/YYYY-MM-DD/` (research/reports) và `ke-hoach/YYYY-MM-DD.md` + link đầu `README.md` (main) |
 
 Quota YouTube hồi lúc 00:00 giờ Thái Bình Dương: 08:00 UTC vào mùa đông, 07:00 UTC vào mùa hè. Lịch chạy
 lúc 08:17 UTC nên luôn sau giờ hồi quanh năm.

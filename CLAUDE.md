@@ -10,6 +10,10 @@
 - Ưu tiên gạch đầu dòng thay cho đoạn văn dài.
 - Dùng bảng khi so sánh nhiều phương án, số liệu hoặc thuộc tính.
 
+## Chọn nhánh
+- Khi chưa rõ việc thuộc nhánh nào: hỏi người dùng mô tả việc, chọn nhánh,
+  nêu lý do và chờ người dùng xác nhận trước khi thực hiện.
+
 ## Git
 - KHÔNG tự `git commit` hoặc `git push`. Luôn hỏi và chờ người dùng đồng ý trước.
 - Ngoại lệ: thay đổi trong `CLAUDE.md` thì tự commit và push, không cần hỏi,

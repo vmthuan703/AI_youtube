@@ -141,6 +141,84 @@ def test_import_snapshot(tmp_path):
     assert ch[0]["first_upload_at"] == iso(20)
 
 
+def test_readme_block_replace_and_idempotent(tmp_path):
+    root = tmp_path / "r"
+    for d, body in (("2026-11-03", "# Tóm tắt thu thập 2026-11-03\n\n## Ô A\n- cũ"),
+                    ("2026-11-04", "# Tóm tắt thu thập 2026-11-04\n\n## Ô A\n- mới")):
+        (root / "data" / d).mkdir(parents=True)
+        (root / "data" / d / "TOM_TAT.md").write_text(body, encoding="utf-8")
+    readme = tmp_path / "README.md"
+    readme.write_text("# X\n\nMở đầu\n\n" + mw.README_START + "\nCŨ\n" + mw.README_END + "\n\nCuối\n",
+                      encoding="utf-8")
+    day, changed = mw.update_readme(str(root), str(readme), "o/r")
+    text = readme.read_text(encoding="utf-8")
+    assert (day, changed) == ("2026-11-04", True)
+    assert "- mới" in text and "- cũ" not in text and "CŨ" not in text      # chỉ lấy ngày mới nhất
+    assert "### Tóm tắt thu thập 2026-11-04" in text and "#### Ô A" in text  # hạ cấp tiêu đề
+    assert text.startswith("# X\n\nMở đầu\n") and text.rstrip().endswith("Cuối")
+    assert "blob/research/reports/data/2026-11-04/TOM_TAT.md" in text
+    assert mw.update_readme(str(root), str(readme), "o/r") == ("2026-11-04", False)  # chạy lại không đổi
+
+
+def test_readme_appends_block_when_markers_missing(tmp_path):
+    readme = tmp_path / "README.md"
+    readme.write_text("# X\n", encoding="utf-8")
+    (tmp_path / "r").mkdir()
+    day, changed = mw.update_readme(str(tmp_path / "r"), str(readme))
+    text = readme.read_text(encoding="utf-8")
+    assert day is None and changed and text.count(mw.README_START) == 1 and "Chưa có báo cáo" in text
+
+
+def test_readme_weekly_block(tmp_path):
+    root = tmp_path / "r"
+    (root / "reports" / "2026-W44").mkdir(parents=True)
+    (root / "reports" / "2026-W44" / "SO_LIEU.md").write_text("# Số liệu\n\n### Bảng chấm ô\ncũ", encoding="utf-8")
+    d = root / "reports" / "2026-W45"
+    d.mkdir()
+    (d / "SO_LIEU.md").write_text("# Số liệu\n\n### Bảng chấm ô\nSỐ LIỆU", encoding="utf-8")
+    (d / "BAO_CAO_DOI_THU.md").write_text(
+        "# Báo cáo\n\n## 1. Kết luận nhanh\n- ý một\n- ý hai\n\n## 2. Bảng chấm ô\nBẢNG\n\n## 9. Giới hạn\nGH",
+        encoding="utf-8")
+    readme = tmp_path / "README.md"
+    readme.write_text(f"# X\n\n{mw.README_START}\n{mw.README_END}\n\n{mw.WEEKLY_START}\nCŨ\n{mw.WEEKLY_END}\n\nCuối\n",
+                      encoding="utf-8")
+    mw.update_readme(str(root), str(readme), "o/r")
+    text = readme.read_text(encoding="utf-8")
+    assert "### 1. Kết luận nhanh" in text and "- ý hai" in text         # lấy mục kết luận, hạ cấp tiêu đề
+    assert "BẢNG" not in text and "GH" not in text and "CŨ" not in text   # không lấy mục khác
+    assert "reports/2026-W45/BAO_CAO_DOI_THU.md" in text and "2026-W44" not in text
+    assert text.rstrip().endswith("Cuối")
+    assert mw.update_readme(str(root), str(readme), "o/r")[1] is False    # chạy lại không đổi
+
+
+def test_readme_weekly_falls_back_to_numbers_file(tmp_path):
+    root = tmp_path / "r"
+    d = root / "reports" / "2026-W45"
+    d.mkdir(parents=True)
+    (d / "SO_LIEU.md").write_text("# Số liệu\n\n## Ô A\n\n### Bảng chấm ô\nSỐ LIỆU\n\n### Kênh\nKHÁC", encoding="utf-8")
+    readme = tmp_path / "README.md"
+    readme.write_text("# X\n", encoding="utf-8")
+    mw.update_readme(str(root), str(readme))
+    text = readme.read_text(encoding="utf-8")
+    assert "SỐ LIỆU" in text and "KHÁC" not in text and "nguồn `SO_LIEU.md`" in text
+
+
+def test_readme_blocks_inserted_at_top_when_markers_missing(tmp_path):
+    root = tmp_path / "r"
+    (root / "data" / "2026-11-04").mkdir(parents=True)
+    (root / "data" / "2026-11-04" / "TOM_TAT.md").write_text("# T\n- số", encoding="utf-8")
+    d = root / "reports" / "2026-W45"
+    d.mkdir(parents=True)
+    (d / "SO_LIEU.md").write_text("# S\n\n### Bảng chấm ô\nB", encoding="utf-8")
+    readme = tmp_path / "README.md"
+    readme.write_text("# X\n\nMở đầu\n", encoding="utf-8")
+    mw.update_readme(str(root), str(readme))
+    text = readme.read_text(encoding="utf-8")
+    assert text.startswith("# X\n\n" + mw.README_START)
+    assert text.index(mw.README_START) < text.index(mw.WEEKLY_START) < text.index("Mở đầu")
+    assert mw.update_readme(str(root), str(readme))[1] is False
+
+
 def niche_cfg(**kw):
     c = cfg(**kw)
     c["markets"][0]["title_regex"] = r"\bwhat if\b"

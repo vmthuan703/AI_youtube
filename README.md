@@ -4,6 +4,25 @@
 > **Kế hoạch nội dung tuần tới:** đang chuẩn bị · [các tuần trước](ke-hoach/README.md)
 <!-- KE_HOACH_MOI_NHAT:END -->
 
+## Tự động nghiên cứu thị trường
+
+- **Hằng ngày:** GitHub Actions chạy `market_watch.py daily`, đẩy dữ liệu vào nhánh `research/reports`.
+- **Chủ nhật:** GitHub Actions tạo số liệu tuần. Sau đó một tác vụ Claude theo lịch viết báo cáo đối thủ.
+- **Báo cáo:** đọc ở [`research/reports` → `reports/INDEX.md`](https://github.com/vmthuan703/AI_youtube/blob/research/reports/reports/INDEX.md).
+- **Cài đặt** (secret `YOUTUBE_API_KEY`) và cách sửa phạm vi nghiên cứu: [`docs/TU_DONG_NGHIEN_CUU.md`](docs/TU_DONG_NGHIEN_CUU.md).
+
+<!-- DAILY:START -->
+## Báo cáo hôm nay
+
+Chưa có báo cáo nào. Báo cáo được cập nhật tự động mỗi ngày sau lượt thu thập thị trường.
+<!-- DAILY:END -->
+
+<!-- WEEKLY:START -->
+## Báo cáo tuần mới nhất
+
+Chưa có báo cáo tuần nào. Báo cáo được cập nhật tự động mỗi tuần.
+<!-- WEEKLY:END -->
+
 Bộ công cụ làm kênh YouTube truyện hoạt hình 2D thể loại **"What If"** cho khán giả Mỹ:
 từ **nghiên cứu ngách** → **viết kịch bản** → **giọng đọc** → **render video**, hầu hết bằng code.
 
@@ -71,13 +90,6 @@ node render.mjs --project projects/my-video         # → build/video_silent.mp4
 ```
 
 Xem thêm: ví dụ nhỏ tại `aitrends-2d-studio/examples/reaction-time/`, dự án hoàn chỉnh tại `aitrends-2d-studio/projects/t4-02/`.
-
-## Tự động nghiên cứu thị trường
-
-- **Hằng ngày:** GitHub Actions chạy `market_watch.py daily`, đẩy dữ liệu vào nhánh `research/reports`.
-- **Chủ nhật:** GitHub Actions tạo số liệu tuần. Sau đó một tác vụ Claude theo lịch viết báo cáo đối thủ.
-- **Báo cáo:** đọc ở [`research/reports` → `reports/INDEX.md`](https://github.com/vmthuan703/AI_youtube/blob/research/reports/reports/INDEX.md).
-- **Cài đặt** (secret `YOUTUBE_API_KEY`) và cách sửa phạm vi nghiên cứu: [`docs/TU_DONG_NGHIEN_CUU.md`](docs/TU_DONG_NGHIEN_CUU.md).
 
 ## Lưu ý
 

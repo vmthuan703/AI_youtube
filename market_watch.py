@@ -11,6 +11,8 @@
                    -> <root>/reports/YYYY-Www/SO_LIEU.md + CSV, cập nhật reports/INDEX.md
   prune            Bỏ kênh discovery lệch ngách khỏi danh sách theo dõi (daily cũng tự làm).
   index            Cập nhật reports/INDEX.md (sau khi viết BAO_CAO_DOI_THU.md).
+  readme           Ghi báo cáo ngày mới nhất (TOM_TAT.md) và phần kết luận của báo cáo tuần mới nhất
+                   vào các khối DAILY / WEEKLY (cặp dấu <!-- X:START --> ... <!-- X:END -->) của README.
   import-snapshot  Chuyển out/videos.csv của audience_research.py thành snapshot của một ngày.
 
 Phương pháp lấy theo tài liệu "Cách dựng kênh tâm lý từ số 0": nhìn tuổi kênh của 5 kênh có
@@ -946,6 +948,129 @@ def run_weekly(cfg, root, end=None, days=7, generated=None, label=None):
     return d, len(snaps)
 
 
+# ---------------------------------------------------------------- README hằng ngày / hằng tuần
+README_START = "<!-- DAILY:START -->"
+README_END = "<!-- DAILY:END -->"
+WEEKLY_START = "<!-- WEEKLY:START -->"
+WEEKLY_END = "<!-- WEEKLY:END -->"
+WEEKLY_PICK = ("Kết luận nhanh", "Bảng chấm ô")      # mục lấy vào README, theo thứ tự ưu tiên
+
+
+def demote(md, n):
+    """Hạ cấp mọi tiêu đề n bậc (bỏ qua dòng trong khối code)."""
+    out, in_code = [], False
+    for ln in md.strip().splitlines():
+        if ln.lstrip().startswith("```"):
+            in_code = not in_code
+        out.append(ln if in_code else re.sub(r"^(#+) ", lambda m: "#" * (len(m.group(1)) + n) + " ", ln))
+    return out
+
+
+def extract_section(md, names):
+    """Lấy mục có tiêu đề chứa một trong `names` (tới tiêu đề cùng cấp hoặc cao hơn kế tiếp)."""
+    lines = md.splitlines()
+    for name in names:
+        for i, ln in enumerate(lines):
+            m = re.match(r"^(#+) (.*)", ln)
+            if m and name.lower() in m.group(2).lower():
+                level, j = len(m.group(1)), i + 1
+                while j < len(lines):
+                    mj = re.match(r"^(#+) ", lines[j])
+                    if mj and len(mj.group(1)) <= level:
+                        break
+                    j += 1
+                return "\n".join(lines[i:j]).strip()
+    return None
+
+
+def latest_summary(root):
+    """Trả (ngày, nội dung TOM_TAT.md) của ngày mới nhất, hoặc (None, None)."""
+    base = os.path.join(root, "data")
+    days = sorted((d for d in os.listdir(base) if os.path.exists(os.path.join(base, d, "TOM_TAT.md"))),
+                  reverse=True) if os.path.isdir(base) else []
+    if not days:
+        return None, None
+    with open(os.path.join(base, days[0], "TOM_TAT.md"), encoding="utf-8") as f:
+        return days[0], f.read()
+
+
+def latest_weekly(root):
+    """Trả (tên thư mục tuần, tên file, nội dung) của báo cáo tuần mới nhất, hoặc None.
+    Ưu tiên BAO_CAO_DOI_THU.md (Claude viết), không có thì dùng SO_LIEU.md (máy tính)."""
+    base = os.path.join(root, "reports")
+    if not os.path.isdir(base):
+        return None
+    for name in sorted((d for d in os.listdir(base) if os.path.isdir(os.path.join(base, d))), reverse=True):
+        for fn in ("BAO_CAO_DOI_THU.md", "SO_LIEU.md"):
+            path = os.path.join(base, name, fn)
+            if os.path.exists(path):
+                with open(path, encoding="utf-8") as f:
+                    return name, fn, f.read()
+    return None
+
+
+def render_readme_block(day, summary, repo=None, data_branch="research/reports"):
+    """Khối báo cáo ngày. Hạ cấp tiêu đề của TOM_TAT xuống dưới '##'."""
+    lines = [README_START, "## Báo cáo hôm nay", ""]
+    if not day:
+        lines += ["Chưa có báo cáo nào.", README_END]
+        return "\n".join(lines)
+    lines += [f"_Cập nhật tự động {day}. Số liệu từ YouTube Data API, đối chiếu bằng tay trước khi quyết định._", ""]
+    lines += demote(summary, 2) + [""]
+    if repo:
+        url = f"https://github.com/{repo}/blob/{data_branch}"
+        lines += [f"Xem thêm: [dữ liệu ngày {day}]({url}/data/{day}/TOM_TAT.md)", ""]
+    lines.append(README_END)
+    return "\n".join(lines)
+
+
+def render_weekly_block(weekly, repo=None, data_branch="research/reports"):
+    """Khối báo cáo tuần: chỉ phần kết luận (hoặc bảng chấm ô), kèm link bản đầy đủ."""
+    lines = [WEEKLY_START, "## Báo cáo tuần mới nhất", ""]
+    if not weekly:
+        lines += ["Chưa có báo cáo tuần nào.", WEEKLY_END]
+        return "\n".join(lines)
+    name, fn, text = weekly
+    picked = extract_section(text, WEEKLY_PICK)
+    lines += [f"_Báo cáo {name} · nguồn `{fn}`. Chỉ trích phần đầu, bản đầy đủ ở link bên dưới._", ""]
+    lines += (demote(picked, 1) if picked else text.strip().splitlines()[:30]) + [""]
+    if repo:
+        url = f"https://github.com/{repo}/blob/{data_branch}"
+        lines += [f"Xem thêm: [báo cáo đầy đủ {name}]({url}/reports/{name}/{fn})"
+                  f" · [mọi báo cáo tuần]({url}/reports/INDEX.md)", ""]
+    lines.append(WEEKLY_END)
+    return "\n".join(lines)
+
+
+def replace_block(text, block, start=README_START, end=README_END, after=None):
+    """Thay khối giữa hai dấu. Nếu chưa có dấu: chèn sau dấu `after` (nếu có trong file), không thì
+    ngay dưới tiêu đề đầu tiên, để báo cáo luôn nằm đầu README."""
+    a, b = text.find(start), text.find(end)
+    if a != -1 and b > a:
+        return text[:a] + block + text[b + len(end):]
+    if after and after in text:
+        i = text.index(after) + len(after)
+    elif text.startswith("# ") and "\n" in text:
+        i = text.index("\n")
+    else:
+        i = 0
+    return text[:i].rstrip("\n") + ("\n\n" if i else "") + block + "\n\n" + text[i:].lstrip("\n")
+
+
+def update_readme(root, readme_path, repo=None):
+    day, summary = latest_summary(root)
+    weekly = latest_weekly(root)
+    with open(readme_path, encoding="utf-8") as f:
+        old = f.read()
+    new = replace_block(old, render_readme_block(day, summary, repo))
+    if weekly or WEEKLY_START in new:       # chưa có báo cáo tuần và README chưa có khối thì bỏ qua
+        new = replace_block(new, render_weekly_block(weekly, repo), WEEKLY_START, WEEKLY_END, after=README_END)
+    if new != old:
+        with open(readme_path, "w", encoding="utf-8") as f:
+            f.write(new)
+    return day, new != old
+
+
 def prune_snapshot(cfg, root):
     """Dọn danh sách theo dõi dựa trên snapshot mới nhất trong <root>/data."""
     base = os.path.join(root, "data")
@@ -1001,7 +1126,7 @@ def load_config(path):
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(dest="cmd", required=True)
-    for name in ("daily", "weekly", "index", "prune", "import-snapshot"):
+    for name in ("daily", "weekly", "index", "readme", "prune", "import-snapshot"):
         s = sub.add_parser(name)
         s.add_argument("--config", default="config/markets.json")
         s.add_argument("--root", default="research", help="Thư mục dữ liệu (worktree của nhánh research/reports)")
@@ -1010,6 +1135,9 @@ def main(argv=None):
     sub.choices["weekly"].add_argument("--end", type=date.fromisoformat, help="Ngày cuối, mặc định hôm nay giờ VN")
     sub.choices["weekly"].add_argument("--days", type=int, default=7)
     sub.choices["weekly"].add_argument("--label", help="Tên thư mục báo cáo, mặc định YYYY-Www")
+    rd = sub.choices["readme"]
+    rd.add_argument("--readme", default="README.md")
+    rd.add_argument("--repo", default=os.environ.get("GITHUB_REPOSITORY"), help="owner/repo, để tạo link")
     imp = sub.choices["import-snapshot"]
     imp.add_argument("--videos", required=True)
     imp.add_argument("--market", default="whatif-us")
@@ -1034,6 +1162,11 @@ def main(argv=None):
         print(f"Đã ghi {d}/SO_LIEU.md từ {n} snapshot.")
         if n == 0:
             print("Cảnh báo: không có snapshot nào trong khoảng ngày.", file=sys.stderr)
+    elif a.cmd == "readme":
+        day, changed = update_readme(a.root, a.readme, a.repo)
+        print(f"README: báo cáo {day or 'trống'} · {'đã đổi' if changed else 'không đổi'}.")
+
+
     elif a.cmd == "prune":
         removed = prune_snapshot(cfg, a.root)
         print(f"Đã bỏ {len(removed)} kênh lệch ngách khỏi {a.root}/state/channels.csv")

@@ -1,0 +1,8 @@
+{
+ "title": "Channel art",
+ "duration": 2,
+ "shots": [
+  {"id": "banner", "start": 0, "end": 1, "line": "Ảnh bìa 2560x1440, vùng an toàn 1546x423 ở giữa", "bars": "none", "vignette": false},
+  {"id": "avatar", "start": 1, "end": 2, "line": "Ảnh kênh: cắt vuông ở giữa, xuất 800x800", "bars": "none", "vignette": false}
+ ]
+}

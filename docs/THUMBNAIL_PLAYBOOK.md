@@ -90,3 +90,32 @@ Ghi chú:
 - Chữ to dưới 3 từ và không trùng tiêu đề.
 - Con số đặt ở vùng đối diện mặt nhân vật.
 - Mỗi video vẫn làm thêm 2 phương án để A/B test.
+
+## 7. Ảnh kênh và ảnh bìa (học từ Jeremy Bearimy)
+
+Học từ ảnh chụp trang kênh Jeremy Bearimy (33,2 N người đăng ký, 35 video):
+
+- **Một linh vật xuất hiện ở mọi nơi**: ảnh kênh, ảnh bìa và mọi thumbnail, nên người xem nhận ra kênh ngay.
+- **Ảnh kênh**: mặt linh vật cận, biểu cảm tự tin, nền tròn một màu sáng, không có chữ.
+- **Ảnh bìa**: linh vật lặp lại 5 lần với 5 màu áo, mỗi lần một siêu năng lực. Nền là các dải màu cầu vồng xếp chéo.
+  Bản ở giữa to nhất, không có chữ.
+
+Đã áp dụng ở `aitrends-2d-studio/projects/channel-art/` (ảnh xuất ra nằm trong `art/`):
+
+- **Linh vật**: nhân vật "you" đầu đen, đội mũ hoodie đỏ cam, đúng phong cách video.
+- **Ảnh kênh** `avatar_800x800.png`: linh vật cười nhếch, nền đỏ cam.
+- **Ảnh bìa** `banner_2560x1440.jpg` có 5 bản linh vật:
+  - đỏ: tốc độ
+  - xanh lá: nhãn `999+` / `160 IQ`
+  - giữa: điện thoại ngày mai
+  - tím: tua thời gian
+  - vàng: sức mạnh
+- **Vùng an toàn**: mọi thứ quan trọng nằm trong dải hiển thị trên máy tính (2560×423).
+  Bản ở giữa nằm gọn trong vùng an toàn 1546×423.
+
+Dựng lại:
+
+```bash
+cd aitrends-2d-studio && node render.mjs --project projects/channel-art --stills 0.5,1.5
+cd projects/channel-art && python3 export_art.py
+```

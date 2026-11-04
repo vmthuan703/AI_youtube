@@ -22,7 +22,8 @@ and `render-qc.md` in `../make-3d-video/references/` before writing or fixing sc
 ## 2. Export quality
 Confirm or change `config.json`: `resolution` (720p/1080p/1440p/2160p), `fps` (24/30/60), `quality`
 (draft/standard/high/max) and `export.upscale` ("1440p"/"2160p" for YouTube). Recommend 1080p · 60 fps · high, plus
-upscale 1440p for YouTube when the machine can afford it; give the time estimate from `render-qc.md` (CPU vs GPU).
+upscale 1440p for YouTube when the machine can afford it. Measure first: `node render.mjs --project projects/<slug>
+--bench` prints whether the GPU is used and estimates the full render; quote that (GPU tips in `render-qc.md`).
 Switching aspect needs a fresh sheet review (9:16 framing differs).
 
 ## 3. Preview checkpoint

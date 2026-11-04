@@ -18,6 +18,21 @@ Every final encode is H.264 High, yuv420p, BT.709, GOP = fps/2, B-frames 2, with
   YouTube-side encode for Premium members; uploaders can't choose it, but a high-bitrate 1080p60 or 1440p upload is the
   best source for it.
 
+## Using a GPU (strongly recommended for 1080p60)
+- **Windows / macOS:** nothing to set. `render.mjs` launches the full Chromium in GPU mode (`--gl auto`, ANGLE Direct3D 11
+  on Windows, Metal on macOS) and prints the WebGL renderer at start, e.g. `WebGL: ANGLE (NVIDIA, NVIDIA GeForce GTX
+  1660 SUPER Direct3D11 …) (GPU)`. If it says SwiftShader, the GPU isn't used: update the NVIDIA driver, run
+  `npx playwright install chromium`, or try `--angle gl` / `--chrome "C:\Program Files\Google\Chrome\Application\chrome.exe"`.
+- **Linux with an NVIDIA GPU:** add `--gl gpu` (optionally `--angle vulkan`).
+- **NVENC:** with the GPU in use and an ffmpeg build that has `h264_nvenc` (the gyan.dev Windows builds do), parts are
+  encoded on the GPU's hardware encoder (`encoder: auto`), which frees the CPU for capture. Force with
+  `--encoder nvenc|x264` or config.json `"encoder"`. NVENC p7/hq at CQ 18 is visually transparent for animation; x264
+  slow CRF 14 is a little more efficient per bit. `audio/mix.py --upscale` uses NVENC too when available.
+- **Workers:** default half the CPU threads (max 8), capped for video memory on a GPU: 5 at 1440p, 3 at 4K (6 GB cards).
+  More workers help until the CPU (capture + colour grade) or the GPU is saturated; try `--workers 4/6/8` with `--bench`.
+- **Measure:** `node render.mjs --project examples/speed-demo --bench` (or your project) times one worker on frames
+  across the video and estimates the full render on this machine. Run it once on each machine and quote it.
+
 ## Render
 **Preview first.** `node render.mjs --project projects/<slug> --from 0 --to 20 --scale 0.5` writes `build/preview.mp4`
 (draft encode, JPEG). Add `--fps 30` to preview a 60 fps project at half the frames.
@@ -40,8 +55,9 @@ Frames = seconds × fps. Measured on a 4-thread cloud CPU **without a GPU**, qua
   speed-demo at 1080p60 high, 3 workers, with motion blur on 3 shots: 61 min).
 - 720p: ≈ 1.4 frames/s. Preview at `--scale 0.5 --fps 30`: ≈ 3–4 frames/s.
 - Extra cost per shot: `dof` +40%, `mblur: 2` ×2, `mblur: 3` ×3, quality `max` ×2.5.
-With a desktop GPU the 3D part is 20–50× faster and capture/encode dominate: expect roughly 5–15 frames/s at 1080p on
-a modern 8-core PC (a 10-minute 1080p60 video in about 1–2 hours). Always state the estimate before a long render, and
+With a desktop GPU the 3D part takes milliseconds and capture (≈ 70 ms) + colour grade (≈ 20–40 ms) per frame dominate:
+expect very roughly 5–10 frames/s per worker at 1080p, i.e. 15–40 frames/s with several workers on a 6–8-core PC (a
+10-minute 1080p60 video in roughly 20–40 minutes). These GPU figures are estimates, not measurements: run `--bench`. Always state the estimate before a long render, and
 offer: a 720p30 draft now, the final overnight or on a GPU machine (copy the project folder; it's self-contained).
 
 The render log prints frames, fps, elapsed time and ETA every 48 frames; report progress at sensible intervals.

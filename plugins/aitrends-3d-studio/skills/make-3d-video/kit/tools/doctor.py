@@ -52,12 +52,23 @@ fw = importlib.util.find_spec("faster_whisper") is not None
 rows.append((("OK " if fw else "optional ") + "python: faster-whisper", "only needed when you bring your own voiceover" if not fw else ""))
 ok(f"python >= 3.9", sys.version_info >= (3, 9), sys.version.split()[0], "install Python 3.10+ from https://python.org")
 
+gpu = "unknown"
+try:
+    nv = ver(["nvidia-smi", "--query-gpu=name,memory.total", "--format=csv,noheader"]) if shutil.which("nvidia-smi") else None
+    if nv: gpu = f"NVIDIA GPU: {nv}" + (" (used automatically)" if OS != "Linux" else " (render with --gl gpu)")
+    elif OS == "Darwin": gpu = "macOS GPU (used automatically)"
+    elif OS == "Windows": gpu = "Windows GPU (used automatically; check the WebGL line printed by render.mjs)"
+    else: gpu = "no GPU found: 3D frames render on the CPU (SwiftShader) — fine for 720p drafts, slow for 1080p60"
+except Exception: pass
+nvenc = False
+if ff:
+    try: nvenc = subprocess.run(["ffmpeg", "-hide_banner", "-v", "error", "-f", "lavfi", "-i", "color=c=black:s=320x240:d=0.2", "-c:v", "h264_nvenc", "-f", "null", "-"], capture_output=True, timeout=30).returncode == 0
+    except Exception: pass
+rows.append((("OK " if nvenc else "optional ") + "ffmpeg NVENC (h264_nvenc)", "hardware encoding on: render.mjs uses it with the GPU" if nvenc else "not available (x264 on the CPU is used)"))
 print("\naiTrends 3D Studio — environment check\n")
 for a, b in rows: print(f"  {a:45s} {b}")
-gpu = "unknown"
-try: gpu = "NVIDIA GPU found (render with --gl gpu)" if shutil.which("nvidia-smi") else ("macOS GPU (render uses it automatically)" if OS == "Darwin" else "Windows GPU (render uses it automatically)" if OS == "Windows" else "no GPU found: 3D frames render on the CPU (SwiftShader) — fine for 720p drafts, slow for 1080p60")
-except Exception: pass
 print(f"\n  {OS} {platform.machine()}, {os.cpu_count()} CPU threads, {gpu}")
+print("  Measure this machine: node render.mjs --project examples/speed-demo --bench")
 if fixes:
     print("\nTo fix, run:")
     for f in fixes: print("  " + f)

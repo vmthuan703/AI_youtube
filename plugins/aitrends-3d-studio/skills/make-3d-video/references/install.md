@@ -47,6 +47,9 @@ source silently.
 ## Notes
 - No GPU (Linux servers, cloud sessions): Chromium uses SwiftShader (`--gl swiftshader`, the Linux default). It works,
   but 3D is CPU-heavy. On Windows/macOS desktops the GPU is used (`--gl auto`); with an NVIDIA GPU on Linux pass `--gl gpu`.
+  `npx playwright install chromium` installs the full Chromium used for GPU rendering. After installing, run
+  `node render.mjs --project examples/speed-demo --bench`: the first line names the GPU (or warns that it isn't used),
+  the last line estimates the render time on this machine. `python tools/doctor.py` also lists the NVIDIA GPU and NVENC.
 - Disk: ~600 MB for node_modules + Chromium, ~350 MB for the voice model, plus renders (10 min at 1080p60 high ≈ 0.6–1.2 GB).
 - Updating: copy the new `kit/` over the install; it never touches `projects/`. Custom styles in `engine/styles.js`
   need re-adding.

@@ -59,7 +59,8 @@ the mapping), generated music + SFX on, style chosen later from rendered samples
 ## Stage 2: Install or check the studio
 Follow `references/install.md`: copy `kit/` to `aitrends-3d-studio/` in the workspace (skip if present), install
 dependencies, download the voice model, run `python tools/verify_kit.py` and `python tools/doctor.py`, then the
-self-test. Report what was installed in one short list, and whether frames will render on a GPU or the CPU.
+self-test, then `node render.mjs --project examples/speed-demo --bench`. Report what was installed in one short list,
+the GPU line it printed (GPU or CPU) and its time estimate, which feeds the export-quality advice.
 
 ## Stage 3: Voiceover + timeline
 Follow `references/voiceover.md` (inside `aitrends-3d-studio/`; `python3` where `python` isn't Python 3):

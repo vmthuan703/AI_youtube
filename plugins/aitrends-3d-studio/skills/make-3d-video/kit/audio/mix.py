@@ -38,7 +38,7 @@ def load_any(path, sr=SR):
 
 
 def main():
-    ap = argparse.ArgumentParser(); ap.add_argument("--project", required=True); ap.add_argument("--video"); ap.add_argument("--no-music", action="store_true"); ap.add_argument("--no-sfx", action="store_true"); ap.add_argument("--out"); ap.add_argument("--upscale", choices=["1440p", "2160p", "none"])
+    ap = argparse.ArgumentParser(); ap.add_argument("--project", required=True); ap.add_argument("--video"); ap.add_argument("--no-music", action="store_true"); ap.add_argument("--no-sfx", action="store_true"); ap.add_argument("--out"); ap.add_argument("--upscale", choices=["1440p", "2160p", "none"]); ap.add_argument("--encoder", choices=["auto", "x264", "nvenc"], default=None)
     a = ap.parse_args(); P = a.project
     cfg = json.load(open(os.path.join(P, "config.json"), encoding="utf-8")); story = json.load(open(os.path.join(P, "story", "shots.json"), encoding="utf-8"))
     total = story.get("duration") or story["shots"][-1]["end"]; n = secs(total)
@@ -105,9 +105,12 @@ def main():
         if up and up != "none":
             vertical = cfg.get("aspect") == "9:16"; short = 1440 if up == "1440p" else 2160; long = short * 16 // 9
             w, h = (short, long) if vertical else (long, short)
-            vcodec = ["-vf", f"scale={w}:{h}:flags=lanczos", "-c:v", "libx264", "-preset", "medium", "-crf", "15", "-profile:v", "high", "-tune", "animation", "-pix_fmt", "yuv420p",
+            enc = a.encoder or cfg.get("encoder", "auto")
+            nv = enc == "nvenc" or (enc == "auto" and subprocess.run(["ffmpeg", "-hide_banner", "-v", "error", "-f", "lavfi", "-i", "color=c=black:s=320x240:d=0.2", "-c:v", "h264_nvenc", "-f", "null", "-"], capture_output=True).returncode == 0)
+            codec = ["-c:v", "h264_nvenc", "-preset", "p7", "-tune", "hq", "-rc", "vbr", "-cq", "17", "-b:v", "0", "-maxrate", "100M", "-bufsize", "200M", "-spatial-aq", "1"] if nv else ["-c:v", "libx264", "-preset", "medium", "-crf", "15", "-tune", "animation"]
+            vcodec = ["-vf", f"scale={w}:{h}:flags=lanczos", *codec, "-profile:v", "high", "-pix_fmt", "yuv420p",
                       "-g", str(max(1, round((cfg.get("fps") or 24) / 2))), "-bf", "2", "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709"]
-            print(f"upscaling picture to {w}x{h} for upload…")
+            print(f"upscaling picture to {w}x{h} for upload ({'NVENC' if nv else 'x264'})…")
         subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", video, "-i", out_wav, "-map", "0:v:0", "-map", "1:a:0", *vcodec, "-c:a", "aac", "-b:a", abr, "-ar", "48000", "-shortest", "-movflags", "+faststart", out], check=True)
         print(f"FINAL VIDEO: {out}")
     else:

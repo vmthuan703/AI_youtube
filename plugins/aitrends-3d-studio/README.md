@@ -40,10 +40,20 @@ Bản xuất: H.264 High, BT.709, AAC 48 kHz 384 kb/s, đúng khuyến nghị t�
 **1080p60 · high**, kèm `upscale 1440p` khi đăng YouTube.
 
 ## Thời gian render
-- Máy **có GPU** (PC Windows/macOS): nhanh, khoảng 5–15 khung/giây ở 1080p.
+- Máy **có GPU** (PC Windows/macOS): phần 3D gần như không tốn thời gian, còn lại chủ yếu là chụp khung và chỉnh màu.
+  Ước tính 15–40 khung/giây ở 1080p với nhiều worker (video 10 phút 1080p60 khoảng 20–40 phút).
+  Đây là ước tính, chưa đo trên GPU thật; chạy `--bench` để có số của máy bạn.
 - Máy **không GPU** (máy chủ, phiên cloud): khoảng 0,6 khung/giây ở 1080p chất lượng high.
   - 1 phút video 1080p60 mất khoảng 100–120 phút (đo thật: demo 32,5 giây 1080p60 high mất 61 phút).
   - Nên xem thử bản 720p trước, rồi render bản cuối qua đêm hoặc trên máy có GPU.
+
+## Tận dụng GPU (ví dụ GTX 1660 Super 6 GB)
+- Trên Windows, renderer tự dùng GPU, không cần cấu hình. Dòng đầu log in tên card, ví dụ `WebGL: ANGLE (NVIDIA … GTX 1660 SUPER …) (GPU)`.
+  Nếu thấy `SwiftShader` là GPU chưa được dùng: cập nhật driver NVIDIA rồi chạy `npx playwright install chromium`.
+- Bộ mã hóa phần cứng **NVENC** của card được dùng tự động khi ffmpeg có `h264_nvenc` (bản ffmpeg cài bằng winget có sẵn),
+  giúp CPU rảnh để chụp khung. Ép chọn: `--encoder nvenc` hoặc `--encoder x264`.
+- Số worker mặc định bằng nửa số luồng CPU, tối đa 8. Với card 6 GB, plugin tự giới hạn 5 worker ở 1440p, 3 worker ở 4K.
+- Đo máy của bạn: `node render.mjs --project examples/speed-demo --bench`. Lệnh in GPU đang dùng, thời gian mỗi khung và ước tính tổng.
 
 ## Cài đặt plugin
 ```bash

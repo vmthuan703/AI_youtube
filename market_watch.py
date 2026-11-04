@@ -772,12 +772,19 @@ def render_weekly_block(weekly, repo=None, data_branch="research/reports"):
     return "\n".join(lines)
 
 
-def replace_block(text, block, start=README_START, end=README_END):
-    """Thay khối giữa hai dấu; nếu chưa có dấu thì thêm vào cuối file."""
+def replace_block(text, block, start=README_START, end=README_END, after=None):
+    """Thay khối giữa hai dấu. Nếu chưa có dấu: chèn sau dấu `after` (nếu có trong file), không thì
+    ngay dưới tiêu đề đầu tiên, để báo cáo luôn nằm đầu README."""
     a, b = text.find(start), text.find(end)
     if a != -1 and b > a:
         return text[:a] + block + text[b + len(end):]
-    return text.rstrip("\n") + "\n\n" + block + "\n"
+    if after and after in text:
+        i = text.index(after) + len(after)
+    elif text.startswith("# ") and "\n" in text:
+        i = text.index("\n")
+    else:
+        i = 0
+    return text[:i].rstrip("\n") + ("\n\n" if i else "") + block + "\n\n" + text[i:].lstrip("\n")
 
 
 def update_readme(root, readme_path, repo=None):
@@ -787,7 +794,7 @@ def update_readme(root, readme_path, repo=None):
         old = f.read()
     new = replace_block(old, render_readme_block(day, summary, repo))
     if weekly or WEEKLY_START in new:       # chưa có báo cáo tuần và README chưa có khối thì bỏ qua
-        new = replace_block(new, render_weekly_block(weekly, repo), WEEKLY_START, WEEKLY_END)
+        new = replace_block(new, render_weekly_block(weekly, repo), WEEKLY_START, WEEKLY_END, after=README_END)
     if new != old:
         with open(readme_path, "w", encoding="utf-8") as f:
             f.write(new)

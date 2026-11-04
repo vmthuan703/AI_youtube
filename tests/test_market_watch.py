@@ -201,3 +201,19 @@ def test_readme_weekly_falls_back_to_numbers_file(tmp_path):
     mw.update_readme(str(root), str(readme))
     text = readme.read_text(encoding="utf-8")
     assert "SỐ LIỆU" in text and "KHÁC" not in text and "nguồn `SO_LIEU.md`" in text
+
+
+def test_readme_blocks_inserted_at_top_when_markers_missing(tmp_path):
+    root = tmp_path / "r"
+    (root / "data" / "2026-11-04").mkdir(parents=True)
+    (root / "data" / "2026-11-04" / "TOM_TAT.md").write_text("# T\n- số", encoding="utf-8")
+    d = root / "reports" / "2026-W45"
+    d.mkdir(parents=True)
+    (d / "SO_LIEU.md").write_text("# S\n\n### Bảng chấm ô\nB", encoding="utf-8")
+    readme = tmp_path / "README.md"
+    readme.write_text("# X\n\nMở đầu\n", encoding="utf-8")
+    mw.update_readme(str(root), str(readme))
+    text = readme.read_text(encoding="utf-8")
+    assert text.startswith("# X\n\n" + mw.README_START)
+    assert text.index(mw.README_START) < text.index(mw.WEEKLY_START) < text.index("Mở đầu")
+    assert mw.update_readme(str(root), str(readme))[1] is False

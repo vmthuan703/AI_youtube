@@ -1,10 +1,5 @@
 # AI_youtube
 
-Bộ công cụ làm kênh YouTube truyện hoạt hình 2D thể loại **"What If"** cho khán giả Mỹ:
-từ **nghiên cứu ngách** → **viết kịch bản** → **giọng đọc** → **render video**, hầu hết bằng code.
-
-> Trạng thái: đang phát triển. Video đã dựng xong: **T4 #2 – "What If Your Phone Showed Tomorrow's Notifications Today?"** (9:48).
-
 <!-- DAILY:START -->
 ## Báo cáo hôm nay
 
@@ -16,6 +11,11 @@ Chưa có báo cáo nào. Báo cáo được cập nhật tự động mỗi ng�
 
 Chưa có báo cáo tuần nào. Báo cáo được cập nhật tự động mỗi tuần.
 <!-- WEEKLY:END -->
+
+Bộ công cụ làm kênh YouTube truyện hoạt hình 2D thể loại **"What If"** cho khán giả Mỹ:
+từ **nghiên cứu ngách** → **viết kịch bản** → **giọng đọc** → **render video**, hầu hết bằng code.
+
+> Trạng thái: đang phát triển. Video đã dựng xong: **T4 #2 – "What If Your Phone Showed Tomorrow's Notifications Today?"** (9:48).
 
 ## Quy trình tổng thể
 

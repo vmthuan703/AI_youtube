@@ -18,6 +18,8 @@
 - KHÔNG tự `git commit` hoặc `git push`. Luôn hỏi và chờ người dùng đồng ý trước.
 - Ngoại lệ: thay đổi trong `CLAUDE.md` thì tự commit và push, không cần hỏi,
   nhưng commit riêng, không gộp với file khác.
+- Ngoại lệ: tác vụ theo lịch "Báo cáo đối thủ hằng tuần" được tự commit và push
+  vào `research/reports`; trên `main` chỉ được đổi `ke-hoach/` và đoạn link đầu `README.md`.
 
 ## Bảo trì file này
 - Mỗi khi thêm nội dung vào `CLAUDE.md`, nếu file dài quá 50 dòng thì đề nghị

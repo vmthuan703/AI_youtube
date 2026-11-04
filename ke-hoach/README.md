@@ -6,4 +6,5 @@ Mỗi chủ nhật, tác vụ Claude theo lịch đọc dữ liệu đối thủ
 Mới nhất ở trên cùng.
 
 <!-- DANH_SACH:START -->
+- [Tuần 2026-W46 (09/11–15/11)](2026-W46.md): lập ngày 2026-11-04, 5 video
 <!-- DANH_SACH:END -->

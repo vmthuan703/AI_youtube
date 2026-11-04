@@ -1,7 +1,7 @@
 # AI_youtube
 
 <!-- KE_HOACH_MOI_NHAT:START -->
-> **Kế hoạch nội dung tuần tới:** đang chuẩn bị · [các tuần trước](ke-hoach/README.md)
+> **Kế hoạch nội dung tuần tới:** [Tuần 2026-W46 (09/11–15/11)](ke-hoach/2026-W46.md) · lập ngày 2026-11-04 · [các tuần trước](ke-hoach/README.md)
 <!-- KE_HOACH_MOI_NHAT:END -->
 
 ## Tự động nghiên cứu thị trường

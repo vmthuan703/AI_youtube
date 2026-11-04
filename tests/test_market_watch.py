@@ -167,3 +167,37 @@ def test_readme_appends_block_when_markers_missing(tmp_path):
     day, changed = mw.update_readme(str(tmp_path / "r"), str(readme))
     text = readme.read_text(encoding="utf-8")
     assert day is None and changed and text.count(mw.README_START) == 1 and "Chưa có báo cáo" in text
+
+
+def test_readme_weekly_block(tmp_path):
+    root = tmp_path / "r"
+    (root / "reports" / "2026-W44").mkdir(parents=True)
+    (root / "reports" / "2026-W44" / "SO_LIEU.md").write_text("# Số liệu\n\n### Bảng chấm ô\ncũ", encoding="utf-8")
+    d = root / "reports" / "2026-W45"
+    d.mkdir()
+    (d / "SO_LIEU.md").write_text("# Số liệu\n\n### Bảng chấm ô\nSỐ LIỆU", encoding="utf-8")
+    (d / "BAO_CAO_DOI_THU.md").write_text(
+        "# Báo cáo\n\n## 1. Kết luận nhanh\n- ý một\n- ý hai\n\n## 2. Bảng chấm ô\nBẢNG\n\n## 9. Giới hạn\nGH",
+        encoding="utf-8")
+    readme = tmp_path / "README.md"
+    readme.write_text(f"# X\n\n{mw.README_START}\n{mw.README_END}\n\n{mw.WEEKLY_START}\nCŨ\n{mw.WEEKLY_END}\n\nCuối\n",
+                      encoding="utf-8")
+    mw.update_readme(str(root), str(readme), "o/r")
+    text = readme.read_text(encoding="utf-8")
+    assert "### 1. Kết luận nhanh" in text and "- ý hai" in text         # lấy mục kết luận, hạ cấp tiêu đề
+    assert "BẢNG" not in text and "GH" not in text and "CŨ" not in text   # không lấy mục khác
+    assert "reports/2026-W45/BAO_CAO_DOI_THU.md" in text and "2026-W44" not in text
+    assert text.rstrip().endswith("Cuối")
+    assert mw.update_readme(str(root), str(readme), "o/r")[1] is False    # chạy lại không đổi
+
+
+def test_readme_weekly_falls_back_to_numbers_file(tmp_path):
+    root = tmp_path / "r"
+    d = root / "reports" / "2026-W45"
+    d.mkdir(parents=True)
+    (d / "SO_LIEU.md").write_text("# Số liệu\n\n## Ô A\n\n### Bảng chấm ô\nSỐ LIỆU\n\n### Kênh\nKHÁC", encoding="utf-8")
+    readme = tmp_path / "README.md"
+    readme.write_text("# X\n", encoding="utf-8")
+    mw.update_readme(str(root), str(readme))
+    text = readme.read_text(encoding="utf-8")
+    assert "SỐ LIỆU" in text and "KHÁC" not in text and "nguồn `SO_LIEU.md`" in text

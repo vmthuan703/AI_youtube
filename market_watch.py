@@ -10,7 +10,8 @@
                    (>= 10x trung vị của CHÍNH kênh đó), danh sách tiêu đề để đọc tay.
                    -> <root>/reports/YYYY-Www/SO_LIEU.md + CSV, cập nhật reports/INDEX.md
   index            Cập nhật reports/INDEX.md (sau khi viết BAO_CAO_DOI_THU.md).
-  readme           Ghi báo cáo ngày mới nhất (TOM_TAT.md) vào khối giữa hai dấu DAILY:START/END của README.
+  readme           Ghi báo cáo ngày mới nhất (TOM_TAT.md) và phần kết luận của báo cáo tuần mới nhất
+                   vào các khối DAILY / WEEKLY (cặp dấu <!-- X:START --> ... <!-- X:END -->) của README.
   import-snapshot  Chuyển out/videos.csv của audience_research.py thành snapshot của một ngày.
 
 Phương pháp lấy theo tài liệu "Cách dựng kênh tâm lý từ số 0": nhìn tuổi kênh của 5 kênh có
@@ -677,9 +678,39 @@ def run_weekly(cfg, root, end=None, days=7, generated=None, label=None):
     return d, len(snaps)
 
 
-# ---------------------------------------------------------------- README hằng ngày
+# ---------------------------------------------------------------- README hằng ngày / hằng tuần
 README_START = "<!-- DAILY:START -->"
 README_END = "<!-- DAILY:END -->"
+WEEKLY_START = "<!-- WEEKLY:START -->"
+WEEKLY_END = "<!-- WEEKLY:END -->"
+WEEKLY_PICK = ("Kết luận nhanh", "Bảng chấm ô")      # mục lấy vào README, theo thứ tự ưu tiên
+
+
+def demote(md, n):
+    """Hạ cấp mọi tiêu đề n bậc (bỏ qua dòng trong khối code)."""
+    out, in_code = [], False
+    for ln in md.strip().splitlines():
+        if ln.lstrip().startswith("```"):
+            in_code = not in_code
+        out.append(ln if in_code else re.sub(r"^(#+) ", lambda m: "#" * (len(m.group(1)) + n) + " ", ln))
+    return out
+
+
+def extract_section(md, names):
+    """Lấy mục có tiêu đề chứa một trong `names` (tới tiêu đề cùng cấp hoặc cao hơn kế tiếp)."""
+    lines = md.splitlines()
+    for name in names:
+        for i, ln in enumerate(lines):
+            m = re.match(r"^(#+) (.*)", ln)
+            if m and name.lower() in m.group(2).lower():
+                level, j = len(m.group(1)), i + 1
+                while j < len(lines):
+                    mj = re.match(r"^(#+) ", lines[j])
+                    if mj and len(mj.group(1)) <= level:
+                        break
+                    j += 1
+                return "\n".join(lines[i:j]).strip()
+    return None
 
 
 def latest_summary(root):
@@ -693,37 +724,70 @@ def latest_summary(root):
         return days[0], f.read()
 
 
+def latest_weekly(root):
+    """Trả (tên thư mục tuần, tên file, nội dung) của báo cáo tuần mới nhất, hoặc None.
+    Ưu tiên BAO_CAO_DOI_THU.md (Claude viết), không có thì dùng SO_LIEU.md (máy tính)."""
+    base = os.path.join(root, "reports")
+    if not os.path.isdir(base):
+        return None
+    for name in sorted((d for d in os.listdir(base) if os.path.isdir(os.path.join(base, d))), reverse=True):
+        for fn in ("BAO_CAO_DOI_THU.md", "SO_LIEU.md"):
+            path = os.path.join(base, name, fn)
+            if os.path.exists(path):
+                with open(path, encoding="utf-8") as f:
+                    return name, fn, f.read()
+    return None
+
+
 def render_readme_block(day, summary, repo=None, data_branch="research/reports"):
-    """Khối Markdown để chèn vào README. Hạ cấp tiêu đề của TOM_TAT xuống dưới '##'."""
+    """Khối báo cáo ngày. Hạ cấp tiêu đề của TOM_TAT xuống dưới '##'."""
     lines = [README_START, "## Báo cáo hôm nay", ""]
     if not day:
         lines += ["Chưa có báo cáo nào.", README_END]
         return "\n".join(lines)
-    body = [re.sub(r"^(#+) ", lambda m: "#" * (len(m.group(1)) + 2) + " ", ln)
-            for ln in summary.strip().splitlines()]
     lines += [f"_Cập nhật tự động {day}. Số liệu từ YouTube Data API, đối chiếu bằng tay trước khi quyết định._", ""]
-    lines += body + [""]
+    lines += demote(summary, 2) + [""]
     if repo:
         url = f"https://github.com/{repo}/blob/{data_branch}"
-        lines += [f"Xem thêm: [dữ liệu ngày {day}]({url}/data/{day}/TOM_TAT.md)"
-                  f" · [báo cáo theo tuần]({url}/reports/INDEX.md)", ""]
+        lines += [f"Xem thêm: [dữ liệu ngày {day}]({url}/data/{day}/TOM_TAT.md)", ""]
     lines.append(README_END)
     return "\n".join(lines)
 
 
-def replace_block(text, block):
+def render_weekly_block(weekly, repo=None, data_branch="research/reports"):
+    """Khối báo cáo tuần: chỉ phần kết luận (hoặc bảng chấm ô), kèm link bản đầy đủ."""
+    lines = [WEEKLY_START, "## Báo cáo tuần mới nhất", ""]
+    if not weekly:
+        lines += ["Chưa có báo cáo tuần nào.", WEEKLY_END]
+        return "\n".join(lines)
+    name, fn, text = weekly
+    picked = extract_section(text, WEEKLY_PICK)
+    lines += [f"_Báo cáo {name} · nguồn `{fn}`. Chỉ trích phần đầu, bản đầy đủ ở link bên dưới._", ""]
+    lines += (demote(picked, 1) if picked else text.strip().splitlines()[:30]) + [""]
+    if repo:
+        url = f"https://github.com/{repo}/blob/{data_branch}"
+        lines += [f"Xem thêm: [báo cáo đầy đủ {name}]({url}/reports/{name}/{fn})"
+                  f" · [mọi báo cáo tuần]({url}/reports/INDEX.md)", ""]
+    lines.append(WEEKLY_END)
+    return "\n".join(lines)
+
+
+def replace_block(text, block, start=README_START, end=README_END):
     """Thay khối giữa hai dấu; nếu chưa có dấu thì thêm vào cuối file."""
-    a, b = text.find(README_START), text.find(README_END)
+    a, b = text.find(start), text.find(end)
     if a != -1 and b > a:
-        return text[:a] + block + text[b + len(README_END):]
+        return text[:a] + block + text[b + len(end):]
     return text.rstrip("\n") + "\n\n" + block + "\n"
 
 
 def update_readme(root, readme_path, repo=None):
     day, summary = latest_summary(root)
+    weekly = latest_weekly(root)
     with open(readme_path, encoding="utf-8") as f:
         old = f.read()
     new = replace_block(old, render_readme_block(day, summary, repo))
+    if weekly or WEEKLY_START in new:       # chưa có báo cáo tuần và README chưa có khối thì bỏ qua
+        new = replace_block(new, render_weekly_block(weekly, repo), WEEKLY_START, WEEKLY_END)
     if new != old:
         with open(readme_path, "w", encoding="utf-8") as f:
             f.write(new)

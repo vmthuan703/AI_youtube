@@ -12,6 +12,8 @@
 Quota YouTube hồi lúc 00:00 giờ Thái Bình Dương: 08:00 UTC vào mùa đông, 07:00 UTC vào mùa hè. Lịch chạy
 lúc 08:17 UTC nên luôn sau giờ hồi quanh năm.
 
+**Báo lỗi:** workflow lỗi ở bất kỳ bước nào thì tự mở Issue nhãn `workflow-loi` (đã có Issue mở thì thêm bình luận). GitHub gửi email và thông báo trên app GitHub cho chủ repo. Bật ở GitHub → Settings → Notifications.
+
 **Lưu ý README:** bước này commit thẳng vào `main` bằng `GITHUB_TOKEN`, nên mỗi ngày có thêm một commit tự động. Nếu `main` bật bảo vệ nhánh (bắt buộc PR), bước này sẽ bị từ chối: cho phép `github-actions[bot]` đẩy vào `main`, hoặc bỏ bước này.
 
 Báo cáo tuần của Claude (Chủ nhật 19:47 giờ VN) viết sau lượt chạy 15:17 nên lên README ở lượt chạy hôm sau (thứ Hai).

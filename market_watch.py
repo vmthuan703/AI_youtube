@@ -50,6 +50,7 @@ CHANNEL_FIELDS = [
 VIDEO_FIELDS = [
     "snapshot_date", "market", "channel_id", "channel_title", "video_id", "title",
     "published_at", "duration_s", "is_long", "exclude_reason", "views", "likes", "comments",
+    "tags", "description",
 ]
 SCORE_FIELDS = [
     "market", "name", "decisive_new_winner", "n_big_videos", "top5_median_age_months",
@@ -335,6 +336,8 @@ def track(client, registry, cfg, snap_date, budget):
                 "published_at": c["published_at"], "duration_s": c["duration_s"],
                 "is_long": c["is_long"], "exclude_reason": c["exclude_reason"],
                 "views": c["views"], "likes": c["likes"], "comments": c["comments"],
+                "tags": "|".join(v.get("snippet", {}).get("tags", []) or []),
+                "description": (v.get("snippet", {}).get("description") or "").replace("\r", "")[:1500],
             })
         cs = info.get("statistics", {})
         hidden = bool(cs.get("hiddenSubscriberCount"))
@@ -625,6 +628,167 @@ def new_winners(pool, info, max_age=180, min_views=BIG_VIEWS):
                    for c, vw in best.items()), key=lambda x: -x[3])
 
 
+# ---------------------------------------------------------------- tín hiệu nội dung
+HOT_FIELDS = [
+    "market", "channel", "title", "video_url", "published_at", "age_days", "duration_min", "views",
+    "relative", "views_gain_per_day", "tags", "description",
+]
+TAG_FIELDS = ["market", "tag", "n_channels", "n_videos", "n_top_videos", "top_share"]
+FEATURE_FIELDS = ["market", "feature", "top_pct", "rest_pct", "lift", "n_top", "n_rest"]
+TOP_RELATIVE = 3.0                     # "video thắng" = >= 3x trung vị của chính kênh
+HOT_DAYS = 45
+
+TITLE_FEATURES = [
+    ("Bắt đầu bằng \"What If You\"", lambda t: bool(re.match(r"\s*what\s*if\s+you\b", t, re.I))),
+    ("Viết hoa \"IF\"", lambda t: bool(re.search(r"\bWhat IF\b", t))),
+    ("Có \"Could\" (năng lực)", lambda t: bool(re.search(r"\bcould\b", t, re.I))),
+    ("Có \"Everyone/Every\" (so với người khác)", lambda t: bool(re.search(r"\bevery(one|body)?\b", t, re.I))),
+    ("Có con số (10x, 1000 IQ…)", lambda t: bool(re.search(r"\d", t))),
+    ("Có từ VIẾT HOA để nhấn", lambda t: bool(re.search(r"\b(?!IF\b|IQ\b|POV\b|AI\b)[A-Z]{3,}\b", t))),
+    ("Kết thúc bằng \"?\"", lambda t: t.strip().endswith("?")),
+    ("Có vế đối \"But/…\" (cái giá)", lambda t: bool(re.search(r"\bbut\b|…|\.\.\.", t, re.I))),
+    ("Ngắn (≤ 45 ký tự)", lambda t: len(t) <= 45),
+]
+
+
+def us_time(iso):
+    """Giờ đăng theo giờ miền Đông Mỹ (khán giả Mỹ)."""
+    dt = nf.parse_time(iso)
+    try:
+        from zoneinfo import ZoneInfo
+        return dt.astimezone(ZoneInfo("America/New_York"))
+    except Exception:                                   # không có tzdata
+        return dt.astimezone(timezone(timedelta(hours=-5)))
+
+
+def pct(n, d):
+    return round(100 * n / d, 1) if d else None
+
+
+def content_signals(cfg, snaps, end, generated, seeds=frozenset()):
+    """Tín hiệu để lên kế hoạch nội dung: video thắng gần đây, khung tiêu đề, tags, mô tả, độ dài, giờ đăng."""
+    ref = end_of_day(end)
+    out = {"hot": [], "tags": [], "features": []}
+    lines = [f"# Tín hiệu nội dung tuần {week_label(end)}", "",
+             f"- **Ngày tạo:** {generated.isoformat()} · **Dữ liệu đến:** {end.isoformat()} · "
+             f"{len(snaps)} snapshot",
+             f"- \"Video thắng\" = video dài đúng ngách ≥ {TOP_RELATIVE:g}× trung vị của chính kênh. "
+             f"\"Gần đây\" = đăng trong {HOT_DAYS} ngày.", ""]
+    for m in cfg["markets"]:
+        first, last = {}, {}
+        for d, s in snaps:
+            for r in s["videos"]:
+                if r["market"] == m["id"] and truthy(r["is_long"]):
+                    first.setdefault(r["video_id"], (d, r))
+                    last[r["video_id"]] = (d, r)
+        by_ch = {}
+        for vid, (d, r) in last.items():
+            by_ch.setdefault(r["channel_id"], []).append((d, r))
+        vids = []
+        for cid, rows in by_ch.items():
+            share = niche_share(m, (r["title"] for _, r in rows))
+            if cid not in seeds and share is not None and share < min_share(m, cfg):
+                continue
+            views = [to_int(r["views"]) or 0 for _, r in rows]
+            base = median(views) if len(views) >= ar.MIN_VIDEOS_FOR_BASELINE else None
+            for d, r in rows:
+                if not in_niche(m, r["title"]):
+                    continue
+                v = to_int(r["views"]) or 0
+                fd, fr = first[r["video_id"]]
+                gain = round((v - (to_int(fr["views"]) or 0)) / (d - fd).days, 1) if fd < d else None
+                vids.append({
+                    "market": m["id"], "channel": r["channel_title"], "title": r["title"],
+                    "video_url": f"https://www.youtube.com/watch?v={r['video_id']}",
+                    "published_at": r["published_at"], "age_days": days_between(r["published_at"], ref),
+                    "duration_min": round((to_int(r["duration_s"]) or 0) / 60, 1), "views": v,
+                    "relative": round(v / base, 2) if base else None, "views_gain_per_day": gain,
+                    "tags": r.get("tags", ""), "description": (r.get("description") or "")[:600],
+                    "_channel_id": r["channel_id"]})
+        top = [v for v in vids if (v["relative"] or 0) >= TOP_RELATIVE]
+        rest = [v for v in vids if v["relative"] is not None and v["relative"] < TOP_RELATIVE]
+        hot = sorted((v for v in vids if v["age_days"] is not None and v["age_days"] <= HOT_DAYS
+                      and (v["relative"] or 0) >= TOP_RELATIVE),
+                     key=lambda v: (-(v["relative"] or 0), -(v["views_gain_per_day"] or 0)))
+        out["hot"] += hot
+        # khung tiêu đề
+        feats = []
+        for name, fn in TITLE_FEATURES:
+            tp = pct(sum(fn(v["title"]) for v in top), len(top))
+            rp = pct(sum(fn(v["title"]) for v in rest), len(rest))
+            lift = round(tp / rp, 2) if tp is not None and rp else None
+            feats.append({"market": m["id"], "feature": name, "top_pct": tp, "rest_pct": rp, "lift": lift,
+                          "n_top": len(top), "n_rest": len(rest)})
+        out["features"] += feats
+        # tags
+        tag_v, tag_c, tag_t = {}, {}, {}
+        tagged = [v for v in vids if v["tags"]]
+        top_ids = {id(v) for v in top}
+        for v in tagged:
+            for t in {x.strip().lower() for x in v["tags"].split("|") if x.strip()}:
+                tag_v[t] = tag_v.get(t, 0) + 1
+                tag_c.setdefault(t, set()).add(v["_channel_id"])
+                if id(v) in top_ids:
+                    tag_t[t] = tag_t.get(t, 0) + 1
+        tags = sorted(({"market": m["id"], "tag": t, "n_channels": len(tag_c[t]), "n_videos": n,
+                        "n_top_videos": tag_t.get(t, 0), "top_share": round(tag_t.get(t, 0) / n, 2)}
+                       for t, n in tag_v.items()), key=lambda x: (-x["n_channels"], -x["n_top_videos"]))
+        out["tags"] += tags
+        # mô tả, độ dài, giờ đăng
+        descs = [v["description"] for v in top if v["description"]]
+        hashtags = {}
+        for dsc in descs:
+            for h in set(re.findall(r"#\w+", dsc.lower())):
+                hashtags[h] = hashtags.get(h, 0) + 1
+        dur_top = [v["duration_min"] for v in top if v["duration_min"]]
+        dur_rest = [v["duration_min"] for v in rest if v["duration_min"]]
+        wd = {}
+        hr = {}
+        for v in top:
+            if v["published_at"]:
+                t = us_time(v["published_at"])
+                wd[t.strftime("%a")] = wd.get(t.strftime("%a"), 0) + 1
+                hr[t.hour] = hr.get(t.hour, 0) + 1
+        lines += [f"## {m['name']}", "",
+                  f"Cỡ mẫu: {len(vids)} video dài đúng ngách của kênh theo dõi · {len(top)} video thắng · "
+                  f"{len(hot)} video thắng gần đây · {len(tagged)} video có tags.", "",
+                  "### Video thắng gần đây (nguồn ý tưởng)", ""]
+        lines += [md_table(["Kênh", "Tiêu đề", "× trung vị", "View", "+View/ngày", "Tuổi (ngày)", "Phút"],
+                           [[v["channel"], f"[{v['title'][:70]}]({v['video_url']})", fmt_num(v["relative"]),
+                             fmt_num(v["views"]), fmt_num(v["views_gain_per_day"]), v["age_days"],
+                             fmt_num(v["duration_min"])] for v in hot[:25]])
+                  if hot else "Chưa có video nào đạt ngưỡng.", ""]
+        lines += ["### Khung tiêu đề: video thắng so với phần còn lại", "",
+                  md_table(["Đặc điểm", "% video thắng", "% còn lại", "Lift"],
+                           [[f["feature"], fmt_num(f["top_pct"]), fmt_num(f["rest_pct"]), fmt_num(f["lift"])]
+                            for f in feats]),
+                  f"\nCỡ mẫu: {len(top)} video thắng, {len(rest)} video còn lại. Lift > 1 nghĩa là đặc điểm "
+                  "xuất hiện nhiều hơn ở video thắng (tương quan, không phải nhân quả).", ""]
+        lines += ["### Tags dùng nhiều nhất (theo số kênh khác nhau)", ""]
+        lines += [md_table(["Tag", "Số kênh", "Số video", "Trong video thắng"],
+                           [[t["tag"], t["n_channels"], t["n_videos"], t["n_top_videos"]] for t in tags[:30]])
+                  if tags else "Chưa có dữ liệu tags (snapshot cũ chưa lưu tags).", ""]
+        lines += ["### Mô tả, độ dài, giờ đăng (video thắng)", "",
+                  f"- Mô tả: {len(descs)}/{len(top)} video có mô tả · độ dài trung vị "
+                  f"{fmt_num(int(median(len(x) for x in descs))) if descs else '—'} ký tự · "
+                  f"{pct(sum('#' in x for x in descs), len(descs)) if descs else '—'}% có hashtag · "
+                  f"{pct(sum('http' in x for x in descs), len(descs)) if descs else '—'}% có link",
+                  f"- Hashtag hay dùng: {', '.join(h for h, _ in sorted(hashtags.items(), key=lambda x: -x[1])[:10]) or '—'}",
+                  f"- Độ dài trung vị: video thắng {fmt_num(median(dur_top)) if dur_top else '—'} phút · "
+                  f"còn lại {fmt_num(median(dur_rest)) if dur_rest else '—'} phút",
+                  f"- Ngày đăng (giờ miền Đông Mỹ): {', '.join(f'{k} {v}' for k, v in sorted(wd.items(), key=lambda x: -x[1])) or '—'}",
+                  f"- Giờ đăng: {', '.join(f'{k}h ({v})' for k, v in sorted(hr.items(), key=lambda x: -x[1])[:5]) or '—'}",
+                  ""]
+        if descs:
+            lines += ["Mẫu mô tả của 3 video thắng gần đây nhất (600 ký tự đầu):", ""]
+            for v in sorted((v for v in top if v["description"]), key=lambda v: v["published_at"], reverse=True)[:3]:
+                lines += [f"**{v['channel']} · {v['title']}**", "", "```text",
+                          v["description"].strip(), "```", ""]
+    for v in out["hot"]:
+        v.pop("_channel_id", None)
+    return "\n".join(lines) + "\n", out
+
+
 # ---------------------------------------------------------------- báo cáo
 LIMITS = """## Giới hạn của số liệu
 
@@ -772,6 +936,12 @@ def run_weekly(cfg, root, end=None, days=7, generated=None, label=None):
     write_csv(os.path.join(d, "competitors.csv"), COMPETITOR_FIELDS, out["competitors"])
     write_csv(os.path.join(d, "bung_videos.csv"), BURST_FIELDS, out["bursts"])
     write_csv(os.path.join(d, "titles.csv"), TITLE_FIELDS, out["titles"])
+    sig_md, sig = content_signals(cfg, snaps, end, generated, seeds)
+    with open(os.path.join(d, "TIN_HIEU_NOI_DUNG.md"), "w", encoding="utf-8") as f:
+        f.write(sig_md)
+    write_csv(os.path.join(d, "hot_videos.csv"), HOT_FIELDS, sig["hot"])
+    write_csv(os.path.join(d, "tags.csv"), TAG_FIELDS, sig["tags"])
+    write_csv(os.path.join(d, "title_features.csv"), FEATURE_FIELDS, sig["features"])
     update_index(root)
     return d, len(snaps)
 

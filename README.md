@@ -1,5 +1,9 @@
 # AI_youtube
 
+<!-- KE_HOACH_MOI_NHAT:START -->
+> **Kế hoạch nội dung tuần tới:** đang chuẩn bị · [các tuần trước](ke-hoach/README.md)
+<!-- KE_HOACH_MOI_NHAT:END -->
+
 Bộ công cụ làm kênh YouTube truyện hoạt hình 2D thể loại **"What If"** cho khán giả Mỹ:
 từ **nghiên cứu ngách** → **viết kịch bản** → **giọng đọc** → **render video**, hầu hết bằng code.
 

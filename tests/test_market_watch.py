@@ -172,3 +172,19 @@ def test_scorecard_flags_mixed_niche_top5():
     sc = mw.scorecard(m, pool, info, NOW)
     assert sc["niche_ok_top5"].startswith("3/5") and sc["gate_niche"] == "không"
     assert sc["verdict"].startswith("CẦN THEO DÕI")
+
+
+def test_track_saves_tags_and_description_and_signals(tmp_path):
+    client = FakeClient(views={"a": 900_000})
+    client.videos["a"]["snippet"].update(tags=["what if", "animation"], description="Story #whatif")
+    root = str(tmp_path)
+    mw.run_daily(client, cfg(), root, date(2026, 11, 4), NOW)
+    vids = {r["video_id"]: r for r in mw.read_csv(str(tmp_path / "data" / "2026-11-04" / "videos.csv"))}
+    assert vids["a"]["tags"] == "what if|animation" and "#whatif" in vids["a"]["description"]
+    d, _ = mw.run_weekly(cfg(), root, date(2026, 11, 4), 7, generated=date(2026, 11, 4))
+    hot = mw.read_csv(os.path.join(d, "hot_videos.csv"))
+    assert [h["title"] for h in hot] == ["What if a"]
+    tags = {t["tag"]: t for t in mw.read_csv(os.path.join(d, "tags.csv"))}
+    assert tags["what if"]["n_top_videos"] == "1"
+    md = open(os.path.join(d, "TIN_HIEU_NOI_DUNG.md"), encoding="utf-8").read()
+    assert "#whatif" in md and "Video thắng gần đây" in md

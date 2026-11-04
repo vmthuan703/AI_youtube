@@ -36,7 +36,8 @@ python audio/mix.py --project projects/<slug>        # music + SFX, mix, mux (+ 
 
 ## Speed guide (measure, then tell the user)
 Frames = seconds × fps. Measured on a 4-thread cloud CPU **without a GPU**, quality `high`, typical street/room shots:
-- 1080p: ≈ 0.6 frames/s → 1 minute of video ≈ 50 min at 30 fps, ≈ 100 min at 60 fps.
+- 1080p: ≈ 0.55–0.6 frames/s → 1 minute of video ≈ 50–60 min at 30 fps, ≈ 100–120 min at 60 fps (the 32.5 s
+  speed-demo at 1080p60 high, 3 workers, with motion blur on 3 shots: 61 min).
 - 720p: ≈ 1.4 frames/s. Preview at `--scale 0.5 --fps 30`: ≈ 3–4 frames/s.
 - Extra cost per shot: `dof` +40%, `mblur: 2` ×2, `mblur: 3` ×3, quality `max` ×2.5.
 With a desktop GPU the 3D part is 20–50× faster and capture/encode dominate: expect roughly 5–15 frames/s at 1080p on

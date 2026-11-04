@@ -42,7 +42,7 @@ Bản xuất: H.264 High, BT.709, AAC 48 kHz 384 kb/s, đúng khuyến nghị t�
 ## Thời gian render
 - Máy **có GPU** (PC Windows/macOS): nhanh, khoảng 5–15 khung/giây ở 1080p.
 - Máy **không GPU** (máy chủ, phiên cloud): khoảng 0,6 khung/giây ở 1080p chất lượng high.
-  - 1 phút video 1080p60 mất khoảng 100 phút.
+  - 1 phút video 1080p60 mất khoảng 100–120 phút (đo thật: demo 32,5 giây 1080p60 high mất 61 phút).
   - Nên xem thử bản 720p trước, rồi render bản cuối qua đêm hoặc trên máy có GPU.
 
 ## Cài đặt plugin

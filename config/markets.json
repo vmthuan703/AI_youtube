@@ -1,11 +1,12 @@
 {
-  "_ghi_chu": "Cấu hình cho market_watch.py. Mỗi truy vấn search = 100 đơn vị quota (10.000/ngày). Theo tài liệu phương pháp: mỗi ô thử >= 8 truy vấn khác nhau trước khi kết luận ô trống.",
+  "_ghi_chu": "Cấu hình cho market_watch.py. Mỗi truy vấn search = 100 đơn vị quota (10.000/ngày). Theo tài liệu phương pháp: mỗi ô thử >= 8 truy vấn khác nhau trước khi kết luận ô trống. title_regex: chỉ video có tiêu đề khớp mới được tính vào bảng chấm và mới được tự thêm kênh; kênh discovery có < min_niche_share video dài khớp sẽ bị bỏ khỏi danh sách theo dõi. exclude_channels: tên hoặc ID kênh khớp bộ lọc chữ nhưng không làm ngách (vd. vlog thử thách, hài kịch), bị loại khỏi bảng chấm.",
   "quota_budget": 6000,
   "discovery": {
     "video_age_days": 90,
     "max_results": 50,
     "new_channel_days": 365,
-    "track_min_views": 20000
+    "track_min_views": 20000,
+    "min_niche_share": 0.5
   },
   "tracking": {
     "max_channels": 60,
@@ -17,8 +18,15 @@
       "name": "What-If Fiction × Mỹ",
       "region": "US",
       "language": "en",
+      "title_regex": "\\bwhat\\s*if\\b|\\bhypothetical\\b|\\bimagine if\\b|\\bwhat would happen if\\b",
+      "exclude_channels": [
+        "Jordan Matter",
+        "janine berdin"
+      ],
       "seed_channels_csv": "data/channels_2026-11-04.csv",
-      "seed_handles": ["@hypotheticatales"],
+      "seed_handles": [
+        "@hypotheticatales"
+      ],
       "queries": [
         "what if you",
         "what if story animated",

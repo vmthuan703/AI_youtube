@@ -139,3 +139,36 @@ def test_import_snapshot(tmp_path):
     assert (nc, nv) == (1, 1)
     ch = mw.read_csv(str(tmp_path / "r" / "data" / "2026-11-03" / "channels.csv"))
     assert ch[0]["first_upload_at"] == iso(20)
+
+
+def niche_cfg(**kw):
+    c = cfg(**kw)
+    c["markets"][0]["title_regex"] = r"\bwhat if\b"
+    return c
+
+
+def test_niche_filter_blocks_off_niche_channel(tmp_path):
+    client = FakeClient()
+    client.videos["a"]["snippet"]["title"] = "Short drama ep 1"     # kênh mới nhưng lệch ngách
+    for k in ("b", "c", "d"):
+        client.videos[k]["snippet"]["title"] = f"Drama {k}"
+    mw.run_daily(client, niche_cfg(), str(tmp_path), date(2026, 11, 4), NOW)
+    assert "new" not in {r["channel_id"] for r in mw.load_registry(str(tmp_path))}
+
+
+def test_prune_removes_discovery_channel_but_keeps_seed():
+    reg = [{"channel_id": "x", "market": "m", "source": "discovery", "title": "X"},
+           {"channel_id": "s", "market": "m", "source": "seed", "title": "S"}]
+    rows = [{"channel_id": c, "is_long": "True", "title": "Drama"} for c in ("x", "s") for _ in range(4)]
+    removed = mw.prune_registry(reg, rows, niche_cfg())
+    assert [r["channel_id"] for r in removed] == ["x"] and [r["channel_id"] for r in reg] == ["s"]
+
+
+def test_scorecard_flags_mixed_niche_top5():
+    m = {"id": "m", "name": "Ô", "title_regex": r"\bwhat if\b"}
+    pool = {f"v{i}": {"channel_id": f"c{i % 5}", "views": 200_000, "is_long": "True"} for i in range(10)}
+    info = {f"c{i}": {"title": f"C{i}", "age": 40, "age_source": "x", "subs": 5_000,
+                      "niche_share": 1.0 if i < 3 else 0.1} for i in range(5)}
+    sc = mw.scorecard(m, pool, info, NOW)
+    assert sc["niche_ok_top5"].startswith("3/5") and sc["gate_niche"] == "không"
+    assert sc["verdict"].startswith("CẦN THEO DÕI")

@@ -15,9 +15,11 @@
   nêu lý do và chờ người dùng xác nhận trước khi thực hiện.
 
 ## Git
-- KHÔNG tự `git commit` hoặc `git push`. Luôn hỏi và chờ người dùng đồng ý trước.
-- Ngoại lệ: thay đổi trong `CLAUDE.md` thì tự commit và push, không cần hỏi,
-  nhưng commit riêng, không gộp với file khác.
+- Được tự `git commit` và `git push` lên nhánh làm việc mà không cần hỏi.
+  Vẫn hỏi trước khi: push lên `main`, force-push, xóa nhánh, mở/đóng/gộp PR.
+- Thay đổi trong `CLAUDE.md` thì commit riêng, không gộp với file khác.
+- Ngoại lệ: tác vụ theo lịch "Báo cáo đối thủ 3 ngày" được tự commit và push
+  vào `research/reports`, và vào `main` nhưng chỉ đổi `ke-hoach/` và khối `KE_HOACH_MOI_NHAT` đầu `README.md`.
 
 ## Bảo trì file này
 - Mỗi khi thêm nội dung vào `CLAUDE.md`, nếu file dài quá 50 dòng thì đề nghị

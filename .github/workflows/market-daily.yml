@@ -1,0 +1,111 @@
+# Thu thập thị trường YouTube mỗi ngày, ngay sau khi quota YouTube hồi.
+# Quota hồi lúc 00:00 giờ Thái Bình Dương: 08:00 UTC (mùa đông) hoặc 07:00 UTC (mùa hè).
+# Chạy 08:17 UTC (15:17 giờ VN) nên luôn sau giờ hồi quanh năm.
+# Lưu ý: GitHub chỉ chạy lịch (schedule) với workflow nằm trên nhánh mặc định (main).
+name: Thu thập thị trường hằng ngày
+
+on:
+  schedule:
+    - cron: "17 8 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: market-daily
+  cancel-in-progress: false
+
+jobs:
+  daily:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+      DATA_BRANCH: research/reports
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - run: pip install -r requirements.txt
+
+      - name: Kiểm tra API key
+        run: |
+          if [ -z "$YOUTUBE_API_KEY" ]; then
+            echo "::error::Chưa có secret YOUTUBE_API_KEY (Settings → Secrets and variables → Actions)"
+            exit 1
+          fi
+
+      - name: Mở nhánh dữ liệu
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin "$DATA_BRANCH" > /dev/null; then
+            git fetch origin "$DATA_BRANCH"
+            git worktree add -B "$DATA_BRANCH" research "origin/$DATA_BRANCH"
+          else
+            git worktree add --orphan -b "$DATA_BRANCH" research
+          fi
+
+      - name: Thu thập (discovery + snapshot đối thủ)
+        run: python market_watch.py daily --config config/markets.json --root research
+
+      - name: Số liệu tuần (chủ nhật giờ VN)
+        run: |
+          if [ "$(TZ=Asia/Ho_Chi_Minh date +%u)" = "7" ]; then
+            python market_watch.py weekly --config config/markets.json --root research
+          fi
+
+      - name: Đẩy dữ liệu lên nhánh research/reports
+        run: |
+          cd research
+          git add -A
+          if git diff --cached --quiet; then echo "Không có gì mới"; exit 0; fi
+          git commit -m "Dữ liệu thị trường $(TZ=Asia/Ho_Chi_Minh date +%F)"
+          for i in 1 2 3 4; do
+            git push origin "HEAD:$DATA_BRANCH" && exit 0
+            sleep $((2 ** i))
+            git pull --rebase origin "$DATA_BRANCH" || true
+          done
+          exit 1
+
+      - name: Cập nhật báo cáo hôm nay vào README của main
+        if: github.ref == 'refs/heads/main'
+        run: |
+          python market_watch.py readme --root research --readme README.md --repo "$GITHUB_REPOSITORY"
+          git add README.md
+          if git diff --cached --quiet; then echo "README không đổi"; exit 0; fi
+          git commit -m "README: báo cáo thị trường $(TZ=Asia/Ho_Chi_Minh date +%F) [skip ci]"
+          for i in 1 2 3 4; do
+            git push origin HEAD:main && exit 0
+            sleep $((2 ** i))
+            git pull --rebase origin main || true
+          done
+          exit 1
+
+      # Lỗi thì mở Issue: GitHub gửi email và thông báo trên app GitHub cho chủ repo.
+      # Đã có Issue lỗi đang mở thì chỉ thêm bình luận, không mở thêm.
+      - name: Báo lỗi bằng Issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          RUN_URL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          NGAY="$(TZ=Asia/Ho_Chi_Minh date +%F)"
+          gh label create workflow-loi --color B60205 --description "Workflow hằng ngày lỗi" 2>/dev/null || true
+          OPEN="$(gh issue list --label workflow-loi --state open --limit 1 --json number --jq '.[0].number')"
+          if [ -n "$OPEN" ]; then
+            gh issue comment "$OPEN" --body "Lỗi tiếp ngày $NGAY: $RUN_URL"
+          else
+            gh issue create --label workflow-loi \
+              --title "Workflow thu thập hằng ngày lỗi ($NGAY)" \
+              --body "Lượt chạy lỗi: $RUN_URL
+
+Nguyên nhân hay gặp: thiếu hoặc sai secret YOUTUBE_API_KEY, hết quota YouTube, nhánh research/reports bị chặn push. Đọc log ở link trên. Sửa xong thì đóng Issue này."
+          fi

@@ -1,0 +1,40 @@
+---
+name: render-3d-video
+description: "This skill should be used when the user runs /render-3d-video or asks to \"build the 3D scenes\", \"check the shots\", \"show me a contact sheet\", \"preview the video\", \"render the video\", \"render in 1080p60 / 4K / 9:16\", \"export in high quality\", \"re-render after a fix\", or \"export the final MP4\" for an aiTrends 3D Studio project. It writes or repairs shot code in batches with contact-sheet QC, makes preview clips, sets the export quality, runs the full frame-by-frame render, and muxes the final video with sound.\n"
+metadata:
+  version: "0.1.0"
+  author: aiTrends
+---
+
+# /render-3d-video: build, QC, preview, export quality and final render
+
+Work inside `aitrends-3d-studio/` on the active project (ask if several exist). Read `engine-api.md`, `style-bible.md`
+and `render-qc.md` in `../make-3d-video/references/` before writing or fixing scenes.
+
+## 1. Build or repair shots (batches of 8–12)
+- `node render.mjs --project projects/<slug> --sheet --scale 0.4` lists MISSING shots and errors and writes
+  `build/sheets/sheet_XX.png` (one still per shot).
+- Write `scenes/sets/*.js` and `scenes/shots/NN_name.js` (`registerShot(id, { init, draw, overlay })`). Study
+  `examples/speed-demo/scenes/` for working patterns.
+- After each batch, re-run the sheet and **open every sheet PNG** against the QC checklist. Repeat until clean.
+- Motion: `--stills t1,t2,t3` or `--from A --to B --scale 0.5 [--fps 30]` (writes `build/preview.mp4`).
+
+## 2. Export quality
+Confirm or change `config.json`: `resolution` (720p/1080p/1440p/2160p), `fps` (24/30/60), `quality`
+(draft/standard/high/max) and `export.upscale` ("1440p"/"2160p" for YouTube). Recommend 1080p · 60 fps · high, plus
+upscale 1440p for YouTube when the machine can afford it; give the time estimate from `render-qc.md` (CPU vs GPU).
+Switching aspect needs a fresh sheet review (9:16 framing differs).
+
+## 3. Preview checkpoint
+`node render.mjs --project projects/<slug> --from 0 --to 20 --scale 0.5` and send the preview (or the sheets) with the
+final render-time estimate before the long render.
+
+## 4. Final render
+`nohup node render.mjs --project projects/<slug> > projects/<slug>/build/render.log 2>&1 &`. Poll the log and report
+progress and ETA. Fewer workers if memory is tight. Output: `build/video_silent.mp4`; the end of the log lists shot
+errors to fix and re-render.
+
+## 5. Sound, mux and deliver
+Make sure the music plan and SFX are set (`/3d-video-sound`), then `python audio/mix.py --project projects/<slug>` →
+`out/<title>.mp4` (AAC 48 kHz; upscaled if `export.upscale`). QC with ffprobe (resolution, fps, duration, audio) and a
+final contact sheet, send the MP4, and say in plain words where it was saved.

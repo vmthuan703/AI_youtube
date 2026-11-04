@@ -12,5 +12,15 @@ aitrends-2d-studio/projects/*/out/
 aitrends-2d-studio/projects/*/input/*.mp3
 aitrends-2d-studio/projects/*/input/*.wav
 
+# aiTrends 3D studio (bản cài trong workspace) và gói zip của plugin
+aitrends-3d-studio/node_modules/
+aitrends-3d-studio/build_voice/
+aitrends-3d-studio/projects/*/build/
+aitrends-3d-studio/projects/*/out/
+aitrends-3d-studio/projects/*/input/*.mp3
+aitrends-3d-studio/projects/*/input/*.wav
+plugins/**/build/
+dist/
+
 # Cài đặt Claude Code cá nhân
 .claude/settings.local.json

@@ -115,7 +115,7 @@ export const JAKE = { top: 'tshirt', color: '#e0402e', head: 'capBack', headColo
 export const MOM  = { top: 'dress', color: '#c05a8a', hair: 'bun', hairColor: '#5a3a2a' };
 export const BOSS = { top: 'suit', color: '#22222a', tie: '#c02a2a', face: 'sunglasses', legs: '#22222a', shoes: '#111111', scale: 1.15 };
 ```
-`skin` 'pale' | 'ink' | '#hex' (default from the style) · `eyes` 'dot' | 'big` · `top` hoodie | tshirt | jacket | suit |
+`skin` 'pale' | 'ink' | '#hex' (default from the style) · `eyes` 'dot' | 'big' · `top` hoodie | tshirt | jacket | suit |
 dress | labcoat | vest | none · `color`, `color2` (trim), `shirt`, `tie`, `strings` · `legs` pants colour | 'shorts:#hex' |
 null (bare stick legs) · `shoes` colour | null (round feet), `shoeSole` · `gloves` colour (default: ball hands in skin) ·
 `head` cap | capBack | beanie | hood | headband | tophat | crown, `headColor` · `hair` short | messy | spiky | bob | long |
@@ -138,7 +138,7 @@ sit sitBack sitDesk lie jump fall superLand flexL`. A pose object:
 `{ y, hips:[pitch,yaw,roll], spine:[…], head:[…], armL:[raise, az, bend, twist] | {to:[x,y,z], pole}, armR, legL:[lift, side,
 knee, twist] | {to}, legR, handL:'fist'|'open'|'point'|'relaxed', handR }` in degrees. Pitch + leans/nods forward, yaw +
 turns to the character's left, arm raise 0 = hanging, 90 = horizontal, 180 = up; az 0 = forward, 90 = sideways. `{to}`
-uses IK in character space (metres, +z forward, y up; shoulders at y ≈ 1.15, hips at 0.68). Copy and edit:
+uses IK in character space (metres, +z forward, y up; shoulders at y ≈ 1.08 and x ≈ ±0.18, hips at 0.68). Copy and edit:
 `{ ...T.POSES3.sit, armL: { to: [0.1, 0.95, 0.35] }, handL: 'open' }`.
 
 Walking/running: phase = t × 2π × cadence (walk 0.9, run 1.4, sprint 1.9 Hz); move the character at about 1.3 / 4 / 9

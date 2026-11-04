@@ -119,3 +119,22 @@ Dựng lại:
 cd aitrends-2d-studio && node render.mjs --project projects/channel-art --stills 0.5,1.5
 cd projects/channel-art && python3 export_art.py
 ```
+
+## 8. Học từ kênh linh vật áo hoodie xanh (ảnh chụp người dùng gửi)
+
+Kênh làm toàn bộ thumbnail theo một công thức, 24–91 N view chỉ sau 1–4 ngày:
+
+| Điểm | Ví dụ trên kênh |
+|---|---|
+| Một linh vật duy nhất (đầu đen, hoodie xanh), cận nửa người, chiếm 40–50% khung bên trái | mọi video |
+| **Tay làm hành động** của câu chuyện (cầm bút ký, xé bức tranh, chống cằm, giơ tay) | DON'T SIGN., MY RULES NOW. |
+| Chữ **2 tầng ở góc trên phải**, trắng + vàng, viền đen dày, **câu mệnh lệnh hoặc câu thoại** có dấu chấm | DAY 10,000., CAN'T HIDE., READ THIS FIRST. |
+| Một **đạo cụ mang luật chơi** (lịch, hợp đồng, giấy nhớ, tia X-quang, bóng nghĩ) | lịch "DAY 10,000", giấy "DON'T TRUST HIM" |
+| Phông phòng có ánh sáng điện ảnh (hoàng hôn, đèn đêm), hơi mờ để nhân vật nổi lên | phòng ngủ, văn phòng, phố đêm |
+| Thường có nhân vật phụ (phản diện cười) ở hậu cảnh | DON'T SIGN., HE'S LYING |
+
+Áp dụng: **T4 #2 · phương án D "PICK UP."** (`aitrends-2d-studio/projects/t4-02-thumb/thumbnails/D_pick_up.jpg`).
+
+- Maya cận nửa người trong phòng ngủ đêm, tay cầm điện thoại hướng về người xem, mặt lo lắng.
+- Thẻ thông báo "Mom · 14 missed calls · TOMORROW 6:12 PM" là đạo cụ mang luật chơi.
+- Chữ "PICK / UP." ở góc trên phải.

@@ -86,3 +86,27 @@ registerShot('thC', { draw(g) {
   headline(g, [['IT', WHITE], ['KEEPS', WHITE]], 1080, 150, 150);
   headline(g, [['COUNT.', YELLOW]], 1080, 300, 150);
 } });
+
+// D — learned from the "Project IF" style channel (blue-hoodie mascot):
+//   cinematic lit room behind, the hero in a big upper-body shot WITH hands doing the action,
+//   2-line imperative headline top-right (white + yellow, ends with a period), one story prop carries the premise.
+import { drawFigure, POSES } from '/engine/rig2d.js';
+import { bedroom, digitalClock } from '/projects/t4-02/scenes/sets/bedroom.js';
+import { blurLayer, veil } from '/engine/core.js';
+
+registerShot('thD', { draw(g) {
+  blurLayer(g, 3, (g) => bedroom(g, 0, { z: 1.25, x: -120, y: -40 }, { clock: '11:59', phoneGlow: 1 }));
+  veil(g, '#2a3a8a', 0.28, 'lighter');
+  g.fillStyle = radGrad(g, 1250, 620, 0, 900, [alpha('#ff4a3a', 0.45), alpha('#ff4a3a', 0)]); g.fillRect(0, 0, E.W, E.H);
+  g.fillStyle = radGrad(g, 380, 300, 0, 700, [alpha('#8fd3ff', 0.35), alpha('#8fd3ff', 0)]); g.fillRect(0, 0, E.W, E.H);
+  // Maya, big upper body, holding the phone out toward the viewer
+  const pose = { ...POSES.phone, hF: [44, -150], eF: [30, -128], hB: [34, -140], eB: [14, -128] };
+  drawFigure(g, { x: 430, y: 1850, s: 6.8, facing: 1, outfit: MAYA, pose, expr: 'shocked', face: { brows: 'raised', mouth: 'wavy', sweat: true }, look: [0.6, 0.25],
+    rim: { color: '#9fdcff', dir: [1, -0.3], w: 5 }, shadow: false });
+  // phone in her hands, screen to us
+  g.save(); g.translate(880, 700); g.rotate(-0.08); phone(g, 0, 0, 640, 0, { time: '11:59', date: 'Tonight', cards: [], glowA: 1.6 }); g.restore();
+  bigNotif(g, 700, 600, 1000, { sender: 'Mom', msg: '14 missed calls', msgColor: '#ff6b5a', tag: 'TOMORROW 6:12 PM', icon: '☎' });
+  // 2-line headline, top-right, right-aligned
+  const hl = (str, y, col) => { text(g, str, 1868, y + 12, { size: 230, align: 'right', color: alpha('#000', 0.55) }); text(g, str, 1860, y, { size: 230, align: 'right', color: col, stroke: 44, strokeColor: '#0a0712' }); };
+  hl('PICK', 150, WHITE); hl('UP.', 365, YELLOW);
+} });

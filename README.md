@@ -65,3 +65,23 @@ Chỉ có lượt xem tích luỹ nên luôn có cảnh báo tuổi video và c�
 so sánh trong cùng nhóm tuổi. Điểm 100 là heuristic, không phải xác suất.
 
 Kết quả nghiên cứu 2026-11-03 (27 kênh, 377 video dài): `reports/2026-11-03/BAO_CAO_TEP_KHAN_GIA.md`.
+
+## 3. Script → voiceover (mã nguồn mở) → video 2D
+
+`tools/tts/kokoro_tts.py` đọc kịch bản có tên người nói (`NARRATOR: …`, `MOM: …`) bằng
+**Kokoro-82M** (Apache-2.0, chạy CPU, 28 giọng tiếng Anh), xuất `voiceover.mp3`, `words.json`
+(mốc thời gian từng từ, nhập thẳng vào aiTrends 2D Studio, không cần Whisper) và `lines.json`
+(ai nói lúc nào, để nhép miệng nhân vật).
+
+```bash
+pip install -r requirements-tts.txt
+python tools/tts/kokoro_tts.py --download            # ~350 MB, một lần
+python tools/tts/kokoro_tts.py --script scripts/T4_02_tomorrows_notifications_VO.txt --list-speakers
+python tools/tts/kokoro_tts.py --script scripts/T4_02_tomorrows_notifications_VO.txt \
+    --out-dir out/T4_02_voice --speed 1.12 --sentence-pause 0.15 --line-pause 0.35 \
+    --voices "NARRATOR=am_michael,MOM=af_sarah,MAYA=af_bella,SAM=am_puck,..."
+```
+
+Skill dự án `.claude/skills/script-to-2d-video`: chỉ cần đưa kịch bản. Claude hỏi bạn một lần
+(giọng dẫn, tốc độ, giọng nhân vật, khung hình), cho nghe thử, tạo voiceover, rồi chuyển sang
+`aitrends-2d-studio:make-2d-video`.

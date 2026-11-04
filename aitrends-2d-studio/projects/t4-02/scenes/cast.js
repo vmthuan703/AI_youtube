@@ -1,0 +1,14 @@
+// cast.js — one outfit per recurring character. Signature colour = identity; identical in every shot.
+export const MAYA = { top: 'hoodie', color: '#d64a33', head: 'ponytail' };                     // "you", 16
+export const MOM = { top: 'tshirt', color: '#3a6ea5', head: 'bun' };                           // nurse in blue scrubs
+export const JORDAN = { top: 'tshirt', color: '#2a2a36', head: 'cap', headColor: '#3fb950' };   // best friend, green cap
+export const OKAFOR = { top: 'labcoat', face: 'glasses', head: 'none' };                        // chemistry teacher
+export const SAM = { top: 'tshirt', color: '#2a2a36', head: 'cap', headColor: '#f2c21a', kid: true }; // brother, 9, yellow cap
+export const AVA = { top: 'tshirt', color: '#2a2a36', head: 'beanie', headColor: '#f29ac0' };   // crush, pink beanie
+export const COACH = { top: 'tracksuit', color: '#8a5ad6', head: 'headband', headColor: '#e8e4f0' }; // track coach, purple
+export const TYLER = { top: 'jersey', color: '#3a3a48', head: 'capBack', headColor: '#9aa0ae' };  // classmate, grey
+export const PRIYA = { top: 'suit', color: '#cfd6e6', head: 'bun', face: 'glasses' };            // Hindsight Labs, pale suit
+export const ALVAREZ = { top: 'dress', color: '#c0844a', head: 'curly' };                       // neighbour, ochre dress
+export const DOCTOR = { top: 'labcoat', head: 'none' };                                          // ER doctor
+export const CAST = [MAYA, MOM, SAM, JORDAN, AVA, PRIYA];
+export const WHO = { MAYA, MOM, JORDAN, OKAFOR, SAM, AVA, COACH, TYLER, PRIYA, ALVAREZ, DOCTOR };

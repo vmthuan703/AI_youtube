@@ -1,0 +1,3292 @@
+{
+ "title": "What If Your Phone Showed Tomorrow's Notifications Today?",
+ "duration": 588.073,
+ "shots": [
+  {
+   "id": "s001",
+   "start": 0,
+   "end": 1.5,
+   "line": "It's 11:59 p.m.",
+   "scene": "Establishing wide: dark bedroom at night, moonlight through the window, red digital clock 11:59 on the nightstand, Maya asleep, slow push",
+   "set": "bedroom",
+   "bars": null,
+   "in": {
+    "type": "fade",
+    "dur": 0.6
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s002",
+   "start": 1.5,
+   "end": 4.6,
+   "line": "Your phone is face down on the nightstand.",
+   "scene": "Insert: nightstand top, phone face down, red clock 11:59 blurred behind, moon rim, slow push",
+   "set": "bedroom",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s003",
+   "start": 4.6,
+   "end": 5.88,
+   "line": "It buzzes once.",
+   "scene": "Same insert: the phone buzzes once (shake + rings), the screen edge glows blue",
+   "set": "bedroom",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.12,
+     "name": "phonebuzz",
+     "gain": -8
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s004",
+   "start": 5.88,
+   "end": 7.57,
+   "line": "You flip it over.",
+   "scene": "Medium: Maya props up on an elbow in bed and flips the phone; blue light hits her face",
+   "set": "bedroom",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.6,
+     "name": "whoosh",
+     "gain": -18
+    }
+   ],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s005",
+   "start": 7.57,
+   "end": 9.62,
+   "line": "Forty-six new notifications.",
+   "scene": "Phone close-up: lock screen 11:59, the notification stack scrolls in, a counter pops 46",
+   "set": "phone",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.3,
+     "name": "pop",
+     "gain": -14
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s006",
+   "start": 9.62,
+   "end": 10.6,
+   "line": "Normal.",
+   "scene": "bigFace Maya, sleepy-neutral, blue glow from below",
+   "set": "bedroom",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s007",
+   "start": 10.6,
+   "end": 13.58,
+   "line": "Except every single one is stamped tomorrow.",
+   "scene": "Lock screen: a coral TOMORROW tag stamps onto every card, one by one",
+   "set": "phone",
+   "bars": "scope",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.9,
+     "name": "glitch",
+     "gain": -14
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s008",
+   "start": 13.58,
+   "end": 17.16,
+   "line": "Tomorrow, 7:02 a.m. Mom: Don't forget your lunch.",
+   "scene": "Big TOMORROW card: 7:02 AM \u00b7 Mom \u00b7 Don't forget your lunch",
+   "set": "phone",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.1,
+     "name": "pop",
+     "gain": -12
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s009",
+   "start": 17.16,
+   "end": 21.12,
+   "line": "Tomorrow, 10:15 a.m. School alert: Fire drill.",
+   "scene": "Big TOMORROW card: 10:15 AM \u00b7 School alert \u00b7 Fire drill",
+   "set": "phone",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.1,
+     "name": "pop",
+     "gain": -12
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s010",
+   "start": 21.12,
+   "end": 22.38,
+   "line": "You go to sleep.",
+   "scene": "Wide: Maya lies back, the phone glow fades, the room goes dark",
+   "set": "bedroom",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s011",
+   "start": 22.38,
+   "end": 25.58,
+   "line": "At 7:02, a voice comes up the stairs.",
+   "scene": "Morning stairs wide: sunrise through the landing window, the clock readout 7:02 appears",
+   "set": "stairs",
+   "bars": null,
+   "in": {
+    "type": "dip",
+    "dur": 0.5
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s012",
+   "start": 25.58,
+   "end": 28.0,
+   "line": "Maya! Don't forget your lunch!",
+   "scene": "Medium: Mom in blue scrubs at the bottom of the stairs, holding up a lunch bag, calling up (lip-sync)",
+   "set": "stairs",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": ""
+  },
+  {
+   "id": "s013",
+   "start": 28.0,
+   "end": 30.76,
+   "line": "At 10:15, the fire alarm goes off.",
+   "scene": "School hallway: the red alarm strobes, the crowd jumps, readout 10:15",
+   "set": "hallway",
+   "bars": null,
+   "in": {
+    "type": "whip",
+    "dur": 0.3,
+    "dir": 1
+   },
+   "sfx": [
+    {
+     "at": 0.3,
+     "name": "buzz",
+     "gain": -14
+    }
+   ],
+   "notes": "",
+   "amb": {
+    "name": "murmur",
+    "gain": -24
+   }
+  },
+  {
+   "id": "s014",
+   "start": 30.76,
+   "end": 32.58,
+   "line": "Exactly on time.",
+   "scene": "Medium: Maya stands calm in the red strobe while others cover their ears; a slight smirk",
+   "set": "hallway",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "murmur",
+    "gain": -26
+   }
+  },
+  {
+   "id": "s015",
+   "start": 32.58,
+   "end": 35.31,
+   "line": "Your name is Maya. You're sixteen.",
+   "scene": "Medium at the lockers: Maya, callout MAYA \u00b7 16",
+   "set": "hallway",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.4,
+     "name": "blip",
+     "gain": -14
+    }
+   ],
+   "notes": "",
+   "amb": {
+    "name": "murmur",
+    "gain": -26
+   }
+  },
+  {
+   "id": "s016",
+   "start": 35.31,
+   "end": 37.47,
+   "line": "And your phone just showed you tomorrow.",
+   "scene": "bigFace Maya looking down at the phone, awe, blue glow",
+   "set": "hallway",
+   "bars": "scope",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.6,
+     "name": "riser",
+     "gain": -10
+    }
+   ],
+   "notes": "",
+   "amb": {
+    "name": "murmur",
+    "gain": -26
+   }
+  },
+  {
+   "id": "s017",
+   "start": 37.47,
+   "end": 41.34,
+   "line": "So what if your phone showed tomorrow's notifications today?",
+   "scene": "3D night street of houses with lit windows (one bedroom window blue), dolly; title card",
+   "set": "title",
+   "bars": "scope",
+   "in": {
+    "type": "flash",
+    "dur": 0.4
+   },
+   "sfx": [
+    {
+     "at": 0.05,
+     "name": "impact",
+     "gain": -8
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s018",
+   "start": 41.34,
+   "end": 42.62,
+   "line": "Here's the rule.",
+   "scene": "Blueprint: the line THE RULE draws on",
+   "set": "blueprint",
+   "bars": "none",
+   "in": {
+    "type": "zoom",
+    "dur": 0.35
+   },
+   "sfx": [
+    {
+     "at": 0.1,
+     "name": "blip",
+     "gain": -14
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s019",
+   "start": 42.62,
+   "end": 48.15,
+   "line": "Every night at 11:59, tomorrow's notifications land on your lock screen.",
+   "scene": "Blueprint: clock 11:59 \u2192 arrow \u2192 lock screen with cards dropping in",
+   "set": "blueprint",
+   "bars": "none",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": ""
+  },
+  {
+   "id": "s020",
+   "start": 48.15,
+   "end": 51.97,
+   "line": "The time. The sender. The first forty characters.",
+   "scene": "Blueprint notification with 3 callouts popping on the words: TIME / SENDER / 40 CHARACTERS",
+   "set": "blueprint",
+   "bars": "none",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.1,
+     "name": "pop",
+     "gain": -14
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s021",
+   "start": 51.97,
+   "end": 54.87,
+   "line": "You can't open them. You can't reply.",
+   "scene": "Blueprint: a padlock snaps over the message body, the reply button is crossed out",
+   "set": "blueprint",
+   "bars": "none",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.2,
+     "name": "hit",
+     "gain": -12
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s022",
+   "start": 54.87,
+   "end": 58.4,
+   "line": "And you'll learn the hard way: tomorrow keeps count.",
+   "scene": "Dark lock screen, slight roll: a single tally mark etches into the corner; music drops out",
+   "set": "phone",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 2.4,
+     "name": "tick",
+     "gain": -8
+    },
+    {
+     "at": 2.6,
+     "name": "heartbeat",
+     "gain": -12
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s023",
+   "start": 58.4,
+   "end": 64.97,
+   "line": "One industry study found the average American gets about 46 push notifications a day.",
+   "scene": "dataCard: AVERAGE AMERICAN \u00b7 PUSH NOTIFICATIONS PER DAY counting 0 \u2192 46",
+   "set": "data",
+   "bars": "none",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.6,
+     "name": "counter",
+     "gain": -14
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s024",
+   "start": 64.97,
+   "end": 67.09,
+   "line": "You get yours a day early.",
+   "scene": "bigFace Maya, smirk, blue glow, badge +1 DAY",
+   "set": "bedroom",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.6,
+     "name": "blip",
+     "gain": -14
+    }
+   ],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s025",
+   "start": 67.09,
+   "end": 69.8,
+   "line": "Day one. Tomorrow, 8:05 a.m.",
+   "scene": "Bedroom at night, badge DAY 1, the phone lights up on the nightstand",
+   "set": "bedroom",
+   "bars": null,
+   "in": {
+    "type": "dip",
+    "dur": 0.4
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s026",
+   "start": 69.8,
+   "end": 73.09,
+   "line": "Mr. Okafor posted: Pop quiz, chapter seven.",
+   "scene": "Big TOMORROW card: 8:05 AM \u00b7 Mr. Okafor \u00b7 Pop quiz, chapter seven",
+   "set": "phone",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.1,
+     "name": "pop",
+     "gain": -12
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s027",
+   "start": 73.09,
+   "end": 76.53,
+   "line": "So tonight, you read chapter seven. Twice.",
+   "scene": "Maya in bed with a chemistry textbook under the lamp, the phone propped up; badge 2x on 'Twice'",
+   "set": "bedroom",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 2.4,
+     "name": "blip",
+     "gain": -14
+    }
+   ],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s028",
+   "start": 76.53,
+   "end": 82.34,
+   "line": "Here's the real part. Without review, most people forget most of something new within a day.",
+   "scene": "Blueprint: the forgetting curve draws, dropping over 1 DAY",
+   "set": "blueprint",
+   "bars": "none",
+   "in": {
+    "type": "zoom",
+    "dur": 0.35
+   },
+   "sfx": [],
+   "notes": ""
+  },
+  {
+   "id": "s029",
+   "start": 82.34,
+   "end": 84.58,
+   "line": "Scientists call it the forgetting curve.",
+   "scene": "Blueprint: label THE FORGETTING CURVE; a gold line labelled YOU stays high",
+   "set": "blueprint",
+   "bars": "none",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.3,
+     "name": "blip",
+     "gain": -14
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s030",
+   "start": 84.58,
+   "end": 86.35,
+   "line": "You reviewed at eleven p.m.",
+   "scene": "Insert: the red clock shows 11:00 PM beside the open textbook",
+   "set": "bedroom",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s031",
+   "start": 86.35,
+   "end": 88.28,
+   "line": "Twenty out of twenty.",
+   "scene": "Insert: the quiz paper slams onto the desk, a red 20/20 pops; classroom blurred behind",
+   "set": "classroom",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.25,
+     "name": "hit",
+     "gain": -8
+    },
+    {
+     "at": 0.5,
+     "name": "ding",
+     "gain": -12
+    }
+   ],
+   "notes": "",
+   "amb": {
+    "name": "murmur",
+    "gain": -28
+   }
+  },
+  {
+   "id": "s032",
+   "start": 88.28,
+   "end": 90.825,
+   "line": "You studied? On purpose?",
+   "scene": "bigFace Jordan (green cap), shocked, lip-synced: You studied? On purpose?",
+   "set": "classroom",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "murmur",
+    "gain": -28
+   }
+  },
+  {
+   "id": "s033",
+   "start": 90.825,
+   "end": 95.797,
+   "line": "Mom gets home at seven every morning after a twelve-hour shift at Mercy General.",
+   "scene": "Kitchen at dawn: Mom in blue scrubs comes home with coffee, wall clock 7:00",
+   "set": "kitchen",
+   "bars": null,
+   "in": {
+    "type": "dip",
+    "dur": 0.45
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s034",
+   "start": 95.797,
+   "end": 98.793,
+   "line": "She calls a lot. Like, a lot.",
+   "scene": "Lock screen: a column of missed calls from Mom (9)",
+   "set": "phone",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.2,
+     "name": "phonebuzz",
+     "gain": -14
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s035",
+   "start": 98.793,
+   "end": 101.277,
+   "line": "She holds out her hand for your phone.",
+   "scene": "Medium: Mom holds out her hand for Maya's phone",
+   "set": "kitchen",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s036",
+   "start": 101.277,
+   "end": 102.686,
+   "line": "Put me in your favorites.",
+   "scene": "Mom bigFace, lip-synced: Put me in your favorites",
+   "set": "kitchen",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s037",
+   "start": 102.686,
+   "end": 106.536,
+   "line": "Do Not Disturb lets favorites through. So I always get through.",
+   "scene": "Insert: settings screen, Do Not Disturb with ALLOW FAVORITES, a star on Mom",
+   "set": "phone",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.3,
+     "name": "blip",
+     "gain": -14
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s038",
+   "start": 106.536,
+   "end": 108.465,
+   "line": "You take the phone back.",
+   "scene": "Medium: Maya takes the phone back, Mom's smile fades a little",
+   "set": "kitchen",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s039",
+   "start": 108.465,
+   "end": 110.182,
+   "line": "Mom. Later.",
+   "scene": "Maya bigFace: Mom. Later.",
+   "set": "kitchen",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s040",
+   "start": 110.182,
+   "end": 114.906,
+   "line": "Your little brother Sam, nine, is eating cereal out of a mixing bowl.",
+   "scene": "Sam (9, yellow cap) eating cereal out of a giant mixing bowl",
+   "set": "kitchen",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.4,
+     "name": "tick",
+     "gain": -16
+    }
+   ],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s041",
+   "start": 114.906,
+   "end": 116.323,
+   "line": "Later means never.",
+   "scene": "Sam bigFace: Later means never.",
+   "set": "kitchen",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s042",
+   "start": 116.323,
+   "end": 117.433,
+   "line": "Day three.",
+   "scene": "Bedroom at night, badge DAY 3, the phone lights up",
+   "set": "bedroom",
+   "bars": null,
+   "in": {
+    "type": "dip",
+    "dur": 0.45
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s043",
+   "start": 117.433,
+   "end": 121.658,
+   "line": "Tomorrow, 3:40 p.m. Weather: Severe thunderstorm warning.",
+   "scene": "Big TOMORROW card: 3:40 PM \u00b7 Weather \u00b7 Severe thunderstorm warning",
+   "set": "card",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.1,
+     "name": "pop",
+     "gain": -12
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s044",
+   "start": 121.658,
+   "end": 124.966,
+   "line": "Track practice is at 3:30. Outside.",
+   "scene": "Track under a blue sky, sign PRACTICE 3:30",
+   "set": "track",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "wind",
+    "gain": -28
+   }
+  },
+  {
+   "id": "s045",
+   "start": 124.966,
+   "end": 127.898,
+   "line": "The forecast says ten percent chance of rain.",
+   "scene": "Weather app: 10% chance of rain",
+   "set": "phone",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.3,
+     "name": "blip",
+     "gain": -14
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s046",
+   "start": 127.898,
+   "end": 133.979,
+   "line": "A five-day forecast is right about ninety percent of the time. A ten-day forecast, about half.",
+   "scene": "Blueprint compare bars: 5-DAY 90% \u00b7 10-DAY 50%",
+   "set": "board",
+   "bars": "none",
+   "in": {
+    "type": "zoom",
+    "dur": 0.35
+   },
+   "sfx": [
+    {
+     "at": 0.3,
+     "name": "pop",
+     "gain": -14
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s047",
+   "start": 133.979,
+   "end": 135.857,
+   "line": "Yours is right every time.",
+   "scene": "Compare bars add YOURS 100% in gold",
+   "set": "board",
+   "bars": "none",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.2,
+     "name": "shimmer",
+     "gain": -12
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s048",
+   "start": 135.857,
+   "end": 137.437,
+   "line": "You bring a rain jacket.",
+   "scene": "Maya stuffs a rain jacket into her backpack",
+   "set": "bedroom",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s049",
+   "start": 137.437,
+   "end": 139.963,
+   "line": "At 3:40 the sky opens.",
+   "scene": "STORM: the sky opens, lightning, the whole team drenched, Maya dry under her hood",
+   "set": "track",
+   "bars": "scope",
+   "in": {
+    "type": "flash",
+    "dur": 0.35
+   },
+   "sfx": [
+    {
+     "at": 0.1,
+     "name": "thunder",
+     "gain": -6
+    }
+   ],
+   "notes": "",
+   "amb": {
+    "name": "rain",
+    "gain": -18
+   }
+  },
+  {
+   "id": "s050",
+   "start": 139.963,
+   "end": 143.472,
+   "line": "How did you know? The app said ten percent!",
+   "scene": "Coach (purple tracksuit) bigFace in the rain: How did you know?",
+   "set": "track",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "rain",
+    "gain": -18
+   }
+  },
+  {
+   "id": "s051",
+   "start": 143.472,
+   "end": 144.582,
+   "line": "Day five.",
+   "scene": "Bedroom at night, badge DAY 5",
+   "set": "bedroom",
+   "bars": null,
+   "in": {
+    "type": "dip",
+    "dur": 0.45
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s052",
+   "start": 144.582,
+   "end": 148.999,
+   "line": "Tomorrow, 9:47 p.m. Ava: hey are you going to the...",
+   "scene": "Big TOMORROW card: 9:47 PM \u00b7 Ava \u00b7 hey are you going to the\u2026",
+   "set": "card",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.1,
+     "name": "pop",
+     "gain": -12
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s053",
+   "start": 148.999,
+   "end": 152.166,
+   "line": "The preview cuts off. Going to the what?",
+   "scene": "Maya bigFace, confused, the text trailing off as '\u2026'",
+   "set": "bedroom",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": ""
+  },
+  {
+   "id": "s054",
+   "start": 152.166,
+   "end": 159.549,
+   "line": "In one study, eighty-nine percent of college students said they'd felt their phone buzz when it hadn't. Phantom vibrations.",
+   "scene": "Data card: 89% of college students felt a phantom buzz",
+   "set": "board",
+   "bars": "none",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.6,
+     "name": "counter",
+     "gain": -14
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s055",
+   "start": 159.549,
+   "end": 162.643,
+   "line": "You never wonder. You already know who's texting.",
+   "scene": "Maya bigFace, a knowing smile, phone glow",
+   "set": "bedroom",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": ""
+  },
+  {
+   "id": "s056",
+   "start": 162.643,
+   "end": 164.487,
+   "line": "So you ask first.",
+   "scene": "Hallway: Maya walks up to Ava at her locker",
+   "set": "hallway",
+   "bars": null,
+   "in": {
+    "type": "whip",
+    "dur": 0.3,
+    "dir": 1
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "murmur",
+    "gain": -26
+   }
+  },
+  {
+   "id": "s057",
+   "start": 164.487,
+   "end": 167.655,
+   "line": "Wait. I was literally about to ask you.",
+   "scene": "Ava (pink beanie) bigFace: Wait. I was literally about to ask you.",
+   "set": "hallway",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "murmur",
+    "gain": -26
+   }
+  },
+  {
+   "id": "s058",
+   "start": 167.655,
+   "end": 171.005,
+   "line": "Day six. You start a group chat called Called It.",
+   "scene": "Bedroom, badge DAY 6, Maya typing; group chat CALLED IT is created",
+   "set": "bedroom",
+   "bars": null,
+   "in": {
+    "type": "dip",
+    "dur": 0.45
+   },
+   "sfx": [
+    {
+     "at": 0.5,
+     "name": "pop",
+     "gain": -14
+    }
+   ],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s059",
+   "start": 171.005,
+   "end": 173.395,
+   "line": "You post tomorrow's alerts a day early.",
+   "scene": "Chat screen: Maya posts tomorrow's alerts",
+   "set": "phone",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.3,
+     "name": "blip",
+     "gain": -14
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s060",
+   "start": 173.395,
+   "end": 175.85,
+   "line": "Snow day. Lockdown drill.",
+   "scene": "Chat posts pop: SNOW DAY, LOCKDOWN DRILL",
+   "set": "phone",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.1,
+     "name": "pop",
+     "gain": -14
+    },
+    {
+     "at": 1.2,
+     "name": "pop",
+     "gain": -14
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s061",
+   "start": 175.85,
+   "end": 179.422,
+   "line": "The cafeteria running out of pizza at 12:14.",
+   "scene": "Cafeteria: an empty pizza tray, the clock reads 12:14, kids staring",
+   "set": "classroom",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "murmur",
+    "gain": -26
+   }
+  },
+  {
+   "id": "s062",
+   "start": 179.422,
+   "end": 182.333,
+   "line": "Within a day, two thousand kids follow it.",
+   "scene": "Follower counter climbs to 2,000",
+   "set": "phone",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.4,
+     "name": "counter",
+     "gain": -14
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s063",
+   "start": 182.333,
+   "end": 185.415,
+   "line": "Okay. Who is leaking this?",
+   "scene": "Tyler (grey cap) bigFace: Okay. Who is leaking this?",
+   "set": "hallway",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "murmur",
+    "gain": -26
+   }
+  },
+  {
+   "id": "s064",
+   "start": 185.415,
+   "end": 192.669,
+   "line": "Then a text from Jordan lands a day early. Tomorrow, 2:05 p.m. Jordan: failed my driving test lol.",
+   "scene": "Big TOMORROW card: 2:05 PM \u00b7 Jordan \u00b7 failed my driving test lol",
+   "set": "card",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.1,
+     "name": "pop",
+     "gain": -12
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s065",
+   "start": 192.669,
+   "end": 197.215,
+   "line": "So tonight, you quiz Jordan on parallel parking. For two hours.",
+   "scene": "School lot at night: Maya coaches Jordan through parallel parking",
+   "set": "parking",
+   "bars": null,
+   "in": {
+    "type": "dip",
+    "dur": 0.45
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "wind",
+    "gain": -28
+   }
+  },
+  {
+   "id": "s066",
+   "start": 197.215,
+   "end": 201.79,
+   "line": "In the school lot. With traffic cones you borrowed from the gym.",
+   "scene": "Wide: orange cones from the gym, the car inching back",
+   "set": "parking",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.6,
+     "name": "carpass",
+     "gain": -18
+    }
+   ],
+   "notes": "",
+   "amb": {
+    "name": "wind",
+    "gain": -28
+   }
+  },
+  {
+   "id": "s067",
+   "start": 201.79,
+   "end": 204.531,
+   "line": "I passed! I actually passed!",
+   "scene": "Jordan bigFace, waving a licence: I passed!",
+   "set": "parking",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.2,
+     "name": "cheer",
+     "gain": -16
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s068",
+   "start": 204.531,
+   "end": 208.799,
+   "line": "You've never felt this good. You're not just reading tomorrow anymore.",
+   "scene": "Maya on the bed scrolling tomorrow like a to-do list, grinning",
+   "set": "bedroom",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.4,
+     "name": "shimmer",
+     "gain": -14
+    }
+   ],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s069",
+   "start": 208.799,
+   "end": 210.365,
+   "line": "You're editing it.",
+   "scene": "Maya bigFace, determined: You're editing it.",
+   "set": "bedroom",
+   "bars": "scope",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": ""
+  },
+  {
+   "id": "s070",
+   "start": 210.365,
+   "end": 211.347,
+   "line": "The catch?",
+   "scene": "Dark: the line THE CATCH?",
+   "set": "board",
+   "bars": "scope",
+   "in": {
+    "type": "dip",
+    "dur": 0.45
+   },
+   "sfx": [
+    {
+     "at": 0.1,
+     "name": "stinger",
+     "gain": -8
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s071",
+   "start": 211.347,
+   "end": 212.457,
+   "line": "Day seven.",
+   "scene": "Bedroom, badge DAY 7",
+   "set": "bedroom",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s072",
+   "start": 212.457,
+   "end": 218.077,
+   "line": "Tomorrow, 4:22 p.m. Sam: i fell off my skateboard arm hurts.",
+   "scene": "Big TOMORROW card: 4:22 PM \u00b7 Sam \u00b7 i fell off my skateboard arm hurts",
+   "set": "card",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.1,
+     "name": "pop",
+     "gain": -12
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s073",
+   "start": 218.077,
+   "end": 221.812,
+   "line": "So you hide the skateboard under your bed. Problem solved.",
+   "scene": "Maya slides the skateboard under her bed",
+   "set": "bedroom",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.6,
+     "name": "whoosh",
+     "gain": -16
+    }
+   ],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s074",
+   "start": 221.812,
+   "end": 226.272,
+   "line": "At 11:59, the list updates. The skateboard message is gone.",
+   "scene": "11:59: the list updates, the skateboard card glitches away",
+   "set": "phone",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.4,
+     "name": "glitch",
+     "gain": -10
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s075",
+   "start": 226.272,
+   "end": 231.573,
+   "line": "In its place, two new ones. 4:22 p.m. Sam: tripped on the stairs.",
+   "scene": "New card: 4:22 PM \u00b7 Sam \u00b7 tripped on the stairs",
+   "set": "card",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.1,
+     "name": "pop",
+     "gain": -12
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s076",
+   "start": 231.573,
+   "end": 235.891,
+   "line": "4:23 p.m. Mom: Taking Sam to urgent care.",
+   "scene": "New card: 4:23 PM \u00b7 Mom \u00b7 Taking Sam to urgent care",
+   "set": "card",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.1,
+     "name": "pop",
+     "gain": -12
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s077",
+   "start": 235.891,
+   "end": 240.843,
+   "line": "It's a sprained ankle, not a broken arm. Better. But not gone.",
+   "scene": "Sam on the couch, ice pack on his ankle, Maya watching",
+   "set": "livingroom",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s078",
+   "start": 240.843,
+   "end": 247.616,
+   "line": "That's the cost. Erase one notification, and tomorrow sends back two. Tomorrow keeps count.",
+   "scene": "Blueprint: one card erased \u2192 two cards back; THAT'S THE COST",
+   "set": "board",
+   "bars": "none",
+   "in": {
+    "type": "zoom",
+    "dur": 0.35
+   },
+   "sfx": [
+    {
+     "at": 0.3,
+     "name": "hit",
+     "gain": -10
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s079",
+   "start": 247.616,
+   "end": 252.311,
+   "line": "Forty-six becomes forty-eight. Then fifty-two. Then sixty.",
+   "scene": "Counter on the lock screen: 46 \u2192 48 \u2192 52 \u2192 60",
+   "set": "phone",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.2,
+     "name": "counter",
+     "gain": -14
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s080",
+   "start": 252.311,
+   "end": 254.616,
+   "line": "By day nine, one hundred and four.",
+   "scene": "Counter hits 104, badge DAY 9",
+   "set": "phone",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.3,
+     "name": "stinger",
+     "gain": -12
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s081",
+   "start": 254.616,
+   "end": 258.039,
+   "line": "You can read tomorrow. You can't answer it.",
+   "scene": "Maya bigFace in the dark: You can read tomorrow. You can't answer it.",
+   "set": "bedroom",
+   "bars": "scope",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": ""
+  },
+  {
+   "id": "s082",
+   "start": 258.039,
+   "end": 262.969,
+   "line": "Every erase is for someone. Jordan's test. Ava's flat tire.",
+   "scene": "Erase montage: Jordan's test, Ava's flat tire cards struck through",
+   "set": "card",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.3,
+     "name": "swish",
+     "gain": -14
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s083",
+   "start": 262.969,
+   "end": 267.728,
+   "line": "Mr. Okafor's coffee spill. And for every one, tomorrow sends back two.",
+   "scene": "Erase montage: Mr. Okafor's coffee spill struck through; 'tomorrow sends back two'",
+   "set": "card",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.3,
+     "name": "swish",
+     "gain": -14
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s084",
+   "start": 267.728,
+   "end": 273.873,
+   "line": "Doubling is sneaky. Start with one and double it ten times, and you get one thousand and twenty-four.",
+   "scene": "Blueprint doubling grid: 1, 2, 4 \u2026 1,024 squares",
+   "set": "board",
+   "bars": "none",
+   "in": {
+    "type": "zoom",
+    "dur": 0.35
+   },
+   "sfx": [
+    {
+     "at": 0.4,
+     "name": "counter",
+     "gain": -14
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s085",
+   "start": 273.873,
+   "end": 277.936,
+   "line": "You do that math at 3 a.m., and then you stop doing math.",
+   "scene": "3:00 AM: Maya with a calculator on the bed, then pushes it away",
+   "set": "bedroom",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s086",
+   "start": 277.936,
+   "end": 280.731,
+   "line": "Every night you're up until three, erasing.",
+   "scene": "3 AM wide: Maya hunched over the glowing phone, erasing",
+   "set": "bedroom",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s087",
+   "start": 280.731,
+   "end": 284.829,
+   "line": "Teenagers need eight to ten hours of sleep. You're getting four.",
+   "scene": "Compare bars: TEENS NEED 8\u201310 H \u00b7 YOU 4 H",
+   "set": "board",
+   "bars": "none",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.3,
+     "name": "pop",
+     "gain": -14
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s088",
+   "start": 284.829,
+   "end": 289.148,
+   "line": "Nine nights. That's about forty hours you'll never get back.",
+   "scene": "Data card: NIGHTS 9 \u2192 SLEEP LOST 40 HOURS",
+   "set": "board",
+   "bars": "none",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.4,
+     "name": "counter",
+     "gain": -14
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s089",
+   "start": 289.148,
+   "end": 292.657,
+   "line": "You look like a raccoon. A tired raccoon.",
+   "scene": "Jordan bigFace, squinting: You look like a raccoon.",
+   "set": "hallway",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "murmur",
+    "gain": -26
+   }
+  },
+  {
+   "id": "s090",
+   "start": 292.657,
+   "end": 298.853,
+   "line": "Then, tomorrow, 9:00 a.m. Email: Priya Shah, Hindsight Labs. We've been watching Called It...",
+   "scene": "Big card: 9:00 AM \u00b7 Email \u00b7 Priya Shah, Hindsight Labs \u2014 We've been watching Called It\u2026",
+   "set": "card",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.1,
+     "name": "pop",
+     "gain": -12
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s091",
+   "start": 298.853,
+   "end": 302.425,
+   "line": "Priya is calm, polite, and very expensive-looking.",
+   "scene": "Glass office at dusk, 22nd floor: Priya at the window, calm",
+   "set": "office",
+   "bars": null,
+   "in": {
+    "type": "dip",
+    "dur": 0.45
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "hum",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s092",
+   "start": 302.425,
+   "end": 306.288,
+   "line": "We'd like to buy the phone. Two million dollars.",
+   "scene": "Priya bigFace: We'd like to buy the phone. Two million dollars.",
+   "set": "office",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "hum",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s093",
+   "start": 306.288,
+   "end": 308.913,
+   "line": "Tomorrow, six p.m., our office.",
+   "scene": "Medium: a contract slides across the table; readouts $2,000,000 \u00b7 6:00 PM",
+   "set": "office",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.3,
+     "name": "swish",
+     "gain": -16
+    }
+   ],
+   "notes": "",
+   "amb": {
+    "name": "hum",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s094",
+   "start": 308.913,
+   "end": 313.445,
+   "line": "At 6:15, it goes into our shielded case for twenty-four hours.",
+   "scene": "Insert: a sleek metal case opens: 6:15 \u00b7 24 HOURS",
+   "set": "office",
+   "bars": "scope",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.4,
+     "name": "hit",
+     "gain": -12
+    }
+   ],
+   "notes": "",
+   "amb": {
+    "name": "hum",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s095",
+   "start": 313.445,
+   "end": 320.12,
+   "line": "She already knows everything. Sixty-three predictions. Sixty-three correct.",
+   "scene": "Priya's tablet: a grid of 63 green checkmarks",
+   "set": "office",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.3,
+     "name": "blip",
+     "gain": -14
+    }
+   ],
+   "notes": "",
+   "amb": {
+    "name": "hum",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s096",
+   "start": 320.12,
+   "end": 326.457,
+   "line": "If each one were a coin flip, the odds of guessing all sixty-three are about one in nine quintillion.",
+   "scene": "Blueprint coin flips: 1 IN 9,000,000,000,000,000,000",
+   "set": "board",
+   "bars": "none",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.4,
+     "name": "counter",
+     "gain": -14
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s097",
+   "start": 326.457,
+   "end": 329.474,
+   "line": "Hindsight Labs does not believe in luck.",
+   "scene": "Priya bigFace, a polite smile: does not believe in luck",
+   "set": "office",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "hum",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s098",
+   "start": 329.474,
+   "end": 335.533,
+   "line": "A shielded case is basically a Faraday cage, a metal box that blocks radio signals.",
+   "scene": "Blueprint Faraday cage: radio waves bounce off a metal box",
+   "set": "board",
+   "bars": "none",
+   "in": {
+    "type": "zoom",
+    "dur": 0.35
+   },
+   "sfx": [],
+   "notes": ""
+  },
+  {
+   "id": "s099",
+   "start": 335.533,
+   "end": 339.887,
+   "line": "Nothing gets in. Nothing gets out. Not even a phone call.",
+   "scene": "Phone inside the box: incoming call blocked, X",
+   "set": "board",
+   "bars": "none",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.3,
+     "name": "hit",
+     "gain": -12
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s100",
+   "start": 339.887,
+   "end": 343.801,
+   "line": "Two million dollars. Mom could stop working doubles.",
+   "scene": "Maya bigFace thinking, readout $2,000,000",
+   "set": "bedroom",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.3,
+     "name": "ding",
+     "gain": -14
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s101",
+   "start": 343.801,
+   "end": 348.495,
+   "line": "That night, Mom falls asleep on the couch in her scrubs, still wearing her shoes.",
+   "scene": "Living room at night: Mom asleep on the couch in scrubs and shoes",
+   "set": "livingroom",
+   "bars": null,
+   "in": {
+    "type": "dip",
+    "dur": 0.45
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s102",
+   "start": 348.495,
+   "end": 352.644,
+   "line": "On the table, a pile of envelopes. Two of them are red.",
+   "scene": "Insert: envelopes on the coffee table, two of them red",
+   "set": "livingroom",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 1.6,
+     "name": "hit",
+     "gain": -14
+    }
+   ],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s103",
+   "start": 352.644,
+   "end": 355.074,
+   "line": "Day ten. 11:59 p.m.",
+   "scene": "Day 10, 11:59, badge DAY 10, the phone explodes with light",
+   "set": "bedroom",
+   "bars": null,
+   "in": {
+    "type": "dip",
+    "dur": 0.45
+   },
+   "sfx": [
+    {
+     "at": 0.6,
+     "name": "phonebuzz",
+     "gain": -10
+    }
+   ],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s104",
+   "start": 355.074,
+   "end": 360.583,
+   "line": "Three hundred and twelve notifications. Your thumb is shaking. You scroll.",
+   "scene": "Lock screen scrolling fast, counter 312, the thumb shaking",
+   "set": "phone",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.2,
+     "name": "counter",
+     "gain": -12
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s105",
+   "start": 360.583,
+   "end": 364.255,
+   "line": "Spam. School. Tyler. Ava.",
+   "scene": "Quick flicks: SPAM / SCHOOL / TYLER / AVA cards",
+   "set": "phone",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.0,
+     "name": "tick",
+     "gain": -14
+    },
+    {
+     "at": 0.9,
+     "name": "tick",
+     "gain": -14
+    },
+    {
+     "at": 1.8,
+     "name": "tick",
+     "gain": -14
+    },
+    {
+     "at": 2.7,
+     "name": "tick",
+     "gain": -14
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s106",
+   "start": 364.255,
+   "end": 366.931,
+   "line": "Then one line that wasn't there before.",
+   "scene": "Maya bigFace, the scrolling stops",
+   "set": "bedroom",
+   "bars": "scope",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.2,
+     "name": "riser",
+     "gain": -12
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s107",
+   "start": 366.931,
+   "end": 371.527,
+   "line": "Tomorrow, 6:12 p.m. Missed call: Mom. Fourteen.",
+   "scene": "RED card: TOMORROW 6:12 PM \u00b7 Missed call: Mom (14)",
+   "set": "card",
+   "bars": "scope",
+   "in": {
+    "type": "flash",
+    "dur": 0.35
+   },
+   "sfx": [
+    {
+     "at": 0.05,
+     "name": "impact",
+     "gain": -6
+    },
+    {
+     "at": 0.6,
+     "name": "heartbeat",
+     "gain": -10
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s108",
+   "start": 371.527,
+   "end": 376.819,
+   "line": "Missed calls from Mom aren't news. She called you nine times last Tuesday about a sweater.",
+   "scene": "Flashback lock screen: Mom \u00d79 last Tuesday \u2014 'have you seen my sweater?'",
+   "set": "phone",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": ""
+  },
+  {
+   "id": "s109",
+   "start": 376.819,
+   "end": 379.709,
+   "line": "Still. In the morning, you call her.",
+   "scene": "Bus stop at dawn: Maya calls Mom",
+   "set": "busstop",
+   "bars": null,
+   "in": {
+    "type": "dip",
+    "dur": 0.45
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "city",
+    "gain": -28
+   }
+  },
+  {
+   "id": "s110",
+   "start": 379.709,
+   "end": 383.368,
+   "line": "I'm fine, honey. Day off. I'm making lasagna.",
+   "scene": "Mom in the kitchen with a lasagna dish, phone on her shoulder: I'm fine, honey",
+   "set": "kitchen",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s111",
+   "start": 383.368,
+   "end": 385.396,
+   "line": "Fine. She's fine.",
+   "scene": "Maya bigFace, relieved",
+   "set": "busstop",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "city",
+    "gain": -28
+   }
+  },
+  {
+   "id": "s112",
+   "start": 385.396,
+   "end": 390.91,
+   "line": "And the list won't update until 11:59. Tonight is too late to check.",
+   "scene": "Readout countdown to 11:59 \u2014 TOO LATE TO CHECK",
+   "set": "board",
+   "bars": "none",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.2,
+     "name": "clock",
+     "gain": -14
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s113",
+   "start": 390.91,
+   "end": 396.159,
+   "line": "At 5:15, you stand at the front door for a full minute. Downtown, or home.",
+   "scene": "Front door from inside, 5:15 PM: Maya's hand on the knob",
+   "set": "kitchen",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.3,
+     "name": "clock",
+     "gain": -16
+    }
+   ],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s114",
+   "start": 396.159,
+   "end": 401.26,
+   "line": "In the kitchen, Mom is singing along to the radio. Badly. She's fine.",
+   "scene": "Mom dancing with a spatula to the radio",
+   "set": "kitchen",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s115",
+   "start": 401.26,
+   "end": 404.043,
+   "line": "Two million dollars. You go.",
+   "scene": "Maya bigFace, decides: You go.",
+   "set": "kitchen",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 1.0,
+     "name": "whoosh",
+     "gain": -14
+    }
+   ],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s116",
+   "start": 404.043,
+   "end": 405.951,
+   "line": "Bring me back a fancy pen!",
+   "scene": "Mom bigFace: Bring me back a fancy pen!",
+   "set": "kitchen",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s117",
+   "start": 405.951,
+   "end": 412.298,
+   "line": "At six, you're downtown, forty minutes from home. Hindsight Labs. Twenty-second floor.",
+   "scene": "3D downtown towers at dusk, dolly up to the 22nd floor",
+   "set": "city3d",
+   "bars": "scope",
+   "in": {
+    "type": "dip",
+    "dur": 0.45
+   },
+   "sfx": [
+    {
+     "at": 0.3,
+     "name": "riser",
+     "gain": -16
+    }
+   ],
+   "notes": "",
+   "amb": {
+    "name": "city",
+    "gain": -28
+   }
+  },
+  {
+   "id": "s118",
+   "start": 412.298,
+   "end": 417.172,
+   "line": "Phones on Do Not Disturb, please. The lawyers insist.",
+   "scene": "Conference room: Priya: Phones on Do Not Disturb, please",
+   "set": "office",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "hum",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s119",
+   "start": 417.172,
+   "end": 421.185,
+   "line": "Priya turns the pages. Sign here. Initial here.",
+   "scene": "Insert: pages turning, Maya signing; DND moon on her phone face up",
+   "set": "office",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.4,
+     "name": "swish",
+     "gain": -16
+    }
+   ],
+   "notes": "",
+   "amb": {
+    "name": "hum",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s120",
+   "start": 421.185,
+   "end": 425.227,
+   "line": "6:09. 6:10. 6:11.",
+   "scene": "Wall clock 6:09 \u2192 6:10 \u2192 6:11",
+   "set": "office",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.0,
+     "name": "tick",
+     "gain": -10
+    },
+    {
+     "at": 1.3,
+     "name": "tick",
+     "gain": -10
+    },
+    {
+     "at": 2.5,
+     "name": "tick",
+     "gain": -10
+    }
+   ],
+   "notes": "",
+   "amb": {
+    "name": "hum",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s121",
+   "start": 425.227,
+   "end": 430.457,
+   "line": "6:12. Your phone lights up on the table. No sound. Mom.",
+   "scene": "Phone face up on the table glowing silently: MOM calling",
+   "set": "office",
+   "bars": "scope",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.2,
+     "name": "freeze",
+     "gain": -12
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s122",
+   "start": 430.457,
+   "end": 434.947,
+   "line": "Do Not Disturb swallows it. Call two. Call three.",
+   "scene": "Call counter: CALL 2 \u00b7 CALL 3, no sound",
+   "set": "office",
+   "bars": "scope",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.2,
+     "name": "heartbeat",
+     "gain": -10
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s123",
+   "start": 434.947,
+   "end": 439.331,
+   "line": "And then you hear it. Not out loud. In your head.",
+   "scene": "Maya bigFace, eyes widening",
+   "set": "office",
+   "bars": "scope",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": ""
+  },
+  {
+   "id": "s124",
+   "start": 439.331,
+   "end": 442.541,
+   "line": "Put me in your favorites. So I always get through.",
+   "scene": "Memory, warm tint: Mom bigFace at dawn: Put me in your favorites",
+   "set": "kitchen",
+   "bars": null,
+   "in": {
+    "type": "fade",
+    "dur": 0.5
+   },
+   "sfx": [],
+   "notes": ""
+  },
+  {
+   "id": "s125",
+   "start": 442.541,
+   "end": 449.201,
+   "line": "You never did. Under the table, your thumb moves. Contacts. Mom. Add to Favorites.",
+   "scene": "Insert under the table: thumb \u2192 Contacts \u2192 Mom \u2192 Add to Favorites \u2605",
+   "set": "office",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.8,
+     "name": "blip",
+     "gain": -12
+    },
+    {
+     "at": 2.0,
+     "name": "blip",
+     "gain": -12
+    },
+    {
+     "at": 3.0,
+     "name": "ding",
+     "gain": -10
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s126",
+   "start": 449.201,
+   "end": 452.133,
+   "line": "Call five rings. Out loud.",
+   "scene": "The phone rings OUT LOUD, everyone turns",
+   "set": "office",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.0,
+     "name": "phonering",
+     "gain": -6
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s127",
+   "start": 452.133,
+   "end": 457.307,
+   "line": "You answer. Her words are coming out wrong. Slow. Thick.",
+   "scene": "Maya bigFace answering, frozen",
+   "set": "office",
+   "bars": "scope",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": ""
+  },
+  {
+   "id": "s128",
+   "start": 457.307,
+   "end": 460.027,
+   "line": "Maya... my arm... can't...",
+   "scene": "Mom on the kitchen floor, conscious, phone in hand, speaking slowly",
+   "set": "kitchen",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": ""
+  },
+  {
+   "id": "s129",
+   "start": 460.027,
+   "end": 464.04,
+   "line": "Doctors have a word for this. FAST. Face drooping.",
+   "scene": "Blueprint FAST: Face drooping",
+   "set": "board",
+   "bars": "none",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.2,
+     "name": "pop",
+     "gain": -14
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s130",
+   "start": 464.04,
+   "end": 468.863,
+   "line": "Arm weakness. Speech difficulty. Time to call 911.",
+   "scene": "Blueprint FAST: Arm \u00b7 Speech \u00b7 Time to call 911",
+   "set": "board",
+   "bars": "none",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.1,
+     "name": "pop",
+     "gain": -14
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s131",
+   "start": 468.863,
+   "end": 474.441,
+   "line": "During a stroke, the brain can lose around one point nine million neurons every minute.",
+   "scene": "Blueprint brain: 1.9 MILLION NEURONS / MINUTE",
+   "set": "board",
+   "bars": "none",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.6,
+     "name": "heartbeat",
+     "gain": -10
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s132",
+   "start": 474.441,
+   "end": 478.837,
+   "line": "6:13. You call 911. One point nine million.",
+   "scene": "Split: Maya with phones at both ears; counter 1.9M",
+   "set": "office",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.2,
+     "name": "phonering",
+     "gain": -18
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s133",
+   "start": 478.837,
+   "end": 485.419,
+   "line": "6:14. You call Mrs. Alvarez next door. She has a key. Three point eight million.",
+   "scene": "Mrs. Alvarez runs across the lawn with a key; counter 3.8M",
+   "set": "street",
+   "bars": null,
+   "in": {
+    "type": "whip",
+    "dur": 0.3,
+    "dir": 1
+   },
+   "sfx": [
+    {
+     "at": 0.3,
+     "name": "footstep",
+     "gain": -12
+    }
+   ],
+   "notes": "",
+   "amb": {
+    "name": "wind",
+    "gain": -28
+   }
+  },
+  {
+   "id": "s134",
+   "start": 485.419,
+   "end": 488.651,
+   "line": "I'm going. I'm going!",
+   "scene": "Mrs. Alvarez bigFace: I'm going! I'm going!",
+   "set": "street",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "wind",
+    "gain": -28
+   }
+  },
+  {
+   "id": "s135",
+   "start": 488.651,
+   "end": 493.056,
+   "line": "6:15. Maya. It's 6:15.",
+   "scene": "Priya opens the metal case: 6:15",
+   "set": "office",
+   "bars": "scope",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.3,
+     "name": "hit",
+     "gain": -10
+    }
+   ],
+   "notes": "",
+   "amb": {
+    "name": "hum",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s136",
+   "start": 493.056,
+   "end": 496.565,
+   "line": "The case. Now, or the deal is off.",
+   "scene": "Priya bigFace: The case. Now, or the deal is off.",
+   "set": "office",
+   "bars": "scope",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "hum",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s137",
+   "start": 496.565,
+   "end": 498.43,
+   "line": "The deal, or the call.",
+   "scene": "FREEZE: the case on one side, the phone on the other \u2014 THE DEAL, OR THE CALL",
+   "set": "office",
+   "bars": "scope",
+   "in": {
+    "type": "flash",
+    "dur": 0.35
+   },
+   "sfx": [
+    {
+     "at": 0.05,
+     "name": "freeze",
+     "gain": -8
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s138",
+   "start": 498.43,
+   "end": 504.884,
+   "line": "You keep the phone at your ear. Mom can't talk much. But she can hear you. So you talk.",
+   "scene": "Maya stands, phone at her ear, talking softly",
+   "set": "office",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "hum",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s139",
+   "start": 504.884,
+   "end": 505.853,
+   "line": "No.",
+   "scene": "Maya bigFace: No.",
+   "set": "office",
+   "bars": "scope",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.1,
+     "name": "hit",
+     "gain": -12
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s140",
+   "start": 505.853,
+   "end": 509.041,
+   "line": "You're walking away from two million dollars.",
+   "scene": "Priya bigFace, confused: You're walking away from two million dollars.",
+   "set": "office",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "hum",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s141",
+   "start": 509.041,
+   "end": 510.949,
+   "line": "I'm walking toward my mom.",
+   "scene": "Maya pushes through the glass door: I'm walking toward my mom.",
+   "set": "office",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.3,
+     "name": "whoosh",
+     "gain": -12
+    }
+   ],
+   "notes": "",
+   "amb": {
+    "name": "hum",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s142",
+   "start": 510.949,
+   "end": 516.989,
+   "line": "6:17. Mrs. Alvarez: I'm with her. She's awake. Seven point six million.",
+   "scene": "Mom's porch at night: Mrs. Alvarez holding Mom's hand; 6:17, 7.6M",
+   "set": "street",
+   "bars": null,
+   "in": {
+    "type": "whip",
+    "dur": 0.3,
+    "dir": 1
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "wind",
+    "gain": -28
+   }
+  },
+  {
+   "id": "s143",
+   "start": 516.989,
+   "end": 519.444,
+   "line": "6:21. Sirens.",
+   "scene": "6:21: the ambulance arrives, red and blue light",
+   "set": "street",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.0,
+     "name": "carpass",
+     "gain": -10
+    }
+   ],
+   "notes": "",
+   "amb": {
+    "name": "wind",
+    "gain": -28
+   }
+  },
+  {
+   "id": "s144",
+   "start": 519.444,
+   "end": 524.681,
+   "line": "You can read tomorrow. You can't answer it. But you can answer today.",
+   "scene": "Maya bigFace, warm: But you can answer today.",
+   "set": "street",
+   "bars": "scope",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 1.5,
+     "name": "shimmer",
+     "gain": -12
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s145",
+   "start": 524.681,
+   "end": 530.473,
+   "line": "Clot-busting drugs work best within about three hours. Mom gets them in fifty-one minutes.",
+   "scene": "Blueprint clock: BEST WITHIN 3 HOURS \u00b7 MOM: 51 MIN",
+   "set": "board",
+   "bars": "none",
+   "in": {
+    "type": "zoom",
+    "dur": 0.35
+   },
+   "sfx": [
+    {
+     "at": 0.4,
+     "name": "ding",
+     "gain": -12
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s146",
+   "start": 530.473,
+   "end": 532.466,
+   "line": "You got her here in time.",
+   "scene": "Doctor bigFace: You got her here in time.",
+   "set": "hospital",
+   "bars": null,
+   "in": {
+    "type": "dip",
+    "dur": 0.45
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "hum",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s147",
+   "start": 532.466,
+   "end": 536.124,
+   "line": "Mom's words are still slow. But they're hers.",
+   "scene": "Hospital room: Mom awake, Maya holding her hand",
+   "set": "hospital",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "hum",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s148",
+   "start": 536.124,
+   "end": 538.31,
+   "line": "Told you. Favorites.",
+   "scene": "Mom bigFace, weak smile: Told you. Favorites.",
+   "set": "hospital",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "hum",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s149",
+   "start": 538.31,
+   "end": 541.383,
+   "line": "Sam wakes up and climbs onto the end of the bed.",
+   "scene": "Sam climbs onto the end of the bed",
+   "set": "hospital",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "hum",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s150",
+   "start": 541.383,
+   "end": 546.655,
+   "line": "You open your phone. Called It. Two thousand followers. You delete it.",
+   "scene": "Phone: CALLED IT \u00b7 2,000 followers \u2192 Delete group?",
+   "set": "phone",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 2.0,
+     "name": "pop",
+     "gain": -14
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s151",
+   "start": 546.655,
+   "end": 550.824,
+   "line": "Then you open Contacts, and you add Sam to your favorites too.",
+   "scene": "Phone: Contacts \u2192 Sam \u2192 \u2605 Favorites",
+   "set": "phone",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 1.5,
+     "name": "ding",
+     "gain": -12
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s152",
+   "start": 550.824,
+   "end": 553.885,
+   "line": "See? Later means never. Now means now.",
+   "scene": "Sam bigFace: See? Later means never. Now means now.",
+   "set": "hospital",
+   "bars": null,
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [],
+   "notes": "",
+   "amb": {
+    "name": "hum",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s153",
+   "start": 553.885,
+   "end": 555.422,
+   "line": "Is any of this real?",
+   "scene": "IS ANY OF THIS REAL?",
+   "set": "board",
+   "bars": "none",
+   "in": {
+    "type": "dip",
+    "dur": 0.45
+   },
+   "sfx": [
+    {
+     "at": 0.1,
+     "name": "stinger",
+     "gain": -10
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s154",
+   "start": 555.422,
+   "end": 562.229,
+   "line": "A phone that reads tomorrow, no. But favorites that break through Do Not Disturb are real; most phones have them.",
+   "scene": "Blueprint phone: 'reads tomorrow' NO; favorites through DND: REAL",
+   "set": "board",
+   "bars": "none",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.5,
+     "name": "pop",
+     "gain": -14
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s155",
+   "start": 562.229,
+   "end": 567.649,
+   "line": "And FAST is real. In the U.S., someone has a stroke about every forty seconds.",
+   "scene": "FAST recap + 1 STROKE EVERY 40 SECONDS (U.S.)",
+   "set": "board",
+   "bars": "none",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.3,
+     "name": "pop",
+     "gain": -14
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s156",
+   "start": 567.649,
+   "end": 571.627,
+   "line": "If you see the signs, don't wait for tomorrow. Call.",
+   "scene": "DON'T WAIT FOR TOMORROW. CALL.",
+   "set": "board",
+   "bars": "none",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 1.4,
+     "name": "hit",
+     "gain": -10
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s157",
+   "start": 571.627,
+   "end": 576.523,
+   "line": "That night, 11:59. One notification. Just one.",
+   "scene": "That night, 11:59: one buzz",
+   "set": "bedroom",
+   "bars": null,
+   "in": {
+    "type": "dip",
+    "dur": 0.45
+   },
+   "sfx": [
+    {
+     "at": 1.6,
+     "name": "phonebuzz",
+     "gain": -8
+    }
+   ],
+   "notes": "",
+   "amb": {
+    "name": "roomtone",
+    "gain": -30
+   }
+  },
+  {
+   "id": "s158",
+   "start": 576.523,
+   "end": 580.671,
+   "line": "Tomorrow, 6:00 a.m. Unknown number: I know you can see this.",
+   "scene": "Card: 6:00 AM \u00b7 Unknown number \u00b7 I know you can see this.",
+   "set": "card",
+   "bars": "scope",
+   "in": {
+    "type": "cut"
+   },
+   "sfx": [
+    {
+     "at": 0.1,
+     "name": "glitch",
+     "gain": -8
+    },
+    {
+     "at": 2.0,
+     "name": "stinger",
+     "gain": -8
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "id": "s159",
+   "start": 580.671,
+   "end": 588.073,
+   "line": "If your phone showed you tomorrow, would you read it every night, or turn it off? Tell us in the comments.",
+   "scene": "End screen: the question, comment bubble, the cast",
+   "set": "end",
+   "bars": "none",
+   "in": {
+    "type": "fade",
+    "dur": 0.5
+   },
+   "sfx": [],
+   "notes": ""
+  }
+ ],
+ "music": [
+  {
+   "start": 0,
+   "end": 21.12,
+   "mood": "mystery",
+   "intensity": 0.35
+  },
+  {
+   "start": 21.12,
+   "end": 37.47,
+   "mood": "wonder",
+   "intensity": 0.45
+  },
+  {
+   "start": 37.47,
+   "end": 41.34,
+   "mood": "epic",
+   "intensity": 0.6
+  },
+  {
+   "start": 41.34,
+   "end": 67.09,
+   "mood": "tension",
+   "intensity": 0.3
+  },
+  {
+   "start": 67.09,
+   "end": 116.323,
+   "mood": "playful",
+   "intensity": 0.45
+  },
+  {
+   "start": 116.323,
+   "end": 210.365,
+   "mood": "hopeful",
+   "intensity": 0.5
+  },
+  {
+   "start": 210.365,
+   "end": 298.853,
+   "mood": "tension",
+   "intensity": 0.45
+  },
+  {
+   "start": 298.853,
+   "end": 352.644,
+   "mood": "mystery",
+   "intensity": 0.45
+  },
+  {
+   "start": 352.644,
+   "end": 425.227,
+   "mood": "dark",
+   "intensity": 0.5
+  },
+  {
+   "start": 425.227,
+   "end": 530.473,
+   "mood": "action",
+   "intensity": 0.75
+  },
+  {
+   "start": 530.473,
+   "end": 553.885,
+   "mood": "hopeful",
+   "intensity": 0.4
+  },
+  {
+   "start": 553.885,
+   "end": 571.627,
+   "mood": "wonder",
+   "intensity": 0.35
+  },
+  {
+   "start": 571.627,
+   "end": 588.073,
+   "mood": "mystery",
+   "intensity": 0.4
+  }
+ ]
+}

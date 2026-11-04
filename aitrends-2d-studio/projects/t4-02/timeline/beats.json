@@ -1,0 +1,1610 @@
+[
+ {
+  "i": 0,
+  "start": 0.0,
+  "speechStart": 0.0,
+  "speechEnd": 1.615,
+  "text": "It's 11:59 p.m.",
+  "end": 1.465
+ },
+ {
+  "i": 1,
+  "start": 1.465,
+  "speechStart": 1.615,
+  "speechEnd": 7.191,
+  "text": "Your phone is face down on the nightstand. It buzzes once. You flip it over.",
+  "end": 7.541
+ },
+ {
+  "i": 2,
+  "start": 7.541,
+  "speechStart": 7.691,
+  "speechEnd": 10.571,
+  "text": "Forty-six new notifications. Normal.",
+  "end": 10.571
+ },
+ {
+  "i": 3,
+  "start": 10.571,
+  "speechStart": 10.721,
+  "speechEnd": 13.196,
+  "text": "Except every single one is stamped tomorrow.",
+  "end": 13.546
+ },
+ {
+  "i": 4,
+  "start": 13.546,
+  "speechStart": 13.696,
+  "speechEnd": 15.551,
+  "text": "Tomorrow, 7:02 a.m. Mom:",
+  "end": 15.401
+ },
+ {
+  "i": 5,
+  "start": 15.401,
+  "speechStart": 15.551,
+  "speechEnd": 17.131,
+  "text": "Don't forget your lunch.",
+  "end": 17.131
+ },
+ {
+  "i": 6,
+  "start": 17.131,
+  "speechStart": 17.281,
+  "speechEnd": 22.346,
+  "text": "Tomorrow, 10:15 a.m. School alert: Fire drill. You go to sleep.",
+  "end": 22.346
+ },
+ {
+  "i": 7,
+  "start": 22.346,
+  "speechStart": 22.496,
+  "speechEnd": 27.626,
+  "text": "At 7:02, a voice comes up the stairs. Maya! Don't forget your lunch!",
+  "end": 27.976
+ },
+ {
+  "i": 8,
+  "start": 27.976,
+  "speechStart": 28.126,
+  "speechEnd": 30.729,
+  "text": "At 10:15, the fire alarm goes off.",
+  "end": 30.729
+ },
+ {
+  "i": 9,
+  "start": 30.729,
+  "speechStart": 30.879,
+  "speechEnd": 32.201,
+  "text": "Exactly on time.",
+  "end": 32.551
+ },
+ {
+  "i": 10,
+  "start": 32.551,
+  "speechStart": 32.701,
+  "speechEnd": 35.283,
+  "text": "Your name is Maya. You're sixteen.",
+  "end": 35.283
+ },
+ {
+  "i": 11,
+  "start": 35.283,
+  "speechStart": 35.433,
+  "speechEnd": 37.439,
+  "text": "And your phone just showed you tomorrow.",
+  "end": 37.439
+ },
+ {
+  "i": 12,
+  "start": 37.439,
+  "speechStart": 37.589,
+  "speechEnd": 42.59,
+  "text": "So what if your phone showed tomorrow's notifications today? Here's the rule.",
+  "end": 42.59
+ },
+ {
+  "i": 13,
+  "start": 42.59,
+  "speechStart": 42.74,
+  "speechEnd": 49.162,
+  "text": "Every night at 11:59, tomorrow's notifications land on your lock screen. The time.",
+  "end": 49.162
+ },
+ {
+  "i": 14,
+  "start": 49.162,
+  "speechStart": 49.312,
+  "speechEnd": 50.208,
+  "text": "The sender.",
+  "end": 50.208
+ },
+ {
+  "i": 15,
+  "start": 50.208,
+  "speechStart": 50.358,
+  "speechEnd": 51.937,
+  "text": "The first forty characters.",
+  "end": 51.937
+ },
+ {
+  "i": 16,
+  "start": 51.937,
+  "speechStart": 52.087,
+  "speechEnd": 53.431,
+  "text": "You can't open them.",
+  "end": 53.431
+ },
+ {
+  "i": 17,
+  "start": 53.431,
+  "speechStart": 53.581,
+  "speechEnd": 54.839,
+  "text": "You can't reply.",
+  "end": 54.839
+ },
+ {
+  "i": 18,
+  "start": 54.839,
+  "speechStart": 54.989,
+  "speechEnd": 56.746,
+  "text": "And you'll learn the hard way:",
+  "end": 56.596
+ },
+ {
+  "i": 19,
+  "start": 56.596,
+  "speechStart": 56.746,
+  "speechEnd": 58.019,
+  "text": "tomorrow keeps count.",
+  "end": 58.369
+ },
+ {
+  "i": 20,
+  "start": 58.369,
+  "speechStart": 58.519,
+  "speechEnd": 64.94,
+  "text": "One industry study found the average American gets about 46 push notifications a day.",
+  "end": 64.94
+ },
+ {
+  "i": 21,
+  "start": 64.94,
+  "speechStart": 65.09,
+  "speechEnd": 68.065,
+  "text": "You get yours a day early. Day one.",
+  "end": 68.065
+ },
+ {
+  "i": 22,
+  "start": 68.065,
+  "speechStart": 68.215,
+  "speechEnd": 71.419,
+  "text": "Tomorrow, 8:05 a.m. Mr. Okafor posted:",
+  "end": 71.269
+ },
+ {
+  "i": 23,
+  "start": 71.269,
+  "speechStart": 71.419,
+  "speechEnd": 73.057,
+  "text": "Pop quiz, chapter seven.",
+  "end": 73.057
+ },
+ {
+  "i": 24,
+  "start": 73.057,
+  "speechStart": 73.207,
+  "speechEnd": 76.152,
+  "text": "So tonight, you read chapter seven. Twice.",
+  "end": 76.502
+ },
+ {
+  "i": 25,
+  "start": 76.502,
+  "speechStart": 76.652,
+  "speechEnd": 78.081,
+  "text": "Here's the real part.",
+  "end": 78.081
+ },
+ {
+  "i": 26,
+  "start": 78.081,
+  "speechStart": 78.231,
+  "speechEnd": 82.306,
+  "text": "Without review, most people forget most of something new within a day.",
+  "end": 82.306
+ },
+ {
+  "i": 27,
+  "start": 82.306,
+  "speechStart": 82.456,
+  "speechEnd": 84.547,
+  "text": "Scientists call it the forgetting curve.",
+  "end": 84.547
+ },
+ {
+  "i": 28,
+  "start": 84.547,
+  "speechStart": 84.697,
+  "speechEnd": 86.467,
+  "text": "You reviewed at eleven p.m.",
+  "end": 86.317
+ },
+ {
+  "i": 29,
+  "start": 86.317,
+  "speechStart": 86.467,
+  "speechEnd": 90.445,
+  "text": "Twenty out of twenty. You studied? On purpose?",
+  "end": 90.795
+ },
+ {
+  "i": 30,
+  "start": 90.795,
+  "speechStart": 90.945,
+  "speechEnd": 95.767,
+  "text": "Mom gets home at seven every morning after a twelve-hour shift at Mercy General.",
+  "end": 95.767
+ },
+ {
+  "i": 31,
+  "start": 95.767,
+  "speechStart": 95.917,
+  "speechEnd": 98.413,
+  "text": "She calls a lot. Like, a lot.",
+  "end": 98.763
+ },
+ {
+  "i": 32,
+  "start": 98.763,
+  "speechStart": 98.913,
+  "speechEnd": 100.897,
+  "text": "She holds out her hand for your phone.",
+  "end": 101.247
+ },
+ {
+  "i": 33,
+  "start": 101.247,
+  "speechStart": 101.397,
+  "speechEnd": 102.656,
+  "text": "Put me in your favorites.",
+  "end": 102.656
+ },
+ {
+  "i": 34,
+  "start": 102.656,
+  "speechStart": 102.806,
+  "speechEnd": 104.705,
+  "text": "Do Not Disturb lets favorites through.",
+  "end": 104.705
+ },
+ {
+  "i": 35,
+  "start": 104.705,
+  "speechStart": 104.855,
+  "speechEnd": 106.156,
+  "text": "So I always get through.",
+  "end": 106.506
+ },
+ {
+  "i": 36,
+  "start": 106.506,
+  "speechStart": 106.656,
+  "speechEnd": 109.802,
+  "text": "You take the phone back. Mom. Later.",
+  "end": 110.152
+ },
+ {
+  "i": 37,
+  "start": 110.152,
+  "speechStart": 110.302,
+  "speechEnd": 115.943,
+  "text": "Your little brother Sam, nine, is eating cereal out of a mixing bowl. Later means never.",
+  "end": 116.293
+ },
+ {
+  "i": 38,
+  "start": 116.293,
+  "speechStart": 116.443,
+  "speechEnd": 117.403,
+  "text": "Day three.",
+  "end": 117.403
+ },
+ {
+  "i": 39,
+  "start": 117.403,
+  "speechStart": 117.553,
+  "speechEnd": 119.694,
+  "text": "Tomorrow, 3:40 p.m. Weather:",
+  "end": 119.544
+ },
+ {
+  "i": 40,
+  "start": 119.544,
+  "speechStart": 119.694,
+  "speechEnd": 121.628,
+  "text": "Severe thunderstorm warning.",
+  "end": 121.628
+ },
+ {
+  "i": 41,
+  "start": 121.628,
+  "speechStart": 121.778,
+  "speechEnd": 124.936,
+  "text": "Track practice is at 3:30. Outside.",
+  "end": 124.936
+ },
+ {
+  "i": 42,
+  "start": 124.936,
+  "speechStart": 125.086,
+  "speechEnd": 127.518,
+  "text": "The forecast says ten percent chance of rain.",
+  "end": 127.868
+ },
+ {
+  "i": 43,
+  "start": 127.868,
+  "speechStart": 128.018,
+  "speechEnd": 131.794,
+  "text": "A five-day forecast is right about ninety percent of the time.",
+  "end": 131.794
+ },
+ {
+  "i": 44,
+  "start": 131.794,
+  "speechStart": 131.944,
+  "speechEnd": 133.949,
+  "text": "A ten-day forecast, about half.",
+  "end": 133.949
+ },
+ {
+  "i": 45,
+  "start": 133.949,
+  "speechStart": 134.099,
+  "speechEnd": 135.827,
+  "text": "Yours is right every time.",
+  "end": 135.827
+ },
+ {
+  "i": 46,
+  "start": 135.827,
+  "speechStart": 135.977,
+  "speechEnd": 137.407,
+  "text": "You bring a rain jacket.",
+  "end": 137.407
+ },
+ {
+  "i": 47,
+  "start": 137.407,
+  "speechStart": 137.557,
+  "speechEnd": 141.15,
+  "text": "At 3:40 the sky opens. How did you know?",
+  "end": 141.15
+ },
+ {
+  "i": 48,
+  "start": 141.15,
+  "speechStart": 141.3,
+  "speechEnd": 144.552,
+  "text": "The app said ten percent! Day five.",
+  "end": 144.552
+ },
+ {
+  "i": 49,
+  "start": 144.552,
+  "speechStart": 144.702,
+  "speechEnd": 147.064,
+  "text": "Tomorrow, 9:47 p.m. Ava:",
+  "end": 146.914
+ },
+ {
+  "i": 50,
+  "start": 146.914,
+  "speechStart": 147.064,
+  "speechEnd": 148.969,
+  "text": "hey are you going to the...",
+  "end": 148.969
+ },
+ {
+  "i": 51,
+  "start": 148.969,
+  "speechStart": 149.119,
+  "speechEnd": 151.786,
+  "text": "The preview cuts off. Going to the what?",
+  "end": 152.136
+ },
+ {
+  "i": 52,
+  "start": 152.136,
+  "speechStart": 152.286,
+  "speechEnd": 157.854,
+  "text": "In one study, eighty-nine percent of college students said they'd felt their phone buzz when it hadn't.",
+  "end": 157.854
+ },
+ {
+  "i": 53,
+  "start": 157.854,
+  "speechStart": 158.004,
+  "speechEnd": 160.757,
+  "text": "Phantom vibrations. You never wonder.",
+  "end": 160.757
+ },
+ {
+  "i": 54,
+  "start": 160.757,
+  "speechStart": 160.907,
+  "speechEnd": 162.613,
+  "text": "You already know who's texting.",
+  "end": 162.613
+ },
+ {
+  "i": 55,
+  "start": 162.613,
+  "speechStart": 162.763,
+  "speechEnd": 165.311,
+  "text": "So you ask first. Wait.",
+  "end": 165.311
+ },
+ {
+  "i": 56,
+  "start": 165.311,
+  "speechStart": 165.461,
+  "speechEnd": 168.713,
+  "text": "I was literally about to ask you. Day six.",
+  "end": 168.713
+ },
+ {
+  "i": 57,
+  "start": 168.713,
+  "speechStart": 168.863,
+  "speechEnd": 170.975,
+  "text": "You start a group chat called Called It.",
+  "end": 170.975
+ },
+ {
+  "i": 58,
+  "start": 170.975,
+  "speechStart": 171.125,
+  "speechEnd": 175.82,
+  "text": "You post tomorrow's alerts a day early. Snow day. Lockdown drill.",
+  "end": 175.82
+ },
+ {
+  "i": 59,
+  "start": 175.82,
+  "speechStart": 175.97,
+  "speechEnd": 179.042,
+  "text": "The cafeteria running out of pizza at 12:14.",
+  "end": 179.392
+ },
+ {
+  "i": 60,
+  "start": 179.392,
+  "speechStart": 179.542,
+  "speechEnd": 183.349,
+  "text": "Within a day, two thousand kids follow it. Okay.",
+  "end": 183.349
+ },
+ {
+  "i": 61,
+  "start": 183.349,
+  "speechStart": 183.499,
+  "speechEnd": 185.035,
+  "text": "Who is leaking this?",
+  "end": 185.385
+ },
+ {
+  "i": 62,
+  "start": 185.385,
+  "speechStart": 185.535,
+  "speechEnd": 187.924,
+  "text": "Then a text from Jordan lands a day early.",
+  "end": 187.924
+ },
+ {
+  "i": 63,
+  "start": 187.924,
+  "speechStart": 188.074,
+  "speechEnd": 190.438,
+  "text": "Tomorrow, 2:05 p.m. Jordan:",
+  "end": 190.288
+ },
+ {
+  "i": 64,
+  "start": 190.288,
+  "speechStart": 190.438,
+  "speechEnd": 192.639,
+  "text": "failed my driving test lol.",
+  "end": 192.639
+ },
+ {
+  "i": 65,
+  "start": 192.639,
+  "speechStart": 192.789,
+  "speechEnd": 197.185,
+  "text": "So tonight, you quiz Jordan on parallel parking. For two hours.",
+  "end": 197.185
+ },
+ {
+  "i": 66,
+  "start": 197.185,
+  "speechStart": 197.335,
+  "speechEnd": 198.572,
+  "text": "In the school lot.",
+  "end": 198.572
+ },
+ {
+  "i": 67,
+  "start": 198.572,
+  "speechStart": 198.722,
+  "speechEnd": 202.699,
+  "text": "With traffic cones you borrowed from the gym. I passed!",
+  "end": 202.699
+ },
+ {
+  "i": 68,
+  "start": 202.699,
+  "speechStart": 202.849,
+  "speechEnd": 204.151,
+  "text": "I actually passed!",
+  "end": 204.501
+ },
+ {
+  "i": 69,
+  "start": 204.501,
+  "speechStart": 204.651,
+  "speechEnd": 206.293,
+  "text": "You've never felt this good.",
+  "end": 206.293
+ },
+ {
+  "i": 70,
+  "start": 206.293,
+  "speechStart": 206.443,
+  "speechEnd": 212.427,
+  "text": "You're not just reading tomorrow anymore. You're editing it. The catch? Day seven.",
+  "end": 212.427
+ },
+ {
+  "i": 71,
+  "start": 212.427,
+  "speechStart": 212.577,
+  "speechEnd": 214.94,
+  "text": "Tomorrow, 4:22 p.m. Sam:",
+  "end": 214.79
+ },
+ {
+  "i": 72,
+  "start": 214.79,
+  "speechStart": 214.94,
+  "speechEnd": 217.697,
+  "text": "i fell off my skateboard arm hurts.",
+  "end": 218.047
+ },
+ {
+  "i": 73,
+  "start": 218.047,
+  "speechStart": 218.197,
+  "speechEnd": 220.416,
+  "text": "So you hide the skateboard under your bed.",
+  "end": 220.416
+ },
+ {
+  "i": 74,
+  "start": 220.416,
+  "speechStart": 220.566,
+  "speechEnd": 221.782,
+  "text": "Problem solved.",
+  "end": 221.782
+ },
+ {
+  "i": 75,
+  "start": 221.782,
+  "speechStart": 221.932,
+  "speechEnd": 224.3,
+  "text": "At 11:59, the list updates.",
+  "end": 224.3
+ },
+ {
+  "i": 76,
+  "start": 224.3,
+  "speechStart": 224.45,
+  "speechEnd": 226.242,
+  "text": "The skateboard message is gone.",
+  "end": 226.242
+ },
+ {
+  "i": 77,
+  "start": 226.242,
+  "speechStart": 226.392,
+  "speechEnd": 227.949,
+  "text": "In its place, two new ones.",
+  "end": 228.299
+ },
+ {
+  "i": 78,
+  "start": 228.299,
+  "speechStart": 228.449,
+  "speechEnd": 229.96,
+  "text": "4:22 p.m. Sam:",
+  "end": 229.81
+ },
+ {
+  "i": 79,
+  "start": 229.81,
+  "speechStart": 229.96,
+  "speechEnd": 231.543,
+  "text": "tripped on the stairs.",
+  "end": 231.543
+ },
+ {
+  "i": 80,
+  "start": 231.543,
+  "speechStart": 231.693,
+  "speechEnd": 233.485,
+  "text": "4:23 p.m. Mom:",
+  "end": 233.335
+ },
+ {
+  "i": 81,
+  "start": 233.335,
+  "speechStart": 233.485,
+  "speechEnd": 235.511,
+  "text": "Taking Sam to urgent care.",
+  "end": 235.861
+ },
+ {
+  "i": 82,
+  "start": 235.861,
+  "speechStart": 236.011,
+  "speechEnd": 242.051,
+  "text": "It's a sprained ankle, not a broken arm. Better. But not gone. That's the cost.",
+  "end": 242.051
+ },
+ {
+  "i": 83,
+  "start": 242.051,
+  "speechStart": 242.201,
+  "speechEnd": 245.678,
+  "text": "Erase one notification, and tomorrow sends back two.",
+  "end": 245.678
+ },
+ {
+  "i": 84,
+  "start": 245.678,
+  "speechStart": 245.828,
+  "speechEnd": 247.236,
+  "text": "Tomorrow keeps count.",
+  "end": 247.586
+ },
+ {
+  "i": 85,
+  "start": 247.586,
+  "speechStart": 247.736,
+  "speechEnd": 249.656,
+  "text": "Forty-six becomes forty-eight.",
+  "end": 249.656
+ },
+ {
+  "i": 86,
+  "start": 249.656,
+  "speechStart": 249.806,
+  "speechEnd": 252.281,
+  "text": "Then fifty-two. Then sixty.",
+  "end": 252.281
+ },
+ {
+  "i": 87,
+  "start": 252.281,
+  "speechStart": 252.431,
+  "speechEnd": 254.586,
+  "text": "By day nine, one hundred and four.",
+  "end": 254.586
+ },
+ {
+  "i": 88,
+  "start": 254.586,
+  "speechStart": 254.736,
+  "speechEnd": 256.165,
+  "text": "You can read tomorrow.",
+  "end": 256.165
+ },
+ {
+  "i": 89,
+  "start": 256.165,
+  "speechStart": 256.315,
+  "speechEnd": 257.659,
+  "text": "You can't answer it.",
+  "end": 258.009
+ },
+ {
+  "i": 90,
+  "start": 258.009,
+  "speechStart": 258.159,
+  "speechEnd": 261.339,
+  "text": "Every erase is for someone. Jordan's test.",
+  "end": 261.339
+ },
+ {
+  "i": 91,
+  "start": 261.339,
+  "speechStart": 261.489,
+  "speechEnd": 263.553,
+  "text": "Ava's flat tire. Mr.",
+  "end": 263.403
+ },
+ {
+  "i": 92,
+  "start": 263.403,
+  "speechStart": 263.553,
+  "speechEnd": 264.945,
+  "text": "Okafor's coffee spill.",
+  "end": 264.945
+ },
+ {
+  "i": 93,
+  "start": 264.945,
+  "speechStart": 265.095,
+  "speechEnd": 267.698,
+  "text": "And for every one, tomorrow sends back two.",
+  "end": 267.698
+ },
+ {
+  "i": 94,
+  "start": 267.698,
+  "speechStart": 267.848,
+  "speechEnd": 269.064,
+  "text": "Doubling is sneaky.",
+  "end": 269.064
+ },
+ {
+  "i": 95,
+  "start": 269.064,
+  "speechStart": 269.214,
+  "speechEnd": 273.843,
+  "text": "Start with one and double it ten times, and you get one thousand and twenty-four.",
+  "end": 273.843
+ },
+ {
+  "i": 96,
+  "start": 273.843,
+  "speechStart": 273.993,
+  "speechEnd": 277.556,
+  "text": "You do that math at 3 a.m., and then you stop doing math.",
+  "end": 277.906
+ },
+ {
+  "i": 97,
+  "start": 277.906,
+  "speechStart": 278.056,
+  "speechEnd": 280.701,
+  "text": "Every night you're up until three, erasing.",
+  "end": 280.701
+ },
+ {
+  "i": 98,
+  "start": 280.701,
+  "speechStart": 280.851,
+  "speechEnd": 286.058,
+  "text": "Teenagers need eight to ten hours of sleep. You're getting four. Nine nights.",
+  "end": 286.058
+ },
+ {
+  "i": 99,
+  "start": 286.058,
+  "speechStart": 286.208,
+  "speechEnd": 288.768,
+  "text": "That's about forty hours you'll never get back.",
+  "end": 289.118
+ },
+ {
+  "i": 100,
+  "start": 289.118,
+  "speechStart": 289.268,
+  "speechEnd": 290.761,
+  "text": "You look like a raccoon.",
+  "end": 290.761
+ },
+ {
+  "i": 101,
+  "start": 290.761,
+  "speechStart": 290.911,
+  "speechEnd": 292.277,
+  "text": "A tired raccoon.",
+  "end": 292.627
+ },
+ {
+  "i": 102,
+  "start": 292.627,
+  "speechStart": 292.777,
+  "speechEnd": 295.025,
+  "text": "Then, tomorrow, 9:00 a.m. Email:",
+  "end": 294.875
+ },
+ {
+  "i": 103,
+  "start": 294.875,
+  "speechStart": 295.025,
+  "speechEnd": 296.745,
+  "text": "Priya Shah, Hindsight Labs.",
+  "end": 296.745
+ },
+ {
+  "i": 104,
+  "start": 296.745,
+  "speechStart": 296.895,
+  "speechEnd": 298.473,
+  "text": "We've been watching Called It...",
+  "end": 298.823
+ },
+ {
+  "i": 105,
+  "start": 298.823,
+  "speechStart": 298.973,
+  "speechEnd": 302.045,
+  "text": "Priya is calm, polite, and very expensive-looking.",
+  "end": 302.395
+ },
+ {
+  "i": 106,
+  "start": 302.395,
+  "speechStart": 302.545,
+  "speechEnd": 304.487,
+  "text": "We'd like to buy the phone.",
+  "end": 304.487
+ },
+ {
+  "i": 107,
+  "start": 304.487,
+  "speechStart": 304.637,
+  "speechEnd": 306.258,
+  "text": "Two million dollars.",
+  "end": 306.258
+ },
+ {
+  "i": 108,
+  "start": 306.258,
+  "speechStart": 306.408,
+  "speechEnd": 308.883,
+  "text": "Tomorrow, six p.m., our office.",
+  "end": 308.883
+ },
+ {
+  "i": 109,
+  "start": 308.883,
+  "speechStart": 309.033,
+  "speechEnd": 313.065,
+  "text": "At 6:15, it goes into our shielded case for twenty-four hours.",
+  "end": 313.415
+ },
+ {
+  "i": 110,
+  "start": 313.415,
+  "speechStart": 313.565,
+  "speechEnd": 315.335,
+  "text": "She already knows everything.",
+  "end": 315.685
+ },
+ {
+  "i": 111,
+  "start": 315.685,
+  "speechStart": 315.835,
+  "speechEnd": 317.755,
+  "text": "Sixty-three predictions.",
+  "end": 317.755
+ },
+ {
+  "i": 112,
+  "start": 317.755,
+  "speechStart": 317.905,
+  "speechEnd": 319.74,
+  "text": "Sixty-three correct.",
+  "end": 320.09
+ },
+ {
+  "i": 113,
+  "start": 320.09,
+  "speechStart": 320.24,
+  "speechEnd": 326.427,
+  "text": "If each one were a coin flip, the odds of guessing all sixty-three are about one in nine quintillion.",
+  "end": 326.427
+ },
+ {
+  "i": 114,
+  "start": 326.427,
+  "speechStart": 326.577,
+  "speechEnd": 329.094,
+  "text": "Hindsight Labs does not believe in luck.",
+  "end": 329.444
+ },
+ {
+  "i": 115,
+  "start": 329.444,
+  "speechStart": 329.594,
+  "speechEnd": 335.503,
+  "text": "A shielded case is basically a Faraday cage, a metal box that blocks radio signals.",
+  "end": 335.503
+ },
+ {
+  "i": 116,
+  "start": 335.503,
+  "speechStart": 335.653,
+  "speechEnd": 336.805,
+  "text": "Nothing gets in.",
+  "end": 336.805
+ },
+ {
+  "i": 117,
+  "start": 336.805,
+  "speechStart": 336.955,
+  "speechEnd": 338.214,
+  "text": "Nothing gets out.",
+  "end": 338.214
+ },
+ {
+  "i": 118,
+  "start": 338.214,
+  "speechStart": 338.364,
+  "speechEnd": 339.857,
+  "text": "Not even a phone call.",
+  "end": 339.857
+ },
+ {
+  "i": 119,
+  "start": 339.857,
+  "speechStart": 340.007,
+  "speechEnd": 341.351,
+  "text": "Two million dollars.",
+  "end": 341.351
+ },
+ {
+  "i": 120,
+  "start": 341.351,
+  "speechStart": 341.501,
+  "speechEnd": 343.421,
+  "text": "Mom could stop working doubles.",
+  "end": 343.771
+ },
+ {
+  "i": 121,
+  "start": 343.771,
+  "speechStart": 343.921,
+  "speechEnd": 348.465,
+  "text": "That night, Mom falls asleep on the couch in her scrubs, still wearing her shoes.",
+  "end": 348.465
+ },
+ {
+  "i": 122,
+  "start": 348.465,
+  "speechStart": 348.615,
+  "speechEnd": 350.77,
+  "text": "On the table, a pile of envelopes.",
+  "end": 350.77
+ },
+ {
+  "i": 123,
+  "start": 350.77,
+  "speechStart": 350.92,
+  "speechEnd": 353.681,
+  "text": "Two of them are red. Day ten.",
+  "end": 353.681
+ },
+ {
+  "i": 124,
+  "start": 353.681,
+  "speechStart": 353.831,
+  "speechEnd": 355.194,
+  "text": "11:59 p.m.",
+  "end": 355.044
+ },
+ {
+  "i": 125,
+  "start": 355.044,
+  "speechStart": 355.194,
+  "speechEnd": 357.991,
+  "text": "Three hundred and twelve notifications.",
+  "end": 357.991
+ },
+ {
+  "i": 126,
+  "start": 357.991,
+  "speechStart": 358.141,
+  "speechEnd": 364.225,
+  "text": "Your thumb is shaking. You scroll. Spam. School. Tyler. Ava.",
+  "end": 364.225
+ },
+ {
+  "i": 127,
+  "start": 364.225,
+  "speechStart": 364.375,
+  "speechEnd": 366.551,
+  "text": "Then one line that wasn't there before.",
+  "end": 366.901
+ },
+ {
+  "i": 128,
+  "start": 366.901,
+  "speechStart": 367.051,
+  "speechEnd": 371.147,
+  "text": "Tomorrow, 6:12 p.m. Missed call: Mom. Fourteen.",
+  "end": 371.497
+ },
+ {
+  "i": 129,
+  "start": 371.497,
+  "speechStart": 371.647,
+  "speechEnd": 373.546,
+  "text": "Missed calls from Mom aren't news.",
+  "end": 373.546
+ },
+ {
+  "i": 130,
+  "start": 373.546,
+  "speechStart": 373.696,
+  "speechEnd": 377.643,
+  "text": "She called you nine times last Tuesday about a sweater. Still.",
+  "end": 377.643
+ },
+ {
+  "i": 131,
+  "start": 377.643,
+  "speechStart": 377.793,
+  "speechEnd": 384.213,
+  "text": "In the morning, you call her. I'm fine, honey. Day off. I'm making lasagna. Fine.",
+  "end": 384.213
+ },
+ {
+  "i": 132,
+  "start": 384.213,
+  "speechStart": 384.363,
+  "speechEnd": 385.366,
+  "text": "She's fine.",
+  "end": 385.366
+ },
+ {
+  "i": 133,
+  "start": 385.366,
+  "speechStart": 385.516,
+  "speechEnd": 388.609,
+  "text": "And the list won't update until 11:59.",
+  "end": 388.609
+ },
+ {
+  "i": 134,
+  "start": 388.609,
+  "speechStart": 388.759,
+  "speechEnd": 390.53,
+  "text": "Tonight is too late to check.",
+  "end": 390.88
+ },
+ {
+  "i": 135,
+  "start": 390.88,
+  "speechStart": 391.03,
+  "speechEnd": 394.593,
+  "text": "At 5:15, you stand at the front door for a full minute.",
+  "end": 394.593
+ },
+ {
+  "i": 136,
+  "start": 394.593,
+  "speechStart": 394.743,
+  "speechEnd": 396.129,
+  "text": "Downtown, or home.",
+  "end": 396.129
+ },
+ {
+  "i": 137,
+  "start": 396.129,
+  "speechStart": 396.279,
+  "speechEnd": 401.23,
+  "text": "In the kitchen, Mom is singing along to the radio. Badly. She's fine.",
+  "end": 401.23
+ },
+ {
+  "i": 138,
+  "start": 401.23,
+  "speechStart": 401.38,
+  "speechEnd": 403.663,
+  "text": "Two million dollars. You go.",
+  "end": 404.013
+ },
+ {
+  "i": 139,
+  "start": 404.013,
+  "speechStart": 404.163,
+  "speechEnd": 405.571,
+  "text": "Bring me back a fancy pen!",
+  "end": 405.921
+ },
+ {
+  "i": 140,
+  "start": 405.921,
+  "speechStart": 406.071,
+  "speechEnd": 408.909,
+  "text": "At six, you're downtown, forty minutes from home.",
+  "end": 408.909
+ },
+ {
+  "i": 141,
+  "start": 408.909,
+  "speechStart": 409.059,
+  "speechEnd": 410.339,
+  "text": "Hindsight Labs.",
+  "end": 410.339
+ },
+ {
+  "i": 142,
+  "start": 410.339,
+  "speechStart": 410.489,
+  "speechEnd": 411.918,
+  "text": "Twenty-second floor.",
+  "end": 412.268
+ },
+ {
+  "i": 143,
+  "start": 412.268,
+  "speechStart": 412.418,
+  "speechEnd": 414.935,
+  "text": "Phones on Do Not Disturb, please.",
+  "end": 414.935
+ },
+ {
+  "i": 144,
+  "start": 414.935,
+  "speechStart": 415.085,
+  "speechEnd": 416.792,
+  "text": "The lawyers insist.",
+  "end": 417.142
+ },
+ {
+  "i": 145,
+  "start": 417.142,
+  "speechStart": 417.292,
+  "speechEnd": 423.588,
+  "text": "Priya turns the pages. Sign here. Initial here. 6:09. 6:10.",
+  "end": 423.588
+ },
+ {
+  "i": 146,
+  "start": 423.588,
+  "speechStart": 423.738,
+  "speechEnd": 426.414,
+  "text": "6:11. 6:12.",
+  "end": 426.414
+ },
+ {
+  "i": 147,
+  "start": 426.414,
+  "speechStart": 426.564,
+  "speechEnd": 430.427,
+  "text": "Your phone lights up on the table. No sound. Mom.",
+  "end": 430.427
+ },
+ {
+  "i": 148,
+  "start": 430.427,
+  "speechStart": 430.577,
+  "speechEnd": 434.567,
+  "text": "Do Not Disturb swallows it. Call two. Call three.",
+  "end": 434.917
+ },
+ {
+  "i": 149,
+  "start": 434.917,
+  "speechStart": 435.067,
+  "speechEnd": 436.39,
+  "text": "And then you hear it.",
+  "end": 436.39
+ },
+ {
+  "i": 150,
+  "start": 436.39,
+  "speechStart": 436.54,
+  "speechEnd": 438.951,
+  "text": "Not out loud. In your head.",
+  "end": 439.301
+ },
+ {
+  "i": 151,
+  "start": 439.301,
+  "speechStart": 439.451,
+  "speechEnd": 440.71,
+  "text": "Put me in your favorites.",
+  "end": 440.71
+ },
+ {
+  "i": 152,
+  "start": 440.71,
+  "speechStart": 440.86,
+  "speechEnd": 443.685,
+  "text": "So I always get through. You never did.",
+  "end": 443.685
+ },
+ {
+  "i": 153,
+  "start": 443.685,
+  "speechStart": 443.835,
+  "speechEnd": 447.741,
+  "text": "Under the table, your thumb moves. Contacts. Mom.",
+  "end": 447.741
+ },
+ {
+  "i": 154,
+  "start": 447.741,
+  "speechStart": 447.891,
+  "speechEnd": 449.171,
+  "text": "Add to Favorites.",
+  "end": 449.171
+ },
+ {
+  "i": 155,
+  "start": 449.171,
+  "speechStart": 449.321,
+  "speechEnd": 453.171,
+  "text": "Call five rings. Out loud. You answer.",
+  "end": 453.171
+ },
+ {
+  "i": 156,
+  "start": 453.171,
+  "speechStart": 453.321,
+  "speechEnd": 459.647,
+  "text": "Her words are coming out wrong. Slow. Thick. Maya... my arm... can't...",
+  "end": 459.997
+ },
+ {
+  "i": 157,
+  "start": 459.997,
+  "speechStart": 460.147,
+  "speechEnd": 465.355,
+  "text": "Doctors have a word for this. FAST. Face drooping. Arm weakness.",
+  "end": 465.355
+ },
+ {
+  "i": 158,
+  "start": 465.355,
+  "speechStart": 465.505,
+  "speechEnd": 466.891,
+  "text": "Speech difficulty.",
+  "end": 466.891
+ },
+ {
+  "i": 159,
+  "start": 466.891,
+  "speechStart": 467.041,
+  "speechEnd": 468.833,
+  "text": "Time to call 911.",
+  "end": 468.833
+ },
+ {
+  "i": 160,
+  "start": 468.833,
+  "speechStart": 468.983,
+  "speechEnd": 475.649,
+  "text": "During a stroke, the brain can lose around one point nine million neurons every minute. 6:13.",
+  "end": 475.649
+ },
+ {
+  "i": 161,
+  "start": 475.649,
+  "speechStart": 475.799,
+  "speechEnd": 477.249,
+  "text": "You call 911.",
+  "end": 477.249
+ },
+ {
+  "i": 162,
+  "start": 477.249,
+  "speechStart": 477.399,
+  "speechEnd": 483.524,
+  "text": "One point nine million. 6:14. You call Mrs. Alvarez next door. She has a key.",
+  "end": 483.524
+ },
+ {
+  "i": 163,
+  "start": 483.524,
+  "speechStart": 483.674,
+  "speechEnd": 485.039,
+  "text": "Three point eight million.",
+  "end": 485.389
+ },
+ {
+  "i": 164,
+  "start": 485.389,
+  "speechStart": 485.539,
+  "speechEnd": 486.819,
+  "text": "I'm going.",
+  "end": 486.819
+ },
+ {
+  "i": 165,
+  "start": 486.819,
+  "speechStart": 486.969,
+  "speechEnd": 491.255,
+  "text": "I'm going! 6:15. Maya.",
+  "end": 491.255
+ },
+ {
+  "i": 166,
+  "start": 491.255,
+  "speechStart": 491.405,
+  "speechEnd": 494.093,
+  "text": "It's 6:15. The case.",
+  "end": 494.093
+ },
+ {
+  "i": 167,
+  "start": 494.093,
+  "speechStart": 494.243,
+  "speechEnd": 496.185,
+  "text": "Now, or the deal is off.",
+  "end": 496.535
+ },
+ {
+  "i": 168,
+  "start": 496.535,
+  "speechStart": 496.685,
+  "speechEnd": 498.05,
+  "text": "The deal, or the call.",
+  "end": 498.4
+ },
+ {
+  "i": 169,
+  "start": 498.4,
+  "speechStart": 498.55,
+  "speechEnd": 500.129,
+  "text": "You keep the phone at your ear.",
+  "end": 500.129
+ },
+ {
+  "i": 170,
+  "start": 500.129,
+  "speechStart": 500.279,
+  "speechEnd": 501.751,
+  "text": "Mom can't talk much.",
+  "end": 501.751
+ },
+ {
+  "i": 171,
+  "start": 501.751,
+  "speechStart": 501.901,
+  "speechEnd": 505.473,
+  "text": "But she can hear you. So you talk. No.",
+  "end": 505.823
+ },
+ {
+  "i": 172,
+  "start": 505.823,
+  "speechStart": 505.973,
+  "speechEnd": 508.661,
+  "text": "You're walking away from two million dollars.",
+  "end": 509.011
+ },
+ {
+  "i": 173,
+  "start": 509.011,
+  "speechStart": 509.161,
+  "speechEnd": 515.252,
+  "text": "I'm walking toward my mom. 6:17. Mrs. Alvarez: I'm with her. She's awake.",
+  "end": 515.252
+ },
+ {
+  "i": 174,
+  "start": 515.252,
+  "speechStart": 515.402,
+  "speechEnd": 516.959,
+  "text": "Seven point six million.",
+  "end": 516.959
+ },
+ {
+  "i": 175,
+  "start": 516.959,
+  "speechStart": 517.109,
+  "speechEnd": 519.414,
+  "text": "6:21. Sirens.",
+  "end": 519.414
+ },
+ {
+  "i": 176,
+  "start": 519.414,
+  "speechStart": 519.564,
+  "speechEnd": 520.993,
+  "text": "You can read tomorrow.",
+  "end": 520.993
+ },
+ {
+  "i": 177,
+  "start": 520.993,
+  "speechStart": 521.143,
+  "speechEnd": 522.487,
+  "text": "You can't answer it.",
+  "end": 522.487
+ },
+ {
+  "i": 178,
+  "start": 522.487,
+  "speechStart": 522.637,
+  "speechEnd": 524.301,
+  "text": "But you can answer today.",
+  "end": 524.651
+ },
+ {
+  "i": 179,
+  "start": 524.651,
+  "speechStart": 524.801,
+  "speechEnd": 527.916,
+  "text": "Clot-busting drugs work best within about three hours.",
+  "end": 527.916
+ },
+ {
+  "i": 180,
+  "start": 527.916,
+  "speechStart": 528.066,
+  "speechEnd": 530.093,
+  "text": "Mom gets them in fifty-one minutes.",
+  "end": 530.443
+ },
+ {
+  "i": 181,
+  "start": 530.443,
+  "speechStart": 530.593,
+  "speechEnd": 532.086,
+  "text": "You got her here in time.",
+  "end": 532.436
+ },
+ {
+  "i": 182,
+  "start": 532.436,
+  "speechStart": 532.586,
+  "speechEnd": 537.93,
+  "text": "Mom's words are still slow. But they're hers. Told you. Favorites.",
+  "end": 538.28
+ },
+ {
+  "i": 183,
+  "start": 538.28,
+  "speechStart": 538.43,
+  "speechEnd": 541.353,
+  "text": "Sam wakes up and climbs onto the end of the bed.",
+  "end": 541.353
+ },
+ {
+  "i": 184,
+  "start": 541.353,
+  "speechStart": 541.503,
+  "speechEnd": 543.765,
+  "text": "You open your phone. Called It.",
+  "end": 543.765
+ },
+ {
+  "i": 185,
+  "start": 543.765,
+  "speechStart": 543.915,
+  "speechEnd": 546.625,
+  "text": "Two thousand followers. You delete it.",
+  "end": 546.625
+ },
+ {
+  "i": 186,
+  "start": 546.625,
+  "speechStart": 546.775,
+  "speechEnd": 552.523,
+  "text": "Then you open Contacts, and you add Sam to your favorites too. See? Later means never.",
+  "end": 552.523
+ },
+ {
+  "i": 187,
+  "start": 552.523,
+  "speechStart": 552.673,
+  "speechEnd": 553.505,
+  "text": "Now means now.",
+  "end": 553.855
+ },
+ {
+  "i": 188,
+  "start": 553.855,
+  "speechStart": 554.005,
+  "speechEnd": 555.392,
+  "text": "Is any of this real?",
+  "end": 555.392
+ },
+ {
+  "i": 189,
+  "start": 555.392,
+  "speechStart": 555.542,
+  "speechEnd": 557.441,
+  "text": "A phone that reads tomorrow, no.",
+  "end": 557.441
+ },
+ {
+  "i": 190,
+  "start": 557.441,
+  "speechStart": 557.591,
+  "speechEnd": 560.915,
+  "text": "But favorites that break through Do Not Disturb are real;",
+  "end": 560.765
+ },
+ {
+  "i": 191,
+  "start": 560.765,
+  "speechStart": 560.915,
+  "speechEnd": 562.199,
+  "text": "most phones have them.",
+  "end": 562.199
+ },
+ {
+  "i": 192,
+  "start": 562.199,
+  "speechStart": 562.349,
+  "speechEnd": 563.693,
+  "text": "And FAST is real.",
+  "end": 563.693
+ },
+ {
+  "i": 193,
+  "start": 563.693,
+  "speechStart": 563.843,
+  "speechEnd": 567.619,
+  "text": "In the U.S., someone has a stroke about every forty seconds.",
+  "end": 567.619
+ },
+ {
+  "i": 194,
+  "start": 567.619,
+  "speechStart": 567.769,
+  "speechEnd": 571.247,
+  "text": "If you see the signs, don't wait for tomorrow. Call.",
+  "end": 571.597
+ },
+ {
+  "i": 195,
+  "start": 571.597,
+  "speechStart": 571.747,
+  "speechEnd": 573.645,
+  "text": "That night, 11:59.",
+  "end": 573.645
+ },
+ {
+  "i": 196,
+  "start": 573.645,
+  "speechStart": 573.795,
+  "speechEnd": 576.143,
+  "text": "One notification. Just one.",
+  "end": 576.493
+ },
+ {
+  "i": 197,
+  "start": 576.493,
+  "speechStart": 576.643,
+  "speechEnd": 578.855,
+  "text": "Tomorrow, 6:00 a.m. Unknown number:",
+  "end": 578.705
+ },
+ {
+  "i": 198,
+  "start": 578.705,
+  "speechStart": 578.855,
+  "speechEnd": 580.291,
+  "text": "I know you can see this.",
+  "end": 580.641
+ },
+ {
+  "i": 199,
+  "start": 580.641,
+  "speechStart": 580.791,
+  "speechEnd": 584.993,
+  "text": "If your phone showed you tomorrow, would you read it every night, or turn it off?",
+  "end": 584.993
+ },
+ {
+  "i": 200,
+  "start": 584.993,
+  "speechStart": 585.143,
+  "speechEnd": 586.573,
+  "text": "Tell us in the comments.",
+  "end": 588.073
+ }
+]

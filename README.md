@@ -30,7 +30,9 @@ từ **nghiên cứu ngách** → **viết kịch bản** → **giọng đọc**
 | `scripts/` | Kịch bản đã viết và bản đọc thuần cho giọng đọc |
 | `tools/` | Công cụ phụ: TTS Kokoro, làm sạch phụ đề `.vtt`, thống kê mô típ transcript |
 | `aitrends-2d-studio/` | Bộ dựng video: engine, dự án mẫu, công cụ tạo dự án và render |
-| `tests/` | Kiểm thử cho `niche_finder`, `audience_research`, TTS |
+| `market_watch.py`, `config/markets.json` | Tự động thu thập thị trường hằng ngày và tính số liệu đối thủ hằng tuần |
+| `.github/workflows/market-daily.yml` | Lịch chạy `market_watch.py` mỗi ngày lúc 15:17 giờ VN, sau khi quota YouTube hồi |
+| `tests/` | Kiểm thử cho `niche_finder`, `audience_research`, `market_watch`, TTS |
 | `.claude/skills/` | Skill `script-to-2d-video`: từ kịch bản sang giọng đọc rồi sang video |
 
 ## Bắt đầu nhanh
@@ -65,6 +67,13 @@ node render.mjs --project projects/my-video         # → build/video_silent.mp4
 ```
 
 Xem thêm: ví dụ nhỏ tại `aitrends-2d-studio/examples/reaction-time/`, dự án hoàn chỉnh tại `aitrends-2d-studio/projects/t4-02/`.
+
+## Tự động nghiên cứu thị trường
+
+- **Hằng ngày:** GitHub Actions chạy `market_watch.py daily`, đẩy dữ liệu vào nhánh `research/reports`.
+- **Chủ nhật:** GitHub Actions tạo số liệu tuần. Sau đó một tác vụ Claude theo lịch viết báo cáo đối thủ.
+- **Báo cáo:** đọc ở [`research/reports` → `reports/INDEX.md`](https://github.com/vmthuan703/AI_youtube/blob/research/reports/reports/INDEX.md).
+- **Cài đặt** (secret `YOUTUBE_API_KEY`) và cách sửa phạm vi nghiên cứu: [`docs/TU_DONG_NGHIEN_CUU.md`](docs/TU_DONG_NGHIEN_CUU.md).
 
 ## Lưu ý
 

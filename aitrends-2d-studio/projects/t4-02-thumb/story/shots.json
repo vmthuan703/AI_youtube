@@ -1,0 +1,9 @@
+{
+ "title": "T4 #2 thumbnails",
+ "duration": 3,
+ "shots": [
+  {"id": "thA", "start": 0, "end": 1, "line": "A · TOO LATE? (cái giá: cuộc gọi lỡ của mẹ)", "bars": "none"},
+  {"id": "thB", "start": 1, "end": 2, "line": "B · I KNOW. (năng lực: biết trước bài kiểm tra)", "bars": "none"},
+  {"id": "thC", "start": 2, "end": 3, "line": "C · 46 → 312 (con số leo thang)", "bars": "none"}
+ ]
+}

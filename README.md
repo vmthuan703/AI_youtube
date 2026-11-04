@@ -101,6 +101,7 @@ từ **nghiên cứu ngách** → **viết kịch bản** → **giọng đọc**
 | `tools/` | Công cụ phụ: TTS Kokoro, làm sạch phụ đề `.vtt`, thống kê mô típ transcript |
 | `aitrends-2d-studio/` | Bộ dựng video: engine, dự án mẫu, công cụ tạo dự án và render |
 | `market_watch.py`, `config/markets.json` | Tự động thu thập thị trường hằng ngày và tính số liệu đối thủ hằng tuần |
+| `tools/thumbnails/`, `docs/THUMBNAIL_PLAYBOOK.md` | Thu thập thumbnail đối thủ (workflow **Thu thập thumbnail đối thủ**) và cẩm nang làm thumbnail rút ra từ đó |
 | `.github/workflows/market-daily.yml` | Lịch chạy `market_watch.py` mỗi ngày lúc 15:17 giờ VN, sau khi quota YouTube hồi |
 | `tests/` | Kiểm thử cho `niche_finder`, `audience_research`, `market_watch`, TTS |
 | `.claude/skills/` | Skill `script-to-2d-video`: từ kịch bản sang giọng đọc rồi sang video |

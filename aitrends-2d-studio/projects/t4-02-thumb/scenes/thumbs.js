@@ -48,8 +48,8 @@ function bigNotif(g, x, y, w, o) {
 
 // A — the cost: Mom's missed calls, tomorrow. Shocked Maya, phone glow on her face.
 registerShot('thA', { draw(g) {
-  backdrop(g, { top: '#0c1030', bottom: '#2a0f2a', hot: '#ff3b3b', hx: 1450, hy: 560, hr: 950 });
-  glow(g, 560, 640, 700, '#8fd3ff', 0.35);
+  backdrop(g, { top: '#101a4a', bottom: '#3a1030', hot: '#ff3b3b', hx: 1450, hy: 560, hr: 1050 });
+  glow(g, 560, 640, 760, '#8fd3ff', 0.5);
   bigFace(g, 600, 720, 330, { outfit: MAYA, expr: 'shocked', look: [0.35, 0.1], rimColor: '#9fdcff', rimSide: 1, tilt: -0.06 });
   g.save(); g.translate(1420, 640); g.rotate(0.07); phone(g, 0, 0, 980, 0, { time: '11:59', date: 'Tonight', cards: [], glowA: 1.4 }); g.restore();
   bigNotif(g, 860, 470, 1010, { sender: 'Mom', msg: '14 missed calls', msgColor: '#ff6b5a', tag: 'TOMORROW 6:12 PM', icon: '☎' });

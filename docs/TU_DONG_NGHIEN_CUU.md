@@ -6,10 +6,13 @@
 |---|---|---|---|
 | Hằng ngày 08:17 UTC (15:17 giờ VN) | GitHub Actions (`.github/workflows/market-daily.yml`) | `market_watch.py daily`: chạy truy vấn tìm kiếm, thêm kênh mới thắng vào danh sách theo dõi, chụp snapshot mọi kênh đang theo dõi | nhánh `research/reports`, thư mục `data/YYYY-MM-DD/` |
 | Chủ nhật, cùng lượt trên | GitHub Actions | `market_watch.py weekly`: bảng chấm ô, đối thủ, video bung, danh sách tiêu đề | `reports/YYYY-Www/SO_LIEU.md` + CSV |
+| Hằng ngày, ngay sau lượt thu thập | GitHub Actions | `market_watch.py readme`: chép `TOM_TAT.md` mới nhất vào khối `<!-- DAILY:START -->` … `<!-- DAILY:END -->` của `README.md`, rồi commit thẳng vào `main` | `README.md` trên `main` |
 | Chủ nhật 19:47 giờ VN | Tác vụ Claude theo lịch | Đọc số liệu và tiêu đề theo `prompts/weekly_competitor_report.md`, viết báo cáo | `reports/YYYY-Www/BAO_CAO_DOI_THU.md` |
 
 Quota YouTube hồi lúc 00:00 giờ Thái Bình Dương: 08:00 UTC vào mùa đông, 07:00 UTC vào mùa hè. Lịch chạy
 lúc 08:17 UTC nên luôn sau giờ hồi quanh năm.
+
+**Lưu ý README:** bước này commit thẳng vào `main` bằng `GITHUB_TOKEN`, nên mỗi ngày có thêm một commit tự động. Nếu `main` bật bảo vệ nhánh (bắt buộc PR), bước này sẽ bị từ chối: cho phép `github-actions[bot]` đẩy vào `main`, hoặc bỏ bước này.
 
 ## Cài đặt một lần
 

@@ -139,3 +139,31 @@ def test_import_snapshot(tmp_path):
     assert (nc, nv) == (1, 1)
     ch = mw.read_csv(str(tmp_path / "r" / "data" / "2026-11-03" / "channels.csv"))
     assert ch[0]["first_upload_at"] == iso(20)
+
+
+def test_readme_block_replace_and_idempotent(tmp_path):
+    root = tmp_path / "r"
+    for d, body in (("2026-11-03", "# Tóm tắt thu thập 2026-11-03\n\n## Ô A\n- cũ"),
+                    ("2026-11-04", "# Tóm tắt thu thập 2026-11-04\n\n## Ô A\n- mới")):
+        (root / "data" / d).mkdir(parents=True)
+        (root / "data" / d / "TOM_TAT.md").write_text(body, encoding="utf-8")
+    readme = tmp_path / "README.md"
+    readme.write_text("# X\n\nMở đầu\n\n" + mw.README_START + "\nCŨ\n" + mw.README_END + "\n\nCuối\n",
+                      encoding="utf-8")
+    day, changed = mw.update_readme(str(root), str(readme), "o/r")
+    text = readme.read_text(encoding="utf-8")
+    assert (day, changed) == ("2026-11-04", True)
+    assert "- mới" in text and "- cũ" not in text and "CŨ" not in text      # chỉ lấy ngày mới nhất
+    assert "### Tóm tắt thu thập 2026-11-04" in text and "#### Ô A" in text  # hạ cấp tiêu đề
+    assert text.startswith("# X\n\nMở đầu\n") and text.rstrip().endswith("Cuối")
+    assert "blob/research/reports/data/2026-11-04/TOM_TAT.md" in text
+    assert mw.update_readme(str(root), str(readme), "o/r") == ("2026-11-04", False)  # chạy lại không đổi
+
+
+def test_readme_appends_block_when_markers_missing(tmp_path):
+    readme = tmp_path / "README.md"
+    readme.write_text("# X\n", encoding="utf-8")
+    (tmp_path / "r").mkdir()
+    day, changed = mw.update_readme(str(tmp_path / "r"), str(readme))
+    text = readme.read_text(encoding="utf-8")
+    assert day is None and changed and text.count(mw.README_START) == 1 and "Chưa có báo cáo" in text

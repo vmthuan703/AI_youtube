@@ -2,6 +2,12 @@
 
 Công cụ tự động hoá quy trình làm kênh YouTube.
 
+<!-- DAILY:START -->
+## Báo cáo hôm nay
+
+Chưa có báo cáo nào. Báo cáo được cập nhật tự động mỗi ngày sau lượt thu thập thị trường.
+<!-- DAILY:END -->
+
 ## 1. Tìm ngách: `niche_finder.py`
 
 Tìm các chủ đề mà **kênh mới** vẫn có video nhiều view, theo từng quốc gia.

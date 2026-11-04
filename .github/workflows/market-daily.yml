@@ -73,3 +73,17 @@ jobs:
             git pull --rebase origin "$DATA_BRANCH" || true
           done
           exit 1
+
+      - name: Cập nhật báo cáo hôm nay vào README của main
+        if: github.ref == 'refs/heads/main'
+        run: |
+          python market_watch.py readme --root research --readme README.md --repo "$GITHUB_REPOSITORY"
+          git add README.md
+          if git diff --cached --quiet; then echo "README không đổi"; exit 0; fi
+          git commit -m "README: báo cáo thị trường $(TZ=Asia/Ho_Chi_Minh date +%F) [skip ci]"
+          for i in 1 2 3 4; do
+            git push origin HEAD:main && exit 0
+            sleep $((2 ** i))
+            git pull --rebase origin main || true
+          done
+          exit 1

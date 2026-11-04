@@ -10,6 +10,7 @@
                    (>= 10x trung vị của CHÍNH kênh đó), danh sách tiêu đề để đọc tay.
                    -> <root>/reports/YYYY-Www/SO_LIEU.md + CSV, cập nhật reports/INDEX.md
   index            Cập nhật reports/INDEX.md (sau khi viết BAO_CAO_DOI_THU.md).
+  readme           Ghi báo cáo ngày mới nhất (TOM_TAT.md) vào khối giữa hai dấu DAILY:START/END của README.
   import-snapshot  Chuyển out/videos.csv của audience_research.py thành snapshot của một ngày.
 
 Phương pháp lấy theo tài liệu "Cách dựng kênh tâm lý từ số 0": nhìn tuổi kênh của 5 kênh có
@@ -22,6 +23,7 @@ import argparse
 import csv
 import json
 import os
+import re
 import sys
 from datetime import date, datetime, timedelta, timezone
 from statistics import median
@@ -675,6 +677,59 @@ def run_weekly(cfg, root, end=None, days=7, generated=None, label=None):
     return d, len(snaps)
 
 
+# ---------------------------------------------------------------- README hằng ngày
+README_START = "<!-- DAILY:START -->"
+README_END = "<!-- DAILY:END -->"
+
+
+def latest_summary(root):
+    """Trả (ngày, nội dung TOM_TAT.md) của ngày mới nhất, hoặc (None, None)."""
+    base = os.path.join(root, "data")
+    days = sorted((d for d in os.listdir(base) if os.path.exists(os.path.join(base, d, "TOM_TAT.md"))),
+                  reverse=True) if os.path.isdir(base) else []
+    if not days:
+        return None, None
+    with open(os.path.join(base, days[0], "TOM_TAT.md"), encoding="utf-8") as f:
+        return days[0], f.read()
+
+
+def render_readme_block(day, summary, repo=None, data_branch="research/reports"):
+    """Khối Markdown để chèn vào README. Hạ cấp tiêu đề của TOM_TAT xuống dưới '##'."""
+    lines = [README_START, "## Báo cáo hôm nay", ""]
+    if not day:
+        lines += ["Chưa có báo cáo nào.", README_END]
+        return "\n".join(lines)
+    body = [re.sub(r"^(#+) ", lambda m: "#" * (len(m.group(1)) + 2) + " ", ln)
+            for ln in summary.strip().splitlines()]
+    lines += [f"_Cập nhật tự động {day}. Số liệu từ YouTube Data API, đối chiếu bằng tay trước khi quyết định._", ""]
+    lines += body + [""]
+    if repo:
+        url = f"https://github.com/{repo}/blob/{data_branch}"
+        lines += [f"Xem thêm: [dữ liệu ngày {day}]({url}/data/{day}/TOM_TAT.md)"
+                  f" · [báo cáo theo tuần]({url}/reports/INDEX.md)", ""]
+    lines.append(README_END)
+    return "\n".join(lines)
+
+
+def replace_block(text, block):
+    """Thay khối giữa hai dấu; nếu chưa có dấu thì thêm vào cuối file."""
+    a, b = text.find(README_START), text.find(README_END)
+    if a != -1 and b > a:
+        return text[:a] + block + text[b + len(README_END):]
+    return text.rstrip("\n") + "\n\n" + block + "\n"
+
+
+def update_readme(root, readme_path, repo=None):
+    day, summary = latest_summary(root)
+    with open(readme_path, encoding="utf-8") as f:
+        old = f.read()
+    new = replace_block(old, render_readme_block(day, summary, repo))
+    if new != old:
+        with open(readme_path, "w", encoding="utf-8") as f:
+            f.write(new)
+    return day, new != old
+
+
 # ---------------------------------------------------------------- nhập dữ liệu cũ
 def import_snapshot(videos_csv, root, market_id, snap_date):
     """Biến out/videos.csv của audience_research.py thành snapshot (không có sub/ngày tạo kênh)."""
@@ -718,7 +773,7 @@ def load_config(path):
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(dest="cmd", required=True)
-    for name in ("daily", "weekly", "index", "import-snapshot"):
+    for name in ("daily", "weekly", "index", "readme", "import-snapshot"):
         s = sub.add_parser(name)
         s.add_argument("--config", default="config/markets.json")
         s.add_argument("--root", default="research", help="Thư mục dữ liệu (worktree của nhánh research/reports)")
@@ -727,6 +782,9 @@ def main(argv=None):
     sub.choices["weekly"].add_argument("--end", type=date.fromisoformat, help="Ngày cuối, mặc định hôm nay giờ VN")
     sub.choices["weekly"].add_argument("--days", type=int, default=7)
     sub.choices["weekly"].add_argument("--label", help="Tên thư mục báo cáo, mặc định YYYY-Www")
+    rd = sub.choices["readme"]
+    rd.add_argument("--readme", default="README.md")
+    rd.add_argument("--repo", default=os.environ.get("GITHUB_REPOSITORY"), help="owner/repo, để tạo link")
     imp = sub.choices["import-snapshot"]
     imp.add_argument("--videos", required=True)
     imp.add_argument("--market", default="whatif-us")
@@ -751,6 +809,9 @@ def main(argv=None):
         print(f"Đã ghi {d}/SO_LIEU.md từ {n} snapshot.")
         if n == 0:
             print("Cảnh báo: không có snapshot nào trong khoảng ngày.", file=sys.stderr)
+    elif a.cmd == "readme":
+        day, changed = update_readme(a.root, a.readme, a.repo)
+        print(f"README: báo cáo {day or 'trống'} · {'đã đổi' if changed else 'không đổi'}.")
     elif a.cmd == "index":
         update_index(a.root)
         print(f"Đã cập nhật {a.root}/reports/INDEX.md")

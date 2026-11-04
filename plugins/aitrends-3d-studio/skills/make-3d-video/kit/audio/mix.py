@@ -105,7 +105,7 @@ def main():
         if up and up != "none":
             vertical = cfg.get("aspect") == "9:16"; short = 1440 if up == "1440p" else 2160; long = short * 16 // 9
             w, h = (short, long) if vertical else (long, short)
-            vcodec = ["-vf", f"scale={w}:{h}:flags=lanczos", "-c:v", "libx264", "-preset", "slow", "-crf", "14", "-profile:v", "high", "-tune", "animation", "-pix_fmt", "yuv420p",
+            vcodec = ["-vf", f"scale={w}:{h}:flags=lanczos", "-c:v", "libx264", "-preset", "medium", "-crf", "15", "-profile:v", "high", "-tune", "animation", "-pix_fmt", "yuv420p",
                       "-g", str(max(1, round((cfg.get("fps") or 24) / 2))), "-bf", "2", "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709"]
             print(f"upscaling picture to {w}x{h} for upload…")
         subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", video, "-i", out_wav, "-map", "0:v:0", "-map", "1:a:0", *vcodec, "-c:a", "aac", "-b:a", abr, "-ar", "48000", "-shortest", "-movflags", "+faststart", out], check=True)

@@ -11,7 +11,7 @@ EXPECTED = {
     "player.html": "5ffdd7da4a48cd4b",
     "render.mjs": "82a9e4aacb53cbd9",
     "audio/dsp.py": "589d305d94d8acc3",
-    "audio/mix.py": "22853151ed914969",
+    "audio/mix.py": "2477d0be9bcdc7dc",
     "audio/music.py": "2fb3ce1df2fe5c7d",
     "audio/sfx.py": "2fa56141e2423718",
     "engine/core.js": "e269def910147ea8",

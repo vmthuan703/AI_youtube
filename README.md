@@ -1,5 +1,12 @@
 # AI_youtube
 
+## Tự động nghiên cứu thị trường
+
+- **Hằng ngày:** GitHub Actions chạy `market_watch.py daily`, đẩy dữ liệu vào nhánh `research/reports`.
+- **Chủ nhật:** GitHub Actions tạo số liệu tuần. Sau đó một tác vụ Claude theo lịch viết báo cáo đối thủ.
+- **Báo cáo:** đọc ở [`research/reports` → `reports/INDEX.md`](https://github.com/vmthuan703/AI_youtube/blob/research/reports/reports/INDEX.md).
+- **Cài đặt** (secret `YOUTUBE_API_KEY`) và cách sửa phạm vi nghiên cứu: [`docs/TU_DONG_NGHIEN_CUU.md`](docs/TU_DONG_NGHIEN_CUU.md).
+
 <!-- DAILY:START -->
 ## Báo cáo hôm nay
 
@@ -79,13 +86,6 @@ node render.mjs --project projects/my-video         # → build/video_silent.mp4
 ```
 
 Xem thêm: ví dụ nhỏ tại `aitrends-2d-studio/examples/reaction-time/`, dự án hoàn chỉnh tại `aitrends-2d-studio/projects/t4-02/`.
-
-## Tự động nghiên cứu thị trường
-
-- **Hằng ngày:** GitHub Actions chạy `market_watch.py daily`, đẩy dữ liệu vào nhánh `research/reports`.
-- **Chủ nhật:** GitHub Actions tạo số liệu tuần. Sau đó một tác vụ Claude theo lịch viết báo cáo đối thủ.
-- **Báo cáo:** đọc ở [`research/reports` → `reports/INDEX.md`](https://github.com/vmthuan703/AI_youtube/blob/research/reports/reports/INDEX.md).
-- **Cài đặt** (secret `YOUTUBE_API_KEY`) và cách sửa phạm vi nghiên cứu: [`docs/TU_DONG_NGHIEN_CUU.md`](docs/TU_DONG_NGHIEN_CUU.md).
 
 ## Lưu ý
 

@@ -1,0 +1,75 @@
+# Thu thập thị trường YouTube mỗi ngày, ngay sau khi quota YouTube hồi.
+# Quota hồi lúc 00:00 giờ Thái Bình Dương: 08:00 UTC (mùa đông) hoặc 07:00 UTC (mùa hè).
+# Chạy 08:17 UTC (15:17 giờ VN) nên luôn sau giờ hồi quanh năm.
+# Lưu ý: GitHub chỉ chạy lịch (schedule) với workflow nằm trên nhánh mặc định (main).
+name: Thu thập thị trường hằng ngày
+
+on:
+  schedule:
+    - cron: "17 8 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: market-daily
+  cancel-in-progress: false
+
+jobs:
+  daily:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+      DATA_BRANCH: research/reports
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install -r requirements.txt
+
+      - name: Kiểm tra API key
+        run: |
+          if [ -z "$YOUTUBE_API_KEY" ]; then
+            echo "::error::Chưa có secret YOUTUBE_API_KEY (Settings → Secrets and variables → Actions)"
+            exit 1
+          fi
+
+      - name: Mở nhánh dữ liệu
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin "$DATA_BRANCH" > /dev/null; then
+            git fetch origin "$DATA_BRANCH"
+            git worktree add -B "$DATA_BRANCH" research "origin/$DATA_BRANCH"
+          else
+            git worktree add --orphan -b "$DATA_BRANCH" research
+          fi
+
+      - name: Thu thập (discovery + snapshot đối thủ)
+        run: python market_watch.py daily --config config/markets.json --root research
+
+      - name: Số liệu tuần (chủ nhật giờ VN)
+        run: |
+          if [ "$(TZ=Asia/Ho_Chi_Minh date +%u)" = "7" ]; then
+            python market_watch.py weekly --config config/markets.json --root research
+          fi
+
+      - name: Đẩy dữ liệu lên nhánh research/reports
+        run: |
+          cd research
+          git add -A
+          if git diff --cached --quiet; then echo "Không có gì mới"; exit 0; fi
+          git commit -m "Dữ liệu thị trường $(TZ=Asia/Ho_Chi_Minh date +%F)"
+          for i in 1 2 3 4; do
+            git push origin "HEAD:$DATA_BRANCH" && exit 0
+            sleep $((2 ** i))
+            git pull --rebase origin "$DATA_BRANCH" || true
+          done
+          exit 1

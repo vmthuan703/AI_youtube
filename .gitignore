@@ -1,0 +1,13 @@
+.env
+cache.sqlite
+niches*.csv
+__pycache__/
+.pytest_cache/
+out/
+
+# aiTrends studio: chỉ commit code dự án, không commit dependency và bản render
+aitrends-2d-studio/node_modules/
+aitrends-2d-studio/projects/*/build/
+aitrends-2d-studio/projects/*/out/
+aitrends-2d-studio/projects/*/input/*.mp3
+aitrends-2d-studio/projects/*/input/*.wav

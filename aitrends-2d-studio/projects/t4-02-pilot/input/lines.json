@@ -1,0 +1,110 @@
+[
+ {
+  "i": 0,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 0.0,
+  "end": 7.191,
+  "text": "It's 11:59 p.m. Your phone is face down on the nightstand. It buzzes once. You flip it over."
+ },
+ {
+  "i": 1,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 7.691,
+  "end": 13.196,
+  "text": "Forty-six new notifications. Normal. Except every single one is stamped tomorrow."
+ },
+ {
+  "i": 2,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 13.696,
+  "end": 20.737,
+  "text": "Tomorrow, 7:02 a.m. Mom: Don't forget your lunch. Tomorrow, 10:15 a.m. School alert: Fire drill."
+ },
+ {
+  "i": 3,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 21.237,
+  "end": 25.205,
+  "text": "You go to sleep. At 7:02, a voice comes up the stairs."
+ },
+ {
+  "i": 4,
+  "speaker": "MOM",
+  "note": "",
+  "voice": "af_sarah",
+  "start": 25.705,
+  "end": 27.626,
+  "text": "Maya! Don't forget your lunch!"
+ },
+ {
+  "i": 5,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 28.126,
+  "end": 32.201,
+  "text": "At 10:15, the fire alarm goes off. Exactly on time."
+ },
+ {
+  "i": 6,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 32.701,
+  "end": 40.959,
+  "text": "Your name is Maya. You're sixteen. And your phone just showed you tomorrow. So what if your phone showed tomorrow's notifications today?"
+ },
+ {
+  "i": 7,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 41.459,
+  "end": 58.019,
+  "text": "Here's the rule. Every night at 11:59, tomorrow's notifications land on your lock screen. The time. The sender. The first forty characters. You can't open them. You can't reply. And you'll learn the hard way: tomorrow keeps count."
+ },
+ {
+  "i": 8,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 58.519,
+  "end": 66.711,
+  "text": "One industry study found the average American gets about 46 push notifications a day. You get yours a day early."
+ },
+ {
+  "i": 9,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 67.211,
+  "end": 76.152,
+  "text": "Day one. Tomorrow, 8:05 a.m. Mr. Okafor posted: Pop quiz, chapter seven. So tonight, you read chapter seven. Twice."
+ },
+ {
+  "i": 10,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 76.652,
+  "end": 87.897,
+  "text": "Here's the real part. Without review, most people forget most of something new within a day. Scientists call it the forgetting curve. You reviewed at eleven p.m. Twenty out of twenty."
+ },
+ {
+  "i": 11,
+  "speaker": "JORDAN",
+  "note": "",
+  "voice": "am_liam",
+  "start": 88.397,
+  "end": 90.445,
+  "text": "You studied? On purpose?"
+ }
+]

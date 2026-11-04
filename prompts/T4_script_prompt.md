@@ -4,15 +4,15 @@ Cách dùng: copy toàn bộ khối bên dưới vào Claude, thay các trườn
 Anh cho khán giả Mỹ. Đầu ra có mốc thời gian và ghi chú cảnh, dùng được ngay với quy trình
 `aitrends-2d-studio` (voiceover → timestamps → shot list).
 
-**Cơ sở** (cập nhật 2026-11-04): transcript của 23 video T4. Chi tiết ở
-`reports/2026-11-03/T4_mo_tip_kich_ban.md`, mục 7.
-- **Văn phong bề mặt** (ngôi "you", câu ngắn, khoảng 165 từ/phút) là chuẩn chung của thể loại;
-  video tốt và video xấu đều viết như vậy.
-- **Khác biệt của video top** nằm ở bốn điểm:
-  1. báo trước cái giá trong 45 giây đầu;
-  2. gieo một câu hoặc đồ vật rồi trả ở cao trào;
-  3. cái giá tích lũy được đo bằng con số;
-  4. khoa học gắn vào cảnh.
+**Cơ sở** (cập nhật 2026-11-04, 28 transcript): `reports/2026-11-03/T4_mo_tip_kich_ban.md`, mục 7.6.
+- **Văn phong bề mặt** (ngôi "you", câu ngắn, khoảng 165 từ/phút) là chuẩn chung của thể loại:
+  phải có, nhưng không làm video nổi bật.
+- **Có bằng chứng yếu:** nhiều nhân vật phụ có tên; khoa học gắn vào cảnh.
+- **Giả thuyết, chưa chứng minh** (rút từ 2 video top): gieo rồi trả ở cao trào, câu chủ đề lặp
+  lại hai lần, cao trào bằng phép đếm, từ chối kẻ cám dỗ.
+- **Không có tín hiệu:** thời điểm người thân xuất hiện; báo trước cái giá trong 45 giây đầu.
+  Prompt vẫn giữ hai điểm này vì chúng giúp truyện mạch lạc, nhưng đừng coi là yếu tố tạo view.
+- Hiệu quả thật cần đo bằng retention của chính kênh bạn.
 
 ---
 
@@ -44,12 +44,13 @@ STRUCTURE (times for a 10-minute video; scale proportionally)
 3. RULE + FORESHADOWED COST, before 0:45: state the rule with a number, then ONE short line
    warning that the power will collect its price ("But luck always collects." /
    "Remember that. It matters later.").
-4. EASY MODE, ~1:00–3:00: 3 escalating wins. Each win gets one true science fact with a
+4. EASY MODE, ~1:00–3:00: 3 escalating wins, each in front of a DIFFERENT named person
+   (friend, coach, teacher, rival) — aim for 8+ named people across the video.
+   Each win gets one true science fact with a
    number, tied to the moment. After each win, a named side character reacts in ≤ 8 words
    ("Dude, you were behind me." / "Mate, that's creepy.").
-5. LOVED ONE + PLANT, ~1:30–4:00 (after the power is established, not before):
-   introduce {LOVED_ONE} through a small warm scene, and plant {PLANT}. Do not explain
-   why it matters.
+5. LOVED ONE + PLANT, any time before 4:00: introduce {LOVED_ONE} through a small warm
+   scene, and plant {PLANT}. Do not explain why it matters.
 6. THE CATCH, ~2:30–4:30: "The catch?" / "And there's a cost." Reveal {COST}, measured in a
    number that grows ("four extra days nobody else lived"). First use of {THEME}.
 7. TEMPTATION, ~4:00–5:30: {TEMPTER} appears; the stakes go public.
@@ -83,8 +84,9 @@ D) Word count and estimated runtime.
 E) Self-check — answer yes/no and fix every "no" before returning:
    1. The first sentence is a physical action, not "What if".
    2. The rule has a number AND a foreshadowing line before 0:45.
-   3. There are 3 easy-mode wins, each with one science fact containing a number.
-   4. The loved one appears after the power is established, with a planted line or object.
+   3. There are 3 easy-mode wins, each with one science fact containing a number,
+      and at least 8 named characters appear across the script.
+   4. The loved one appears before 4:00, together with a planted line or object.
    5. The cost grows as a number at least twice.
    6. The theme line appears exactly twice (catch + refusal).
    7. The planted line or object returns at the moment it solves the climax.

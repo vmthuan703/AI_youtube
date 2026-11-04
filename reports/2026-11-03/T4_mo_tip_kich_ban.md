@@ -233,3 +233,34 @@ Cả hai phong cách đều dùng mô típ 1 (báo trước cái giá) và mô t
 | 4 | What If You Could Freeze Time, But You Aged Twice as Fast While It Was Frozen? | Ông nội chỉ cho bạn cách đo tuổi bằng vạch trên khung cửa → cao trào: vạch mới cao hơn vạch của ông | "Time isn't free. It's just quiet about the bill." | Huấn luyện viên đội tuyển thuê bạn "freeze" mọi trận đấu |
 | 1 | What If You Could Undo One Decision Every Day? | Bố nói "Don't waste it on small stuff" và đặt nam châm hình đồng hồ lên tủ lạnh → cao trào: undo đã dùng hết, nam châm nhắc bạn gọi điện trước 6 giờ chiều | "Every undo is a choice you made twice." | Bạn cùng lớp trả tiền để bạn undo giúp |
 | 3 | What If You Woke Up on Your First Day of High School With Every Memory? | Lá thư viết dở cho người bạn thân từ tương lai cũ → cao trào: gửi thư thay vì đổi thêm một ký ức | "Knowing the ending doesn't mean you get to keep it." | Một quỹ đầu tư phát hiện bạn đoán trúng mọi cổ phiếu |
+
+### 7.6 Kiểm chứng lại với 28 video (sau khi bổ sung 5 transcript)
+
+Đã có 28/30 transcript. Vẫn thiếu 2 video có relative cao nhất (`aX7XDXwQKCI` 70×,
+`BQdEcPOYOUY` 52×). Chia nhóm: top 14 video (relative ≥ 2), thấp 14 video.
+
+| Chỉ số | n=23 (top / thấp) | n=28 (top / thấp) | Kết luận |
+|---|---|---|---|
+| Văn phong bề mặt (từ/phút, độ dài câu, % "you", % câu ngắn) | gần bằng nhau | gần bằng nhau (165/165 từ/phút, 6,9/6,9 từ/câu) | **Vững: không phân biệt** |
+| Số tên riêng (nhân vật, địa danh) | 17 / 10 | 15 / 10 | **Vững, chênh vừa phải.** Trong cùng kênh, xu hướng này giữ ở OTHERWISE (24 so với 13) và WhatIf Functions (12–18 so với 8); ở Jeremy thì lẫn lộn |
+| Khoa học (lần nhắc/phút) | 0,55 / 0,36 | 0,54 / 0,32 | **Vững nhưng yếu**; trong cùng kênh kết quả lẫn lộn |
+| Câu hỏi/phút | 1,4 / 1,0 | 1,35 / 0,85 | Yếu |
+| Thời điểm người thân xuất hiện lần đầu | 68 / 32 giây | **31 / 96 giây** | **Đảo chiều → không có tín hiệu.** Hủy nhận định "người thân nên xuất hiện muộn" ở mục 7.4 |
+| Câu báo luật hoặc cái giá trong 60 giây đầu | (chỉ đọc 3 top và 1 thấp) | **5/14 / 5/14** | **Không có tín hiệu** khi đo bằng từ khóa. Mô típ 1 ở mục 7.3 bị hạ xuống thành giả thuyết |
+
+**Đánh giá lại:**
+- **Phần lớn khác biệt về hiệu suất không giải thích được bằng lời thoại đo từ transcript.**
+  Nhiều khả năng tiêu đề, thumbnail, thời điểm đăng và lịch sử kênh quyết định phần lớn, điều mà
+  transcript không đo được.
+- **Có bằng chứng (yếu nhưng giữ được ở cả n=23 và n=28):** thế giới có nhiều nhân vật được gọi
+  tên; có khoa học gắn vào cảnh.
+- **Chỉ là giả thuyết** (đọc kỹ 2 video top, Twivio và OTHERWISE; không đo được tự động):
+  - gieo rồi trả ở cao trào;
+  - câu chủ đề lặp lại hai lần;
+  - cao trào gồm phép đếm và một lựa chọn hai đường;
+  - từ chối kẻ cám dỗ;
+  - kết bằng "Is any of this real?".
+
+  Đây là kỹ thuật kể chuyện hợp lý, nhưng **chưa được chứng minh là làm tăng view**.
+- **Cách kiểm chứng đúng:** áp dụng prompt cho 4 video thử nghiệm, rồi so retention trên YouTube
+  Analytics của kênh mới. So hai chỗ: thời điểm người xem rời đi, và đoạn sau khi lộ cái giá.

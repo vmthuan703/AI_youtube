@@ -118,7 +118,7 @@ export function stage(o = {}) {
   composer.addPass(new RenderPass(scene, camera));
   let bokeh = null;
   if (o.dof) { bokeh = new BokehPass(scene, camera, { focus: o.dof.focus ?? 5, aperture: o.dof.aperture ?? 0.0025, maxblur: o.dof.maxblur ?? 0.008 }); composer.addPass(bokeh); }
-  const bloomK = (o.bloom ?? (st.grade.bloom ?? 0.6)) * 0.8; const bloom = new UnrealBloomPass(new THREE.Vector2(w, h), bloomK, 0.5, o.bloomThreshold ?? 1.0); if (bloomK > 0) composer.addPass(bloom); else bloom.dispose();
+  const bloomK = (o.bloom ?? (st.grade.bloom ?? 0.6)) * 0.8; const bloom = new UnrealBloomPass(new THREE.Vector2(w, h), bloomK, 0.5, o.bloomThreshold ?? st.grade.bloomThreshold ?? 1.0); if (bloomK > 0) composer.addPass(bloom); else bloom.dispose();
   composer.addPass(new OutputPass());
   if (E.quality === 'standard' && o.msaa == null) { const fx = new ShaderPass(FXAAShader); fx.uniforms.resolution.value.set(1 / w, 1 / h); composer.addPass(fx); }   // cheap anti-aliasing
   const tickers = [];
@@ -227,6 +227,8 @@ export function shake(camera, t, amp = 0.02, freq = 1.4, rot = 0.004, seed = 5) 
 export function aim(camera, target, o = {}) { const { dist = 1.4, yaw = 0, pitch = 0.05, fov } = o; camera.position.set(target[0] + Math.sin(yaw) * Math.cos(pitch) * dist, target[1] + Math.sin(pitch) * dist, target[2] + Math.cos(yaw) * Math.cos(pitch) * dist); camera.lookAt(...target); if (fov && camera.fov !== fov) { camera.fov = fov; camera.updateProjectionMatrix(); } }
 export const setFov = (camera, fov) => { if (camera.fov !== fov) { camera.fov = fov; camera.updateProjectionMatrix(); } };
 export const v3 = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
+// project a world point (or object) to overlay coordinates [x, y] in logical units (1920×1080 / 1080×1920); z > 1 = behind the camera
+export function toScreen(p, camera) { const v = Array.isArray(p) ? new THREE.Vector3(...p) : p.isVector3 ? p.clone() : p.getWorldPosition(new THREE.Vector3()); camera.updateMatrixWorld(); v.project(camera); return [((v.x + 1) / 2) * E.W, ((1 - v.y) / 2) * E.H, v.z]; }
 export const worldPos = (obj, out = new THREE.Vector3()) => obj.getWorldPosition(out);
 
 // ---------------------------------------------------------------- static merge (big speed-up on CPU renderers)

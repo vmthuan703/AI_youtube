@@ -1,6 +1,6 @@
 ---
 name: 3d-video-styles
-description: "This skill should be used when the user runs /3d-video-styles or asks to \"show me 3D style options\", \"compare the looks\", \"pick a style for my 3D video\", \"make it warmer / darker / more neon\", \"use black stickmen instead\", \"create a custom style\", or \"change the colour grade\" for an aiTrends 3D Studio video. It renders the same shots of the user's story in the preset styles (cinematic, ink, toon, golden, neon, noir) as a comparison grid, records the choice, and builds custom styles.\n"
+description: "This skill should be used when the user runs /3d-video-styles or asks to \"show me 3D style options\", \"compare the looks\", \"pick a style for my 3D video\", \"make it warmer / darker / more neon\", \"use black stickmen instead\", \"create a custom style\", or \"change the colour grade\" for an aiTrends 3D Studio video. It renders the same shots of the user's story in the preset styles (cinematic, soft, ink, toon, golden, neon, noir) as a comparison grid, records the choice, and builds custom styles.\n"
 metadata:
   version: "0.1.0"
   author: aiTrends
@@ -18,11 +18,13 @@ face close-up with `dof`, and an action or night-exterior shot. Pick one time ~4
 
 ## 2. Render the grid
 ```bash
-node render.mjs --project projects/<slug> --styles cinematic,ink,toon,golden,neon,noir --at <t1>,<t2>,<t3> --scale 0.5
+node render.mjs --project projects/<slug> --styles cinematic,soft,ink,toon,golden,neon,noir --at <t1>,<t2>,<t3> --scale 0.5
 ```
 Open `build/styles/style_grid.png` (one row per style), check it, send it, one line each:
 - **cinematic — Night Toon Cinema:** ivory round heads with lavender shading and an outline, chunky hoodies, purple
-  night, warm practicals (the reference look).
+  night, warm practicals, serif labels (the "crush" reference).
+- **soft — Soft Pastel Glow:** no outline, glossy pastel heads, dreamy purple grade with glow, rounded bold labels (the
+  "luck" reference).
 - **ink — Ink Stickman:** black stick figures with big white eyes and a lavender rim light.
 - **toon — Bright Toon:** cel-shaded daylight cartoon, punchy colours, family-friendly.
 - **golden — Golden Hour:** warm orange-and-teal sunset light, nostalgic.

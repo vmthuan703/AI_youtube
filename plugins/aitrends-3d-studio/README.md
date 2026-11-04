@@ -21,7 +21,7 @@ giữ nguyên dáng suốt video và chữ luôn nét. Giọng đọc dùng Koko
 2. **Cài studio** vào thư mục làm việc (`aitrends-3d-studio/`): ffmpeg, Node, Chromium, numpy/scipy, Kokoro.
 3. **Giọng đọc:** nghe thử 8 câu → đọc toàn bộ → mốc thời gian từng từ có tên người nói (không cần Whisper).
 4. **Phân cảnh:** `story/bible.md`, trang phục nhân vật, `story/shots.json`.
-5. **Chọn phong cách** từ ảnh render thật: cinematic · ink · toon · golden · neon · noir.
+5. **Chọn phong cách** từ ảnh render thật: cinematic (có viền, như video "Crush") · soft (không viền, như video "Luck") · ink · toon · golden · neon · noir.
 6. **Dựng từng cảnh** theo lô 8–12, kiểm tra bằng contact sheet.
 7. **Âm thanh:** nhạc tự sinh theo cảm xúc, 36 hiệu ứng, tiếng nền.
 8. **Render:** xem thử → bản cuối → mix (−14 LUFS) → `out/<tên>.mp4`.

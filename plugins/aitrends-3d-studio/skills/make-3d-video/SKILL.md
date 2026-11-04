@@ -86,16 +86,18 @@ user objects.
 Build the 1–2 most-used sets plus 3 representative shots (a wide with ≥ 2 characters, a face close-up with `dof`, an
 action or night-exterior shot). Then:
 ```bash
-node render.mjs --project projects/<slug> --styles cinematic,ink,toon,golden,neon,noir --at <t1>,<t2>,<t3> --scale 0.5
+node render.mjs --project projects/<slug> --styles cinematic,soft,ink,toon,golden,neon,noir --at <t1>,<t2>,<t3> --scale 0.5
 ```
-Open `build/styles/style_grid.png`, then show it with one line per style: **cinematic** (ivory heads, purple night,
-warm practicals: the reference look), **ink** (black stick figures, big white eyes, lavender rim), **toon** (bright
+Open `build/styles/style_grid.png`, then show it with one line per style: **cinematic** (ivory heads with a thin
+outline, purple night, warm practicals, serif labels: the "crush" reference), **soft** (no outline, glossy pastel heads,
+dreamy glow, rounded labels: the "luck" reference), **ink** (black stick figures, big white eyes, lavender rim), **toon** (bright
 cel-shaded daylight), **golden** (warm sunset orange-teal), **neon** (magenta/cyan, strong glow), **noir** (cold,
 desaturated thriller). Save the pick in `config.json` → `style`. Tweaks: add a custom entry to `STYLES` in
 `engine/styles.js` (skin, paleSkin, outline, toon ramp, light multipliers, moods, grade) and re-render that row.
 
 ## Stage 6: Build every shot
-Read `references/engine-api.md` and the example scenes in `examples/speed-demo/scenes/` once. Work in batches of 8–12:
+Read `references/engine-api.md` and the example scenes in `examples/speed-demo/scenes/` (a full 32 s video) and
+`examples/look-demo/scenes/` (explainer stage, UI pills, diner, gym, game show, casino, end screen) once. Work in batches of 8–12:
 1. Write `scenes/sets/<location>.js` (reusable builders on top of `T.W.*`) and `scenes/shots/NN_<name>.js` with
    `registerShot('<id>', { init, draw, overlay? })` for the ids in shots.json.
 2. `node render.mjs --project projects/<slug> --sheet --scale 0.4`. Open every `build/sheets/sheet_XX.png` against the

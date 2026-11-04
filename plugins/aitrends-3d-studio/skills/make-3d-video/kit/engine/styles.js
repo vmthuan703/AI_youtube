@@ -22,12 +22,20 @@ const UI = { card: 'rgba(16,14,36,.92)', cardLine: 'rgba(170,150,255,.28)', text
 // toon: shading ramp for every material (null = soft PBR); outline/outlineW: character outline colour and width (m)
 export const STYLES = {
   cinematic: {
-    name: 'Night Toon Cinema', desc: 'Reference look: ivory round heads with lavender shading and a dark outline, chunky coloured hoodies, purple night sets lit by warm practicals, soft depth of field.',
+    name: 'Night Toon Cinema', desc: 'Reference look ("crush" video): ivory round heads with lavender shading and a thin dark outline, chunky coloured hoodies, purple night sets lit by warm practicals, serif labels, soft depth of field.',
     ink: '#0b0a10', inkFar: '#2b2333', feature: '#f6f2ea', skin: 'pale', paleSkin: '#e2d9ea', outline: '#1b1430', outlineW: 0.011,
-    toon: null, ui: UI,
+    toon: null, ui: { ...UI, labelFont: 'serif', explainBg: '#3a2a5e' },
     light: { ambient: 0.9, key: 1.1, fill: 0.9, rim: 1.0, practical: 1.0, exposure: 1.0 },
     grade: { contrast: 1.04, sat: 1.08, lift: [0.01, 0.0, 0.035], gamma: [1, 1, 1.02], gain: [1.02, 1.0, 1.02], vignette: 0.4, grain: 0.03, bloom: 0.55 },
     moods: { night: { rim: '#ffc89a' }, dusk: { rim: '#ffc89a' }, interiorCool: { rim: '#ffd0a8' } },
+  },
+  soft: {
+    name: 'Soft Pastel Glow', desc: 'Reference look ("luck" video): no outlines, glossy pastel heads with lavender shadows and warm highlights, dreamy purple grade with glow and grain, rounded bold labels.',
+    ink: '#0b0a10', inkFar: '#2b2333', feature: '#f6f2ea', skin: 'pale', paleSkin: '#dcd2ea', outline: false,
+    toon: null, ui: { ...UI, labelFont: 'ui', explainBg: '#3b2c63', gold: '#ffcf4a' },
+    light: { ambient: 1.0, key: 0.95, fill: 1.0, rim: 1.05, practical: 0.9, exposure: 0.98 },
+    grade: { contrast: 0.97, sat: 1.05, lift: [0.035, 0.015, 0.06], gamma: [1.0, 0.98, 1.04], gain: [1.02, 0.99, 1.03], vignette: 0.55, grain: 0.045, bloom: 0.7, bloomThreshold: 0.97 },
+    moods: { night: { rim: '#ffd6b0', ambient: '#4a3a7a' }, dusk: { rim: '#ffd0a8' }, interiorCool: { rim: '#ffe0c0' }, interiorWarm: { rim: '#ffe0c0' } },
   },
   ink: {
     name: 'Ink Stickman', desc: 'Black stick figures with big white eyes and a lavender rim light, glossy soft shading, purple night city (thumbnail look).',
@@ -67,4 +75,4 @@ export const STYLES = {
 };
 // alias so 2D-studio habits still work
 STYLES.dusk = STYLES.cinematic;
-export const STYLE_IDS = ['cinematic', 'ink', 'toon', 'golden', 'neon', 'noir'];
+export const STYLE_IDS = ['cinematic', 'soft', 'ink', 'toon', 'golden', 'neon', 'noir'];

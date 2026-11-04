@@ -89,3 +89,79 @@ export function captions(g, globalT, o = {}) {
   const gap = sz * 0.3, widths = strs.map(s => measure(g, s, sz)), total = widths.reduce((a, b) => a + b, 0) + gap * (strs.length - 1);
   let x = E.W / 2 - total / 2; strs.forEach((s, k) => { const cur = st + k === i; const pop = cur ? 1 + 0.08 * ease.out(prog(globalT, group[k].start, group[k].start + 0.12)) : 1; g.save(); g.translate(x + widths[k] / 2, y); g.scale(pop, pop); text(g, s, 0, 0, { size: sz, color: cur ? hi : color, stroke: sz * 0.16, strokeColor: 'rgba(0,0,0,.85)' }); g.restore(); x += widths[k] + gap; });
 }
+
+// ---------------------------------------------------------------- 3D-explainer graphics (the look of the reference videos)
+// Labels use S().ui.labelFont: 'ui' (rounded heavy sans, letter-spaced) or 'serif' (Playfair small caps). All take t/start
+// for a pop-in (ease.outBack) and fade with a.
+const LF = () => (S().ui.labelFont === 'serif' ? FONTS.serif : FONTS.ui);
+const popK = (t, start = 0) => (t == null ? 1 : ease.outBack(prog(t, start, start + 0.35)));
+// "1 IN 1,000", "$10,000", "40,000": dark translucent pill, thin light border, bold caps (gold: true for key numbers)
+export function pill(g, o = {}) {
+  const { str = '1 IN 1,000', x = E.W / 2, y = V(140, 260), size = V(48, 56), gold = false, color = null, a = 1, t = null, start = 0, icon = null, bg = null, line = null } = o;
+  const k = popK(t, start); if (k <= 0.001 || a <= 0) return; const f = LF(), w8 = f === FONTS.serif ? 700 : 900;
+  const tw = measure(g, str, size, f, w8) + (icon ? size * 1.05 : 0), w = tw + size * 1.1, h = size * 1.5;
+  g.save(); g.globalAlpha *= a * clamp(k * 1.4); g.translate(x, y); g.scale(k, k);
+  rr(g, -w / 2, -h / 2, w, h, h / 2); g.fillStyle = bg || 'rgba(22,14,42,.8)'; g.fill(); g.lineWidth = Math.max(2, size * 0.06); g.strokeStyle = line || 'rgba(255,236,210,.4)'; g.stroke();
+  let tx = 0; if (icon) { tx = size * 0.5; drawIcon(g, icon, -tw / 2 + size * 0.38, 0, size * 0.5); }
+  text(g, str, tx, size * 0.04, { size, font: f, weight: w8, color: color || (gold ? S().ui.gold : '#fff6ea'), spacing: f === FONTS.serif ? 2 : 0.5 });
+  g.restore();
+}
+// small icons for pills/tags: 'check', 'heart', 'star', 'x', 'up', 'down'
+export function drawIcon(g, kind, x, y, r) {
+  g.save(); g.translate(x, y); g.lineCap = 'round'; g.lineJoin = 'round';
+  if (kind === 'check') { g.strokeStyle = '#5fd39a'; g.lineWidth = r * 0.32; g.beginPath(); g.moveTo(-r * 0.7, 0); g.lineTo(-r * 0.15, r * 0.55); g.lineTo(r * 0.8, -r * 0.6); g.stroke(); }
+  if (kind === 'x') { g.strokeStyle = '#ff5a6a'; g.lineWidth = r * 0.32; g.beginPath(); g.moveTo(-r * 0.6, -r * 0.6); g.lineTo(r * 0.6, r * 0.6); g.moveTo(r * 0.6, -r * 0.6); g.lineTo(-r * 0.6, r * 0.6); g.stroke(); }
+  if (kind === 'heart') { g.fillStyle = '#ff5a8a'; g.beginPath(); g.moveTo(0, r * 0.8); g.bezierCurveTo(-r * 1.4, -r * 0.2, -r * 0.6, -r * 1.2, 0, -r * 0.45); g.bezierCurveTo(r * 0.6, -r * 1.2, r * 1.4, -r * 0.2, 0, r * 0.8); g.fill(); }
+  if (kind === 'star') { g.fillStyle = S().ui.gold; g.beginPath(); for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + (i * Math.PI) / 5, rr2 = i % 2 ? r * 0.45 : r; g.lineTo(Math.cos(a) * rr2, Math.sin(a) * rr2); } g.closePath(); g.fill(); }
+  if (kind === 'up' || kind === 'down') { const s = kind === 'up' ? -1 : 1; g.strokeStyle = kind === 'up' ? '#5fd39a' : '#ff5a6a'; g.lineWidth = r * 0.3; g.beginPath(); g.moveTo(0, -s * r); g.lineTo(0, s * r); g.moveTo(-r * 0.6, s * -r * 0.3); g.lineTo(0, -s * r); g.lineTo(r * 0.6, s * -r * 0.3); g.stroke(); }
+  g.restore();
+}
+// "✓ SMARTER" tag (serif in the crush look)
+export const tag = (g, o = {}) => pill(g, { icon: 'check', ...o, size: o.size || V(40, 48), bg: o.bg || 'rgba(30,18,30,.72)', line: o.line || 'rgba(255,214,150,.55)' });
+// counter pill with a heart (crush meter), e.g. heartPill(g, { n: 26, x, y })
+export const heartPill = (g, o = {}) => pill(g, { str: String(o.n ?? 3), icon: 'heart', bg: 'rgba(60,14,40,.82)', line: 'rgba(255,120,170,.75)', color: '#ffe0ea', ...o });
+// stat card: small spaced label over a big gold number ("TRIES / 1,000")
+export function statCard(g, o = {}) {
+  const { label = 'TRIES', value = '1,000', x = E.W / 2, y = V(E.H - 220, E.H * 0.72), size = V(72, 84), a = 1, t = null, start = 0 } = o;
+  const k = popK(t, start); if (k <= 0.001) return; const f = LF(), w = Math.max(measure(g, value, size, f, 900), size * 3.2) + size * 1.6, h = size * 2.3;
+  g.save(); g.globalAlpha *= a * clamp(k * 1.4); g.translate(x, y); g.scale(k, k);
+  rr(g, -w / 2, -h / 2, w, h, size * 0.3); g.fillStyle = 'rgba(22,14,42,.82)'; g.fill(); g.lineWidth = 2; g.strokeStyle = 'rgba(255,236,210,.3)'; g.stroke();
+  text(g, label, 0, -h * 0.22, { size: size * 0.32, font: f, weight: 900, color: alpha('#fff6ea', 0.85), spacing: 4 });
+  text(g, value, 0, h * 0.14, { size, font: f, weight: 900, color: S().ui.gold });
+  g.restore();
+}
+// red roulette-style number ball ("17")
+export function numberBall(g, o = {}) { const { n = 17, x, y, r = V(42, 50), color = '#c8303a', t = null, start = 0 } = o; const k = popK(t, start); if (k <= 0.001) return; g.save(); g.translate(x, y); g.scale(k, k); circle(g, 0, 0, r, color); ring(g, 0, 0, r * 0.86, r * 0.08, 'rgba(255,255,255,.55)'); text(g, String(n), 0, r * 0.04, { size: r * 0.95, font: FONTS.ui, weight: 900, color: '#fff' }); g.restore(); }
+// letter-spaced heading at the top ("THE RULES", "RULE 3 · IT BALANCES")
+export function heading(g, o = {}) { const { str = 'THE RULES', x = E.W / 2, y = V(120, 240), size = V(46, 54), a = 1, t = null, start = 0, color = '#fff2e2' } = o; const k = t == null ? 1 : ease.out(prog(t, start, start + 0.4)); if (k <= 0) return; const f = LF(); text(g, str, x, y, { size, font: f, weight: f === FONTS.serif ? 700 : 900, color, spacing: 6, alpha: a * k, glow: 10, glowColor: 'rgba(255,200,140,.35)' }); }
+// small spaced label under a character ("JAKE", "YOU")
+export function nameLabel(g, o = {}) { const { str = 'YOU', x, y, size = V(32, 38), a = 1, color = '#fff2e2' } = o; const f = LF(); text(g, str, x, y, { size, font: f, weight: f === FONTS.serif ? 700 : 900, color, spacing: 4, alpha: a }); }
+// white speech bubble with a tail toward [tx, ty] ("Sir. You're done for tonight.")
+export function speech(g, o = {}) {
+  const { str = 'Hello!', x = E.W / 2, y = 200, tx = null, ty = null, size = V(34, 40), a = 1, t = null, start = 0, maxW = V(620, 700) } = o;
+  const k = popK(t, start); if (k <= 0.001) return; const f = FONTS.ui;
+  const words = str.split(' '), lines = []; let cur = ''; for (const w of words) { const n = cur ? cur + ' ' + w : w; if (measure(g, n, size, f, 900) > maxW && cur) { lines.push(cur); cur = w; } else cur = n; } lines.push(cur);
+  const w = Math.max(...lines.map(l => measure(g, l, size, f, 900))) + size * 1.4, h = lines.length * size * 1.25 + size * 0.8;
+  g.save(); g.globalAlpha *= a * clamp(k * 1.4); g.translate(x, y); g.scale(k, k);
+  g.fillStyle = '#ffffff'; rr(g, -w / 2, -h / 2, w, h, size * 0.7); g.fill();
+  if (tx != null) { const dx = (tx - x) / k, dy = (ty - y) / k, ang = Math.atan2(dy, dx), bx = Math.cos(ang) * w * 0.3, by = Math.sin(ang) * h * 0.3; g.beginPath(); g.moveTo(bx - Math.sin(ang) * size * 0.4, by + Math.cos(ang) * size * 0.4); g.lineTo(bx + Math.cos(ang) * (Math.hypot(dx, dy) * 0.35), by + Math.sin(ang) * (Math.hypot(dx, dy) * 0.35)); g.lineTo(bx + Math.sin(ang) * size * 0.4, by - Math.cos(ang) * size * 0.4); g.fill(); }
+  lines.forEach((l, i) => text(g, l, 0, -h / 2 + size * 0.4 + size * 1.25 * (i + 0.5), { size, font: f, weight: 900, color: '#16121e' }));
+  g.restore();
+}
+// stream-chat panel (rounded dark card, coloured names)
+export function chatPanel(g, o = {}) {
+  const { title = 'STREAM CHAT', lines = [['dev', 'FIRST TRY???'], ['sam', 'HACKS']], x = V(60, 60), y = V(80, 160), w = V(420, 520), size = V(20, 26), t = 0, rate = 0.35 } = o;
+  const shown = lines.slice(0, Math.max(1, Math.floor(t / rate) + 1)), h = size * 2.2 + shown.length * size * 1.45, cols = ['#ffb35a', '#5ad0ff', '#ff6ac8', '#7aff9a', '#c8a8ff'];
+  g.save(); rr(g, x, y, w, h, size * 0.6); g.fillStyle = 'rgba(16,12,30,.82)'; g.fill(); g.strokeStyle = 'rgba(255,255,255,.18)'; g.lineWidth = 2; g.stroke();
+  text(g, title, x + w / 2, y + size * 1.1, { size: size * 0.8, font: FONTS.ui, weight: 900, color: 'rgba(255,255,255,.7)', spacing: 3 });
+  shown.forEach(([n, m], i) => { const yy = y + size * 2.4 + i * size * 1.45; text(g, n + ':', x + size, yy, { size, font: FONTS.ui, weight: 900, color: cols[i % cols.length], align: 'left' }); text(g, m, x + size + measure(g, n + ': ', size, FONTS.ui, 900), yy, { size, font: FONTS.ui, weight: 800, color: '#fff', align: 'left' }); });
+  g.restore();
+}
+// end screen row: thumbs-up circle + SUBSCRIBED pill + "MORE WHAT IFS" heading (put the 3D cast below it)
+export function subscribeRow(g, o = {}) {
+  const { y = V(E.H * 0.3, E.H * 0.3), t = 0, label = 'MORE WHAT IFS', done = false } = o; const k = ease.outBack(prog(t, 0.2, 0.6));
+  g.save(); g.translate(E.W / 2 - V(190, 150), y); g.scale(k * 1.4, k * 1.4); circle(g, 0, 0, V(46, 52), '#2f6fe0'); g.fillStyle = '#fff'; rr(g, -18, -6, 14, 32, 4); g.fill(); rr(g, -2, -22, 26, 48, 8); g.fill(); g.restore();
+  if (done) pill(g, { str: 'SUBSCRIBED', icon: 'check', x: E.W / 2 + V(150, 120), y, size: V(42, 48), t, start: 0.35, bg: 'rgba(120,120,140,.85)', line: 'rgba(255,255,255,.5)' });
+  else pill(g, { str: 'SUBSCRIBE', x: E.W / 2 + V(150, 120), y, size: V(46, 52), t, start: 0.35, bg: '#e0303a', line: 'rgba(255,255,255,.6)', color: '#ffffff' });
+  heading(g, { str: label, y: y + V(150, 170), t, start: 0.6, size: V(40, 46) });
+}

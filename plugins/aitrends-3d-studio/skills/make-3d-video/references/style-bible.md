@@ -1,8 +1,9 @@
 # Style bible: the aiTrends 3D look
 
-Follow this closely. It describes the target look of the 3D "What if…" story videos (reference: a school-hallway frame
-of round-headed 3D kids in chunky hoodies, and the black-stickman thumbnails of the same genre). No reference images are
-bundled; this text is the spec.
+Follow this closely. It describes the target look of the 3D "What if…" story videos. It was written from two full
+reference videos of the genre ("What IF You Could Control Your Luck?" and "What IF You Could See Who Has a Crush on
+You?", ~10.5 min each), a school-hallway frame and black-stickman thumbnails. No reference images are bundled; this
+text is the spec. The section "Measured from the reference videos" at the end has the numbers.
 
 ## The look in one paragraph
 Toy-like 3D stick characters with **huge round heads** (ivory with soft lavender shading and a thin dark outline, or
@@ -16,11 +17,16 @@ motion, shallow depth of field on close-ups, light bloom and grain. The tone is 
 simple characters, real staging, real light.
 
 ## Characters
-- **Proportions** are fixed by the rig (`T.character`): 1.75 m tall, head 0.48 m wide (≈ 27% of the height), hoodie
-  from shoulders to upper thigh, thin legs, ball hands. Kids: `kid: true`. Big/bully characters: `scale: 1.15–1.3`.
-- **Skin**: the style decides (`cinematic`, `toon`, `golden`, `neon`, `noir` → pale ivory + dot eyes + outline;
-  `ink` → black + big white eyes + lavender rim). Don't mix skins inside one video unless the story needs it (a ghost,
-  an alien, the "real you" vs a clone).
+- **Proportions** are fixed by the rig (`T.character`), in thirds like the references: head ≈ ⅓ of the height
+  (0.54 m wide on a 1.75 m figure), boxy hoodie ≈ ⅓ (shoulders to upper thigh), bare stick legs ≈ ⅓, a thin visible
+  neck, big ball hands hanging just below the hem. Kids: `kid: true`. Big/bully characters: `scale: 1.15–1.3`.
+- **Skin**: the style decides (`cinematic`, `soft`, `toon`, `golden`, `neon`, `noir` → pale ivory/lavender + dot eyes;
+  `cinematic` adds a thin dark outline like the "crush" video, `soft` has none like the "luck" video; `ink` → black +
+  big white eyes + lavender rim). Pale heads glow faintly so they never go muddy, even back-lit. Don't mix skins
+  inside one video unless the story needs it (a ghost, an alien, the "real you" vs a clone).
+- **Girls and variety** (as in the references): bob/long/ponytail hair helmets with bangs (`hair`, `hairColor`), a bow,
+  `blush`, `lashes`, a `skirt` under a tee or hoodie, or a `dress`. Boys: caps (`cap`/`capBack`), beanies, short hair.
+  Adults: `suit` + `tie`, `vest` (dealer, waiter), `labcoat`, `scale` 1.1–1.2.
 - **Identity = one colour.** Each recurring character has ONE saturated signature garment colour, identical all video:
   hoodie blue `#3a78e0`, red `#e0402e`, green `#2f9a6a`, pink `#e070a8`, yellow `#e0a830`, purple `#8a5ad6`, teal
   `#3ab0c0`, orange `#d65a2a`. Add at most one accessory (cap, beanie, glasses, hair colour, tie). Background people:
@@ -101,3 +107,32 @@ No hard-coded colours that ignore `st.M`/`S()` for set dressing (character signa
 The logical overlay stage is 1080×1920 (`E.vertical === true`); use `V(landscape, vertical)` for fov, camera distance
 and overlay positions. Frame closer (medium and close-ups dominate), keep faces in the middle third and text inside
 the central ~900×1500, captions at ~79% of the height. Check with `--sheet` in 9:16 before rendering.
+
+## Measured from the reference videos
+Two ~10.5-minute videos of the genre, analysed frame by frame (160 sampled frames, scene-cut detection):
+- **Pacing:** median shot 2.6–2.7 s (p25 ≈ 1.6 s, p75 ≈ 4–6 s), 12–16 shots per minute. Explainer segments hold longer
+  (5–11 s) while their graphics build up.
+- **Mix of shots:** ~15% extreme face close-ups (the head fills the frame, background soft), ~25% medium two/three-shots,
+  ~10% over-the-shoulder with a huge soft head in the foreground, ~10% inserts (hands with phone/money/coin, a roulette
+  wheel, a claw machine), ~20% explainer segments, ~10% big wides (arena, stadium, city, plane), title and end screen.
+- **Explainer segments** (`T.W.explainer` + overlays): a flat purple stage with a faint fine grid and a thin light floor
+  line; one or a few small characters standing on the line (fov 18–28, front-on); graphics around them: dark rounded
+  pills with bold numbers (`UI.pill`: "1 IN 1,000", "40,000", "$10,000"), a stat card ("TRIES / 1,000", `UI.statCard`),
+  check tags ("✓ SMARTER", `UI.tag`), a letter-spaced heading ("THE RULES", `UI.heading`), name labels under characters
+  ("JAKE", "MAYA", "YOU", `UI.nameLabel`), coins, scales, arrows, glowing lines between characters. Variant: the real
+  set blurred and darkened behind the small characters (`dof` + `T.W.veil`).
+- **Recurring UI:** white speech bubbles with bold dark text for single lines of dialogue (`UI.speech`), a pink heart
+  counter pill on screen or above a character (`UI.heartPill`), number balls (`UI.numberBall`), a stream-chat panel
+  (`UI.chatPanel`). Rounded heavy sans in the "luck" look (`soft` style), letter-spaced serif small caps in the "crush"
+  look (`cinematic` style); the style's `ui.labelFont` switches every label.
+- **Faces:** small glossy black oval eyes with a white highlight, set wide and a little below the middle of the head;
+  a tiny mouth; most of the acting comes from a heavy upper lid (smug, unimpressed, sleepy), "^ ^" happy eyes, a single
+  thin brow for anger/worry, and a round "o" mouth for surprise.
+- **Sets seen:** casino (roulette, felt table, slot machines: `T.W.casino`), diner with checkered floor and red booths
+  (`T.W.diner`), school hallway with teal/red lockers and strip lights, classroom, gym/basketball court with bleachers
+  and crowds (`T.W.gym`), game-show stage with numbered doors (`T.W.gameshow`), store aisle (`T.W.store`), bedrooms,
+  living rooms, night streets, a dusk highway with power poles, a stadium, an airport and a plane cabin.
+- **Light:** purple ambient everywhere, warm top/side key, white-warm rim on the heads, bloom on lamps and screens,
+  strong vignette, visible grain; close-ups use shallow depth of field.
+- **End screen:** the cast lined up on the explainer stage (relaxed poses, faces visible), a subscribe pill and a like
+  button above them, "MORE WHAT IFS" (`UI.subscribeRow`).

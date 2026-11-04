@@ -5,7 +5,7 @@ import { HERO } from '../cast.js';
 import { bedroom } from '../sets/bedroom.js';
 
 const stageOpts = (T, o = {}) => T.stage({ mood: 'interiorWarm', fov: V(40, 56), fog: [10, 40], keyPos: [3, 7, 2], keyColor: '#ffe2b8', keyIntensity: 1.2, ambient: 1.1, ...o });
-const LYING = { y: -0.56, hips: [-90, 0, 0], armL: [10, 25, 20, 0], armR: [10, 25, 20, 0], legL: [0, 4, 4, 0], legR: [0, 4, 4, 0] };
+const LYING = { y: -0.5, hips: [-90, 0, 0], armL: [10, 25, 20, 0], armR: [10, 25, 20, 0], legL: [0, 4, 4, 0], legR: [0, 4, 4, 0] };
 const alarmScreen = (g, W, H, t) => {
   const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#2a1c5a'); gr.addColorStop(1, '#e0603a'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
   const pulse = 0.5 + 0.5 * Math.sin(t * 18);

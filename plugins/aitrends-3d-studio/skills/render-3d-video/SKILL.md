@@ -15,7 +15,7 @@ and `render-qc.md` in `../make-3d-video/references/` before writing or fixing sc
 - `node render.mjs --project projects/<slug> --sheet --scale 0.4` lists MISSING shots and errors and writes
   `build/sheets/sheet_XX.png` (one still per shot).
 - Write `scenes/sets/*.js` and `scenes/shots/NN_name.js` (`registerShot(id, { init, draw, overlay })`). Study
-  `examples/speed-demo/scenes/` for working patterns.
+  `examples/speed-demo/scenes/` and `examples/look-demo/scenes/` for working patterns.
 - After each batch, re-run the sheet and **open every sheet PNG** against the QC checklist. Repeat until clean.
 - Motion: `--stills t1,t2,t3` or `--from A --to B --scale 0.5 [--fps 30]` (writes `build/preview.mp4`).
 

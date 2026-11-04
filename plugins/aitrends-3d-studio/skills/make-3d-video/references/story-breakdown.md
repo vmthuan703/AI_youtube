@@ -21,10 +21,12 @@ Pacing rules:
 - Shots are **contiguous**: each `end` equals the next `start`. The first starts at 0, the last ends at `duration`
   (voiceover length + ~1.5 s).
 - Cut on phrase boundaries, starting a shot **0.1–0.2 s before** the phrase it illustrates.
-- Target a **median of 2.5–4 s** (3D shots carry camera motion, so they hold a little longer than 2D). Fast action:
-  1–2 s cuts. Emotional or dialogue holds: 4–7 s. Never go beyond ~8 s without a new action or camera move.
+- Target a **median of 2.5–3 s** (the reference videos: 2.6–2.7 s). Fast action: 1–2 s cuts. Emotional or dialogue
+  holds: 4–7 s. Explainer segments: 5–10 s while graphics build. Never hold beyond ~8 s without a new action, graphic
+  or camera move.
+- Plan **explainer segments** for rules, numbers, odds and science (≈ 15–25% of the runtime in the references).
 - Every new location opens with an establishing shot.
-- Expect roughly **12–20 shots per minute** of narration.
+- Expect roughly **12–16 shots per minute** of narration (measured in the references).
 - Reuse sets: a scene of 6 shots in one location is cheap; 6 locations in 6 shots is expensive to build and render.
 
 Give the user a 5–10 line summary: the cast (with colours), the locations, the number of shots, and the visual

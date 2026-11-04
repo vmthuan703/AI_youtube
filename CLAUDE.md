@@ -21,3 +21,5 @@
 ## Bảo trì file này
 - Mỗi khi thêm nội dung vào `CLAUDE.md`, nếu file dài quá 50 dòng thì đề nghị
   mình rút gọn trước. Chỉ rút gọn khi mình đồng ý.
+- Khi người dùng phải nhắc cùng một yêu cầu đến lần thứ 2, tự ghi yêu cầu đó
+  thành quy tắc trong `CLAUDE.md` (rồi tự commit và push như ngoại lệ ở trên).

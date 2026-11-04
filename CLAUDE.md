@@ -16,3 +16,8 @@
 ## Không được làm
 - KHÔNG tự `git commit` hoặc `git push`. Luôn hỏi và chờ mình đồng ý trước,
   kể cả khi đã sửa xong code.
+- Ngoại lệ: thay đổi chỉ nằm trong `CLAUDE.md` thì tự commit và push, không cần hỏi.
+
+## Bảo trì file này
+- Mỗi khi thêm nội dung vào `CLAUDE.md`, nếu file dài quá 50 dòng thì đề nghị
+  mình rút gọn trước. Chỉ rút gọn khi mình đồng ý.

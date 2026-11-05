@@ -6,7 +6,7 @@
 import hashlib, os, re
 
 KIT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "aitrends-3d-studio", "skills", "make-3d-video", "kit")
-SKIP_DIRS = {"node_modules", "build", "__pycache__", "out"}
+SKIP_DIRS = {"node_modules", "build", "__pycache__", "out", "channel"}   # channel/ is the user's own settings: never verified
 files = []
 for root, dirs, names in os.walk(KIT):
     dirs[:] = sorted(d for d in dirs if d not in SKIP_DIRS)

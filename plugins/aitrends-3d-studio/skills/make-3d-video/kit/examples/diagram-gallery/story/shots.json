@@ -1,0 +1,8 @@
+{"title":"Diagram gallery","duration":30,"shots":[
+{"id":"home","start":0,"end":5,"line":"","set":"3d set used as the backdrop below"},
+{"id":"blurred","start":5,"end":10,"line":"","backdrop":{"shot":"home","at":2,"blur":14,"dim":0.5,"tint":"#1c1432"}},
+{"id":"instruments","start":10,"end":15,"line":""},
+{"id":"body-world","start":15,"end":20,"line":""},
+{"id":"screens","start":20,"end":25,"line":""},
+{"id":"lists","start":25,"end":30,"line":""}
+]}

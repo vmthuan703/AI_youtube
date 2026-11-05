@@ -19,7 +19,8 @@ renders next to it.
 ## 3. Install dependencies
 Tell the user, in one short list, what is installed and why: ffmpeg (video/audio encoding), Node.js packages (renderer,
 Three.js, fonts), a headless Chromium (draws the frames), numpy + scipy (music and SFX synthesis), kokoro-onnx +
-soundfile + the Kokoro-82M model (~350 MB, Apache-2.0: the voiceover).
+soundfile + the Kokoro-82M model (~350 MB, Apache-2.0: the reference voices and the fallback voiceover), Chatterbox in its own
+Python 3.11 environment (~6 GB with PyTorch and models, MIT: the emotional voiceover).
 
 | Need | Windows | macOS | Linux |
 |---|---|---|---|
@@ -30,6 +31,7 @@ soundfile + the Kokoro-82M model (~350 MB, Apache-2.0: the voiceover).
 | Headless Chromium | `npx playwright install chromium` | same | same (`npx playwright install-deps chromium` if libraries are missing). Cloud images with `/opt/pw-browsers` need nothing: render.mjs finds it |
 | Python packages | `python -m pip install numpy scipy kokoro-onnx soundfile` | same | add `--break-system-packages` on managed Pythons |
 | Voice model | `python tools/tts.py --download` (GitHub Releases, ~350 MB into `~/.cache/kokoro`; `KOKORO_MODEL_DIR` overrides) | same | same |
+| Chatterbox (GPU recommended) | `py -3.11 -m venv .venvs\chatterbox`, then `.venvs\chatterbox\Scripts\python -m pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cu124` and `.venvs\chatterbox\Scripts\python -m pip install chatterbox-tts==0.1.7 faster-whisper librosa soundfile pyloudnorm` | same with `.venvs/chatterbox/bin/python`, CPU build of torch | same as macOS, CUDA build on NVIDIA. Models download to `.cache/hf` on first use |
 | Only if the user brings a voiceover without a script | `python -m pip install faster-whisper` | same | same |
 
 `python tools/doctor.py --install` runs the npm and pip fixes automatically. If the model download fails in a cloud
@@ -51,5 +53,5 @@ source silently.
   `node render.mjs --project examples/speed-demo --bench`: the first line names the GPU (or warns that it isn't used),
   the last line estimates the render time on this machine. `python tools/doctor.py` also lists the NVIDIA GPU and NVENC.
 - Disk: ~600 MB for node_modules + Chromium, ~350 MB for the voice model, plus renders (10 min at 1080p60 high ≈ 0.6–1.2 GB).
-- Updating: copy the new `kit/` over the install; it never touches `projects/`. Custom styles in `engine/styles.js`
-  need re-adding.
+- Updating: copy the new `kit/` over the install **except `channel/`** (if `channel/brand.json` exists, keep the user's folder and only add missing files); it never touches `projects/`.
+  `refs/`, `.venvs/` and `.cache/` also stay. Custom styles in `engine/styles.js` need re-adding.

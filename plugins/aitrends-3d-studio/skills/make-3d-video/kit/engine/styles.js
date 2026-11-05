@@ -21,6 +21,21 @@ const UI = { card: 'rgba(16,14,36,.92)', cardLine: 'rgba(170,150,255,.28)', text
 // skin: default character skin ('pale' ivory heads + dot eyes + outline, or 'ink' black stick figures + big white eyes)
 // toon: shading ramp for every material (null = soft PBR); outline/outlineW: character outline colour and width (m)
 export const STYLES = {
+  pearl: {
+    name: 'Pearl Dusk', desc: 'Channel default: lifted blacks, soft contrast, pearly heads that never clip, pastel dusk skies with coloured houses and trees, muted aubergine explainer stage, serif labels. Loud hero outfits stay loud.',
+    ink: '#0b0a10', inkFar: '#2b2333', feature: '#f6f2ea', skin: 'pale', paleSkin: '#e6deee', skinGlow: 0.07, outline: '#2a2040', outlineW: 0.006,
+    toon: null, ui: { ...UI, labelFont: 'serif', explainBg: '#34264f', explainBg3d: '#463a5c', card: 'rgba(28,20,48,.82)', gold: '#ffd98a', cream: '#fff1dc' },
+    light: { ambient: 1.55, key: 0.8, fill: 1.15, rim: 1.0, practical: 0.8, exposure: 1.02 },
+    grade: { contrast: 0.97, sat: 1.2, lift: [0.04, 0.02, 0.06], gamma: [1.02, 1.0, 1.04], gain: [1.0, 0.98, 1.0], vignette: 0.4, grain: 0.04, bloom: 0.42, bloomThreshold: 0.98 },
+    moods: {
+      day: { sky: ['#7f9fe0', '#b6c8f2', '#f2dcd8'], fog: '#d8d4ec', ambient: '#c8c8e0', key: '#fff0dc', rim: '#fff0e0', wall: '#a79bc4', floor: '#8d8498', dark: '#6a6280', grass: '#86b070', road: '#77708a', houses: ['#e0a98f', '#a99be0', '#e8c47e', '#8fc4b4', '#e096ac'], tree: '#6f9a62', skyline: false },
+      golden: { rim: '#ffe0b8', dark: '#5a4048', grass: '#8aa060', houses: ['#e0a080', '#c890a0', '#e8c070', '#a0b090'], tree: '#7a8a50', skyline: false },
+      dusk: { sky: ['#5a4a92', '#94689f', '#d898ac', '#f6c8ae'], fog: '#c898a8', ambient: '#a890b8', key: '#ffe2c4', rim: '#ffd8c0', wall: '#6a5070', floor: '#5a4c66', dark: '#54446a', grass: '#7aa868', road: '#6a5e78', houses: ['#e0a98f', '#a99be0', '#e8c47e', '#8fc4b4', '#e096ac'], tree: '#6a9860', skyline: false },
+      night: { sky: ['#1a1440', '#3a2a66', '#6a4a86'], ambient: '#5a4a8a', wall: '#3a3058', floor: '#2c2444', dark: '#1a1430', rim: '#ffd8c0', houses: ['#5a4a78', '#4a4a7a', '#6a4a6a', '#4a5a72'], tree: '#2a4a48' },
+      interiorWarm: { ambient: '#7a5c78', rim: '#ffe0c8', wall: '#6e5468', floor: '#5a4450', dark: '#2c2030' },
+      interiorCool: { ambient: '#5a5888', rim: '#ffe0c8', wall: '#46486e', floor: '#383a58', dark: '#1e2038' },
+    },
+  },
   cinematic: {
     name: 'Night Toon Cinema', desc: 'Reference look ("crush" video): ivory round heads with lavender shading and a thin dark outline, chunky coloured hoodies, purple night sets lit by warm practicals, serif labels, soft depth of field.',
     ink: '#0b0a10', inkFar: '#2b2333', feature: '#f6f2ea', skin: 'pale', paleSkin: '#e2d9ea', outline: '#1b1430', outlineW: 0.011,
@@ -75,4 +90,28 @@ export const STYLES = {
 };
 // alias so 2D-studio habits still work
 STYLES.dusk = STYLES.cinematic;
-export const STYLE_IDS = ['cinematic', 'soft', 'ink', 'toon', 'golden', 'neon', 'noir'];
+export const STYLE_IDS = ['pearl', 'cinematic', 'soft', 'ink', 'toon', 'golden', 'neon', 'noir'];
+
+// A PALETTE gives one video its own colour world on top of the style (config.json "palette"). The purple explainer stage
+// stays the same in every palette: it is what the whole series has in common.
+export const PALETTES = {
+  dusk: { name: 'Pastel dusk', desc: 'Suburbs, parks, outdoor stories: pink-violet sky, coloured houses.', moods: {} },
+  cozy: { name: 'Cozy indoors', desc: 'Parties, homes, sleepovers: rosy warm rooms, string-light glow.',
+    grade: { gain: [1.03, 0.99, 0.96] },
+    moods: { interiorWarm: { sky: ['#4a3040', '#7a5060'], ambient: '#a07880', key: '#ffd8b0', rim: '#ffe4cc', wall: '#8a6470', floor: '#a88068', dark: '#4a3038', practical: '#ffd28a', fog: '#6a4a50' },
+      night: { sky: ['#241c48', '#4a3468', '#7a5078'], ambient: '#6a5488', wall: '#4a3a60', rim: '#ffd8c0', dark: '#241c38' } } },
+  tropic: { name: 'Tropic', desc: 'Beaches, oceans, survival: sandy floors, teal water, bright pastel sky.',
+    grade: { sat: 1.26, gain: [1.0, 1.0, 0.98] },
+    moods: { day: { sky: ['#8a7ac8', '#c0a0d0', '#f0c8c0'], fog: '#c8d8d0', ambient: '#c8c8d8', key: '#fff0d0', rim: '#fff0e0', wall: '#c8a880', floor: '#e8c89a', dark: '#6a7a78', grass: '#62a868', road: '#70c4b0', tree: '#4a9a58' },
+      dusk: { sky: ['#5a4a98', '#9a70b0', '#e0a0b0', '#f8d0a8'], fog: '#c8a8b0', floor: '#d8b48a', grass: '#62a868', road: '#60b0a4', tree: '#4a8a58' } } },
+  alert: { name: 'Red alert', desc: 'Crashes, emergencies, danger: red-lit interiors, deep shadows, cold exteriors.',
+    grade: { contrast: 1.03, gain: [1.03, 0.97, 0.97] },
+    moods: { interiorWarm: { sky: ['#4a1828', '#8a3040'], ambient: '#a84858', key: '#ff9a88', rim: '#ffb0a0', wall: '#7a2c3c', floor: '#3a1a2a', dark: '#2a0e1c', practical: '#ff6a58', fog: '#5a2030' },
+      storm: { sky: ['#2a2a58', '#4a4a80', '#7a78a8'], ambient: '#6a6a98', key: '#e8e8ff', rim: '#d0d8ff', wall: '#3a3a60', floor: '#2a2a48', dark: '#1a1a30' } } },
+  school: { name: 'School day', desc: 'Hallways, classrooms, cafeterias: teal lockers, warm tiles, sunset through big windows.',
+    moods: { interiorCool: { sky: ['#4a3a70', '#a06a88', '#e8a080'], ambient: '#8a80a8', key: '#ffe0c8', rim: '#ffe0c8', wall: '#5a5470', floor: '#b09a90', dark: '#3a3448', practical: '#fff0d0', fog: '#5a5070' },
+      interiorWarm: { ambient: '#90707a', wall: '#7a5c62', floor: '#b09a7c', dark: '#3e2e38', rim: '#ffe4c8' } } },
+  midnight: { name: 'Midnight', desc: 'Night streets, secrets, thrillers: the classic purple night with warm practicals.',
+    grade: { contrast: 1.0, gain: [1.0, 0.98, 1.02] },
+    moods: { night: { sky: ['#120e34', '#2a2058', '#54407c'], ambient: '#4a3e80', wall: '#322a54', floor: '#262040', dark: '#141028', practical: '#ffc070', rim: '#ffd0a8' } } },
+};

@@ -5,6 +5,7 @@ Anh cho khán giả Mỹ. Đầu ra có mốc thời gian và ghi chú cảnh, d
 `aitrends-2d-studio` (voiceover → timestamps → shot list).
 
 **Cơ sở** (cập nhật 2026-11-04, 28 transcript): `reports/2026-11-03/T4_mo_tip_kich_ban.md`, mục 7.6.
+Cập nhật 2026-11-05: đo thêm 6 video dài, chủ yếu một kênh thắng. Cả 6 mở bằng "you" và một hành động, kể trước tương lai, quay về hiện tại, không đọc tiêu đề. Đây là khuôn của một kênh, nên vẫn là giả thuyết, cần đo bằng retention của kênh bạn. Dùng cấu trúc, không dùng lại câu chữ của họ. `tools/script_check.py` trong plugin 3D kiểm tra các điểm này.
 - **Văn phong bề mặt** (ngôi "you", câu ngắn, khoảng 165 từ/phút) là chuẩn chung của thể loại:
   phải có, nhưng không làm video nổi bật.
 - **Có bằng chứng yếu:** nhiều nhân vật phụ có tên; khoa học gắn vào cảnh.
@@ -37,10 +38,13 @@ INPUT
 - Sequel hook? yes/no:         {PART2}
 
 STRUCTURE (times for a 10-minute video; scale proportionally)
-1. COLD OPEN, 0:00–0:20: show the power working on one physical, everyday object.
-   Do NOT start with "What if". Example tone: "Your milk carton tips off the table. You hold
-   your breath, and the ribbon stops in midair. Not slowing. Stopped."
-2. TITLE QUESTION, 0:20–0:60: restate the title question once.
+1. COLD OPEN, 0:00–0:20: start with "You" and one physical action, in the middle of a moment,
+   with the power working on an everyday object. Do NOT start with "What if". Example tone:
+   "You knock the milk carton off the table. You hold your breath, and the ribbon stops in
+   midair. Not slowing. Stopped."
+2. FLASH-FORWARD + BACK TO NOW, 0:20–1:05: in 2–3 short sentences tell what this will turn into:
+   the biggest win AND the danger. Then one short line drops back to the small present moment
+   ("But right now, ..."). Do NOT read the title aloud: it appears on screen as a silent card.
 3. RULE + FORESHADOWED COST, before 0:45: state the rule with a number, then ONE short line
    warning that the power will collect its price ("But luck always collects." /
    "Remember that. It matters later.").
@@ -61,9 +65,10 @@ STRUCTURE (times for a 10-minute video; scale proportionally)
 10. REFUSAL + THEME, ~8:30–9:15: the protagonist refuses the tempter. Second use of {THEME}.
 11. REALITY CHECK, ~9:15–9:45: "Is any of this real?" One sentence: "X, no." Then the real
     science behind it, with a number.
-12. END, ~9:45–10:00: if PART2=yes, a 2-sentence sequel image (something impossible happens
-    again, someone else has the power). Then ONE moral question to the viewer and a single
-    short call to comment.
+12. END, ~9:45–10:00: a 2-sentence last mystery that opens a sequel (a stranger, a message, an
+    offer, someone else has the power). Then ONE question to the viewer, a short call to comment,
+    and one line asking to subscribe that names a decision from THIS story. Write that line fresh
+    for each video in the channel's own words.
 
 VOICE RULES (genre baseline — keep, but they are not what makes a video stand out)
 - Present tense. Style A: narrate "you" with the protagonist's name given once early.
@@ -82,7 +87,8 @@ C) Script table: [timestamp | beat # | narration (VO) | side-character line | 2D
    SFX/music]. One row = 1–3 sentences.
 D) Word count and estimated runtime.
 E) Self-check — answer yes/no and fix every "no" before returning:
-   1. The first sentence is a physical action, not "What if".
+   1. The first sentence starts with "You" and a physical action, not "What if". The title is
+      never read aloud, and a flash-forward plus a back-to-now line come before 1:05.
    2. The rule has a number AND a foreshadowing line before 0:45.
    3. There are 3 easy-mode wins, each with one science fact containing a number,
       and at least 8 named characters appear across the script.
@@ -92,7 +98,8 @@ E) Self-check — answer yes/no and fix every "no" before returning:
    7. The planted line or object returns at the moment it solves the climax.
    8. The climax uses a count and a dilemma of ≤ 5 words.
    9. A reality-check sentence precedes the ending.
-   10. The video ends with exactly one moral question to the viewer.
+   10. The video ends with a last mystery, exactly one question to the viewer, and a subscribe
+       line tied to a decision in this story.
 ```
 
 ---

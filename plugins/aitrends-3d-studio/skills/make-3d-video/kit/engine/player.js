@@ -3,7 +3,8 @@
 // 3D shots render with Three.js (engine/kit3d.js) into a WebGL canvas, then 2D overlays, grade, captions and bars are composited.
 import { E, V, setStyle, getShot, clamp, ease, prog, alpha, text, FONTS } from './core.js';
 import { STYLES } from './styles.js';
-import { captions } from './ui2d.js';
+import { captions, speech } from './ui2d.js';
+import { prepareGag, drawGag } from './gag.js';
 
 const q = new URLSearchParams(location.search);
 const PROJ = '/project';
@@ -23,13 +24,14 @@ async function boot() {
   const cfg = await (await fetch(`${PROJ}/config.json`)).json();
   const story = await (await fetch(`${PROJ}/story/shots.json`)).json();
   let words = []; try { const r = await fetch(`${PROJ}/timeline/words.json`); if (r.ok) words = await r.json(); } catch {}
+  let lines = []; try { const r = await fetch(`${PROJ}/timeline/lines.json`); if (r.ok) lines = await r.json(); } catch {}
   const vertical = (cfg.aspect || '16:9') === '9:16';
   const short = RES[cfg.resolution || '1080p'] || 1080, long = Math.round((short * 16) / 9 / 2) * 2;
   const scale = +(q.get('scale') || 1) * +(q.get('ss') || 1);   // ss = supersampling factor (render.mjs downsizes with lanczos)
   const outW = Math.round(((vertical ? short : long) * scale) / 2) * 2, outH = Math.round(((vertical ? long : short) * scale) / 2) * 2;
-  Object.assign(E, { vertical, W: vertical ? 1080 : 1920, H: vertical ? 1920 : 1080, fps: +(q.get('fps') || cfg.fps || 24), cfg, words: words.words || words, shots: story.shots, outW, outH });
+  Object.assign(E, { vertical, W: vertical ? 1080 : 1920, H: vertical ? 1920 : 1080, fps: +(q.get('fps') || cfg.fps || 24), cfg, words: words.words || words, lines: Array.isArray(lines) ? lines : [], shots: story.shots, outW, outH });
   E.PX = outW / E.W; E.quality = q.get('quality') || cfg.quality || 'high';
-  setStyle(q.get('style') || cfg.style || 'cinematic');
+  setStyle(q.get('style') || cfg.style || 'pearl', q.get('palette') || cfg.palette || null);
   await loadFonts();
   main = document.getElementById('main'); main.width = outW; main.height = outH; mg = main.getContext('2d', { willReadFrequently: true });
   LUT = buildLUT(E.style.grade || {});
@@ -38,7 +40,8 @@ async function boot() {
   for (let k = 0; k < 4; k++) { const c = mk(gw, gh), x = c.getContext('2d'), id = x.createImageData(gw, gh); let s = 1234 + k * 999; for (let i = 0; i < id.data.length; i += 4) { s = (s * 1664525 + 1013904223) >>> 0; const v = s >>> 24; id.data[i] = id.data[i + 1] = id.data[i + 2] = v; id.data[i + 3] = 255; } x.putImageData(id, 0, 0); grainTiles.push(c); }
   const list = await (await fetch(`/__manifest`)).json();
   for (const f of list) { try { await import(f); } catch (e) { errors.push(`import ${f}: ${e.message}`); console.log('IMPORT ERROR', f, e.message); } }
-  if (E.shots.some(s => getShot(s.id)?.kind === '3d')) { three = await import('./kit3d.js'); glCanvas = mk(outW, outH); three.getRenderer(glCanvas); accA = mk(outW, outH); }
+  if (E.shots.some(s => getShot(s.id)?.kind === '3d' || s.backdrop || getShot(s.id)?.backdrop)) { three = await import('./kit3d.js'); glCanvas = mk(outW, outH); three.getRenderer(glCanvas); accA = mk(outW, outH); }
+  await prepareGag(three, mk);
   const dur = story.duration || E.shots[E.shots.length - 1].end;
   window.DURATION = dur; window.TOTAL_FRAMES = Math.ceil(dur * E.fps); window.OUT = [outW, outH];
   window.SHOT_LIST = E.shots.map(s => ({ id: s.id, start: s.start, end: s.end, ok: !!getShot(s.id) }));
@@ -81,7 +84,48 @@ function state3D(shot, def, info) {
   if (def.optimize !== false && three.optimize && stg.scene) { const r = three.optimize(stg, st); if (q.has('prof')) console.log(`ERROR-INFO optimize ${shot.id}: ${r.before} -> ${r.after} static meshes`); }
   cache3D.set(shot.id, st); return st;
 }
-function drawShot(buf, shot, lt) {
+// A 2D shot can sit on the scene being told: a still of another shot, blurred and dimmed ("backdrop" on the shot or its module).
+//   { "shot": "s009", "at": 1.5, "blur": 14, "dim": 0.5, "sat": 0.9, "tint": "#1c1432" }. The still is built once per worker.
+const backdrops = new Map();
+function drawBackdrop(g, bd, p) {
+  const key = `${bd.shot}@${bd.at ?? ''}`; let c = backdrops.get(key);
+  if (!c) {
+    c = mk(main.width, main.height); const ref = E.shots.find(s => s.id === bd.shot);
+    if (ref) drawShot(c, ref, bd.at ?? (ref.end - ref.start) / 2, { noOverlay: true }); else { const x = c.getContext('2d'); x.fillStyle = E.style.ui?.explainBg || '#34264f'; x.fillRect(0, 0, c.width, c.height); }
+    if (backdrops.size >= 3) backdrops.delete(backdrops.keys().next().value);
+    backdrops.set(key, c);
+  }
+  const W = c.width, H = c.height, k = 1.07 + 0.02 * p, dw = W * k, dh = H * k;   // scaled up so the blur never shows an edge; a very slow push keeps it alive
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.filter = `blur(${(bd.blur ?? 14) * E.PX}px) brightness(${1 - (bd.dim ?? 0.5)}) saturate(${bd.sat ?? 0.9})`;
+  g.drawImage(c, (W - dw) / 2, (H - dh) / 2, dw, dh); g.filter = 'none';
+  if (bd.tint) { g.globalAlpha = bd.tintA ?? 0.28; g.fillStyle = bd.tint; g.fillRect(0, 0, W, H); }
+  g.restore();
+}
+// Auto speech bubbles: every line of a named character (timeline/lines.json) gets a bubble while it is spoken.
+// Characters created with { speaker: 'JAKE' } get it above their head; otherwise it sits top-centre. shot.bubbles = false turns it off,
+// shot.bubble = {x, y, tx, ty} places it by hand.
+function bubbleText(L, t) {
+  const str = String(L.text || '').trim(); if (str.length <= 70) return { str, start: L.start };
+  const parts = str.match(/[^.!?]+[.!?]+["']?|[^.!?]+$/g) || [str]; const total = parts.reduce((a, b) => a + b.length, 0); let at = L.start;
+  for (const part of parts) { const d = (L.end - L.start) * part.length / total; if (t < at + d) return { str: part.trim(), start: at }; at += d; }
+  return { str: parts[parts.length - 1].trim(), start: L.end };
+}
+function speakersOf(st, stg) {
+  if (st.__speakers) return st.__speakers; const m = new Map();
+  stg.scene?.traverse(o => { if (o.userData?.speaker) m.set(o.userData.speaker, o); });
+  st.__speakers = m; return m;
+}
+function drawBubble(g, shot, lt, st, stg) {
+  if (!E.cfg.speechBubbles || shot.bubbles === false || !E.lines.length) return;
+  const t = shot.start + lt, L = E.lines.find(l => String(l.speaker).toUpperCase() !== 'NARRATOR' && t >= l.start - 0.05 && t <= l.end + 0.25); if (!L) return;
+  const { str, start } = bubbleText(L, t), top = barVal(shot) + V(70, 110); let x = E.W / 2, y = top + 30, tx = null, ty = null;
+  const who = st && stg?.camera && three ? speakersOf(st, stg).get(String(L.speaker).toUpperCase()) : null;
+  if (who) { const v = who.headWorld(); v.y += 0.4; const [hx, hy, hz] = three.toScreen(v, stg.camera);
+    if (hz < 1 && hx > -120 && hx < E.W + 120 && hy > -240 && hy < E.H) { tx = clamp(hx, 40, E.W - 40); ty = Math.max(hy, top + 60); x = clamp(hx + (hx > E.W / 2 ? -150 : 150), V(330, 300), E.W - V(330, 300)); y = Math.max(top + 30, hy - V(90, 110)); } }
+  if (shot.bubble) ({ x = x, y = y, tx = tx, ty = ty } = shot.bubble);
+  g.save(); speech(g, { str, x, y, tx, ty, t: t - start, start: 0 }); g.restore();
+}
+function drawShot(buf, shot, lt, opts = {}) {
   const g = buf.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; g.filter = 'none';
   g.fillStyle = '#000'; g.fillRect(0, 0, buf.width, buf.height); g.setTransform(E.PX, 0, 0, E.PX, 0, 0);
   const def = getShot(shot.id); const dur = shot.end - shot.start;
@@ -89,7 +133,7 @@ function drawShot(buf, shot, lt) {
   if (!def) { g.fillStyle = '#20141c'; g.fillRect(0, 0, E.W, E.H); text(g, `MISSING SHOT ${shot.id}`, E.W / 2, E.H / 2 - 30, { size: 60, color: '#ff6f61' }); text(g, (shot.line || '').slice(0, 80), E.W / 2, E.H / 2 + 50, { size: 30, color: '#fff', font: FONTS.ui, weight: 800 }); return; }
   try {
     if (def.kind === '3d') {
-      const st = state3D(shot, def, info); const stg = st.stage || st.st || st;
+      const st = state3D(shot, def, info); const stg = st.stage || st.st || st; stg.activate?.();
       const nb = Math.max(1, Math.round(shot.mblur ?? def.mblur ?? 1));
       if (nb <= 1) { const a = performance.now(); def.draw(st, lt, info, three); const b = performance.now(); stg.render(); g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(glCanvas, 0, 0, buf.width, buf.height); g.restore(); PROF.anim = b - a; PROF.gl = performance.now() - b; PROF.calls = stg.calls; PROF.tris = stg.tris; }
       else {   // motion blur: average nb sub-frames across a 180° shutter
@@ -97,12 +141,16 @@ function drawShot(buf, shot, lt) {
         for (let k = 0; k < nb; k++) { const st_ = lt - (0.5 / E.fps) * (1 - k / (nb - 1)); def.draw(st, Math.max(0, st_), { ...info, globalT: shot.start + Math.max(0, st_) }, three); stg.render(); ax.globalAlpha = 1 / (k + 1); ax.drawImage(glCanvas, 0, 0, accA.width, accA.height); }
         ax.globalAlpha = 1; g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(accA, 0, 0, buf.width, buf.height); g.restore();
       }
-      if (def.overlay) { g.save(); def.overlay(g, lt, info, st); g.restore(); }
-    } else { g.save(); def.draw(g, lt, info); g.restore(); }
+      if (def.overlay && !opts.noOverlay) { g.save(); def.overlay(g, lt, info, st); g.restore(); }
+      if (!opts.noOverlay) drawBubble(g, shot, lt, st, stg);
+    } else {
+      const bd = shot.backdrop || def.backdrop; if (bd) drawBackdrop(g, bd, info.p);
+      g.save(); def.draw(g, lt, info); g.restore(); if (!opts.noOverlay) drawBubble(g, shot, lt, null, null);
+    }
   } catch (e) { const msg = `${shot.id}@${lt.toFixed(2)}: ${e.message}`; if (!errors.includes(msg) && errors.length < 200) errors.push(msg); console.log('SHOT ERROR', msg, e.stack?.split('\n')[1]);
     g.setTransform(E.PX, 0, 0, E.PX, 0, 0); text(g, 'ERROR ' + msg.slice(0, 90), E.W / 2, E.H / 2, { size: 34, color: '#ff4040', font: FONTS.ui, weight: 900 }); }
 }
-const BARS = () => ({ none: 0, wide: V(60, 0), scope: V(138, 170), thin: V(30, 60) });
+const BARS = () => ({ none: 0, cine: V(68, 0), wide: V(60, 0), scope: V(138, 170), thin: V(30, 60) });   // cine = 2:1 picture in a 16:9 frame
 const barVal = (s) => (typeof (s?.bars ?? E.cfg.bars) === 'number' ? (s.bars ?? E.cfg.bars) : BARS()[s?.bars ?? E.cfg.bars ?? 'none'] ?? 0);
 
 const PROF = (window.PROF = {});
@@ -123,6 +171,7 @@ window.renderFrame = function (f) {
     else mg.drawImage(bufA, 0, 0);
   } else mg.drawImage(bufA, 0, 0);
   mg.globalAlpha = 1; mg.filter = 'none'; mg.setTransform(1, 0, 0, 1, 0, 0);
+  drawGag(mg, t);   // the subscribe gag runs across cuts, under the grade so it sits in the picture
   if (q.has('prof')) mg.getImageData(0, 0, 1, 1);
   const T1 = performance.now(); applyGrade(W, H, GL.lut); PROF.grade = performance.now() - T1; PROF.before = T1 - T0;
   if (grade.tint) { mg.globalCompositeOperation = grade.tint[1]; mg.fillStyle = alpha(grade.tint[0], grade.tint[2]); mg.fillRect(0, 0, W, H); mg.globalCompositeOperation = 'source-over'; }

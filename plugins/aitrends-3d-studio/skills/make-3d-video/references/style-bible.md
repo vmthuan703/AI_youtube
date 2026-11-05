@@ -1,18 +1,26 @@
 # Style bible: the aiTrends 3D look
 
-Follow this closely. It describes the target look of the 3D "What if…" story videos. It was written from two full
-reference videos of the genre ("What IF You Could Control Your Luck?" and "What IF You Could See Who Has a Crush on
-You?", ~10.5 min each), a school-hallway frame and black-stickman thumbnails. No reference images are bundled; this
-text is the spec. The section "Measured from the reference videos" at the end has the numbers.
+Follow this closely. It describes the target look of the channel's 3D "What if…" story videos. It was written from six full
+reference videos of the genre (10–11 min each) and compared with the channel's own first videos. No reference images are bundled; this
+text is the spec. The section "Measured from the reference videos" at the end has the numbers. Learn the structure, keep the channel's own identity:
+never copy a reference's devices, gags or wording.
+
+## The channel's identity (does not change between videos)
+- **Hero:** quilted lime puffer and copper spiky hair (`channel/cast.js`). The rest of the cast is calmer, so the eye always finds the hero.
+- **Voice:** the emotional `am_puck` narrator through Chatterbox.
+- **Picture:** a 2:1 frame with black bars (`bars: "cine"`), soft contrast, lifted shadows (`pearl`).
+- **Purple stage:** muted aubergine with a faint grid and warm gold labels, the same in every palette.
+- **One signature device per video:** a visual invented for that story's power (a search bar above every head, a counter, a meter).
+  The script's power decides it; it recurs all video and is what people remember.
 
 ## The look in one paragraph
-Toy-like 3D stick characters with **huge round heads** (ivory with soft lavender shading and a thin dark outline, or
-pure black with big white eyes in the `ink` style) on a thin neck, **chunky saturated hoodies** with a bunched hood and
-white drawstrings, thick sleeves ending in **ball hands**, and thin stick legs. Faces are minimal and drawn: two dot
+Toy-like 3D stick characters with **huge round heads** (pearly ivory with soft lavender shading, or
+pure black with big white eyes in the `ink` style) on a thin neck, **chunky saturated tops** (hoodies with a bunched hood and
+white drawstrings, the hero's puffer), thick sleeves ending in **ball hands**, and **bare thin stick legs with round feet**. Faces are minimal and drawn: two dot
 eyes with a tiny highlight, short brows only when angry or worried, a small mouth. They act inside **simple, solid 3D
 sets** (school hallways with lockers, bedrooms, night streets, classrooms, offices, stores) built from clean shapes and
-flat-coloured surfaces, lit like a film: a **purple/indigo night or dusk base**, **warm practical lights** (lit windows,
-street lamps, screens, ceiling lamps) and a warm rim on the heads. Low and wide camera angles, constant slow camera
+flat-coloured surfaces, lit like a film: a **pastel dusk or a colour world picked for this story** (`config.palette`), **warm practical lights** (lit windows,
+street lamps, screens, ceiling lamps) and a warm rim on the heads. Shadows stay lifted: mostly mid values, almost no pure black inside the picture. Low and wide camera angles, constant slow camera
 motion, shallow depth of field on close-ups, light bloom and grain. The tone is "a cartoon shot by a cinematographer":
 simple characters, real staging, real light.
 
@@ -20,18 +28,20 @@ simple characters, real staging, real light.
 - **Proportions** are fixed by the rig (`T.character`), in thirds like the references: head ≈ ⅓ of the height
   (0.54 m wide on a 1.75 m figure), boxy hoodie ≈ ⅓ (shoulders to upper thigh), bare stick legs ≈ ⅓, a thin visible
   neck, big ball hands hanging just below the hem. Kids: `kid: true`. Big/bully characters: `scale: 1.15–1.3`.
-- **Skin**: the style decides (`cinematic`, `soft`, `toon`, `golden`, `neon`, `noir` → pale ivory/lavender + dot eyes;
+- **Skin**: the style decides (`pearl`, `cinematic`, `soft`, `toon`, `golden`, `neon`, `noir` → pale ivory/lavender + dot eyes;
   `cinematic` adds a thin dark outline like the "crush" video, `soft` has none like the "luck" video; `ink` → black +
   big white eyes + lavender rim). Pale heads glow faintly so they never go muddy, even back-lit. Don't mix skins
   inside one video unless the story needs it (a ghost, an alien, the "real you" vs a clone).
 - **Girls and variety** (as in the references): bob/long/ponytail hair helmets with bangs (`hair`, `hairColor`), a bow,
-  `blush`, `lashes`, a `skirt` under a tee or hoodie, or a `dress`. Boys: caps (`cap`/`capBack`), beanies, short hair.
-  Adults: `suit` + `tie`, `vest` (dealer, waiter), `labcoat`, `scale` 1.1–1.2.
+  `lashes`, a `skirt` under a tee or hoodie, or a `dress`. Boys: caps (`cap`/`capBack`), beanies, short hair.
+  Adults: `suit` + `tie`, `vest` (dealer, waiter), `labcoat`, `scale` 1.1–1.2. `blush` only on a character the story calls for, not by default.
+- **Legs:** bare stick legs and round feet by default, hero included. Add `legs` or `shoes` only when the story needs them (a suit, a uniform, sports).
 - **Identity = one colour.** Each recurring character has ONE saturated signature garment colour, identical all video:
   hoodie blue `#3a78e0`, red `#e0402e`, green `#2f9a6a`, pink `#e070a8`, yellow `#e0a830`, purple `#8a5ad6`, teal
   `#3ab0c0`, orange `#d65a2a`. Add at most one accessory (cap, beanie, glasses, hair colour, tie). Background people:
   `T.W.crowd` or plain characters in muted colours.
-- **Faces are the acting.** Change `expr` on the beat of the words, not randomly. Blink (`blink: true, t`). Look where
+- **Faces are the acting, and the comedy.** The hero's resting face is `deadpan` (two flat dashes) or `unimpressed` (heavy lids); it plays against
+  chaos around them. Big expressions are saved for the beats that earn them. Change `expr` on the beat of the words, not randomly. Blink (`blink: true, t`). Look where
   the attention is (`look: [x, y]` or `.lookAt3`). Talk only on quoted dialogue (`talkFor`). Narrator: never lip-synced.
 - **Bodies must read as silhouettes**: clear poses from `POSES3`, blended with `posesAt3`, wrapped in `breathe3` so
   nobody is frozen (except during a time-freeze where only the hero moves). Contact: feet on the floor, hands on the
@@ -64,6 +74,10 @@ Every shot moves: slow push-in, lateral truck, orbit, crane up/down, follow, or 
 Use real lenses: wide (fov 45–60) low angles for drama and kids-in-a-big-world; normal (35–40) for dialogue;
 long (20–28) for close-ups with `dof`.
 
+**Keep a hard variety of size.** Besides the list below, the reference look depends on: **a giant head in the foreground** taking a third of the frame
+while the action plays behind it; **macro shots** (one eye, one hand, a foot, a dropped object filling the frame, under a second); **crowds from above**; **two big
+heads almost touching** for comedy. Recipes in engine-api.md.
+
 **Shot vocabulary** (use all across a video, roughly in these proportions):
 1. **Establishing wide** (10%): the location with small figures, slow push or crane. Opens each new scene.
 2. **Medium two-shot** (25%): characters facing each other, side or 3/4 view.
@@ -76,13 +90,16 @@ long (20–28) for close-ups with `dof`.
    entered with a `flash` transition and a `freeze` SFX.
 9. **Top-down / map** (5%): the scene from above for geography or plans.
 10. **Data card / UI** (as needed): any number the narrator says appears on screen (2D overlay, `wordTime()`).
-11. **Title card**: big glowing title over a cinematic wide (after the cold-open hook).
+11. **Title card**: big glowing title over a cinematic wide, **silent: the narrator does not read it**, between about 0:30 and 1:15, after the cold open.
+12b. **Macro insert** (5–10%): under a second, an object or body part filling the frame, cut on the word.
 12. **End screen**: the question, a comment bubble, a subscribe pill, the cast lined up in 3D.
 
 Continuity: same outfits, same screen direction within a scene (hero on the left facing right in conversations), same
 set geometry and time of day in every shot of a scene.
 
 ## Editing and transitions
+Frame: 16:9 with `bars: "cine"`, so the picture is 2:1. Keep important things and text between y = 90 and y = 990.
+
 Hard **cut** by default (80%+). **flash** (white) into freezes, powers and realisations. **dip** (black) for time skips
 and chapters. **fade** for dreamy moments and the title. **whip** for energetic jumps between places. **zoom** into an
 explanation.
@@ -91,14 +108,18 @@ explanation.
 - Fonts: Fredoka Bold for titles and big lines (ALL CAPS), Nunito Black for labels and numbers, Playfair Display Black
   Italic for the end-screen question. Colours: `S().ui.gold` key numbers, `ui.accent` alarming values, `ui.cream` labels.
 - Every number the narrator says appears, synced with `wordTime()`. Keep text minimal (1–2 short labels at once).
+- **Explainers show, they don't caption.** Every explainer has a moving picture from `engine/diagrams2d.js`: cut a house open, weigh the thing, draw the path, count the slots.
+  Two presentations, alternated: **on the scene** (the story's own set blurred and dimmed behind the diagram, `backdrop`, with a flat 2D figure) so the viewer never leaves the moment;
+  **on the purple stage** for rules and the big numbers, with a small figure on the floor line reacting. Never an empty stage with only a label.
+- **Speech bubbles:** every line of a named character shows in a white bubble over their head while spoken (automatic, `speaker` on the character).
 - Captions (`captions: true`, default for 9:16): word-by-word, current word highlighted.
 
 ## Story conventions ("What if…?" narratives; use only what the script contains)
-Cold-open hook → title card → normal life and the discovery → escalation with concrete moments → the cost or twist →
-the climax → the resolution → (optional science segment) → end screen with a question and CTA.
+Cold open in one physical moment → flash-forward (what this turns into, and the danger) → back to the small present moment → silent title card → the rule → escalation with
+concrete moments → the cost or twist → the climax → the resolution → (optional reality check) → a last small mystery → question and call to action.
 
 ## Don't
-No realism, photos, emoji or clip-art. No static shots. No floating feet or hands passing through objects. No narrator
+No realism, photos, emoji or clip-art. No copying a reference's devices or wording. No empty purple stage. No static shots. No floating feet or hands passing through objects. No narrator
 lip-sync. No walls of text. No more than ~4 characters in focus at once (crowds are fine). No outfit colour changes.
 No hard-coded colours that ignore `st.M`/`S()` for set dressing (character signature colours are the exception). No
 `Math.random()`/`Date.now()` or state that carries between frames in `draw()`. No more than ~5 real lights per shot.
@@ -109,9 +130,13 @@ and overlay positions. Frame closer (medium and close-ups dominate), keep faces 
 the central ~900×1500, captions at ~79% of the height. Check with `--sheet` in 9:16 before rendering.
 
 ## Measured from the reference videos
-Two ~10.5-minute videos of the genre, analysed frame by frame (160 sampled frames, scene-cut detection):
-- **Pacing:** median shot 2.6–2.7 s (p25 ≈ 1.6 s, p75 ≈ 4–6 s), 12–16 shots per minute. Explainer segments hold longer
-  (5–11 s) while their graphics build up.
+Six videos of the genre, 10–11 minutes each, mostly from one channel, so this is one winning template, not a rule of the genre. Measured frame by frame and from transcripts:
+- **Pacing:** median shot 2.2–2.5 s (p25 1.3–1.5 s, p75 3.3–3.9 s), 17–21 shots per minute, 18–33 in the first minute, 8–16% of shots under 1 s, 4–7% over 8 s.
+  Explainer segments hold longer (5–11 s) while their graphics build up.
+- **Picture (bars excluded):** 2:1 in all six. Median brightness 0.20–0.40, near-black pixels 3–20%, mean saturation 0.35–0.44. `tools/qc_metrics.py` compares with these.
+- **Purple stage:** 10–31% of the runtime.
+- **Script:** 1,730–1,800 words, 159–177 words per minute, 7–9 numbers per minute. All six open on "you" and an action, flash forward, drop back to the present, and never read the title.
+- **Mid-video:** a silent subscribe gag at about 1:30 in all six. A pixel-ripple transition in only two (about 11% of cuts), so it isn't part of the template.
 - **Mix of shots:** ~15% extreme face close-ups (the head fills the frame, background soft), ~25% medium two/three-shots,
   ~10% over-the-shoulder with a huge soft head in the foreground, ~10% inserts (hands with phone/money/coin, a roulette
   wheel, a claw machine), ~20% explainer segments, ~10% big wides (arena, stadium, city, plane), title and end screen.

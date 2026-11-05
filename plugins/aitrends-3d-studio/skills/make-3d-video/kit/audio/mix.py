@@ -7,7 +7,7 @@ Reads config.json and story/shots.json:
                name may also be a path to your own .wav/.mp3 relative to the project)
   shot "amb":  {"name": "rain", "gain": -20}   ambience bed looped under that shot (0.4 s fades)
   story "music": plan for audio/music.py  (or config.music.file = your own track, looped/trimmed)
-Ducking: music −9 dB and ambience −5 dB while the narrator speaks. Master: loudness-normalised to config.loudness (default −14 LUFS).
+Ducking: music −6 dB and ambience −4 dB while the narrator speaks, recovering quickly in the pauses (config.music.duckDb / releaseS). Master: loudness-normalised to config.loudness (default −14 LUFS).
 Outputs build/mix.wav and, if the silent video exists, out/<title>.mp4 (AAC 48 kHz, 384 kb/s for quality high/max).
 --upscale (or config "export": {"upscale": "1440p"}) re-encodes the picture to 1440p/4K with lanczos: YouTube then serves
 its higher-bitrate VP9/AV1 encodes, so even 1080p viewers get a sharper image. Rendering stays at the project resolution.
@@ -45,7 +45,8 @@ def main():
     voice = load_any(os.path.join(P, cfg["voiceover"]))
     voice = np.concatenate([voice, np.zeros((max(0, n - len(voice)), 2), np.float32)])[:n]
     v_rms = rms_db(voice[np.abs(voice).mean(1) > db(-40)]) if np.any(np.abs(voice).mean(1) > db(-40)) else -20
-    env = envelope(voice)
+    mcfg0 = cfg.get("music", {}) or {}
+    env = envelope(voice, rel=float(mcfg0.get("releaseS", 0.16)))
     mix = voice.copy()
     # ---- music
     mcfg = cfg.get("music", {}) or {}
@@ -60,8 +61,8 @@ def main():
             print(f"generating music: {len(plan)} section(s) — " + ", ".join(f"{s['mood']}@{s.get('intensity', .5)}" for s in plan))
             mus = MUSIC.render_score(plan, total, mcfg.get("seed", 1), mcfg.get("key")); write_wav(path, mus)
         mus = as_stereo(mus)[:n]; mus = np.concatenate([mus, np.zeros((n - len(mus), 2), np.float32)])
-        mus *= db(v_rms + mcfg.get("gainDb", -17) - rms_db(mus))
-        mus *= db(-9 * env)[:, None]
+        mus *= db(v_rms + mcfg.get("gainDb", -15) - rms_db(mus))
+        mus *= db(float(mcfg.get("duckDb", -6)) * env)[:, None]
         mix += mus
     # ---- sfx + ambience
     scfg = cfg.get("sfx", {}) or {}
@@ -78,12 +79,15 @@ def main():
                 f = min(secs(0.4), len(loop) // 2); loop[:f] *= np.linspace(0, 1, f)[:, None]; loop[-f:] *= np.linspace(1, 0, f)[:, None]
                 place(bed, loop, secs(s["start"]), db(am.get("gain", -20)))
         for c in story.get("sfx", []) or []: cues.append({**c, "t": float(c["t"])})
+        gag = cfg.get("subscribeGag") or {}
+        if gag.get("enabled") and cfg.get("aspect") != "9:16":   # the subscribe gag's own small sounds (engine/gag.js timing)
+            at = float(gag.get("at", 90)); cues += [{"name": "pop", "t": at + 0.32, "gain": -14}, {"name": "blip", "t": at + 2.05, "gain": -12}, {"name": "ding", "t": at + 2.1, "gain": -18}]
         for c in cues:
             nm = c["name"]
             if re.search(r"\.(wav|mp3|ogg|flac|m4a)$", nm, re.I): snd = load_any(os.path.join(P, nm))
             else: snd = SFX.make(nm, dur=c.get("dur"), seed=c.get("seed"), pitch=c.get("pitch"))
             place(hits, snd, secs(c["t"]), db(c.get("gain", -8)))
-        bed *= db(-5 * env)[:, None]
+        bed *= db(float(scfg.get("ambDuckDb", -4)) * env)[:, None]
         g = db(scfg.get("gainDb", -6) + (v_rms + 18))   # SFX levels are relative to the voice level
         mix += (hits + bed) * g
         print(f"sfx: {len(cues)} cue(s), ambience on {sum(1 for s in story['shots'] if s.get('amb'))} shot(s)")

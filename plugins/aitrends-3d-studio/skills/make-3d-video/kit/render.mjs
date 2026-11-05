@@ -73,7 +73,7 @@ const SS = PREVIEW || args.sheet || args.stills || args.styles ? 1 : +(args.ss |
 const FORMAT = (args.format || (PREVIEW ? 'jpeg' : Q.format)) === 'jpeg' ? 'jpeg' : 'png';
 
 async function openPlayer(browser, style) {
-  const qs = new URLSearchParams(); if (args.scale) qs.set('scale', args.scale); qs.set('quality', PREVIEW && !args.quality ? 'standard' : QN); if (SS > 1) qs.set('ss', SS); if (args.fps) qs.set('fps', args.fps); if (style || args.style) qs.set('style', style || args.style); if (args.debug) qs.set('debug', '1'); if (args.bench) qs.set('prof', '1');
+  const qs = new URLSearchParams(); if (args.scale) qs.set('scale', args.scale); qs.set('quality', PREVIEW && !args.quality ? 'standard' : QN); if (SS > 1) qs.set('ss', SS); if (args.fps) qs.set('fps', args.fps); if (args.palette) qs.set('palette', args.palette); if (style || args.style) qs.set('style', style || args.style); if (args.debug) qs.set('debug', '1'); if (args.bench) qs.set('prof', '1');
   const page = await browser.newPage({ viewport: { width: 640, height: 360 } });
   page.on('pageerror', e => console.log('[pageerror]', e.message));
   page.on('console', m => { const t = m.text(); if (/ERROR|missing/i.test(t)) console.log('[page]', t); });
@@ -129,7 +129,10 @@ async function renderVideo() {
   };
   const parts = (await Promise.all([...Array(W)].map((_, k) => work(k)))).filter(Boolean);
   const list = path.join(partsDir, 'list.txt'); fs.writeFileSync(list, parts.map(p => `file '${p.replace(/\\/g, '/').replace(/'/g, "'\\''")}'`).join('\n'));
-  const out = path.resolve(args.out || path.join(BUILD, args.from || args.to ? 'preview.mp4' : 'video_silent.mp4'));
+  // --out: absolute, or relative to the project (build/fix.mp4), or a path already inside the project
+  const outArg = args.out ? path.resolve(args.out) : null;
+  const out = !args.out ? path.join(BUILD, args.from || args.to ? 'preview.mp4' : 'video_silent.mp4') : (path.isAbsolute(args.out) || outArg.startsWith(PROJECT + path.sep)) ? outArg : path.join(PROJECT, args.out);
+  fs.mkdirSync(path.dirname(out), { recursive: true });
   await new Promise((res, rej) => spawn('ffmpeg', ['-y', '-v', 'error', '-f', 'concat', '-safe', '0', '-i', list, '-c', 'copy', '-movflags', '+faststart', out], { stdio: 'inherit' }).on('close', c => (c ? rej(new Error('concat failed')) : res())));
   if (errs.size) { console.log(`\n${errs.size} shot error(s):`); [...errs].slice(0, 40).forEach(e => console.log('  ' + e)); }
   console.log(`\nDone: ${out}  (${fmtT((Date.now() - t0) / 1000)})`);

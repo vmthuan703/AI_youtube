@@ -2,7 +2,7 @@
 name: render-3d-video
 description: "This skill should be used when the user runs /render-3d-video or asks to \"build the 3D scenes\", \"check the shots\", \"show me a contact sheet\", \"preview the video\", \"render the video\", \"render in 1080p60 / 4K / 9:16\", \"export in high quality\", \"re-render after a fix\", or \"export the final MP4\" for an aiTrends 3D Studio project. It writes or repairs shot code in batches with contact-sheet QC, makes preview clips, sets the export quality, runs the full frame-by-frame render, and muxes the final video with sound.\n"
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
   author: aiTrends
 ---
 
@@ -15,7 +15,7 @@ and `render-qc.md` in `../make-3d-video/references/` before writing or fixing sc
 - `node render.mjs --project projects/<slug> --sheet --scale 0.4` lists MISSING shots and errors and writes
   `build/sheets/sheet_XX.png` (one still per shot).
 - Write `scenes/sets/*.js` and `scenes/shots/NN_name.js` (`registerShot(id, { init, draw, overlay })`). Study
-  `examples/speed-demo/scenes/` and `examples/look-demo/scenes/` for working patterns.
+  `examples/speed-demo/scenes/`, `examples/look-demo/scenes/` and `examples/diagram-gallery/scenes/` for working patterns. Explainers use `engine/diagrams2d.js`, never just text.
 - After each batch, re-run the sheet and **open every sheet PNG** against the QC checklist. Repeat until clean.
 - Motion: `--stills t1,t2,t3` or `--from A --to B --scale 0.5 [--fps 30]` (writes `build/preview.mp4`).
 
@@ -27,8 +27,8 @@ upscale 1440p for YouTube when the machine can afford it. Measure first: `node r
 Switching aspect needs a fresh sheet review (9:16 framing differs).
 
 ## 3. Preview checkpoint
-`node render.mjs --project projects/<slug> --from 0 --to 20 --scale 0.5` and send the preview (or the sheets) with the
-final render-time estimate before the long render.
+`node render.mjs --project projects/<slug> --from 0 --to 40 --scale 0.5`, then `python tools/qc_metrics.py --project projects/<slug>`, and send the preview (or the sheets) and the scorecard with the
+final render-time estimate before the long render. Fix anything marked CHECK that the user cares about first.
 
 ## 4. Final render
 `nohup node render.mjs --project projects/<slug> > projects/<slug>/build/render.log 2>&1 &`. Poll the log and report
@@ -38,4 +38,7 @@ errors to fix and re-render.
 ## 5. Sound, mux and deliver
 Make sure the music plan and SFX are set (`/3d-video-sound`), then `python audio/mix.py --project projects/<slug>` →
 `out/<title>.mp4` (AAC 48 kHz; upscaled if `export.upscale`). QC with ffprobe (resolution, fps, duration, audio) and a
-final contact sheet, send the MP4, and say in plain words where it was saved.
+final contact sheet and `python tools/qc_metrics.py --project projects/<slug>`, send the MP4, and say in plain words where it was saved.
+
+## 6. Clean up
+Once the user has the file: `python tools/tidy_project.py --project projects/<slug>`. It keeps only `out/` and moves the working files to a clearly named folder for the user to delete. It deletes nothing; never send big files to the Recycle Bin.

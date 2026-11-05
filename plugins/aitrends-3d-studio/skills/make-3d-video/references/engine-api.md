@@ -4,11 +4,13 @@
 ```
 aitrends-3d-studio/
   render.mjs  player.html  package.json
-  engine/   core.js styles.js kit3d.js rig3d.js world3d.js fx3d.js player.js   (+ ui2d.js fx2d.js rig2d.js for 2D overlays/cards)
-  tools/    doctor.py verify_kit.py tts.py new_project.py parse_script.py transcribe.py beats.py common.py
+  channel/  brand.json cast.js        (the channel's choices and hero; updates never overwrite this folder)
+  engine/   core.js styles.js kit3d.js rig3d.js world3d.js fx3d.js player.js gag.js   (+ ui2d.js diagrams2d.js fx2d.js rig2d.js for 2D overlays/cards)
+  tools/    doctor.py verify_kit.py tts_chatterbox.py tts.py script_check.py new_project.py parse_script.py transcribe.py beats.py qc_metrics.py tidy_project.py common.py
   audio/    dsp.py sfx.py music.py mix.py
   examples/speed-demo/   (reference project: a finished 32 s video — cast, sets, shots, story, timeline)
   examples/look-demo/    (one shot per reference-video situation: explainer stage + UI, diner, gym, game show, casino)
+  examples/diagram-gallery/ (every picture in diagrams2d.js and a diagram on a blurred scene)
   projects/<slug>/
      config.json   input/ (voiceover, script, music)   timeline/ (words, sentences, beats, lines)
      story/shots.json  story/bible.md   scenes/cast.js  scenes/sets/*.js  scenes/shots/*.js
@@ -19,14 +21,18 @@ paths (`'/engine/core.js'`) and project files relatively (`'../cast.js'`, `'../s
 
 ## config.json
 ```json
-{ "title": "…", "aspect": "16:9", "resolution": "1080p", "fps": 30, "quality": "high", "style": "cinematic",
+{ "title": "…", "aspect": "16:9", "resolution": "1080p", "fps": 60, "quality": "high", "style": "pearl", "palette": "dusk",
   "voiceover": "input/voiceover.mp3", "script": null, "duration": 312.4, "captions": false, "captionStyle": null,
-  "bars": null, "fadeIn": 0.5, "fadeOut": 0.8, "music": {"enabled": true, "gainDb": -17}, "sfx": {"enabled": true, "gainDb": -6},
+  "bars": "cine", "fadeIn": 0.5, "fadeOut": 0.8, "speechBubbles": true,
+  "subscribeGag": {"enabled": true, "at": 90, "dur": 5, "label": "SUBSCRIBE", "done": "SUBSCRIBED"},
+  "music": {"enabled": true, "gainDb": -15, "duckDb": -6, "releaseS": 0.16}, "sfx": {"enabled": true, "gainDb": -6},
   "loudness": -14, "export": {"upscale": "1440p"} }
 ```
 - `resolution` 720p | 1080p | 1440p | 2160p. `fps` 24 | 30 | 60. `quality` draft | standard | high | max (render-qc.md).
 - `export.upscale` 1440p | 2160p: the final MP4 is upscaled for YouTube (better VP9/AV1 encodes). Optional.
-- `bars`: null/"none" (default, full frame) | "wide" | "scope" | number.
+- `bars`: "cine" (channel default: 68 px, a 2:1 picture) | null/"none" (full frame) | "wide" | "scope" | number. Keep text between y = 90 and y = 990.
+- `palette`: dusk | cozy | tropic | alert | school | midnight (engine/styles.js `PALETTES`), this video's colour world on top of the style. Add your own there.
+- `speechBubbles`: every line of a named character gets a bubble while spoken (from `timeline/lines.json`). `subscribeGag`: the hero's silent mid-video button gag, drawn across cuts by `engine/gag.js`; audio/mix.py adds its small sounds.
 
 ## story/shots.json
 ```json
@@ -35,18 +41,23 @@ paths (`'/engine/core.js'`) and project files relatively (`'../cast.js'`, `'../s
                "in": {"type": "cut|fade|dip|dipWhite|flash|whip|zoom", "dur": 0.4, "dir": 1},
                "look": null, "mblur": 1, "bars": null,
                "sfx": [{"at": 0.4, "name": "whoosh", "gain": -10}], "amb": {"name": "city", "gain": -24},
-               "params": {}, "captions": true, "notes": "" } ],
+               "params": {}, "captions": true, "notes": "",
+               "bubbles": true, "bubble": {"x": 900, "y": 240, "tx": 1000, "ty": 400},
+               "backdrop": {"shot": "s009", "at": 1.5, "blur": 14, "dim": 0.5, "sat": 0.9, "tint": "#1c1432"} } ],
   "music": [ {"start": 0, "end": 42, "mood": "mystery", "intensity": 0.4} ] }
 ```
 - `look`: `freeze` (cold, desaturated time-stop), `flashback`, `dream`, `danger`, or an object of grade overrides
   (`{sat, contrast, lift:[r,g,b], gamma, gain, vignette}`). Applied on top of the style.
 - `mblur`: sub-frames per frame for motion blur (2–4). Multiplies render time; use only on fast action shots.
+- `backdrop` (2D shots): a still of another shot, without its overlays, blurred and dimmed behind this shot's drawing. Built once per worker, so it costs almost nothing.
+- `bubbles: false` turns the automatic speech bubble off for one shot; `bubble` places it by hand.
 
 ## Shot modules
 ```js
 import { E, V, registerShot, ease, prog, key, wordTime, talkFor, clamp } from '/engine/core.js';
 import * as UI from '/engine/ui2d.js';            // optional 2D overlays (titles, badges, data cards, captions)
-import { HERO, JAKE } from '../cast.js';
+import * as D from '/engine/diagrams2d.js';       // animated explainer pictures
+import { HERO, JAKE } from '../cast.js';            // scenes/cast.js re-exports the hero from /channel/cast.js
 import { cityNight } from '../sets/city.js';
 
 registerShot('s012', {
@@ -70,7 +81,17 @@ registerShot('s012', {
   overlay(g, t, info, s) { UI.badge(g, { str: '10x' }); },   // optional, 2D in logical units (1920×1080 or 1080×1920)
   // optimize: false,  mblur: 3
 });
-registerShot('s013', { kind: '2d', draw(g, t, info) { UI.blueprint(g); /* 2D card: diagrams, data, end screen */ } });
+registerShot('s013', { kind: '2d', draw(g, t, info) { D.stage2d(g); D.scale(g, { value: 0.7, label: '15 LB', t }); } });   // 2D card; add "backdrop" in shots.json to sit on a blurred scene
+```
+
+**Size and comedy recipes** (tested numbers; head centre ≈ y 1.45, eyes ≈ y 1.40, face toward +z):
+```js
+// macro on one eye, deadpan
+s.h.face({ expr: 'deadpan', t }); T.aim(s.st.camera, [hx - 0.075, 1.405, hz], { dist: 0.86 - t * 0.02, yaw: 0.03, pitch: 0 });   // stage: fov 24, dof focus 0.5
+// giant head in the foreground: hero's back to the camera at the frame edge, target beyond
+hero.place(-1.3, 0, 5.6, 2.6); T.dolly(cam, t, [[0, { pos: [-1.4, 1.55, 6.9], look: [0.3, 1.32, 3.2] }], [3, { pos: [-1.36, 1.53, 6.7], look: [0.3, 1.32, 3.2] }]]); st.focusOn(other.headWorld());   // fov 34, dof
+// low wide: camera near the floor, looking up
+T.dolly(cam, t, [[0, { pos: [0.2, 0.45, 9], look: [0, 1.35, 3] }], [3, { pos: [0.1, 0.42, 8.5], look: [0, 1.35, 3] }]]);   // fov 48
 ```
 - `info = { dur, globalT, p, line, shot, ...shot.params }`. An exception inside a shot prints to the console and draws
   red text on the frame; check the render output.
@@ -103,15 +124,16 @@ registerShot('s013', { kind: '2d', draw(g, t, info) { UI.blueprint(g); /* 2D car
   (additive sprite). Every real point/spot light costs render time; keep ≤ 4–5 per shot and fake the rest with glows.
 - Cameras (`camera = st.camera`): `T.dolly(camera, t, [[0,{pos,look,fov,roll}],[3,{…}]])`, `T.push(camera, t, {from,to,
   look | lookFrom/lookTo, dur, roll})`, `T.orbit(camera, t, {target, radius, height, from, to, dur})`,
-  `T.follow(camera, obj, {offset, look, roll})`, `T.aim(camera, [x,y,z], {dist, yaw, pitch, fov})` (close-ups),
+  `T.follow(camera, obj, {offset, look, roll})`, `T.aim(camera, [x,y,z], {dist, yaw, pitch, fov})` (close-ups, macro),
   `T.shake(camera, t, amp, freq, rot)`, `T.setFov(camera, fov)`.
 - Utils: `T.THREE`, `T.v3`, `T.worldPos(obj)`, `T.rng(seed)`, `T.key`, `T.ease`, `T.clamp`, `T.lerp`, `T.noise`,
   `T.optimize(st, keep)` (called automatically).
 
 ## Characters — `T.character(outfit, {pose, expr, seed})` (engine/rig3d.js)
-Outfit (put them in `scenes/cast.js`, one per recurring character, never change them mid-video):
+Outfit (put them in `scenes/cast.js`, one per recurring character, never change them mid-video). The channel hero lives in `/channel/cast.js`; add the script's name for them:
 ```js
-export const HERO = { top: 'hoodie', color: '#3a78e0' };                                   // pale skin, dot eyes (style default)
+import { HERO as CHANNEL_HERO } from '/channel/cast.js';
+export const HERO = { ...CHANNEL_HERO, speaker: 'JAY' };                                   // quilted lime puffer, copper hair; 'speaker' = name in the script
 export const JAKE = { top: 'tshirt', color: '#e0402e', head: 'capBack', headColor: '#f2c21a', legs: '#2a3a5a', shoes: '#f4f4f4' };
 export const MOM  = { top: 'dress', color: '#c05a8a', hair: 'bun', hairColor: '#5a3a2a' };
 export const MAYA = { top: 'hoodie', color: '#ee7aa8', hair: 'bob', hairColor: '#7a4a2e', bow: '#ff5a8a', blush: true, lashes: true };
@@ -119,7 +141,7 @@ export const LILY = { top: 'tshirt', color: '#f0b030', skirt: '#7a4ab0', hair: '
 export const BOSS = { top: 'suit', color: '#22222a', tie: '#c02a2a', face: 'sunglasses', legs: '#22222a', shoes: '#111111', scale: 1.15 };
 ```
 `skin` 'pale' | 'ink' | '#hex' (default from the style) · `eyes` 'dot' | 'big' · `top` hoodie | tshirt | jacket | suit |
-dress | labcoat | vest | none · `color`, `color2` (trim), `shirt`, `tie`, `strings` · `legs` pants colour | 'shorts:#hex' |
+dress | labcoat | vest | puffer | none · `color`, `color2` (trim, quilting seams), `shirt`, `tie`, `strings` · `pop` 0–1 self-lit cloth, keeps a loud outfit loud in dim sets (puffer default 0.35) · `speaker` name in the script (bubbles) · `legs` pants colour | 'shorts:#hex' |
 null (bare stick legs) · `shoes` colour | null (round feet), `shoeSole` · `gloves` colour (default: ball hands in skin) ·
 `head` cap | capBack | beanie | hood | headband | tophat | crown, `headColor` · `hair` short | messy | spiky | bob | long |
 ponytail | pigtails | bun (helmet shells with bangs), `hairColor`, `bow` (colour) · `skirt` (colour, any top) · `blush`
@@ -130,7 +152,7 @@ Methods (all return the character, so they chain):
 - `.pose(p)`: a name from `T.POSES3`, a pose object, `T.posesAt3(t, [[0,'stand'],[0.8,'point'],[2,'shrug']], blend)`,
   `T.walkPose3(phase, {run, sprint, lean})`, `T.breathe3(pose, t, k, seed)`, `T.blendPose3(a, b, k)`.
 - `.face({ expr, talk, blink: true, t, look: [x, y] })`: expressions `neutral smile happy joy smirk smug determined
-  angry surprised shocked scared worried nervous sad cry sleepy thinking confused awe evil dead`, or a custom
+  angry surprised shocked scared worried nervous sad cry sleepy thinking confused awe evil dead deadpan unimpressed`, or a custom
   `{eye:{open, lid, low, pupil, closed, sparkle, tears}, mouth:{type, w, open, curve}}`. `look` moves the eyes (−1..1).
 - `.lookAt3([x, y, z])` turns the head toward a world point (after `.pose`).
 - `.hold(obj, 'L'|'R', {pos, rot})` attaches a prop to a hand. `.headWorld()`, `.handWorld('L')`, `.chestWorld()`.
@@ -159,9 +181,9 @@ Sets build into the stage and return anchors:
 - `T.W.city(st, { seed, length, lights, focus:[x,z], cars, props, signs, front, wet, crosswalk, moon, stars })` → night
   street along x: road z ∈ [−4, 4], sidewalks to ±7 at y = 0.15, building row behind z < −7, street lamps, parked cars,
   skyline, moon. Returns `{ lamps, lane:[-2, 2], sidewalk: 0.15 }`.
-- `T.W.suburb(st, { seed, length, lights, focus, fence })` → houses with lit windows, lawns, fences, trees, road along x.
+- `T.W.suburb(st, { seed, length, lights, focus, fence, moon, stars })` → houses with lit windows, lawns, fences, trees, road along x. Colours follow the stage mood (`M.houses`, `M.tree`); moon and stars only at night unless asked.
 - `T.W.room(st, { kind: bedroom|living|office|classroom|kitchen|hallway|empty, w, d, h, wall, floor, window:
-  'back'|'left'|'right'|false, ceiling, curtains, lockerColor, boardText, desks })` → floor centred at the origin, back wall
+  'back'|'left'|'right'|false, view: 'day'|'night', ceiling, curtains, lockerColor, boardText, desks })` → floor centred at the origin, back wall
   at z = −d/2, side walls at x = ±w/2, open toward +z. Returns `{ w, d, h, window, lamps, backZ }`.
 - `T.W.explainer(st, { color, lineZ, light, line })` → the purple diagram stage of the references: flat backdrop with a
   fine faint grid, a floor meeting it in a thin light line at z = lineZ (default 0). Stand characters on the line, frame
@@ -197,6 +219,13 @@ Build in `init`, then `fx.update(t)` in `draw` (or `st.onTick(fx.update)` once +
 `ghosts(st, outfit, n, {c, opacity, gap})` → `.update(t, tt => ({pos, yaw, pose}))` afterimages,
 `shockwave(st,{pos, t0, r1, c})`, `bokeh(st,{area, colors})`, `frozen(st,{area})` (droplets hanging in time-stop),
 `burst(st,{pos, t0, confetti})`, `aura(st, target, {c})`, `trail(st,{c, width})` → `.update(t, tt => [x,y,z])`.
+
+## Diagrams (engine/diagrams2d.js) — `import * as D from '/engine/diagrams2d.js'`
+Flat animated pictures for explainers, in `overlay()` or a 2D `draw()`. All take logical `x, y`, a size, `t` and `start` (pop-in); `examples/diagram-gallery` shows every call.
+- Base: `D.stage2d(g, {floor})` (the purple stage in 2D), `D.flatFigure(g, {x, y, h, color, hairColor, hair, seams, pose: stand|point|cheer|shrug, expr: neutral|deadpan|happy|shock})` (a cast member as a 2D figure, for diagrams on a blurred scene), `D.label(g, str, x, y, {size, color})`.
+- Things: `crossSection` (a house cut open, pipes, `cut` 0–1 snaps them), `scale`, `calendarCard`, `growthBars`, `stopwatch`, `radar`, `seismo`, `mapPins`, `usMap`, `globe`, `organ` (`kind`: brain, lungs, kidneys, heart; `pulse`), `thermometer`, `jar`.
+- Screens: `phoneChat` (messages arrive), `phoneStat` (one big number), `videoFrame` (view counter or LIVE badge around the scene, `views`, `live`, `viewers`).
+- Lists and meters: `checklist`, `stamp` (slams down), `scoreboard` (`head` + `value`, or `left` + `right`), `progressRing`, `meterBar`, `chips` (items, the first `lit` stay bright from `litAt`), `arrow` (`bend`, `dashed`, draws itself), `compare` (two panels).
 
 ## 2D overlays (engine/ui2d.js, fx2d.js) — logical 1920×1080 (16:9) or 1080×1920 (9:16)
 `overlay(g, t, info, s)` draws on top of the 3D frame. Reference-style graphics (all accept `t` + `start` for a pop-in):

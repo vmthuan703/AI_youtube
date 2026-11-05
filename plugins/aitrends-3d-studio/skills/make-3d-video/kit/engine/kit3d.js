@@ -40,9 +40,13 @@ export function rim(o = {}) {
   if (o.dir) RIM.rimDir.value.set(...o.dir).normalize(); else if (o.dir === null) RIM.rimDir.value.set(0, 0, 0);
   return RIM;
 }
-function addRim(m, k = 1) {
+// limit > 0: a soft ceiling on the lit colour (skin). Heads never clip to white or feed the bloom under strong keys.
+function addRim(m, k = 1, limit = 0) {
   m.onBeforeCompile = (sh) => {
     Object.assign(sh.uniforms, RIM, { rimK: { value: k } });
+    const ceiling = limit > 0 ? `
+        { float mxL = max(gl_FragColor.r, max(gl_FragColor.g, gl_FragColor.b)); float kn = ${(limit * 0.62).toFixed(3)};
+          if (mxL > kn) { float over = mxL - kn; gl_FragColor.rgb *= (kn + over / (1.0 + over / (${limit.toFixed(3)} - kn))) / mxL; } }` : '';
     sh.fragmentShader = 'uniform vec3 rimColor; uniform float rimStrength; uniform float rimPower; uniform vec3 rimDir; uniform float rimK;\n' +
       sh.fragmentShader.replace('#include <opaque_fragment>', `
         { vec3 nV = normalize(normal); vec3 vV = normalize(vViewPosition);
@@ -50,9 +54,9 @@ function addRim(m, k = 1) {
           float side = 1.0;
           if (length(rimDir) > 0.01) { vec3 rd = normalize((viewMatrix * vec4(rimDir, 0.0)).xyz); side = smoothstep(-0.35, 0.55, dot(nV, rd)); }
           outgoingLight += rimColor * fr * side * rimStrength * rimK; }
-        #include <opaque_fragment>`);
+        #include <opaque_fragment>${ceiling}`);
   };
-  m.customProgramCacheKey = () => 'rim' + k;
+  m.customProgramCacheKey = () => 'rim' + k + '/' + limit;
   return m;
 }
 // ---------------------------------------------------------------- materials (respect the style: toon or soft-PBR)
@@ -67,10 +71,10 @@ function toonRamp(steps, hard) {
 // The style decides toon (ramp of grey levels) or soft PBR; shiny metal stays PBR so cars and glass still reflect.
 export function mat(c, o = {}) {
   const st = S(); const toon = o.toon === false ? null : (o.toon || st.toon || null);
-  const { rim: rk = 0, rough = 0.85, metal = 0, flat = false, ...rest } = o; delete rest.toon;
+  const { rim: rk = 0, limit = 0, rough = 0.85, metal = 0, flat = false, ...rest } = o; delete rest.toon;
   const m = QS.has('lambert') ? new THREE.MeshLambertMaterial({ color: C(c), flatShading: flat, ...rest }) : toon && !(metal > 0.45 && rough < 0.4) ? new THREE.MeshToonMaterial({ color: C(c), gradientMap: toonRamp(toon, st.toonHard), ...rest })
     : new THREE.MeshStandardMaterial({ color: C(c), roughness: rough, metalness: metal, flatShading: flat, ...rest });
-  if (rk > 0) addRim(m, rk);
+  if (rk > 0 || limit > 0) addRim(m, rk, limit);
   if (m.isMeshStandardMaterial && (metal > 0.3 || rough < 0.3) && R && !QS.has('noenv')) { m.envMap = envMap(); m.envMapIntensity = o.env ?? 0.6; }
   return m;
 }
@@ -92,7 +96,8 @@ export const discTex = () => cached('disc', () => canvasTex(128, 128, (g, w, h) 
 // stage({ mood, fov, fog:[near,far] | false, fogColor, sky:[top..bottom] | colour, keyPos, keyColor, keyIntensity,
 //         ambient, fill, bloom, bloomThreshold, exposure, dof:{focus, aperture, maxblur}, shadowSize, shadows })
 export function stage(o = {}) {
-  const M = mood(o.mood || 'night'), st = S(), L = st.light || {};
+  const moodName = o.mood || 'night'; E.curMood = moodName;   // props built after this match the stage's mood
+  const M = mood(moodName), st = S(), L = st.light || {};
   if (QS.has('nodof')) o.dof = null; if (QS.has('nobloom')) o.bloom = 0; if (QS.has('noshadow')) o.shadows = false; if (QS.has('msaa')) o.msaa = +QS.get('msaa');
   const scene = new THREE.Scene(); const sky = o.sky || M.sky;
   scene.background = Array.isArray(sky) ? canvasTex(8, 512, (g, w, h) => { const gr = g.createLinearGradient(0, 0, 0, h); sky.forEach((c, i) => gr.addColorStop(i / (sky.length - 1), c)); g.fillStyle = gr; g.fillRect(0, 0, w, h); }) : C(sky);
@@ -112,7 +117,8 @@ export function stage(o = {}) {
   scene.add(sun, sun.target);
   // back light in the rim colour (separates black figures from dark sets); the fresnel rim does the rest
   const fill = new THREE.DirectionalLight(C(o.fillColor || M.rim), (o.fill ?? 0.9) * (L.fill ?? 1)); fill.position.set(...(o.fillPos || [4, 5, -7])); scene.add(fill, fill.target);
-  rim({ color: o.rim || M.rim, strength: (o.rimStrength ?? 0.6) * (L.rim ?? 1), power: o.rimPower ?? 3.4, dir: o.rimDir || null });
+  const rimState = { color: o.rim || M.rim, strength: (o.rimStrength ?? 0.6) * (L.rim ?? 1), power: o.rimPower ?? 3.4, dir: o.rimDir || null };
+  rim(rimState);
   const w = Math.round(E.W * E.PX), h = Math.round(E.H * E.PX);
   const composer = new EffectComposer(R, new THREE.WebGLRenderTarget(w, h, { samples: o.msaa ?? (E.quality === 'high' || E.quality === 'max' ? 4 : 0), type: THREE.HalfFloatType }));
   composer.addPass(new RenderPass(scene, camera));
@@ -123,14 +129,17 @@ export function stage(o = {}) {
   if (E.quality === 'standard' && o.msaa == null) { const fx = new ShaderPass(FXAAShader); fx.uniforms.resolution.value.set(1 / w, 1 / h); composer.addPass(fx); }   // cheap anti-aliasing
   const tickers = [];
   const api = {
-    scene, camera, composer, sun, hemi, fill, M, bloom, bokeh, tickers,
+    scene, camera, composer, sun, hemi, fill, M, bloom, bokeh, tickers, moodName,
+    // re-apply this stage's rim and mood before drawing it: another stage may have been built since (backdrops, transitions)
+    activate: () => { rim(rimState); E.curMood = moodName; },
     add: (...objs) => { objs.forEach(ob => ob && scene.add(ob)); return objs[0]; },
     // run every registered animator (particles, blinking signs, cars…) — call once per frame from draw()
     tick: (t) => { for (const f of tickers) f(t); },
     onTick: (f) => { tickers.push(f); return f; },
     focus: (dist, aperture) => { if (!bokeh) return; bokeh.uniforms.focus.value = dist; if (aperture != null) bokeh.uniforms.aperture.value = aperture; },
     // focus on an object/point automatically: st.focusOn([x,y,z])
-    focusOn: (p) => { if (!bokeh) return; const v = Array.isArray(p) ? new THREE.Vector3(...p) : p.isVector3 ? p : p.getWorldPosition(new THREE.Vector3()); bokeh.uniforms.focus.value = camera.position.distanceTo(v); },
+    // the depth pass measures along the view axis, so focus uses view depth: off-centre subjects stay sharp
+    focusOn: (p) => { if (!bokeh) return; const v = Array.isArray(p) ? new THREE.Vector3(...p) : p.isVector3 ? p.clone() : p.getWorldPosition(new THREE.Vector3()); camera.updateMatrixWorld(); bokeh.uniforms.focus.value = Math.max(0.05, -v.applyMatrix4(camera.matrixWorldInverse).z); },
     exposure: (x) => { R.toneMappingExposure = x; },
     render: () => { R.toneMappingExposure = (o.exposure ?? 1) * (L.exposure ?? 1); camera.aspect = E.W / E.H; camera.updateProjectionMatrix(); R.info.autoReset = false; R.info.reset(); composer.render(); api.calls = R.info.render.calls; api.tris = R.info.render.triangles; },
     dispose: () => { scene.traverse(x => { x.geometry?.dispose(); [].concat(x.material || []).forEach(m => { m.map?.dispose?.(); m.dispose(); }); }); composer.passes.forEach(p => p.dispose?.()); composer.dispose?.(); },   // free bloom/DOF targets too (long videos visit hundreds of shots per worker)

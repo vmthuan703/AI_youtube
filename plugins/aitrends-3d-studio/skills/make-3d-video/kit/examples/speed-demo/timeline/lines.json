@@ -1,0 +1,56 @@
+[
+ {
+  "i": 0,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 0.0,
+  "end": 2.752,
+  "text": "What if you were ten times faster than everyone else?"
+ },
+ {
+  "i": 1,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 3.252,
+  "end": 8.693,
+  "text": "You wake up at seven. Your alarm hasn't even finished its first beep, and you're already dressed."
+ },
+ {
+  "i": 2,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 9.193,
+  "end": 16.063,
+  "text": "On the way to school, a car runs a red light. To everyone else, it happens in a blink. To you, it's crawling."
+ },
+ {
+  "i": 3,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 16.563,
+  "end": 22.729,
+  "text": "You stroll across the street, grab a soda, and you're back on the sidewalk before the driver even notices."
+ },
+ {
+  "i": 4,
+  "speaker": "JAKE",
+  "note": "",
+  "voice": "am_liam",
+  "start": 23.229,
+  "end": 25.491,
+  "text": "Dude... how did you get over there?"
+ },
+ {
+  "i": 5,
+  "speaker": "NARRATOR",
+  "note": "",
+  "voice": "am_michael",
+  "start": 25.991,
+  "end": 30.983,
+  "text": "But here's the thing nobody tells you about super speed. Stopping is the hard part."
+ }
+]

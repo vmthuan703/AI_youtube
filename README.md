@@ -104,6 +104,8 @@ từ **nghiên cứu ngách** → **viết kịch bản** → **giọng đọc**
 | `.github/workflows/market-daily.yml` | Lịch chạy `market_watch.py` mỗi ngày lúc 15:17 giờ VN, sau khi quota YouTube hồi |
 | `tests/` | Kiểm thử cho `niche_finder`, `audience_research`, `market_watch`, TTS |
 | `.claude/skills/` | Skill `script-to-2d-video`: từ kịch bản sang giọng đọc rồi sang video |
+| `plugins/aitrends-3d-studio/` | **Plugin video 3D**: kịch bản → giọng đọc Kokoro → video hoạt hình 3D (Three.js), tới 4K/60 fps. Xem [README plugin](plugins/aitrends-3d-studio/README.md) |
+| `.claude-plugin/marketplace.json` | Marketplace để cài plugin bằng `/plugin` |
 
 ## Bắt đầu nhanh
 
@@ -137,6 +139,16 @@ node render.mjs --project projects/my-video         # → build/video_silent.mp4
 ```
 
 Xem thêm: ví dụ nhỏ tại `aitrends-2d-studio/examples/reaction-time/`, dự án hoàn chỉnh tại `aitrends-2d-studio/projects/t4-02/`.
+
+**Dựng video 3D từ kịch bản (plugin `aitrends-3d-studio`):**
+```bash
+/plugin marketplace add vmthuan703/AI_youtube
+/plugin install aitrends-3d-studio@ai-youtube
+```
+Mở repo này bằng Claude Code thì không cần hai lệnh trên: `.claude/settings.json` đã khai báo plugin (đồng ý khi được hỏi).
+Sau đó nói "làm video 3D từ kịch bản này" kèm file kịch bản. Claude chạy đủ 8 bước: khảo sát, cài studio, giọng đọc,
+phân cảnh, chọn phong cách, dựng cảnh, âm thanh, render (chọn 720p–4K, 24/30/60 fps, preset `draft`→`max`).
+Đóng gói zip để tải lên claude.ai: `bash plugins/build_zip.sh`.
 
 ## Lưu ý
 

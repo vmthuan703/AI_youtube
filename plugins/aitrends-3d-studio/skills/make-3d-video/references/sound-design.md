@@ -1,8 +1,8 @@
 # Sound design
 
-`audio/mix.py` builds the soundtrack from `story/shots.json` (inside `aitrends-3d-studio/`). It ducks the music −9 dB and ambience −5 dB under the voice and normalises the master to −14 LUFS (YouTube), or `config.loudness`.
+`audio/mix.py` builds the soundtrack from `story/shots.json` (inside `aitrends-3d-studio/`). It ducks the music −6 dB and ambience −4 dB under the voice, lets the music come back quickly in the pauses, and normalises the master to −14 LUFS (YouTube), or `config.loudness`.
 
-**Music plan** (`"music"` in shots.json): contiguous sections with a mood and intensity (0–1; higher adds pulse, arps and drums). Moods: `mystery, tension, action, wonder, hopeful, sad, triumph, playful, calm, dark, epic`. Change sections at story turns (the title card, a discovery, danger, the climax, the resolution, the science segment), typically every 30–90 s. Audition with `python audio/music.py --mood tension --dur 20 --out test.wav`. To use the user's own track, set `config.music.file = "input/music.mp3"` (it loops or trims and fades the end). Set `config.music.gainDb` (default −17 relative to the voice) for a louder or quieter bed. The generated music is a serviceable ambient/cinematic bed. For premium results, suggest the user's own licensed track.
+**Music plan** (`"music"` in shots.json): contiguous sections with a mood and intensity (0–1; higher adds pulse, arps and drums). Moods: `mystery, tension, action, wonder, hopeful, sad, triumph, playful, calm, dark, epic`. Change sections at story turns (the title card, a discovery, danger, the climax, the resolution, the science segment), typically every 30–90 s. Audition with `python audio/music.py --mood tension --dur 20 --out test.wav`. To use the user's own track, set `config.music.file = "input/music.mp3"` (it loops or trims and fades the end). Set `config.music.gainDb` (default −15 relative to the voice) for a louder or quieter bed, `config.music.duckDb` (−6) and `releaseS` (0.16 s) for how far and how fast it moves under the voice. Judge these by ear: the mastering step lifts quiet parts, so level numbers measured from the final mix are not a reliable target. The generated music is a serviceable ambient/cinematic bed. For premium results, suggest the user's own licensed track.
 
 **SFX cues** (per shot `"sfx": [{"at": 0.3, "name": "whoosh", "gain": -8}]`, where `at` is seconds from the shot start; optional `dur`, `seed`, `pitch`; `name` can also be a path to the user's own WAV/MP3). Library (`python audio/sfx.py --list`, audition all with `--demo build/sfx_demo`):
 `whoosh, swish, impact, hit, riser, slowmo, freeze, tick, clock, heartbeat, pop, blip, counter, ding, shimmer, stinger, footstep, kick, whistle, carpass, phonebuzz, phonering, cheer, applause, murmur, rain, thunder, wind, roomtone, city, hum, powerup, glitch, flash, buzz`.
@@ -17,3 +17,5 @@ time-stop → `slowmo` going in, `freeze` on the flash, `riser` back out; school
 
 **Export audio:** the final MP4 carries AAC-LC 48 kHz stereo at 384 kb/s for quality `high`/`max` (YouTube's
 recommended upload setting), 192 kb/s otherwise.
+
+**Subscribe gag:** `config.subscribeGag` adds its own quiet `pop`, `blip` and `ding` at the right moments. Nothing to place by hand.

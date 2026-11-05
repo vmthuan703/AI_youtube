@@ -1,0 +1,12 @@
+{
+  "_note": "Choices the channel has already made. new_project.py, tts_chatterbox.py and the survey read this file, so they are not asked again. Edit freely; the plugin never overwrites this folder on update.",
+  "voice": { "engine": "chatterbox", "narrator": "am_puck", "exaggeration": 0.75, "cfg": 0.3, "targetWpm": [160, 175] },
+  "style": "pearl",
+  "palette": null,
+  "bars": "cine",
+  "aspect": "16:9",
+  "export": { "resolution": "1080p", "fps": 60, "quality": "high", "upscale": "1440p", "captions": false },
+  "speechBubbles": true,
+  "subscribeGag": { "enabled": true, "at": 90, "dur": 5, "label": "SUBSCRIBE", "done": "SUBSCRIBED" },
+  "cleanup": { "enabled": true, "folder": "_xoa_duoc" }
+}

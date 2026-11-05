@@ -48,6 +48,8 @@ for mod, pipname in [("numpy", "numpy"), ("scipy", "scipy"), ("kokoro_onnx", "ko
     ok(f"python: {pipname}", importlib.util.find_spec(mod) is not None, "", f"\"{PY}\" -m pip install {pipname}" + pipx)
 mdir = os.environ.get("KOKORO_MODEL_DIR", os.path.expanduser("~/.cache/kokoro"))
 ok("Kokoro TTS model (~350 MB)", all(os.path.exists(os.path.join(mdir, f)) for f in ["kokoro-v1.0.onnx", "voices-v1.0.bin"]), mdir, f"\"{PY}\" tools/tts.py --download")
+cb = os.path.exists(os.path.join(ROOT, ".venvs", "chatterbox", "Scripts" if os.name == "nt" else "bin", "python.exe" if os.name == "nt" else "python"))
+rows.append((("OK " if cb else "optional ") + "Chatterbox voice environment (.venvs/chatterbox)", "the channel's default voice; see references/install.md. Kokoro works without it" if not cb else ""))
 fw = importlib.util.find_spec("faster_whisper") is not None
 rows.append((("OK " if fw else "optional ") + "python: faster-whisper", "only needed when you bring your own voiceover" if not fw else ""))
 ok(f"python >= 3.9", sys.version_info >= (3, 9), sys.version.split()[0], "install Python 3.10+ from https://python.org")

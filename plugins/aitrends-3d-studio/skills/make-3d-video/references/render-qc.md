@@ -34,8 +34,8 @@ Every final encode is H.264 High, yuv420p, BT.709, GOP = fps/2, B-frames 2, with
   across the video and estimates the full render on this machine. Run it once on each machine and quote it.
 
 ## Render
-**Preview first.** `node render.mjs --project projects/<slug> --from 0 --to 20 --scale 0.5` writes `build/preview.mp4`
-(draft encode, JPEG). Add `--fps 30` to preview a 60 fps project at half the frames.
+**Preview first, then the scorecard.** `node render.mjs --project projects/<slug> --from 0 --to 20 --scale 0.5` writes `build/preview.mp4`
+(draft encode, JPEG). Add `--fps 30` to preview a 60 fps project at half the frames. Then `python tools/qc_metrics.py --project projects/<slug>` prints brightness, near-black share, saturation, bars, cut pace, words per minute and loudness against the reference ranges, and writes `build/qc_scorecard.md`. Send it with the preview.
 
 **Final:**
 ```bash
@@ -47,7 +47,7 @@ python audio/mix.py --project projects/<slug>        # music + SFX, mix, mux (+ 
 - GPU: Windows/macOS desktops use it automatically (`--gl auto`); Linux with an NVIDIA GPU: `--gl gpu`. Without a GPU
   (servers, cloud sessions) frames render on the CPU through SwiftShader (`--gl swiftshader`, the Linux default).
 - Partial re-render after a fix: re-run the whole video (simple and safe), or render the changed range with
-  `--from A --to B --out build/fix.mp4` and splice it in with ffmpeg if you're comfortable.
+  `--from A --to B --out build/fix.mp4` (relative to the project) and splice it in with ffmpeg if you're comfortable.
 
 ## Speed guide (measure, then tell the user)
 Frames = seconds × fps. Measured on a 4-thread cloud CPU **without a GPU**, quality `high`, typical street/room shots:
@@ -69,16 +69,22 @@ The render log prints frames, fps, elapsed time and ETA every 48 frames; report 
       rim, nobody cut awkwardly by the frame edge, nobody hidden behind props.
 - [ ] Contact: feet on the floor, hands on what they hold, sitting on seats, props not sinking into tables.
 - [ ] Outfits and screen direction consistent within a scene; same set geometry in every shot of a location.
-- [ ] Light: 1–3 bright accents, faces not too dark, nothing blown out (bloom only on lamps/screens/neon).
+- [ ] Light: 1–3 bright accents, faces not too dark, nothing blown out (bloom only on lamps/screens/neon), almost no pure black inside the picture. The hero's outfit reads as loud in every shot.
+- [ ] Explainers: a moving picture in every one, none is just text on an empty stage, and some sit on the blurred scene.
+- [ ] Bars: nothing important under them; text between y = 90 and y = 990. Speech bubbles sit near the right head and cover no face.
+- [ ] Size variety: giant foreground heads, macro inserts, wides, no run of same-sized faces.
 - [ ] Every shot has camera motion and some atmosphere (dust, bokeh, rain, glows).
 - [ ] Text short, inside the safe area, legible at phone size; numbers match the narration.
 - [ ] Variety: no more than 3 consecutive shots of the same type or framing.
 - [ ] 9:16: subjects in the middle, nothing important under the captions.
 - [ ] Audio: voice clear, music ducked, no SFX pile-ups, final loudness about −14 LUFS.
 
-Final file QC: `ffprobe -v error -show_entries stream=width,height,r_frame_rate,codec_name -of csv out/<file>.mp4`
+Final file QC: `python tools/qc_metrics.py --project projects/<slug>`, `ffprobe -v error -show_entries stream=width,height,r_frame_rate,codec_name -of csv out/<file>.mp4`
 (resolution and fps as chosen, audio present), duration ≈ `story/shots.json` duration, and a contact sheet:
 `ffmpeg -i out/<file>.mp4 -vf fps=1/5,scale=384:-1,tile=6x4 -frames:v 1 build/final_sheet.png`.
+
+## Clean-up after delivery
+`python tools/tidy_project.py --project projects/<slug>` keeps `out/` and moves everything else, plus `build_voice/<slug>`, to `<studio>/_xoa_duoc/<slug>-<date>/` for the user to check and delete. It deletes nothing and does not use the Recycle Bin. `--dry-run` lists what would move.
 
 ## Troubleshooting
 - **A prop is missing** → it may be inside another object (a phone sunk into a table top). Raise it a few millimetres,

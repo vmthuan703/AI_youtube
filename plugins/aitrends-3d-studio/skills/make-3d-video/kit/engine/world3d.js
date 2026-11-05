@@ -42,7 +42,7 @@ export function skyline(o = {}) { const g = group(); const n = o.count || 8, R =
 
 // ---------------------------------------------------------------- props: street
 export function building(w, h, d, o = {}) {
-  const st = S(); const M = mood(o.mood || 'night'); const base = o.color || M.wall;
+  const st = S(); const M = mood(o.mood); const base = o.color || M.wall;
   const cols = Math.max(2, Math.round(w / 1.6)), rows = Math.max(2, Math.round(h / 3.0));
   const t = windowsTex(cols, rows, { ...o, color: base, win: o.win || M.practical, seed: o.seed || 3, shop: o.shop ?? true });
   const front = new THREE.MeshStandardMaterial({ map: t, emissiveMap: t, emissive: new THREE.Color(o.glow ?? 0.9, o.glow ?? 0.9, o.glow ?? 0.9), roughness: 0.95 });
@@ -57,7 +57,7 @@ export function building(w, h, d, o = {}) {
 }
 export function neonSign(text, o = {}) { const w = o.w || 3, h = o.h || w * 0.3; const t = textTex(text, { w: 512, h: Math.round(512 * h / w), color: o.color || '#ff4f8a', size: o.size || 120, glow: 30, bg: o.bg || 'rgba(10,6,20,.9)' }); const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: t, color: new THREE.Color(1.6, 1.6, 1.6), toneMapped: false })); return group(m); }
 export function streetLamp(o = {}) {
-  const M = mood(o.mood || 'night'); const h = o.h || 5.2, c = o.color || M.practical; const pole = mat('#1a1724', { rough: 0.5, metal: 0.4 });
+  const M = mood(o.mood); const h = o.h || 5.2, c = o.color || M.practical; const pole = mat('#1a1724', { rough: 0.5, metal: 0.4 });
   const g = group(cyl(0.07, 0.1, h, pole, 0, h / 2, 0, 10), cyl(0.18, 0.22, 0.4, pole, 0, 0.2, 0, 10));
   const arm = box(0.08, 0.08, 1.4, pole, 0, h - 0.05, 0.65); g.add(arm);
   const head = rbox(0.34, 0.14, 0.55, 0.05, pole, 0, h - 0.12, 1.25); g.add(head);
@@ -173,8 +173,9 @@ export function city(st, o = {}) {
   for (let i = 0; i < (o.cars ?? 6); i++) { const x = -Lh + 6 + r() * (Lh * 2 - 12), sz = r() < 0.5 ? -1 : 1; const c = car({ color: carCols[(r() * carCols.length) | 0], type: ['sedan', 'suv', 'sedan', 'sports', 'taxi'][(r() * 5) | 0], lights: false }); c.position.set(x, 0, sz * 3.0); c.rotation.y = R2 * (sz > 0 ? -1 : 1); st.add(c); }
   for (let i = 0; i < (o.props ?? 8); i++) { const x = -Lh + r() * Lh * 2, sz = r() < 0.5 ? -1 : 1; const p = [hydrant, trashCan, () => tree({ s: 0.8, seed: i })][(r() * 3) | 0](); p.position.set(x, 0.15, sz * (4.6 + r() * 1.5)); st.add(p); }
   st.add(skyline({ color: shade(M.wall, -0.35), seed: (o.seed || 3) + 7, tint: '#d8d0ff' }));
-  if (o.moon !== false) st.add(moon({ color: '#efe6ff' }));
-  if (o.stars !== false) st.add(stars(400));
+  const dark = /night|storm/.test(o.mood || st.moodName || 'night');
+  if (o.moon ?? dark) st.add(moon({ color: '#efe6ff' }));
+  if (o.stars ?? dark) st.add(stars(400));
   return { lamps, road, ground: 0, sidewalk: 0.15, lane: [-2, 2] };
 }
 // suburb: houses with lit windows, lawns, fences and trees along a street (road along x like city)
@@ -184,21 +185,22 @@ export function suburb(st, o = {}) {
   st.add(ground(Lh * 2 + 60, 60, M.grass, null, { y: -0.01 }));
   for (const sz of [-1, 1]) st.add(box(Lh * 2 + 60, 0.12, 1.6, shade(M.floor, 0.15), 0, 0.06, sz * 4.3));
   const houses = []; let x = -Lh;
-  while (x < Lh) { const w = 7 + r() * 3; const hc = [shade(M.wall, 0.1), mix(M.wall, '#6a4a3a', 0.4), mix(M.wall, '#3a4a6a', 0.4), shade(M.wall, -0.05)][(r() * 4) | 0];
-    const h = house({ color: hc, roof: shade(hc, -0.4), seed: (r() * 1e4) | 0, mood: o.mood }); h.position.set(x + w / 2, 0, -12); st.add(h); houses.push(h);
-    st.add(at(tree({ s: 0.9 + r() * 0.5, seed: (r() * 99) | 0, color: shade(M.grass, -0.35) }), x + r() * w, 0, -7 - r() * 2));
+  while (x < Lh) { const w = 7 + r() * 3; const hc = M.houses ? M.houses[(r() * M.houses.length) | 0] : [shade(M.wall, 0.1), mix(M.wall, '#6a4a3a', 0.4), mix(M.wall, '#3a4a6a', 0.4), shade(M.wall, -0.05)][(r() * 4) | 0];
+    const h = house({ color: hc, roof: shade(hc, M.houses ? -0.3 : -0.4), seed: (r() * 1e4) | 0, mood: o.mood }); h.position.set(x + w / 2, 0, -12); st.add(h); houses.push(h);
+    st.add(at(tree({ s: 0.9 + r() * 0.5, seed: (r() * 99) | 0, color: M.tree || shade(M.grass, -0.35) }), x + r() * w, 0, -7 - r() * 2));
     if (o.fence !== false) for (let k = 0; k < w; k += 0.5) st.add(box(0.08, 0.9, 0.06, '#e8e2d8', x + k, 0.45, -6)); x += w + 2;
   }
   const lamps = []; for (let xx = -Lh; xx <= Lh; xx += 18) lamps.push({ x: xx, z: -4.9 });
   const lit = new Set(nearest(lamps, o.focus || [0, 0], o.lights ?? 3));
   for (const L of lamps) { const l = streetLamp({ light: lit.has(L), h: 4.6, mood: o.mood }); l.position.set(L.x, 0.12, L.z); st.add(l); }
-  st.add(skyline({ color: shade(M.wall, -0.4), seed: (o.seed || 5) + 3, height: 30, tint: '#a8a0d0' }));
-  if (o.moon !== false && /night|dusk|storm/.test(o.mood || 'night')) st.add(moon({}));
-  if (o.stars !== false) st.add(stars(400));
+  if (M.skyline !== false) st.add(skyline({ color: shade(M.wall, -0.4), seed: (o.seed || 5) + 3, height: 30, tint: '#a8a0d0' }));
+  const dark = /night|storm/.test(o.mood || st.moodName || 'night');
+  if (o.moon ?? dark) st.add(moon({}));
+  if (o.stars ?? dark) st.add(stars(400));
   return { houses, lamps };
 }
 export function house(o = {}) {
-  const M = mood(o.mood || 'night'); const c = o.color || M.wall, w = o.w || 7, d = o.d || 7, h = o.h || 3.2; const r = rng(o.seed || 1);
+  const M = mood(o.mood); const c = o.color || M.wall, w = o.w || 7, d = o.d || 7, h = o.h || 3.2; const r = rng(o.seed || 1);
   const g = group(box(w, h, d, mat(c, { rough: 0.95 }), 0, h / 2, 0));
   const roofM = mat(o.roof || shade(c, -0.4), { rough: 0.9, flat: true });
   const rg = new THREE.CylinderGeometry(0.01, d * 0.72, w + 0.6, 4, 1); const roofMesh = prep(new THREE.Mesh(rg, roofM)); roofMesh.rotation.set(0, Math.PI / 4, R2); roofMesh.scale.set(1, 1, 0.75); roofMesh.position.y = h + 1.15; const rr = group(roofMesh); rr.rotation.y = 0; g.add(rr);
@@ -222,7 +224,7 @@ export function room(st, o = {}) {
   if (o.ceiling) st.add(box(w + 0.4, 0.1, d + 8, shade(wallC, -0.2), 0, h + 0.05, 4));
   // window with a night (or day) view
   const winSide = o.window ?? 'back'; let win = null;
-  if (winSide) { const ww = o.windowW || Math.min(3.2, w * 0.4), wh = o.windowH || 1.6; const night = /night|dusk|storm|interior/.test(o.mood || 'night');
+  if (winSide) { const ww = o.windowW || Math.min(3.2, w * 0.4), wh = o.windowH || 1.6; const night = o.view ? o.view !== 'day' : /night|dusk|storm|interior/.test(o.mood || st.moodName || 'night');
     const view = canvasTex(512, 256, (g, W, H) => { const gr = g.createLinearGradient(0, 0, 0, H); (night ? ['#120c30', '#2a1c5a', '#5a3a7a'] : ['#7aa8e8', '#b8d4f4', '#f0e6d8']).forEach((c, i) => gr.addColorStop(i / 2, c)); g.fillStyle = gr; g.fillRect(0, 0, W, H); const rr = rng(4); let x = 0; while (x < W) { const bw = 20 + rr() * 50, bh = H * (0.3 + rr() * 0.6); g.fillStyle = night ? '#140f28' : '#8a96b8'; g.fillRect(x, H - bh, bw, bh); if (night) for (let yy = H - bh + 6; yy < H - 4; yy += 9) for (let xx = x + 4; xx < x + bw - 4; xx += 7) if (rr() < 0.35) { g.fillStyle = 'rgba(255,200,120,.9)'; g.fillRect(xx, yy, 3, 4); } x += bw + 2; } if (night) { g.fillStyle = 'rgba(255,255,255,.9)'; g.beginPath(); g.arc(W * 0.78, H * 0.22, 14, 0, 7); g.fill(); } });
     const pane = new THREE.Mesh(new THREE.PlaneGeometry(ww, wh), new THREE.MeshBasicMaterial({ map: view, color: new THREE.Color(1.05, 1.05, 1.05), toneMapped: false })); const fr = mat('#e8e2d8', { rough: 0.6 });
     win = group(pane, box(ww + 0.16, 0.08, 0.14, fr, 0, wh / 2, 0.04), box(ww + 0.16, 0.12, 0.25, fr, 0, -wh / 2, 0.08), box(0.08, wh, 0.14, fr, -ww / 2, 0, 0.04), box(0.08, wh, 0.14, fr, ww / 2, 0, 0.04), box(0.05, wh, 0.1, fr, 0, 0, 0.04));
@@ -273,7 +275,7 @@ export function park(st, o = {}) {
   const lit = new Set(nearest(lamps, o.focus || [0, 0], o.lights ?? 3));
   for (const L of lamps) { const l = streetLamp({ light: lit.has(L), h: 4, mood: o.mood }); l.position.set(L.x, 0, L.z); st.add(l); }
   st.add(skyline({ color: shade(M.wall, -0.35), seed: 11, height: 40, tint: '#b8b0e0' }));
-  if (o.stars !== false) st.add(stars(300));
+  if (o.stars ?? /night|storm/.test(o.mood || st.moodName || 'night')) st.add(stars(300));
   return { lamps };
 }
 // void / studio: endless dark floor with a soft spotlight pool — for explanations, title reveals, "imagine…" moments
@@ -291,7 +293,7 @@ export function studio(st, o = {}) {
 // A flat purple backdrop with a faint grid, a floor that meets it in a thin light line, a soft overhead light.
 // Stand small characters on the line (z = lineZ), frame front-on with a long lens (fov 18–28), add 2D pills/cards in overlay().
 export function explainer(st, o = {}) {
-  const c = o.color || S().ui?.explainBg || '#3b2c63', lineZ = o.lineZ ?? 0;
+  const c = o.color || S().ui?.explainBg3d || S().ui?.explainBg || '#3b2c63', lineZ = o.lineZ ?? 0;
   st.scene.background = color(shade(c, -0.35)); st.scene.fog = null;
   const grid = cached('explainGrid' + c, () => canvasTex(1024, 512, (g, W, H) => { const gr = g.createRadialGradient(W / 2, H * 0.55, 0, W / 2, H * 0.55, W * 0.6); gr.addColorStop(0, shade(c, 0.12)); gr.addColorStop(1, shade(c, -0.25)); g.fillStyle = gr; g.fillRect(0, 0, W, H); g.strokeStyle = 'rgba(255,255,255,.03)'; g.lineWidth = 1; for (let x = 0; x <= W; x += 12) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, H); g.stroke(); } for (let y = 0; y <= H; y += 12) { g.beginPath(); g.moveTo(0, y); g.lineTo(W, y); g.stroke(); } }));
   const back = new THREE.Mesh(new THREE.PlaneGeometry(o.w || 40, o.h || 20), new THREE.MeshBasicMaterial({ map: grid, toneMapped: true })); back.position.set(0, (o.h || 20) / 2 - 2, lineZ - 0.6); st.add(back);

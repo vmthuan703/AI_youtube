@@ -1,8 +1,8 @@
 // engine/core.js — shared runtime for every shot (2D overlays use LOGICAL units):
 // 16:9 stage = 1920x1080, 9:16 stage = 1080x1920. The player scales to output pixels.
-import { STYLES, BASE_MOODS } from './styles.js';
+import { STYLES, BASE_MOODS, PALETTES } from './styles.js';
 
-export const E = { W: 1920, H: 1080, PX: 1, fps: 24, vertical: false, style: null, styleId: 'cinematic', cfg: {}, words: [], shots: [] };
+export const E = { W: 1920, H: 1080, PX: 1, fps: 24, vertical: false, style: null, styleId: 'pearl', palette: null, curMood: null, cfg: {}, words: [], lines: [], shots: [] };
 export const V = (h, v) => (E.vertical ? v : h);           // pick a value by aspect: V(landscape, vertical)
 
 // ---------- math / timing ----------
@@ -71,9 +71,18 @@ export const alpha = (c, a) => { const x = rgb(c); return css([x[0], x[1], x[2],
 export const shade = (c, k) => (k < 0 ? mix(c, '#000000', -k) : mix(c, '#ffffff', k));
 
 // ---------- style / moods ----------
-export function setStyle(id) { E.styleId = STYLES[id] ? id : 'cinematic'; E.style = STYLES[E.styleId]; }
-// mood('night') -> { sky:[...], ambient, key, rim, wall, floor, dark, practical, fog }
-export function mood(name = 'night') { const base = BASE_MOODS[name] || BASE_MOODS.night; return { ...base, ...(E.style.moods?.[name] || {}) }; }
+// setStyle('pearl', 'tropic'): a style re-grades every mood; an optional palette gives this one video its own colour world.
+export function setStyle(id, palette = null) {
+  E.styleId = STYLES[id] ? id : 'pearl'; E.palette = PALETTES[palette] ? palette : null;
+  const pal = E.palette ? PALETTES[E.palette] : null, base = STYLES[E.styleId];
+  E.style = pal?.grade ? { ...base, grade: { ...base.grade, ...pal.grade } } : base;
+}
+// mood('night') -> { sky:[...], ambient, key, rim, wall, floor, dark, practical, fog, houses?, tree?, skyline? }
+// Called without a name it uses the mood of the stage being built, so props match their set.
+export function mood(name) {
+  const n = name || E.curMood || 'night', base = BASE_MOODS[n] || BASE_MOODS.night;
+  return { ...base, ...(E.style.moods?.[n] || {}), ...(E.palette ? PALETTES[E.palette]?.moods?.[n] || {} : {}) };
+}
 export const S = () => E.style;   // current style tokens (ink, feature, ui colours, grade)
 
 // ---------- drawing primitives (logical units) ----------

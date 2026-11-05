@@ -1,9 +1,9 @@
 {
   "name": "aitrends-3d-studio",
-  "version": "0.1.0",
-  "description": "Turn a script into a finished 3D animated story video: open-source voiceover (Kokoro TTS), word timings, story breakdown, code-built 3D sets and toon stick characters (Three.js), style choice, frame-by-frame render up to 4K / 60 fps, generated music and SFX, final MP4.",
+  "version": "0.2.0",
+  "description": "Turn a script into a finished 3D animated story video: channel identity kit, script check, emotional open-source voiceover (Chatterbox, Kokoro fallback), word timings, story breakdown, code-built 3D sets and stick characters (Three.js), animated explainer diagrams, style and palette choice, frame-by-frame render up to 4K / 60 fps, generated music and SFX, quality scorecard, final MP4.",
   "author": {
     "name": "aiTrends"
   },
-  "keywords": ["video", "3d animation", "faceless youtube", "what if", "stick figure", "three.js", "tts", "kokoro", "explainer"]
+  "keywords": ["video", "3d animation", "faceless youtube", "what if", "stick figure", "three.js", "tts", "chatterbox", "kokoro", "explainer"]
 }

@@ -1,0 +1,57 @@
+{
+  "snapshot_date": "2026-11-06",
+  "started_at": "2026-11-05T17:30:29.892950+00:00",
+  "quota_budget": 6000,
+  "markets": {
+    "whatif-us": {
+      "name": "What-If Fiction × Mỹ",
+      "region": "US",
+      "queries_run": [
+        "what if you",
+        "what if story animated",
+        "what if you had infinite iq",
+        "what if you had 1000 iq",
+        "what if you could see the future",
+        "what if you were reborn with memories",
+        "what if you could read minds",
+        "what if you could stop time",
+        "what if you had superpowers",
+        "what if you could see everyone's secrets",
+        "what if you woke up",
+        "what if everyone could",
+        "what if you were the only one",
+        "what if you could rewind time",
+        "what if you became invisible",
+        "what if you got one impossible ability",
+        "what if you could control luck",
+        "what if you lived forever",
+        "what if your phone",
+        "hypothetical story animation"
+      ],
+      "queries_skipped": [],
+      "errors": [],
+      "discovery_rows": 960,
+      "seeded": [],
+      "added": [
+        "Matal",
+        "BrainBracket",
+        "Stick Knows",
+        "The Hypothetical Room",
+        "Just Suppose ?",
+        "Stick Saga"
+      ],
+      "not_added_registry_full": []
+    }
+  },
+  "pruned_off_niche": [
+    "Matal (14% khớp)",
+    "BrainBracket (43% khớp)",
+    "Stick Knows (4% khớp)",
+    "Stick Saga (33% khớp)"
+  ],
+  "tracked_channels": 54,
+  "tracked_videos": 1229,
+  "tracking_skipped": [],
+  "quota_used": 2176,
+  "finished_at": "2026-11-05T17:31:16.414507+00:00"
+}

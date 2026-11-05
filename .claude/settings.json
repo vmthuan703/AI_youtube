@@ -6,8 +6,7 @@
     "ai-youtube": {
       "source": {
         "source": "github",
-        "repo": "vmthuan703/AI_youtube",
-        "ref": "claude/sleepy-wright-g261jn"
+        "repo": "vmthuan703/AI_youtube"
       }
     }
   }

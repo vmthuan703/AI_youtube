@@ -60,10 +60,9 @@ Bản xuất: H.264 High, BT.709, AAC 48 kHz 384 kb/s, đúng khuyến nghị t�
   Khi được hỏi có tin thư mục và cài marketplace `ai-youtube` không, chọn đồng ý.
 - **Cài cho mọi thư mục trên máy** (Claude Code):
   ```bash
-  /plugin marketplace add vmthuan703/AI_youtube#claude/sleepy-wright-g261jn
+  /plugin marketplace add vmthuan703/AI_youtube
   /plugin install aitrends-3d-studio@ai-youtube
   ```
-  Khi plugin đã gộp vào `main` thì bỏ phần `#claude/sleepy-wright-g261jn`.
 - **Claude Desktop / claude.ai** (giống plugin 2D): `bash plugins/build_zip.sh`, rồi tải
   `dist/aitrends-3d-studio-0.1.0.zip` lên mục Plugins trên claude.ai.
 

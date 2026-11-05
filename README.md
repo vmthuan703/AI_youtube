@@ -142,7 +142,7 @@ Xem thêm: ví dụ nhỏ tại `aitrends-2d-studio/examples/reaction-time/`, d�
 
 **Dựng video 3D từ kịch bản (plugin `aitrends-3d-studio`):**
 ```bash
-/plugin marketplace add vmthuan703/AI_youtube#claude/sleepy-wright-g261jn
+/plugin marketplace add vmthuan703/AI_youtube
 /plugin install aitrends-3d-studio@ai-youtube
 ```
 Mở repo này bằng Claude Code thì không cần hai lệnh trên: `.claude/settings.json` đã khai báo plugin (đồng ý khi được hỏi).

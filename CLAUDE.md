@@ -26,3 +26,10 @@
   người dùng rút gọn trước. Chỉ rút gọn khi người dùng đồng ý.
 - Khi người dùng phải nhắc cùng một yêu cầu đến lần thứ 2, tự ghi yêu cầu đó
   thành quy tắc trong `CLAUDE.md` (rồi tự commit và push như ngoại lệ ở trên).
+
+## Dọn dẹp sau mỗi lần thay đổi
+- Sau mỗi lần `git push` lên GitHub, hoặc sau khi sửa trực tiếp file trên máy,
+  đề xuất danh sách có thể xóa: file, nhánh (cục bộ và remote), thư mục, mục
+  trong file (ví dụ `README.md`, `ke-hoach/`), kèm lý do từng mục.
+- Chỉ đề xuất, không xóa. Chỉ xóa đúng những mục người dùng đã đồng ý.
+- Không tính "người dùng im lặng" là đồng ý; mỗi lần đề xuất hỏi lại một lần.

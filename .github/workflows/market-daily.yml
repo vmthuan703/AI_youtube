@@ -103,9 +103,10 @@ jobs:
           if [ -n "$OPEN" ]; then
             gh issue comment "$OPEN" --body "Lỗi tiếp ngày $NGAY: $RUN_URL"
           else
+            BODY="$(printf '%s\n\n%s' \
+              "Lượt chạy lỗi: $RUN_URL" \
+              "Nguyên nhân hay gặp: thiếu hoặc sai secret YOUTUBE_API_KEY, hết quota YouTube, nhánh research/reports bị chặn push. Đọc log ở link trên. Sửa xong thì đóng Issue này.")"
             gh issue create --label workflow-loi \
               --title "Workflow thu thập hằng ngày lỗi ($NGAY)" \
-              --body "Lượt chạy lỗi: $RUN_URL
-
-Nguyên nhân hay gặp: thiếu hoặc sai secret YOUTUBE_API_KEY, hết quota YouTube, nhánh research/reports bị chặn push. Đọc log ở link trên. Sửa xong thì đóng Issue này."
+              --body "$BODY"
           fi

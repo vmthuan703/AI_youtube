@@ -14,59 +14,66 @@
 <!-- DAILY:START -->
 ## Báo cáo hôm nay
 
-_Cập nhật tự động 2026-11-04. Số liệu từ YouTube Data API, đối chiếu bằng tay trước khi quyết định._
+_Cập nhật tự động 2026-11-06. Số liệu từ YouTube Data API, đối chiếu bằng tay trước khi quyết định._
 
-### Tóm tắt thu thập 2026-11-04
+### Tóm tắt thu thập 2026-11-06
 
-- Quota đã dùng: 2170 / ngân sách 6000 đơn vị
-- Kênh theo dõi: 52 · video đã chụp: 1163
+- Quota đã dùng: 2176 / ngân sách 6000 đơn vị
+- Kênh theo dõi: 54 · video đã chụp: 1229
 
 #### What-If Fiction × Mỹ
 
 - Truy vấn đã chạy: 20 · bỏ qua: 0 · lỗi: 0
-- Kênh mới thêm vào theo dõi: Matal, Vanessa Harris, Stick Revival, Nick ifverse, Nearside, Toonists, BrainBracket, Stick Knows, Then What?, Minute Zero Extra, The If Lab, My Academia Recap, Sual, The Frame One, IFSIM FILMS, What If That, What if U click, Mirage
-- Kênh bỏ khỏi theo dõi vì lệch ngách: Matal (14% khớp), BrainBracket (43% khớp), Stick Knows (3% khớp)
-- Bảng chấm nhanh (chỉ dữ liệu hôm nay): **CẦN THEO DÕI** · tuổi trung vị top 5: 57.3 tháng · video ≥ 100k: 220
+- Kênh mới thêm vào theo dõi: Matal, BrainBracket, Stick Knows, The Hypothetical Room, Just Suppose ?, Stick Saga
+- Kênh bỏ khỏi theo dõi vì lệch ngách: Matal (14% khớp), BrainBracket (43% khớp), Stick Knows (4% khớp), Stick Saga (33% khớp)
+- Bảng chấm nhanh (chỉ dữ liệu hôm nay): **CẦN THEO DÕI** · tuổi trung vị top 5: 19.3 tháng · video ≥ 100k: 231
 
 | Kênh mới thắng | Tuổi (ngày) | Sub | Video to nhất |
 |---|---|---|---|
-| Minute Zero | 24 | 21.600 | 2.241.643 |
-| Araragi | 115 | 22.700 | 1.374.705 |
-| ConChaser | 11 | 14.600 | 1.313.338 |
-| OminiAM | 28 | 6.340 | 1.142.835 |
-|  Jeremy Bearimy | 24 | 32.000 | 1.062.186 |
-| Earth Tipping | 35 | 1.500 | 943.197 |
-| Manifesting | 23 | 4.740 | 942.459 |
-| IFOLOGY | 25 | 51.600 | 902.342 |
-| What If Animations | 32 | 6.080 | 875.857 |
-| Miko | 17 | 7.300 | 715.276 |
+| Minute Zero | 26 | 21.900 | 2.271.217 |
+| Araragi | 117 | 23.000 | 1.394.135 |
+| ConChaser | 12 | 16.400 | 1.376.773 |
+|  Jeremy Bearimy | 25 | 37.500 | 1.364.122 |
+| OminiAM | 30 | 6.480 | 1.155.348 |
+| Earth Tipping | 37 | 1.500 | 950.658 |
+| Manifesting | 24 | 4.970 | 949.746 |
+| IFOLOGY | 26 | 52.800 | 914.845 |
+| What If Animations | 33 | 6.090 | 876.803 |
+| Miko | 19 | 7.630 | 751.384 |
 
-Xem thêm: [dữ liệu ngày 2026-11-04](https://github.com/vmthuan703/AI_youtube/blob/research/reports/data/2026-11-04/TOM_TAT.md)
+Xem thêm: [dữ liệu ngày 2026-11-06](https://github.com/vmthuan703/AI_youtube/blob/research/reports/data/2026-11-06/TOM_TAT.md)
 
 <!-- DAILY:END -->
 
 <!-- WEEKLY:START -->
 ## Báo cáo tuần mới nhất
 
-_Báo cáo 2026-11-03_moc · nguồn `BAO_CAO_DOI_THU.md`. Chỉ trích phần đầu, bản đầy đủ ở link bên dưới._
+_Báo cáo 2026-W45 · nguồn `SO_LIEU.md`. Chỉ trích phần đầu, bản đầy đủ ở link bên dưới._
 
-### 1. Kết luận nhanh
+#### Bảng chấm ô
 
-- **Cửa đang mở, nhưng mẫu bị lệch về kênh trẻ.** 17/26 kênh có video dài ≥ 100k khi chưa đầy 3 tháng tuổi.
-  Tuổi trung vị của 5 kênh có video to nhất là 0,8 tháng. Danh sách kênh mồi lấy từ trang theo dõi
-  *kênh mới*, nên kết luận này phải chờ discovery kiểm lại.
-- **View trung vị của video ≥ 100k là 285.537** (61 video), nằm trong vùng tốt 150k–600k. Chưa có dấu
-  hiệu kênh cũ ngồi sẵn.
-- **Ô đang trộn hai ngách.** Trong 5 kênh có video to nhất, chỉ 3 kênh làm what-if *về chính người xem*
-  (ConChaser, Manifesting, IFOLOGY). OminiAM và What If Animations làm what-if *về thế giới/khoa học*. Tỉ lệ
-  đúng ngách 3/5 = 60%, dưới ngưỡng 80%.
-- **Khung tiêu đề mạnh nhất là "What If You Could See Everyone's ___?"**: 23 video ở 11 kênh, 6 kênh có
-  video ≥ 100k, 4 kênh có video bung. ConChaser làm toàn bộ bằng khung này và đạt trung vị 194.047
-  view trên 11 video, khi kênh mới 10 ngày tuổi.
-- **Chủ đề ít người làm mà vẫn bung:** "Làm lại cuộc đời với ký ức cũ" (7 video, bung ở 2 kênh) và
-  "IQ vượt trội" (17 video ở 5 kênh, bung ở 2 kênh).
+| Điều kiện | Ngưỡng | Số đo | Kết quả |
+|---|---|---|---|
+| Có kênh ≤ 3 tháng đã có video ≥ 100k | có |  Jeremy Bearimy, ConChaser, DOOMPERK, Earth Tipping, IFOLOGY (+28 kênh) | đạt |
+| Tuổi trung vị 5 kênh có video to nhất | ≤ 12 tháng | 57.3 tháng (ngày tạo kênh, video cũ nhất) | không |
+| view/sub trung vị (5 kênh đó) | ≥ 10× | 78.6 | đạt |
+| Số video dài ≥ 100k | ≥ 8 (cần, không đủ) | 220 | đạt |
+| View trung vị của video ≥ 100k | 150k–600k | 256.989 | đạt |
+| Kênh đúng ngách (top 5, tự động theo tiêu đề) | ≥ 80% | 2/2 kênh có đủ tiêu đề | — |
 
-Xem thêm: [báo cáo đầy đủ 2026-11-03_moc](https://github.com/vmthuan703/AI_youtube/blob/research/reports/reports/2026-11-03_moc/BAO_CAO_DOI_THU.md) · [mọi báo cáo tuần](https://github.com/vmthuan703/AI_youtube/blob/research/reports/reports/INDEX.md)
+5 kênh có video to nhất (dùng cho 3 dòng tuổi, view/sub, đúng ngách; **cần đọc tay xác minh đúng ngách**, kênh sai thì thêm vào `exclude_channels` trong config):
+
+| Kênh | Tuổi (ngày) | Sub | Video to nhất | Tỉ lệ tiêu đề khớp |
+|---|---|---|---|---|
+| Ifverse | 1.742 | 59.500 | 4.679.653 | chưa theo dõi |
+| Minute Zero | 25 | 21.600 | 2.241.643 | 100% |
+| Peekaboo Kidz | 4.533 | 7.910.000 | 1.886.460 | chưa theo dõi |
+| Kian Odyssey | 2.401 | 4.940 | 1.862.452 | chưa theo dõi |
+| Itadorists | 316 | 42.700 | 1.830.971 | 85% |
+
+**Kết luận số: CẦN THEO DÕI.** Tuổi kênh dự báo mạnh nhất. View trung vị càng cao thì cửa càng đóng.
+
+Xem thêm: [báo cáo đầy đủ 2026-W45](https://github.com/vmthuan703/AI_youtube/blob/research/reports/reports/2026-W45/SO_LIEU.md) · [mọi báo cáo tuần](https://github.com/vmthuan703/AI_youtube/blob/research/reports/reports/INDEX.md)
 
 <!-- WEEKLY:END -->
 

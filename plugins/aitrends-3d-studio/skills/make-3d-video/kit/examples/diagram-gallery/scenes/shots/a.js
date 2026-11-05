@@ -4,7 +4,7 @@ import * as UI from '/engine/ui2d.js';
 import * as D from '/engine/diagrams2d.js';
 import { HERO } from '/channel/cast.js';
 
-const H = { color: HERO.color, hairColor: HERO.hairColor, hair: 'spiky', seams: true };
+const H = { color: HERO.color, hairColor: HERO.hairColor, hair: HERO.hair, seams: true };
 
 registerShot('home', {
   init(T) { const st = T.stage({ mood: 'interiorWarm', fov: 40, fog: [8, 30] }); T.W.room(st, { kind: 'classroom', w: 9, d: 8, h: 3.2, desks: true }); const h = st.add(T.character(HERO).place(0, 0, 0.4, 0)); return { st, h }; },

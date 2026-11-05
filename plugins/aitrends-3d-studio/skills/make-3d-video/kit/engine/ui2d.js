@@ -96,6 +96,8 @@ export function captions(g, globalT, o = {}) {
 const LF = () => (S().ui.labelFont === 'serif' ? FONTS.serif : FONTS.ui);
 const popK = (t, start = 0) => (t == null ? 1 : ease.outBack(prog(t, start, start + 0.35)));
 // "1 IN 1,000", "$10,000", "40,000": dark translucent pill, thin light border, bold caps (gold: true for key numbers)
+// full width of a pill, to place it against something
+export const pillWidth = (g, str, size, icon = null) => { const f = LF(), w8 = f === FONTS.serif ? 700 : 900; return measure(g, str, size, f, w8) + (icon ? size * 1.05 : 0) + size * 1.1; };
 export function pill(g, o = {}) {
   const { str = '1 IN 1,000', x = E.W / 2, y = V(140, 260), size = V(48, 56), gold = false, color = null, a = 1, t = null, start = 0, icon = null, bg = null, line = null } = o;
   const k = popK(t, start); if (k <= 0.001 || a <= 0) return; const f = LF(), w8 = f === FONTS.serif ? 700 : 900;

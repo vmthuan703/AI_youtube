@@ -1,7 +1,7 @@
 # aiTrends 3D Studio
 
 Plugin Claude Code biến **một kịch bản** thành **video hoạt hình 3D hoàn chỉnh** theo phong cách "What if…":
-nhân vật người que 3D đầu tròn to, hero áo phao chanh tóc đồng, bối cảnh đơn giản mà điện ảnh, ánh sáng hoàng hôn phấn,
+nhân vật người que 3D đầu tròn to, hero áo phao chanh tóc bạch kim anime, bối cảnh đơn giản mà điện ảnh, ánh sáng hoàng hôn phấn,
 khung hình 2:1, sơ đồ giải thích hoạt hình.
 
 Mọi khung hình đều dựng bằng code (Three.js) và render từng khung một. Không dùng AI tạo ảnh/video, nên nhân vật

@@ -6,7 +6,7 @@ text is the spec. The section "Measured from the reference videos" at the end ha
 never copy a reference's devices, gags or wording.
 
 ## The channel's identity (does not change between videos)
-- **Hero:** quilted lime puffer and copper spiky hair (`channel/cast.js`). The rest of the cast is calmer, so the eye always finds the hero.
+- **Hero:** quilted lime puffer and platinum anime hair (`channel/cast.js`). The rest of the cast is calmer, so the eye always finds the hero. Near-white, silver or pale blond hair belongs to the hero only: give everyone else a clearly darker or warmer colour, so the hero is recognisable from the hair alone.
 - **Voice:** the emotional `am_puck` narrator through Chatterbox.
 - **Picture:** a 2:1 frame with black bars (`bars: "cine"`), soft contrast, lifted shadows (`pearl`).
 - **Purple stage:** muted aubergine with a faint grid and warm gold labels, the same in every palette.
@@ -32,7 +32,7 @@ simple characters, real staging, real light.
   `cinematic` adds a thin dark outline like the "crush" video, `soft` has none like the "luck" video; `ink` → black +
   big white eyes + lavender rim). Pale heads glow faintly so they never go muddy, even back-lit. Don't mix skins
   inside one video unless the story needs it (a ghost, an alien, the "real you" vs a clone).
-- **Girls and variety** (as in the references): bob/long/ponytail hair helmets with bangs (`hair`, `hairColor`), a bow,
+- **Girls and variety** (as in the references): soft bob/long/ponytail hair with curved bangs (`hair`, `hairColor`), a bow,
   `lashes`, a `skirt` under a tee or hoodie, or a `dress`. Boys: caps (`cap`/`capBack`), beanies, short hair.
   Adults: `suit` + `tie`, `vest` (dealer, waiter), `labcoat`, `scale` 1.1–1.2. `blush` only on a character the story calls for, not by default.
 - **Legs:** bare stick legs and round feet by default, hero included. Add `legs` or `shoes` only when the story needs them (a suit, a uniform, sports).

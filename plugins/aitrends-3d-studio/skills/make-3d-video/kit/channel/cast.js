@@ -2,8 +2,8 @@
 // In a project: import { HERO } from '/channel/cast.js';   export const JAY = { ...HERO, speaker: 'JAY' };
 // `speaker` is the name used in the script: speech bubbles and lip-sync find the character by it.
 
-// The hero: quilted lime puffer and copper hair. This look is the channel's signature; the plain outfits around it stay calmer.
-export const HERO = { top: 'puffer', color: '#b4f02e', color2: '#6fae1e', hair: 'spiky', hairColor: '#e0632a', legs: null, shoes: null };
+// The hero: quilted lime puffer and platinum anime hair. This look is the channel's signature. Nobody else gets near-white hair, and the plain outfits around it stay calmer.
+export const HERO = { top: 'puffer', color: '#b4f02e', color2: '#6fae1e', hair: 'anime', hairColor: '#e8ecf6', hairShade: '#6f7fb8', legs: null, shoes: null };
 
 // Starting points for supporting characters. Bare stick legs and round feet by default; add legs/shoes only when the story needs them.
 export const FRIEND = { top: 'hoodie', color: '#e0402e', head: 'capBack', headColor: '#f2c21a' };

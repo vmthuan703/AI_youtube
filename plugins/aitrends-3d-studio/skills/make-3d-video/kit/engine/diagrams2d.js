@@ -22,7 +22,7 @@ export function stage2d(g, o = {}) {
   if (o.floor !== false) { g.fillStyle = 'rgba(10,6,24,.28)'; g.fillRect(0, fy, E.W, E.H - fy); g.fillStyle = 'rgba(255,241,220,.3)'; g.fillRect(0, fy, E.W, 2); }
 }
 // ---------------------------------------------------------------- people
-// flat 2D stand-in for a cast member: flatFigure(g, { x, y, h: 420, color, hairColor, hair: 'spiky'|'short'|'bob'|'none', expr: 'neutral'|'deadpan'|'happy'|'shock', pose: 'stand'|'point'|'cheer'|'shrug', mirror })
+// flat 2D stand-in for a cast member: flatFigure(g, { x, y, h: 420, color, hairColor, hair: 'anime'|'spiky'|'short'|'bob'|'none', expr: 'neutral'|'deadpan'|'happy'|'shock', pose: 'stand'|'point'|'cheer'|'shrug', mirror })
 export function flatFigure(g, o = {}) {
   const { x = 300, y = E.H - 150, h = 420, color = '#b4f02e', hairColor = null, hair = hairColor ? 'short' : 'none', skin = '#efe8f0', expr = 'neutral', pose = 'stand', mirror = false, t = null, start = 0, seams = false } = o;
   enter(g, t, start, x, y, (h / 180) * (mirror ? 1 : 1), () => {
@@ -35,7 +35,8 @@ export function flatFigure(g, o = {}) {
     if (seams) { g.strokeStyle = shade(color, -0.28); g.lineWidth = 2.5; for (const yy of [-88, -76, -64, -52]) { g.beginPath(); g.moveTo(-24, yy); g.lineTo(24, yy); g.stroke(); } }
     g.strokeStyle = skin; g.lineWidth = 6; g.beginPath(); g.moveTo(0, -100); g.lineTo(0, -112); g.stroke();
     g.beginPath(); g.arc(0, -138, 30, 0, 7); fillStroke(g, skin, 2.5);
-    if (hair !== 'none') { g.fillStyle = hairColor || '#6a3f26'; if (hair === 'spiky') for (const [sx, hh] of [[-20, 10], [-11, 15], [-2, 18], [7, 15], [16, 12]]) { g.beginPath(); g.moveTo(sx - 7, -158); g.lineTo(sx, -158 - hh); g.lineTo(sx + 7, -158); g.fill(); } g.beginPath(); g.ellipse(0, -158, 24, 8, 0, 0, 7); g.fill(); if (hair === 'bob') { g.beginPath(); g.arc(0, -140, 32, Math.PI * 0.95, Math.PI * 2.05); g.fill(); rr(g, -32, -142, 10, 30, 5); g.fill(); rr(g, 22, -142, 10, 30, 5); g.fill(); } }
+    if (hair === 'anime') { g.beginPath(); [[-31, -138], [-44, -146], [-32, -156], [-43, -176], [-25, -170], [-26, -194], [-10, -178], [0, -202], [10, -178], [26, -194], [25, -170], [43, -176], [32, -156], [44, -146], [31, -138], [24, -152], [15, -145], [8, -155], [0, -146], [-8, -155], [-15, -145], [-24, -152]].forEach(([px, py], i) => (i ? g.lineTo(px, py) : g.moveTo(px, py))); g.closePath(); fillStroke(g, hairColor || '#e8ecf6', 2.5); }
+    else if (hair !== 'none') { g.fillStyle = hairColor || '#6a3f26'; if (hair === 'spiky') for (const [sx, hh] of [[-20, 10], [-11, 15], [-2, 18], [7, 15], [16, 12]]) { g.beginPath(); g.moveTo(sx - 7, -158); g.lineTo(sx, -158 - hh); g.lineTo(sx + 7, -158); g.fill(); } g.beginPath(); g.ellipse(0, -158, 24, 8, 0, 0, 7); g.fill(); if (hair === 'bob') { g.beginPath(); g.arc(0, -140, 32, Math.PI * 0.95, Math.PI * 2.05); g.fill(); rr(g, -32, -142, 10, 30, 5); g.fill(); rr(g, 22, -142, 10, 30, 5); g.fill(); } }
     g.fillStyle = '#1a1420'; g.strokeStyle = '#1a1420'; g.lineWidth = 2.4;
     if (expr === 'deadpan') { g.beginPath(); g.moveTo(-16, -138); g.lineTo(-5, -138); g.moveTo(6, -138); g.lineTo(17, -138); g.stroke(); }
     else if (expr === 'happy') { g.beginPath(); g.arc(-10, -136, 4.5, Math.PI * 1.1, Math.PI * 1.9); g.moveTo(16, -136); g.arc(11, -136, 4.5, Math.PI * 1.1, Math.PI * 1.9); g.stroke(); }

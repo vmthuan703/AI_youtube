@@ -3,7 +3,7 @@
 //   config.json: "subscribeGag": { "enabled": true, "at": 90, "dur": 5, "label": "SUBSCRIBE", "done": "SUBSCRIBED" }
 // The outfit comes from channel/cast.js (HERO). audio/mix.py adds the pop and click cues from the same settings.
 import { E, clamp, ease, prog, lerp } from './core.js';
-import { pill } from './ui2d.js';
+import { pill, pillWidth } from './ui2d.js';
 
 let G = null, three = null, make = null, cfg = null, outfit = null;
 const LW = 620, LH = 880;   // logical size of the gag canvas, anchored bottom-right
@@ -12,7 +12,7 @@ export async function prepareGag(t3, mk) {
   cfg = E.cfg.subscribeGag; if (!cfg || !cfg.enabled || E.vertical) { cfg = null; return; }
   make = mk; three = t3 || await import('./kit3d.js');
   try { outfit = (await import('/channel/cast.js')).HERO; } catch { outfit = null; }
-  outfit = outfit || { top: 'puffer', color: '#b4f02e', color2: '#6fae1e', hair: 'spiky', hairColor: '#e0632a' };
+  outfit = outfit || { top: 'puffer', color: '#b4f02e', color2: '#6fae1e', hair: 'anime', hairColor: '#e8ecf6', hairShade: '#6f7fb8' };
 }
 
 function setup() {
@@ -47,7 +47,8 @@ export function drawGag(mg, t) {
   // the button sits in the hand, under the hero's fingers
   mg.save(); mg.setTransform(E.PX, 0, 0, E.PX, 0, 0);
   const label = done ? (cfg.done || 'SUBSCRIBED') : (cfg.label || 'SUBSCRIBE');
-  pill(mg, { str: label, x: hx - 138, y: hy + 6, size: 38, icon: done ? 'check' : null, t: lt, start: 0.3, a: clamp(1 - outK * 3), bg: done ? 'rgba(96,92,110,.95)' : '#d81e3f', line: 'rgba(255,255,255,.4)', color: '#ffffff' });
+  const icon = done ? 'check' : null;
+  pill(mg, { str: label, x: hx - 24 - pillWidth(mg, label, 38, icon) / 2, y: hy + 6, size: 38, icon, t: lt, start: 0.3, a: clamp(1 - outK * 3), bg: done ? 'rgba(96,92,110,.95)' : '#d81e3f', line: 'rgba(255,255,255,.4)', color: '#ffffff' });
   mg.restore();
   mg.save(); mg.setTransform(1, 0, 0, 1, 0, 0); mg.drawImage(canvas, Math.round(px * E.PX), Math.round(py * E.PX)); mg.restore();
 }

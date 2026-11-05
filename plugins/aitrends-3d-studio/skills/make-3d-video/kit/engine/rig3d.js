@@ -10,6 +10,7 @@
 //   hero.face({ expr: 'smirk', talk: talkAmount(info.globalT, a, b), blink: true, t, look: [0.3, 0] });
 //   hero.lookAt3([x, y, z])                      // turn the head toward a world point (call after pose)
 import * as THREE from 'three';
+import { buildHair } from './hair3d.js';
 import { S, clamp, lerp, mixVal, ease, prog, noise, shade } from './core.js';
 import { mat } from './kit3d.js';
 
@@ -227,7 +228,7 @@ const lum = (c) => { const k = new THREE.Color(c); return 0.2126 * k.r + 0.7152 
 //           top: 'hoodie'|'tshirt'|'jacket'|'suit'|'dress'|'labcoat'|'vest'|'none', color, color2 (trim), shirt,
 //           legs: pants colour | 'shorts:#hex' | null (bare stick legs), shoes: colour | null (round feet), shoeSole,
 //           gloves: colour (default: skin, i.e. ball hands), head: 'cap'|'capBack'|'beanie'|'hood'|'headband'|'crown'|'tophat',
-//           headColor, hair: 'short'|'messy'|'ponytail'|'bun'|'pigtails'|'bob'|'spiky'|'long', hairColor, bow,
+//           headColor, hair: 'anime'|'animeLow'|'short'|'messy'|'ponytail'|'bun'|'pigtails'|'bob'|'spiky'|'long', hairColor, hairShade, bow,
 //           face: 'glasses'|'sunglasses', tie, kid: bool, scale }
 export function character(outfit = {}, opts = {}) {
   const st = S();
@@ -305,7 +306,7 @@ export function character(outfit = {}, opts = {}) {
   let faceMesh = null;
   if (!ghost) { faceMesh = add(new THREE.Mesh(new THREE.SphereGeometry(B.headR * 1.003, 56, 36, Math.PI / 2 - FACE.phiSpan / 2, FACE.phiSpan, FACE.thStart, FACE.thSpan), faceMat), head); faceMesh.castShadow = false; faceMesh.receiveShadow = false; }
   const hc = outfit.headColor || '#f2c21a', hM = MAT(hc, { rough: 0.8, rim: 0.4 }); const hr = B.headR;
-  const hairC = outfit.hairColor || (dark ? skin : '#6a3f26'), hairM = MAT(hairC, { rough: 0.85, rim: 0.5 });
+  const hairC = outfit.hairColor || (dark ? skin : '#6a3f26');
   const hat = (m, k = 1.03) => { add(m, head); hull(m, k); return m; };
   if (outfit.head === 'cap' || outfit.head === 'capBack') { hat(new THREE.Mesh(new THREE.SphereGeometry(hr * 1.04, 32, 12, 0, Math.PI * 2, 0, Math.PI * 0.42), hM)).position.y = 0.01; const brim = add(new THREE.Mesh(new THREE.CylinderGeometry(hr * 0.75, hr * 0.75, 0.016, 28, 1, false, -1.1, 2.2), hM), head); brim.scale.set(1, 1, 1.2); brim.position.set(0, hr * 0.42, outfit.head === 'cap' ? hr * 0.72 : -hr * 0.72); if (outfit.head === 'capBack') brim.rotation.y = Math.PI; hull(brim, 1.04); }
   if (outfit.head === 'beanie') { const d = hat(new THREE.Mesh(new THREE.SphereGeometry(hr * 1.05, 32, 12, 0, Math.PI * 2, 0, Math.PI * 0.45), hM)); d.scale.y = 1.12; const cuff = add(new THREE.Mesh(new THREE.TorusGeometry(hr * 1.0, 0.028, 8, 32), hM), head); cuff.rotation.x = Math.PI / 2; cuff.position.y = hr * 0.25; const pom = add(new THREE.Mesh(unitSph, MAT(shade(hc, 0.25), { rim: 0.3 })), head); pom.scale.setScalar(0.055); pom.position.y = hr * 1.18; }
@@ -313,26 +314,7 @@ export function character(outfit = {}, opts = {}) {
   if (outfit.head === 'hood') { hat(new THREE.Mesh(new THREE.SphereGeometry(hr * 1.12, 32, 16, Math.PI * 0.85, Math.PI * 1.3, 0, Math.PI * 0.72), MAT(outfit.headColor || topC, { rough: 0.9, rim: 0.5, side: THREE.DoubleSide }))).position.set(0, 0.01, -0.01); }
   if (outfit.head === 'tophat') { hat(new THREE.Mesh(new THREE.CylinderGeometry(hr * 1.2, hr * 1.2, 0.015, 28), hM)).position.y = hr * 0.78; hat(new THREE.Mesh(new THREE.CylinderGeometry(hr * 0.72, hr * 0.75, hr * 1.1, 28), hM)).position.y = hr * 1.33; }
   if (outfit.head === 'crown') { const cr = add(new THREE.Mesh(new THREE.CylinderGeometry(hr * 0.7, hr * 0.6, hr * 0.45, 8, 1, true), MAT('#f2c21a', { metal: 0.6, rough: 0.35, rim: 0.4, side: THREE.DoubleSide })), head); cr.position.y = hr * 1.05; }
-  const hair = outfit.hair;
-  // hair = a helmet shell with a window for the face: top cap down to the bangs line + back/sides down to backTh
-  const helmet = (bangs, backTh, gap, k = 1.06) => {
-    const cap = hat(new THREE.Mesh(new THREE.SphereGeometry(hr * k, 40, 14, 0, Math.PI * 2, 0, bangs * D2R), hairM));
-    const back = hat(new THREE.Mesh(new THREE.SphereGeometry(hr * (k - 0.004), 40, 20, Math.PI / 2 + (gap / 2) * D2R, (360 - gap) * D2R, 0, backTh * D2R), hairM)); back.material.side = THREE.DoubleSide;
-    return [cap, back];
-  };
-  if (hair === 'bob' || hair === 'long') {
-    const [cap] = helmet(68, 122, 112, 1.07); cap.rotation.z = -0.12;             // side-parted bangs
-    if (hair === 'long') for (const sx of [-1, 1]) { const lk = add(new THREE.Mesh(new THREE.CapsuleGeometry(0.08, 0.28, 6, 12), hairM), head); lk.position.set(sx * hr * 0.78, -hr * 0.55, -hr * 0.35); hull(lk, 1.08); }
-  }
-  if (hair === 'short' || hair === 'messy' || hair === 'spiky') {
-    helmet(50, 98, 150, 1.05);
-    if (hair === 'spiky' || hair === 'messy') for (let i = 0; i < 7; i++) { const sp = add(new THREE.Mesh(new THREE.ConeGeometry(0.055, hair === 'spiky' ? 0.15 : 0.09, 7), hairM), head); const a = -1.2 + i * 0.4; sp.position.set(Math.sin(a) * hr * 0.55, hr * 0.97, Math.cos(a) * hr * 0.25 - 0.04); sp.rotation.set(-0.5, 0, -Math.sin(a) * 0.7); }
-  }
-  if (hair === 'ponytail' || hair === 'pigtails' || hair === 'bun') {
-    if (!dark) helmet(58, 104, 132, 1.055);
-    const tails = hair === 'pigtails' ? [-1, 1] : [0];
-    for (const sx of tails) { const tail = add(new THREE.Mesh(new THREE.CapsuleGeometry(0.07, hair === 'bun' ? 0.01 : 0.22, 6, 12), hairM), head); if (hair === 'bun') tail.position.set(0, hr * 0.98, -hr * 0.35); else if (sx) { tail.position.set(sx * hr * 0.95, -hr * 0.05, -hr * 0.35); tail.rotation.z = sx * 0.35; } else { tail.position.set(0, hr * 0.05, -hr * 1.0); tail.rotation.x = -0.5; } hull(tail, 1.08); }
-  }
+  if (outfit.hair) buildHair(outfit.hair, { head, hr, MAT, add, hull, olM, olW, color: hairC, shade: outfit.hairShade, dark, ghost });
   if (outfit.bow) { const bowM = MAT(outfit.bow, { rim: 0.4 }); const bow = new THREE.Group(); for (const sx of [-1, 1]) { const b = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.08, 4), bowM); b.rotation.z = sx * Math.PI / 2; b.position.x = sx * 0.04; bow.add(b); } bow.add(new THREE.Mesh(new THREE.SphereGeometry(0.022, 10, 8), bowM)); bow.position.set(hr * 0.42, hr * 0.86, hr * 0.2); bow.rotation.z = -0.4; add(bow, head); }
   if (outfit.face === 'glasses' || outfit.face === 'sunglasses') {
     const fm = MAT(outfit.face === 'sunglasses' ? '#111111' : '#2a2a2a', { rough: 0.3, rim: 0.2 });

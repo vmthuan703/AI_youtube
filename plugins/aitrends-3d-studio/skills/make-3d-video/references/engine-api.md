@@ -134,17 +134,15 @@ Outfit (put them in `scenes/cast.js`, one per recurring character, never change 
 ```js
 import { HERO as CHANNEL_HERO } from '/channel/cast.js';
 export const HERO = { ...CHANNEL_HERO, speaker: 'JAY' };                                   // quilted lime puffer, platinum anime hair; 'speaker' = name in the script
-export const JAKE = { top: 'tshirt', color: '#e0402e', head: 'capBack', headColor: '#f2c21a', legs: '#2a3a5a', shoes: '#f4f4f4' };
-export const MOM  = { top: 'dress', color: '#c05a8a', hair: 'bun', hairColor: '#5a3a2a' };
-export const MAYA = { top: 'hoodie', color: '#ee7aa8', hair: 'bob', hairColor: '#7a4a2e', bow: '#ff5a8a', blush: true, lashes: true };
-export const LILY = { top: 'tshirt', color: '#f0b030', skirt: '#7a4ab0', hair: 'long', hairColor: '#b0562e', blush: true };
-export const BOSS = { top: 'suit', color: '#22222a', tie: '#c02a2a', face: 'sunglasses', legs: '#22222a', shoes: '#111111', scale: 1.15 };
+export const NOAH = { ...RIVAL, speaker: 'NOAH' };                                         // import { HERO as CHANNEL_HERO, RIVAL } from '/channel/cast.js'; ready-made: FRIEND, RIVAL, GIRL, GIRL2, PARENT, TEACHER, STRANGER
+export const MAYA = { top: 'hoodie', color: '#8d4a6b', hair: 'fringe', hairColor: '#34262c', scarf: '#9c7a3a', lashes: true };   // a new character: own hair, one detail, a deep muted colour
+export const BOSS = { top: 'suit', color: '#22222a', tie: '#5e2230', face: 'sunglasses', legs: '#22222a', shoes: '#111111', scale: 1.15 };
 ```
 `skin` 'pale' | 'ink' | '#hex' (default from the style) · `eyes` 'dot' | 'big' · `top` hoodie | tshirt | jacket | suit |
 dress | labcoat | vest | puffer | none · `color`, `color2` (trim, quilting seams), `shirt`, `tie`, `strings` · `pop` 0–1 self-lit cloth, keeps a loud outfit loud in dim sets (puffer default 0.35) · `speaker` name in the script (bubbles) · `legs` pants colour | 'shorts:#hex' |
 null (bare stick legs) · `shoes` colour | null (round feet), `shoeSole` · `gloves` colour (default: ball hands in skin) ·
-`head` cap | capBack | beanie | hood | headband | tophat | crown, `headColor` · `hair` anime (tall crown, the hero's) | animeLow (same look, lower) | short | messy | spiky | bob | long |
-ponytail | pigtails | bun (soft hairlines, `engine/hair3d.js`), `hairColor`, `hairShade` (anime only: the shadow between locks), `bow` (colour) · `skirt` (colour, any top) · `blush`
+`head` cap | capBack | beanie | hood | headband | tophat | crown, `headColor` · `hair` anime (tall crown, the hero's) | animeLow (same look, lower) | short | messy | spiky | curls | quiff | sidePart | slick | bob | fringe | long | sidePony |
+ponytail | pigtails | bun (soft hairlines, `engine/hair3d.js`), `hairColor`, `hairShade` (anime only: the shadow between locks), `bow` (colour) · `skirt` (colour, any top) · one-detail accents, each a colour: `sleeves`, `stripe`, `scarf`, `collar`, `bag` · `blush`
 (true | colour) · `lashes: true` · `face` glasses | sunglasses · `kid: true` (74% size) · `scale` · `outline` (colour | false).
 
 Methods (all return the character, so they chain):

@@ -1,6 +1,6 @@
 // engine/hair3d.js — hair for the 3D character. Every kind is a shell whose hairline is a smooth function of the angle round the head,
 // so there is no straight "swim cap" edge. A thin dark sheet under the shell draws the hairline on the face, like a cartoon ink line.
-//   outfit.hair: 'anime' | 'animeLow' | 'spiky' | 'messy' | 'short' | 'bob' | 'long' | 'ponytail' | 'pigtails' | 'bun'
+//   outfit.hair: 'anime' | 'animeLow' | 'spiky' | 'messy' | 'short' | 'curls' | 'quiff' | 'sidePart' | 'slick' | 'bob' | 'fringe' | 'long' | 'sidePony' | 'ponytail' | 'pigtails' | 'bun'
 //   outfit.hairColor: main colour. outfit.hairShade: optional shadow colour for the anime kinds (grooves between locks).
 // 'anime' is one inflated volume cut into big pointed locks with wide chunks on top. Thin spines read as a hedgehog, so keep the chunks wide.
 import * as THREE from 'three';
@@ -20,16 +20,16 @@ function grid(pos, seg, rows, col) {
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); if (col) g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); g.setIndex(idx); g.computeVertexNormals(); return g;
 }
 // limit(az): how far the hair reaches, in degrees from the crown. az 0 faces forward, +90 is the character's left.
-function softShell(r, limit, lift = () => 0) {
-  const seg = 160, rows = 28, pos = [];
-  for (let j = 0; j <= rows; j++) for (let i = 0; i <= seg; i++) { const az = (i / seg) * 360 - 180, v = j / rows, p = orbit(az, limit(az) * v), R = r * (1 + lift(az, v)); pos.push(p[0] * R, p[1] * R, p[2] * R); }
-  return grid(pos, seg, rows);
+function softShell(r, limit, lift = () => 0, paint = null) {
+  const seg = 160, rows = 28, pos = [], col = paint ? [] : null;
+  for (let j = 0; j <= rows; j++) for (let i = 0; i <= seg; i++) { const az = (i / seg) * 360 - 180, v = j / rows, p = orbit(az, limit(az) * v), R = r * (1 + lift(az, v)); pos.push(p[0] * R, p[1] * R, p[2] * R); if (paint) { const c = paint(limit(az) * v); col.push(c.r, c.g, c.b); } }
+  return grid(pos, seg, rows, col);
 }
 // a copy pushed out along its normals: the outline hull, drawn back faces only
 function pushOut(geo, d) { const g = geo.clone(), P = g.attributes.position, N = g.attributes.normal; for (let i = 0; i < P.count; i++) P.setXYZ(i, P.getX(i) + N.getX(i) * d, P.getY(i) + N.getY(i) * d, P.getZ(i) + N.getZ(i) * d); return g; }
 const coneGeo = (r, h, dir, hr, out = 0.28) => { const g = new THREE.ConeGeometry(r, h, 10), d = new THREE.Vector3(...dir).normalize(); g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), d)); const p = d.multiplyScalar(hr * 1.02 + h * out); g.translate(p.x, p.y, p.z); return g; };
-const blobGeo = (r, x, y, z, sx = 1, sy = 1, sz = 1) => { const g = new THREE.SphereGeometry(r, 28, 18); g.scale(sx, sy, sz); g.translate(x, y, z); return g; };
-const shortLine = (front, nape, jag = 0, n = 9) => (az) => { const a = Math.abs(az), k = smooth(42, 118, a), wob = jag * Math.abs(Math.sin(az * D2R * n)); return front * (1 - k) + nape * k + wob * (1 - 0.55 * k); };
+const blobGeo = (r, x, y, z, sx = 1, sy = 1, sz = 1, rz = 0, rx = 0) => { const g = new THREE.SphereGeometry(r, 28, 18); g.scale(sx, sy, sz); if (rx) g.rotateX(rx); if (rz) g.rotateZ(rz); g.translate(x, y, z); return g; };
+const shortLine = (front, nape, jag = 0, n = 9) => (az) => { const a = Math.abs(az), k = smooth(42, 118, a), wob = jag * Math.abs(Math.sin(az * D2R * n)), dip = 13 * Math.exp(-Math.pow((180 - a) / 44, 2)); return front * (1 - k) + nape * k + wob * (1 - 0.55 * k) + dip; };
 const softLine = (front, back, part = 0) => (az) => { const a = Math.abs(az), k = smooth(34, 92, a); return (front + part * smooth(-40, 40, az)) * (1 - k) + back * k; };
 const puff = (az, v) => 0.06 * v * v;
 
@@ -93,6 +93,13 @@ function softKind(kind, hr, dark) {
   if (kind === 'short') return { shell: shortLine(56, 112), r: 1.035 };
   if (kind === 'messy') return { shell: shortLine(56, 112, 7), r: 1.035, extra: () => mergeGeometries([[-60, 28, 0.1, 0.075], [-20, 18, 0.13, 0.08], [25, 20, 0.12, 0.08], [65, 30, 0.1, 0.07], [-110, 34, 0.09, 0.07], [110, 34, 0.09, 0.07], [170, 28, 0.1, 0.075], [0, 38, 0.09, 0.07], [-38, 40, 0.08, 0.065], [38, 42, 0.08, 0.065]].map(([az, pol, h, r]) => coneGeo(r, h, orbit(az, pol), hr))) };
   if (kind === 'spiky') return { shell: shortLine(54, 112, 9, 8), r: 1.035, extra: () => { let s = 11; const rnd = () => (s = (s * 9301 + 49297) % 233280) / 233280, out = []; for (let i = 0; i < 24; i++) { const az = (i * 137.5) % 360 - 180, pol = 8 + 76 * Math.sqrt((i + 0.5) / 24); if (Math.abs(az) < 50 && pol > 48) continue; const d = orbit(az, pol); d[1] += 0.35; out.push(coneGeo(0.075 + rnd() * 0.022, 0.12 + rnd() * 0.05, d, hr)); } for (const [az, tilt] of [[-34, -0.25], [-12, -0.1], [12, 0.1], [34, 0.25]]) { const d = orbit(az, 44); out.push(coneGeo(0.06, 0.1, [d[0] + tilt * 0.1, d[1] * 0.6, d[2]], hr, 0.1)); } return mergeGeometries(out); } };
+  // cast signatures: a round mop of curls, a clean side sweep, a blunt fringe, a high side ponytail, a slick undercut
+  if (kind === 'curls') return { shell: shortLine(50, 108), r: 1.02, extra: () => { let s = 5; const rnd = () => (s = (s * 9301 + 49297) % 233280) / 233280, out = []; for (let i = 0; i < 64; i++) { const az = (i * 137.5) % 360 - 180, pol = 6 + 92 * Math.sqrt((i + 0.5) / 64); if (Math.abs(az) < 44 && pol > 50) continue; const d = orbit(az, pol), r = 0.05 + rnd() * 0.02, k = hr * 1.05; out.push(blobGeo(r, d[0] * k, d[1] * k, d[2] * k)); } return mergeGeometries(out); } };
+  if (kind === 'quiff') return { shell: shortLine(50, 108), r: 1.03, lift: (az, v) => 0.22 * Math.exp(-Math.pow((az - 14) / 88, 2)) * Math.pow(Math.sin(Math.PI * Math.min(1, v / 0.82)), 1.2) + 0.05 * (1 - v) };
+  if (kind === 'sidePart') return { shell: (az) => shortLine(54, 110)(az) - 9 * Math.exp(-Math.pow((az + 36) / 9, 2)), r: 1.035, lift: (az, v) => 0.13 * Math.exp(-Math.pow((az - 20) / 50, 2)) * Math.sin(Math.PI * Math.min(1, v / 0.85)) };
+  if (kind === 'fringe') return { shell: (az) => { const a = Math.abs(az), k = smooth(38, 70, a); return 71 * (1 - k) + 122 * k; }, r: 1.06, lift: puff };
+  if (kind === 'sidePony') return { shell: shortLine(55, 104), r: 1.04, extra: () => mergeGeometries([blobGeo(0.09, hr * 0.74, hr * 0.56, -hr * 0.46, 1, 1, 1), blobGeo(0.1, hr * 0.98, hr * 0.1, -hr * 0.5, 0.82, 1.9, 0.82, -0.2), blobGeo(0.062, hr * 1.14, -hr * 0.46, -hr * 0.5, 0.8, 1.7, 0.8, -0.3)]) };
+  if (kind === 'slick') return { shell: shortLine(56, 108), r: 1.035, lift: (az, v) => 0.08 * (1 - v * v), fade: true };
   if (kind === 'ponytail' || kind === 'pigtails' || kind === 'bun') return dark ? { tails: true } : { shell: shortLine(58, 106), r: 1.04, tails: true };
   return null;
 }
@@ -113,10 +120,11 @@ export function buildHair(kind, c) {
     return;
   }
   const S = softKind(kind, hr, dark); if (!S) return;
-  const m = MAT(color, { rough: 0.72, rim: 0.5, side: THREE.DoubleSide }), tag = `${kind}/${hr}`;
+  const cc = new THREE.Color(color), hairLum = 0.2126 * cc.r + 0.7152 * cc.g + 0.0722 * cc.b, hairRim = 0.14 + 0.5 * Math.min(1, hairLum * 2.2); const m = MAT(color, { rough: 0.78, rim: hairRim, side: THREE.DoubleSide }), tag = `${kind}/${hr}`;
   if (S.shell) {
-    under(cached(tag + '/line', () => softShell(hr * S.r * 0.992, (a) => S.shell(a) + 1.6, S.lift)));
-    put(cached(tag + '/shell', () => softShell(hr * S.r, S.shell, S.lift)), m, tag + '/shell');
+    under(cached(tag + '/line', () => softShell(hr * S.r * 0.992, (a) => S.shell(a) + 1.6, S.lift ? (az, v) => S.lift(az, Math.min(1, (v * (S.shell(az) + 1.6)) / S.shell(az))) : undefined)));
+    if (S.fade) { const hi = new THREE.Color(color), lo = hi.clone().multiplyScalar(0.5), fm = MAT('#ffffff', { rough: 0.78, rim: hairRim, side: THREE.DoubleSide }); if (fm !== ghost) { fm.vertexColors = true; fm.needsUpdate = true; } const key = `${tag}/${color}/fade`; put(cached(key, () => softShell(hr * S.r, S.shell, S.lift, (pol) => hi.clone().lerp(lo, smooth(50, 70, pol)))), fm, key); }
+    else put(cached(tag + '/shell', () => softShell(hr * S.r, S.shell, S.lift)), m, tag + '/shell');
   }
   if (S.extra) put(cached(tag + '/extra', S.extra), m, tag + '/extra');
   if (S.tails) for (const sx of kind === 'pigtails' ? [-1, 1] : [0]) {

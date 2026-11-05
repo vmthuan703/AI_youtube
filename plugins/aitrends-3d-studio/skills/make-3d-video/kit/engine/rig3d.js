@@ -228,7 +228,7 @@ const lum = (c) => { const k = new THREE.Color(c); return 0.2126 * k.r + 0.7152 
 //           top: 'hoodie'|'tshirt'|'jacket'|'suit'|'dress'|'labcoat'|'vest'|'none', color, color2 (trim), shirt,
 //           legs: pants colour | 'shorts:#hex' | null (bare stick legs), shoes: colour | null (round feet), shoeSole,
 //           gloves: colour (default: skin, i.e. ball hands), head: 'cap'|'capBack'|'beanie'|'hood'|'headband'|'crown'|'tophat',
-//           headColor, hair: 'anime'|'animeLow'|'short'|'messy'|'ponytail'|'bun'|'pigtails'|'bob'|'spiky'|'long', hairColor, hairShade, bow,
+//           headColor, hair: see engine/hair3d.js, hairColor, hairShade, bow, sleeves, stripe, scarf, collar, bag (colours),
 //           face: 'glasses'|'sunglasses', tie, kid: bool, scale }
 export function character(outfit = {}, opts = {}) {
   const st = S();
@@ -293,12 +293,18 @@ export function character(outfit = {}, opts = {}) {
     const pull = add(new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.034, 0.008), MAT('#e8e2d8', { rough: 0.4 })), chest); pull.position.set(0, 0.42, 0.152);
   }
   if (top === 'jacket' || top === 'suit' || top === 'labcoat' || top === 'vest') {
-    const shirt = add(new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.08, 0.36, 12, 1, false, -0.6, 1.2), MAT(outfit.shirt || (top === 'suit' ? '#f4f4f4' : top === 'labcoat' ? '#8fa8cc' : trim), { rim: 0.3 })), chest); shirt.position.set(0, 0.3, chunky ? 0.08 : 0.06); shirt.scale.set(1, 1, 0.9);
+    const vee = new THREE.BufferGeometry(); vee.setAttribute('position', new THREE.Float32BufferAttribute([-0.07, 0, 0, 0.07, 0, 0, 0, -0.27, 0], 3)); vee.setIndex([0, 2, 1]); vee.computeVertexNormals(); const shirt = add(new THREE.Mesh(vee, MAT(outfit.shirt || (top === 'suit' ? '#f4f4f4' : top === 'labcoat' ? '#8fa8cc' : trim), { rim: 0.3, side: THREE.DoubleSide })), chest); shirt.castShadow = false; shirt.position.set(0, 0.485, chunky ? 0.137 : 0.113); shirt.rotation.x = chunky ? -0.075 : -0.06;
     const collar = add(new THREE.Mesh(new THREE.TorusGeometry(0.075, 0.02, 8, 20), topM), chest); collar.rotation.x = Math.PI / 2 + 0.25; collar.position.y = 0.48;
   }
-  if (outfit.tie) { const tie = add(new THREE.Mesh(new THREE.ConeGeometry(0.03, 0.28, 4), MAT(outfit.tie, { rim: 0.3 })), chest); tie.rotation.x = Math.PI; tie.position.set(0, 0.33, 0.125); tie.scale.set(1, 1, 0.35); }
+  if (outfit.tie) { const tie = add(new THREE.Mesh(new THREE.ConeGeometry(0.03, 0.28, 4), MAT(outfit.tie, { rim: 0.3 })), chest); tie.rotation.x = Math.PI; tie.position.set(0, 0.33, 0.128); tie.scale.set(1, 1, 0.3); }
+  // small accents, at most one or two per supporting character
+  const torsoR = chunky ? 0.209 : 0.178;
+  if (outfit.stripe) { const b = add(new THREE.Mesh(new THREE.CylinderGeometry(torsoR, torsoR, 0.07, 36, 1, true), clothM(outfit.stripe, { rim: 0.3, side: THREE.DoubleSide })), chest); b.scale.z = 0.71; b.position.y = 0.2; }
+  if (outfit.scarf) { const sm = clothM(outfit.scarf, { rim: 0.35 }); const ring = add(new THREE.Mesh(new THREE.TorusGeometry(0.098, 0.04, 12, 28), sm), chest); ring.rotation.x = Math.PI / 2; ring.position.y = 0.5; ring.scale.set(1.08, 0.92, 0.85); hull(ring, 1 + olW / 0.1); const tail = add(new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.24, 0.03), sm), chest); tail.position.set(-0.07, 0.34, chunky ? 0.158 : 0.135); tail.rotation.x = 0.07; }
+  if (outfit.collar) { const cm = clothM(outfit.collar, { rim: 0.3 }); for (const sx of [-1, 1]) { const w = add(new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.03, 0.075), cm), chest); w.position.set(sx * 0.062, 0.485, 0.082); w.rotation.set(0.55, sx * -0.55, sx * -0.42); } }
+  if (outfit.bag) { const bm = clothM(outfit.bag, { rim: 0.3 }); const pivot = new THREE.Group(); pivot.position.y = 0.19; pivot.rotation.z = -0.72; chest.add(pivot); const strap = add(new THREE.Mesh(new THREE.TorusGeometry(torsoR / Math.cos(0.72) + 0.005, 0.0105, 8, 48), bm), pivot); strap.rotation.x = Math.PI / 2; strap.scale.set(1, 0.56, 1); const pouch = add(new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.115, 0.055), bm), chest); pouch.position.set(0.16, -0.02, chunky ? 0.125 : 0.105); hull(pouch, 1.08); }
   let skirt = null;
-  if (outfit.skirt && top !== 'dress') { const len = 0.26; skirt = add(new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.3, len, 28, 1, true), MAT(outfit.skirt, { rough: 0.85, rim: 0.4, side: THREE.DoubleSide })), pelvis); skirt.scale.z = 0.78; skirt.position.y = -len / 2 - 0.08; hull(skirt, 1 + olW / 0.25); }
+  if (outfit.skirt && top !== 'dress') { const len = 0.26; skirt = add(new THREE.Mesh(new THREE.CylinderGeometry(0.178, 0.3, len, 28, 1, true), MAT(outfit.skirt, { rough: 0.85, rim: 0.4, side: THREE.DoubleSide })), pelvis); skirt.scale.z = 0.74; skirt.position.y = -len / 2 - 0.045; hull(skirt, 1 + olW / 0.25); }
   if (top === 'dress' || top === 'labcoat') { const len = top === 'dress' ? 0.42 : 0.55; skirt = add(new THREE.Mesh(new THREE.CylinderGeometry(0.17, top === 'dress' ? 0.3 : 0.22, len, 28, 1, true), MAT(top === 'dress' ? topC : '#eef0f4', { rough: 0.85, rim: 0.4, side: THREE.DoubleSide })), pelvis); skirt.scale.z = 0.75; skirt.position.y = -len / 2 + 0.02; hull(skirt, 1 + olW / 0.25); }
   // --- head
   const skull = add(new THREE.Mesh(new THREE.SphereGeometry(B.headR, 48, 32), skinM), head); hull(skull, 1 + (olW * 1.15) / B.headR);
@@ -319,14 +325,15 @@ export function character(outfit = {}, opts = {}) {
   if (outfit.face === 'glasses' || outfit.face === 'sunglasses') {
     const fm = MAT(outfit.face === 'sunglasses' ? '#111111' : '#2a2a2a', { rough: 0.3, rim: 0.2 });
     const ex = eyeStyle === 'dot' ? 21 : 23;
-    for (const sx of [-1, 1]) { const ring = add(new THREE.Mesh(new THREE.TorusGeometry(eyeStyle === 'dot' ? 0.05 : 0.06, 0.008, 8, 24), fm), head); const a = sx * ex * D2R, th = 87 * D2R, r = hr * 1.06; ring.position.set(Math.sin(a) * Math.sin(th) * r, Math.cos(th) * r, Math.cos(a) * Math.sin(th) * r); ring.lookAt(ring.position.clone().multiplyScalar(2)); if (outfit.face === 'sunglasses') { const lens = add(new THREE.Mesh(new THREE.CircleGeometry(eyeStyle === 'dot' ? 0.05 : 0.058, 20), MAT('#05050a', { rough: 0.15, metal: 0.4 })), head); lens.position.copy(ring.position); lens.quaternion.copy(ring.quaternion); } }
+    for (const sx of [-1, 1]) { const ring = add(new THREE.Mesh(new THREE.TorusGeometry(eyeStyle === 'dot' ? 0.05 : 0.06, 0.008, 8, 24), fm), head); const a = sx * ex * D2R, th = 87 * D2R, r = hr * 1.06; ring.position.set(Math.sin(a) * Math.sin(th) * r, Math.cos(th) * r, Math.cos(a) * Math.sin(th) * r); ring.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), ring.position.clone().normalize()); ring.scale.set(1.16, 0.92, 1); if (outfit.face === 'sunglasses') { const lens = add(new THREE.Mesh(new THREE.CircleGeometry(eyeStyle === 'dot' ? 0.05 : 0.058, 20), MAT('#05050a', { rough: 0.15, metal: 0.4 })), head); lens.position.copy(ring.position); lens.quaternion.copy(ring.quaternion); lens.scale.copy(ring.scale); } }
   }
+  if (outfit.face === 'glasses' || outfit.face === 'sunglasses') { const br = add(new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.075, 6), MAT('#1a1a1a', { rough: 0.3 })), head); br.rotation.z = Math.PI / 2; br.position.set(0, hr * Math.cos(87 * D2R) * 1.06 + 0.008, hr * 1.05); }
   // --- limbs: segments (cylinder + joint spheres) re-oriented every frame; outlines follow with a bigger radius
   const segs = [];
   const seg = (r, m, capEnd = true) => { const c = add(new THREE.Mesh(unitCyl, m), body); const j = capEnd ? add(new THREE.Mesh(unitSph, m), body) : null; const s = { r, c, j }; if (olM) { s.oc = new THREE.Mesh(unitCyl, olM); s.oj = capEnd ? new THREE.Mesh(unitSph, olM) : null; body.add(s.oc); if (s.oj) body.add(s.oj); } segs.push(s); return s; };
   const pantsC = outfit.legs ?? null, shorts = typeof pantsC === 'string' && /^shorts:/.test(pantsC), bareLegs = !pantsC;
   const pantsM = bareLegs ? skinM : MAT(shorts ? pantsC.slice(7) : pantsC, { rough: 0.85, rim: 0.55 });
-  const sleeveM = top === 'none' || top === 'vest' ? skinM : topM;
+  const sleeveM = top === 'none' || top === 'vest' ? skinM : outfit.sleeves ? clothM(outfit.sleeves) : topM;
   const limbR = dark ? B.limbR : B.limbR * 0.85;
   const armR = sleeveLong ? (top === 'puffer' ? 0.078 : chunky ? 0.068 : 0.058) : limbR;
   const armSeams = top === 'puffer' ? clothM(outfit.color2 || shade(topC, -0.3), { rim: 0.2 }) : null, seamGeo = armSeams ? new THREE.TorusGeometry(1, 0.11, 8, 24) : null;

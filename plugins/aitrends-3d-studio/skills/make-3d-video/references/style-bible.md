@@ -32,14 +32,13 @@ simple characters, real staging, real light.
   `cinematic` adds a thin dark outline like the "crush" video, `soft` has none like the "luck" video; `ink` → black +
   big white eyes + lavender rim). Pale heads glow faintly so they never go muddy, even back-lit. Don't mix skins
   inside one video unless the story needs it (a ghost, an alien, the "real you" vs a clone).
-- **Girls and variety** (as in the references): soft bob/long/ponytail hair with curved bangs (`hair`, `hairColor`), a bow,
-  `lashes`, a `skirt` under a tee or hoodie, or a `dress`. Boys: caps (`cap`/`capBack`), beanies, short hair.
+- **Girls and variety** (as in the references): soft bob, `fringe`, long, ponytail or `sidePony` hair (`hair`, `hairColor`), a bow,
+  `lashes`, a `skirt` under a tee or hoodie, or a `dress`. Boys: `curls`, `quiff`, `sidePart`, `slick`, short hair, caps (`cap`/`capBack`), beanies.
   Adults: `suit` + `tie`, `vest` (dealer, waiter), `labcoat`, `scale` 1.1–1.2. `blush` only on a character the story calls for, not by default.
 - **Legs:** bare stick legs and round feet by default, hero included. Add `legs` or `shoes` only when the story needs them (a suit, a uniform, sports).
-- **Identity = one colour.** Each recurring character has ONE saturated signature garment colour, identical all video:
-  hoodie blue `#3a78e0`, red `#e0402e`, green `#2f9a6a`, pink `#e070a8`, yellow `#e0a830`, purple `#8a5ad6`, teal
-  `#3ab0c0`, orange `#d65a2a`. Add at most one accessory (cap, beanie, glasses, hair colour, tie). Background people:
-  `T.W.crowd` or plain characters in muted colours.
+- **Identity = own hair + one outfit detail.** Each recurring character has a hair shape nobody else has and one outfit detail (`bag`, `sleeves`, `collar`, `stripe`, `scarf`, `tie`, glasses),
+  identical all video. Start from `channel/cast.js`. Colours stay deep and muted: brick `#7a3a34`, navy `#2c3e6e`, plum `#8d4a6b`, teal `#2f6f6a`, forest `#3f6a58`, olive `#5f6a2e`, charcoal `#33313f`.
+  Only the hero wears a loud, bright colour. Background people: `T.W.crowd` or plain characters in muted colours.
 - **Faces are the acting, and the comedy.** The hero's resting face is `deadpan` (two flat dashes) or `unimpressed` (heavy lids); it plays against
   chaos around them. Big expressions are saved for the beats that earn them. Change `expr` on the beat of the words, not randomly. Blink (`blink: true, t`). Look where
   the attention is (`look: [x, y]` or `.lookAt3`). Talk only on quoted dialogue (`talkFor`). Narrator: never lip-synced.

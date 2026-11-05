@@ -1,0 +1,14 @@
+{
+  "enabledPlugins": {
+    "aitrends-3d-studio@ai-youtube": true
+  },
+  "extraKnownMarketplaces": {
+    "ai-youtube": {
+      "source": {
+        "source": "github",
+        "repo": "vmthuan703/AI_youtube",
+        "ref": "claude/sleepy-wright-g261jn"
+      }
+    }
+  }
+}

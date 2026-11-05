@@ -142,9 +142,10 @@ Xem thêm: ví dụ nhỏ tại `aitrends-2d-studio/examples/reaction-time/`, d�
 
 **Dựng video 3D từ kịch bản (plugin `aitrends-3d-studio`):**
 ```bash
-/plugin marketplace add vmthuan703/AI_youtube
+/plugin marketplace add vmthuan703/AI_youtube#claude/sleepy-wright-g261jn
 /plugin install aitrends-3d-studio@ai-youtube
 ```
+Mở repo này bằng Claude Code thì không cần hai lệnh trên: `.claude/settings.json` đã khai báo plugin (đồng ý khi được hỏi).
 Sau đó nói "làm video 3D từ kịch bản này" kèm file kịch bản. Claude chạy đủ 8 bước: khảo sát, cài studio, giọng đọc,
 phân cảnh, chọn phong cách, dựng cảnh, âm thanh, render (chọn 720p–4K, 24/30/60 fps, preset `draft`→`max`).
 Đóng gói zip để tải lên claude.ai: `bash plugins/build_zip.sh`.

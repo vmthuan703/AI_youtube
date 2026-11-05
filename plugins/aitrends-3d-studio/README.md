@@ -12,7 +12,7 @@ giữ nguyên dáng suốt video và chữ luôn nét. Giọng đọc dùng Koko
 |---|---|
 | "Làm video 3D từ kịch bản này" | chạy toàn bộ quy trình (skill `make-3d-video`) |
 | `/new-3d-video` | khảo sát, cài studio, tạo giọng đọc, mốc thời gian, phân cảnh |
-| `/3d-video-styles` | render chính các cảnh của bạn ở 6 phong cách để chọn |
+| `/3d-video-styles` | render chính các cảnh của bạn ở 7 phong cách để chọn |
 | `/render-3d-video` | dựng và kiểm tra cảnh, xem thử, chọn chất lượng xuất, render bản cuối |
 | `/3d-video-sound` | nhạc theo cảm xúc, hiệu ứng âm thanh, mix và ghép |
 
@@ -56,11 +56,16 @@ Bản xuất: H.264 High, BT.709, AAC 48 kHz 384 kb/s, đúng khuyến nghị t�
 - Đo máy của bạn: `node render.mjs --project examples/speed-demo --bench`. Lệnh in GPU đang dùng, thời gian mỗi khung và ước tính tổng.
 
 ## Cài đặt plugin
-```bash
-/plugin marketplace add vmthuan703/AI_youtube
-/plugin install aitrends-3d-studio@ai-youtube
-```
-Hoặc tải file zip của plugin lên mục Plugins trên claude.ai.
+- **Mở repo này bằng Claude Code** (máy bạn hoặc claude.ai/code): plugin đã khai báo sẵn trong `.claude/settings.json`.
+  Khi được hỏi có tin thư mục và cài marketplace `ai-youtube` không, chọn đồng ý.
+- **Cài cho mọi thư mục trên máy** (Claude Code):
+  ```bash
+  /plugin marketplace add vmthuan703/AI_youtube#claude/sleepy-wright-g261jn
+  /plugin install aitrends-3d-studio@ai-youtube
+  ```
+  Khi plugin đã gộp vào `main` thì bỏ phần `#claude/sleepy-wright-g261jn`.
+- **Claude Desktop / claude.ai** (giống plugin 2D): `bash plugins/build_zip.sh`, rồi tải
+  `dist/aitrends-3d-studio-0.1.0.zip` lên mục Plugins trên claude.ai.
 
 ## Nội dung
 - `skills/make-3d-video/`: quy trình đầy đủ, tài liệu tham chiếu và bộ studio (`kit/`: renderer, engine 3D,

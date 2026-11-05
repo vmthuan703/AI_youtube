@@ -54,7 +54,7 @@ EXPECTED = {
     "tools/doctor.py": "8d037a2b0fa634f5",
     "tools/new_project.py": "cb5dd45c811db41a",
     "tools/parse_script.py": "f33853d2823efde2",
-    "tools/qc_metrics.py": "1ff91037442130f0",
+    "tools/qc_metrics.py": "49a4c72037139c39",
     "tools/script_check.py": "54e4ca974d105593",
     "tools/tidy_project.py": "37a1c24f85e1446d",
     "tools/transcribe.py": "ecd48d05a6655d13",

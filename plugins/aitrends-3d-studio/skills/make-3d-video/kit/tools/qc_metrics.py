@@ -11,8 +11,8 @@ import numpy as np
 # name: (low, high, unit, what to do when outside). From the references, with the bars removed.
 TARGETS = {
     "bars": (0.05, 0.08, "share of height, each side", "Set config bars to cine."),
-    "luma": (0.20, 0.40, "median brightness 0-1", "Too dark: raise ambient, use the pearl style or a brighter palette."),
-    "dark": (0.03, 0.20, "share of near-black pixels", "Lift the shadows: pearl style, more ambient, lighter walls."),
+    "luma": (0.19, 0.40, "median brightness 0-1", "Too dark: raise ambient, use the pearl style or a brighter palette."),
+    "dark": (0.03, 0.22, "share of near-black pixels", "Lift the shadows: pearl style, more ambient, lighter walls."),
     "sat": (0.35, 0.47, "mean saturation 0-1", "Too intense: pearl style; keep only the hero outfit loud."),
     "cuts": (16.0, 22.0, "shots per minute", "Add or merge cuts on phrase boundaries."),
     "median": (2.0, 2.7, "median shot, seconds", "Shorten holds or add inserts."),

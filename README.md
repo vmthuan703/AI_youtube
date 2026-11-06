@@ -1,7 +1,7 @@
 # AI_youtube
 
 <!-- KE_HOACH_MOI_NHAT:START -->
-> **Kế hoạch nội dung 3 ngày tới:** [05/11–07/11 · 6 video (tuyến A + B)](ke-hoach/2026-11-05.md) · lập ngày 2026-11-04 · cập nhật 3 ngày một lần · [các kế hoạch trước](ke-hoach/README.md)
+> **Kế hoạch nội dung 3 ngày tới:** [07/11–09/11 · 6 video (tuyến A + B)](ke-hoach/2026-11-07.md) · lập ngày 2026-11-06 · cập nhật 3 ngày một lần · [các kế hoạch trước](ke-hoach/README.md)
 <!-- KE_HOACH_MOI_NHAT:END -->
 
 ## Tự động nghiên cứu thị trường

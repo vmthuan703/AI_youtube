@@ -11,5 +11,5 @@ Tuyến đang chạy (đã duyệt 2026-11-04):
 Mới nhất ở trên cùng.
 
 <!-- DANH_SACH:START -->
-- [05/11–07/11/2026](2026-11-05.md): lập ngày 2026-11-04, 6 video (A1–A3, B1–B3)
+- [07/11–09/11/2026](2026-11-07.md): lập ngày 2026-11-06, 6 video (A1–A3, B1–B3), làm lại trên snapshot 06/11
 <!-- DANH_SACH:END -->

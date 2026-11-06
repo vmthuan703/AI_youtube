@@ -13,8 +13,38 @@
 | Call | The like and subscribe line names one decision from this story (5/5 measurable). Use the channel's own wording, never theirs. |
 Length: 1,500–1,650 words is the channel plan; references run 1,730–1,800.
 
+The check also flags these: **Hero name fits the hero** (a girl's name for the boy hero), **Weekdays run in order**, **Day count adds up**
+(a "thirty days to ..." deadline that ends after the story's last day) and **Punchlines land when heard** (a 1–4 word answer such as
+"You say YouTube."). Under the table it lists the **Story logic** questions. Answer each one in writing before the voice.
+
+## Writing a script (when the user asks you to write or rewrite one)
+These rules come from the Memory 100x v2 review (logic 6.5/10) and the user's notes on the finished video. Follow them from the first draft:
+- **Cast.** The hero ("you") is a **boy**, with a boy's name and he/him. The **best friend is a girl**. Write a cast table (name, gender,
+  role, the outfit from `channel/cast.js`) at the top, and keep names and pronouns matching the models.
+- **One power rule, stated once and early.** Say when it starts, whether it reaches back to the past, how fast it takes things in, how
+  accurate it is, and what it costs. Every use of the power must fit that rule. Never add a hidden second power (perfect memory is
+  not speed reading). Keep big numbers possible under the rule and in the time the story has.
+- **One calendar.** Plan story days in a table before writing (Day 1–7 set-up, 8–10 escalation, the full challenge period, the climax
+  day, the aftermath). Use one day count. Every deadline lands where the event happens. Weekdays move forward, and a jump gets a line
+  such as "Next week." or "Three days later."
+- **Climax by cause and effect.** Locate the danger, add real time pressure, show a mental obstacle, a turn, and an objective cost
+  under rules stated earlier (the hero misses the deadline because they stayed on the call). Then show the rescue confirmed on screen,
+  and a thematic payoff. The sacrifice must follow from the choice. If the person is already safe and the prize is still offered,
+  the choice means nothing.
+- **Change through action.** The hero wins by choosing what to do while the problem is still there, not by a symptom vanishing.
+- **Set up the twist** at least once before it lands.
+- **Safe advice only.** In a rescue the hero describes landmarks and the rescuers lead; no "walk toward the water".
+- **Science.** Use terms correctly (HSAM = memory of one's own life; working memory = limited attention, not physical slots). Check
+  every name and figure. Keep explainers out of the climax.
+- **Jokes are heard, not read.** A punchline must make sense on first listen to a young viewer. Don't end a joke on a lone 1–3 word
+  answer whose meaning is hidden ("You say YouTube."). Say it in full: "You tell him the truth: one weekend of YouTube videos."
+- **Name only props you can show.** If the narration names a prop (headphones, a receipt), plan the shot that shows it clearly.
+- Keep what worked: a hook that gives the power, its cost and the danger in the first lines, a motif planted early and paid off at the
+  end, and one warm anchor character (a grandparent).
+
 Read the whole transcript (`timeline/transcript.txt`) twice. Then write `story/bible.md` (short, practical):
-- **Logline and tone** (wonder / suspense / comedy / drama). The "you" of the script is the channel's hero from `channel/cast.js`, whatever their name in this story.
+- **Logline and tone** (wonder / suspense / comedy / drama). The "you" of the script is the channel's hero from `channel/cast.js`: a boy. If the script gives him a girl's name or she/her, raise it at the script check, before the voice.
+- **Props list:** every prop the narration names, with the shot that shows it and the one detail that makes it readable (a receipt's printed lines and torn edge, headphones in a contrasting colour).
 - **Palette:** this video's colour world (`dusk`, `cozy`, `tropic`, `alert`, `school`, `midnight`, or a new one). Pick from where most of the story happens. Set `config.json` → `palette`.
 - **Signature device:** one visual invented for this story's power, built in the first minute and recurring all video, with the UI part that draws it. Don't reuse one from a reference.
 - **Cast table.** For each recurring character: id, role, outfit (see engine-api.md, Characters), signature colour,

@@ -15,7 +15,7 @@ this skill's base directory); the studio kit is `../make-3d-video/kit/`.
 Get the script (file, pasted text, or repo path). Read `channel/brand.json` once the studio exists: voice, style, format and export quality are already decided, so state them in
 one line (with the render-time estimate from `render-qc.md`), offer to change them for this video, and ask only what is missing. Character voices go by role.
 
-Then `python tools/script_check.py --script <file> --title "<title>"`: show the table, say what matters most, and ask whether the user wants to edit the script first. It never changes the script, and neither do you.
+Then `python tools/script_check.py --script <file> --title "<title>"`: show the table, answer the **Story logic** questions it lists (power rule, timeline, climax cause and effect, twist, safety, science, cast: the hero is a boy and the best friend is a girl) with the script lines that break them, say what matters most, and ask whether the user wants to edit the script first. It never changes the script, and neither do you.
 
 ## 2. Studio
 If `aitrends-3d-studio/render.mjs` doesn't exist in the workspace, follow `../make-3d-video/references/install.md` in

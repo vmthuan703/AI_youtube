@@ -10,6 +10,13 @@
 - Ưu tiên gạch đầu dòng thay cho đoạn văn dài.
 - Dùng bảng khi so sánh nhiều phương án, số liệu hoặc thuộc tính.
 
+## Hỏi trước khi chỉnh sửa
+- Khi người dùng yêu cầu chỉnh sửa, thêm hoặc thay đổi nội dung, KHÔNG tự tạo
+  hoặc xuất bản bản xem trước (preview, artifact, ảnh, bản nháp đầy đủ).
+- Thay vào đó, nêu ngắn gọn sẽ đổi gì và hỏi người dùng có muốn xem bản xem
+  trước không.
+- Chỉ thực hiện khi người dùng đồng ý rõ ràng. Mục đích: tiết kiệm token.
+
 ## Chọn nhánh
 - Khi chưa rõ việc thuộc nhánh nào: hỏi người dùng mô tả việc, chọn nhánh,
   nêu lý do và chờ người dùng xác nhận trước khi thực hiện.
@@ -18,6 +25,8 @@
 - Được tự `git commit` và `git push` lên nhánh làm việc mà không cần hỏi.
   Vẫn hỏi trước khi: push lên `main`, force-push, xóa nhánh, mở/đóng/gộp PR.
 - Thay đổi trong `CLAUDE.md` thì commit riêng, không gộp với file khác.
+- Mở GitHub (tạo PR, xem PR, repo) bằng Chrome của người dùng (Claude in Chrome),
+  vì đã đăng nhập sẵn. Không dùng trình duyệt tích hợp, không chờ `gh`.
 - Ngoại lệ: tác vụ theo lịch "Báo cáo đối thủ 3 ngày" được tự commit và push
   vào `research/reports`, và vào `main` nhưng chỉ đổi `ke-hoach/` và khối `KE_HOACH_MOI_NHAT` đầu `README.md`.
 

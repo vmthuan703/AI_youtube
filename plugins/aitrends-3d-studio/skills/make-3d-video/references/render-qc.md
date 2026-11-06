@@ -68,6 +68,12 @@ The render log prints frames, fps, elapsed time and ETA every 48 frames; report 
 - [ ] Characters readable: faces visible when they matter (not backs), heads separated from the background by light or
       rim, nobody cut awkwardly by the frame edge, nobody hidden behind props.
 - [ ] Contact: feet on the floor, hands on what they hold, sitting on seats, props not sinking into tables.
+- [ ] **No hand or arm passes through a table, desk or counter.** Hands rest on the top (table top at `h` + 0.025), so lower the shoulder or raise the pose. Check every seated table shot in motion. (Memory 100x v2, 3:23: hand through the diner table.)
+- [ ] **No missing limbs.** Seated characters show their legs in front of the seat; nothing is cut off by the seat, the floor or another mesh. (v2, 0:54: the hero lost his legs on the bus seat.)
+- [ ] **Props read as the real thing at a glance.** A receipt has printed lines, a total, a torn or zigzag edge and paper proportions, and it is held in the hand, not a plain grey slab standing upright. Give every named prop one detail that says what it is. (v2, 0:02.)
+- [ ] **Every prop the narration names is visible.** Small ones (headphones, earbuds, a ring, a key) get a colour that contrasts with hair and skin, a slightly larger scale, and at least one close-up or insert. (v2, 3:59: headphones could not be seen.)
+- [ ] **Speech bubbles hold still** for the whole line: the box is anchored once per line (engine/player.js) and only the tail moves. If one still jumps, set `shot.bubble = {x, y}` by hand. (v2, 1:12.)
+- [ ] **Cast matches the script**: the hero is a boy and the best friend is a girl, and names and pronouns match the models.
 - [ ] Outfits and screen direction consistent within a scene; same set geometry in every shot of a location.
 - [ ] Light: 1–3 bright accents, faces not too dark, nothing blown out (bloom only on lamps/screens/neon), almost no pure black inside the picture. The hero's outfit reads as loud in every shot.
 - [ ] Explainers: a moving picture in every one, none is just text on an empty stage, and some sit on the blurred scene.
@@ -89,6 +95,11 @@ Final file QC: `python tools/qc_metrics.py --project projects/<slug>`, `ffprobe 
 ## Troubleshooting
 - **A prop is missing** → it may be inside another object (a phone sunk into a table top). Raise it a few millimetres,
   or render a still with the camera pulled back. Props stand on y = 0; table tops are at `h` + 0.025.
+- **A hand goes through the table** → the arm pose reaches below the table top. Use a pose whose hands end at the top height, move the
+  character back from the table, or lift the hands onto an object on the table. Render `--from A --to B` to check it in motion.
+- **Legs vanish on a seat** → the seat mesh or its back is in front of the legs, or the sit pose puts them inside the cushion. Move the seat
+  back, lower the seat height to match the pose, or frame the shot so the knees are visible.
+- **Speech bubble jumps** → it was placed by hand from a moving value. Give `shot.bubble` fixed `x, y` (the tail still follows the head).
 - **Something that should move is frozen** → it was merged as static. Return it from `init` or set
   `obj.userData.dynamic = true`.
 - **Workers render different things / jumps at worker boundaries** → `draw()` used state from previous frames. Make it a

@@ -115,13 +115,34 @@ function speakersOf(st, stg) {
   stg.scene?.traverse(o => { if (o.userData?.speaker) m.set(o.userData.speaker, o); });
   st.__speakers = m; return m;
 }
-function drawBubble(g, shot, lt, st, stg) {
+// Head of the speaker on screen, or null when off screen / behind the camera.
+function headOnScreen(who, stg) {
+  const v = who.headWorld(); v.y += 0.4; const [hx, hy, hz] = three.toScreen(v, stg.camera);
+  return hz < 1 && hx > -120 && hx < E.W + 120 && hy > -240 && hy < E.H ? [hx, hy] : null;
+}
+// The bubble box is placed ONCE per line and per shot, from where the head is when the line (or the shot) starts, and then stays put:
+// following the head every frame made it jitter with walk bobs and camera shake. Only the tail tip follows the live head.
+// The anchor is found by re-running draw() at that start time, so it is the same in every worker (draw is a pure function of t).
+function bubbleAnchor(shot, L, st, stg, def, info, who, top) {
+  const key = L.start + '|' + L.speaker, cache = st.__bubbleAnchors || (st.__bubbleAnchors = new Map());
+  if (cache.has(key)) return cache.get(key);
+  const t0 = clamp(L.start - shot.start, 0, shot.end - shot.start);
+  def.draw(st, t0, { ...info, globalT: shot.start + t0, p: clamp(t0 / (shot.end - shot.start)) }, three);
+  const h = headOnScreen(who, stg); let a = null;
+  if (h) { const [hx, hy] = h; a = { x: clamp(hx + (hx > E.W / 2 ? -150 : 150), V(330, 300), E.W - V(330, 300)), y: Math.max(top + 30, hy - V(90, 110)) }; }
+  cache.set(key, a); return a;
+}
+function drawBubble(g, shot, lt, st, stg, def, info) {
   if (!E.cfg.speechBubbles || shot.bubbles === false || !E.lines.length) return;
   const t = shot.start + lt, L = E.lines.find(l => String(l.speaker).toUpperCase() !== 'NARRATOR' && t >= l.start - 0.05 && t <= l.end + 0.25); if (!L) return;
   const { str, start } = bubbleText(L, t), top = barVal(shot) + V(70, 110); let x = E.W / 2, y = top + 30, tx = null, ty = null;
   const who = st && stg?.camera && three ? speakersOf(st, stg).get(String(L.speaker).toUpperCase()) : null;
-  if (who) { const v = who.headWorld(); v.y += 0.4; const [hx, hy, hz] = three.toScreen(v, stg.camera);
-    if (hz < 1 && hx > -120 && hx < E.W + 120 && hy > -240 && hy < E.H) { tx = clamp(hx, 40, E.W - 40); ty = Math.max(hy, top + 60); x = clamp(hx + (hx > E.W / 2 ? -150 : 150), V(330, 300), E.W - V(330, 300)); y = Math.max(top + 30, hy - V(90, 110)); } }
+  if (who) {
+    const h = headOnScreen(who, stg);   // live head first: the anchor below re-runs draw() and moves the scene
+    if (h) { tx = clamp(h[0], 40, E.W - 40); ty = Math.max(h[1], top + 60); }
+    const a = def ? bubbleAnchor(shot, L, st, stg, def, info, who, top) : null;
+    if (a) ({ x, y } = a); else if (h) { x = clamp(h[0] + (h[0] > E.W / 2 ? -150 : 150), V(330, 300), E.W - V(330, 300)); y = Math.max(top + 30, h[1] - V(90, 110)); }
+  }
   if (shot.bubble) ({ x = x, y = y, tx = tx, ty = ty } = shot.bubble);
   g.save(); speech(g, { str, x, y, tx, ty, t: t - start, start: 0 }); g.restore();
 }
@@ -142,7 +163,7 @@ function drawShot(buf, shot, lt, opts = {}) {
         ax.globalAlpha = 1; g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(accA, 0, 0, buf.width, buf.height); g.restore();
       }
       if (def.overlay && !opts.noOverlay) { g.save(); def.overlay(g, lt, info, st); g.restore(); }
-      if (!opts.noOverlay) drawBubble(g, shot, lt, st, stg);
+      if (!opts.noOverlay) drawBubble(g, shot, lt, st, stg, def, info);
     } else {
       const bd = shot.backdrop || def.backdrop; if (bd) drawBackdrop(g, bd, info.p);
       g.save(); def.draw(g, lt, info); g.restore(); if (!opts.noOverlay) drawBubble(g, shot, lt, null, null);

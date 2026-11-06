@@ -2,7 +2,7 @@
 name: make-3d-video
 description: "This skill should be used when the user wants a narrated 3D animated story video from a SCRIPT in the aiTrends 3D style (toy-like 3D stick characters with big round heads, a loud channel hero in a lime puffer, simple cinematic sets, soft pastel dusk light, a 2:1 picture, animated explainer diagrams), e.g. \"make a 3D video from this script\", \"turn my script into a 3D animation\", \"tạo video 3D từ kịch bản\", \"làm video what if 3D\", \"animate this story in 3D\", or \"do the whole 3D video\". It runs the full pipeline: channel settings, script check, emotional voiceover (Chatterbox, with Kokoro as fallback) with word timings, story breakdown, style and palette choice, 3D scene building, rendering up to 4K/60 fps, music, SFX, scorecard and the final MP4.\n"
 metadata:
-  version: "0.2.1"
+  version: "0.2.2"
   author: aiTrends
 ---
 
@@ -54,8 +54,15 @@ Then run the check and show the table:
 ```bash
 python tools/script_check.py --script <file> --title "<title>" --out build_voice/<slug>/script_check.md
 ```
+Then read the whole script and answer, in writing, the **Story logic** questions at the end of `script_check.md`: the power rule,
+big numbers, the timeline, the climax's cause and effect, the change of heart, the twist set-up, safety, science, and cast. Quote the
+script line for each problem. These are the faults that cost the Memory 100x v2 script its logic score (6.5/10). Rewriting the
+script after the voiceover is the most expensive fix, so raise them now. A MISS on **Hero name fits the hero** or **Day count adds up**
+and any logic problem must be shown even if the user is away. The channel hero is a **boy** and the best friend is a **girl**
+(`channel/cast.js`).
 Say which results matter most and ask whether the user wants to edit the script before the voice is generated. Never change
-the script yourself. If they say to continue as is, continue.
+the script yourself. If they say to continue as is, continue. When the user asks you to **write** a script, follow the rules in
+`references/story-breakdown.md` → "Writing a script" from the first draft.
 
 ## Stage 2: Install or check the studio
 Follow `references/install.md`: copy `kit/` to `aitrends-3d-studio/` in the workspace (skip if present), install
@@ -111,7 +118,10 @@ Work in batches of 8–12:
 Non-negotiables: a camera move in every shot; expressions on the beat, deadpan as the hero's resting comedy face; hands and feet in
 contact; colours from `st.M`/`S()` and the cast; every number the narrator says on screen (`wordTime()`); **no empty stage: every
 explainer has a moving picture from `engine/diagrams2d.js`, and most sit on the blurred scene (`backdrop`), not the bare purple stage**;
-text between y = 90 and y = 990 so the bars don't cut it; `V()` for aspect-dependent values; `draw()` a pure function of `t`; ≤ 5 real lights per
+text between y = 90 and y = 990 so the bars don't cut it;
+**props read as the real thing** (a receipt has printed lines, a torn edge and paper size, never a plain grey slab); **no missing or
+sunk limbs** (seated legs visible in front of the seat, not swallowed by it); **hands rest on a table top, never pass through it**;
+**every prop the script names is visible** (headphones in a contrasting colour, at least one close-up); `V()` for aspect-dependent values; `draw()` a pure function of `t`; ≤ 5 real lights per
 shot; `dof` only on close-ups; no `Math.random`/`Date.now`.
 
 ## Stage 7: Sound
@@ -123,7 +133,8 @@ audition `build/mix.wav`.
 Read `references/render-qc.md`.
 1. Preview: `node render.mjs --project projects/<slug> --from 0 --to 40 --scale 0.5`, then `python tools/qc_metrics.py --project
    projects/<slug>`. Send the preview (or contact sheets), the scorecard and the final render-time estimate before the long render.
-   This is the last checkpoint before rendering.
+   This is the last checkpoint before rendering. Check **moving** previews, not only stills, of every dialogue shot (bubbles stay
+   put), every seated shot (legs, hands on tables) and every prop insert: jitter and clipping only show in motion.
 2. Final: `nohup node render.mjs --project projects/<slug> > build/render.log 2>&1 &` (quality, fps and resolution come
    from config.json). Poll the log (it prints fps and ETA) and report progress at sensible intervals.
 3. `python audio/mix.py --project projects/<slug>`: music + SFX, ducking, −14 LUFS, AAC 48 kHz, and the upscale if

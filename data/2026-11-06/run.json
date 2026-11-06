@@ -1,6 +1,6 @@
 {
   "snapshot_date": "2026-11-06",
-  "started_at": "2026-11-05T17:30:29.892950+00:00",
+  "started_at": "2026-11-06T15:55:18.709885+00:00",
   "quota_budget": 6000,
   "markets": {
     "whatif-us": {
@@ -30,28 +30,33 @@
       ],
       "queries_skipped": [],
       "errors": [],
-      "discovery_rows": 960,
+      "discovery_rows": 964,
       "seeded": [],
       "added": [
         "Matal",
         "BrainBracket",
         "Stick Knows",
-        "The Hypothetical Room",
-        "Just Suppose ?",
-        "Stick Saga"
+        "The Hidden Why",
+        "Stick Saga",
+        "Brain Cipher"
       ],
-      "not_added_registry_full": []
+      "not_added_registry_full": [
+        "IFANIME",
+        "What If Youverse"
+      ]
     }
   },
   "pruned_off_niche": [
     "Matal (14% khớp)",
-    "BrainBracket (43% khớp)",
+    "BrainBracket (45% khớp)",
     "Stick Knows (4% khớp)",
-    "Stick Saga (33% khớp)"
+    "The Hidden Why (17% khớp)",
+    "Stick Saga (33% khớp)",
+    "Brain Cipher (21% khớp)"
   ],
   "tracked_channels": 54,
-  "tracked_videos": 1229,
+  "tracked_videos": 1269,
   "tracking_skipped": [],
-  "quota_used": 2176,
-  "finished_at": "2026-11-05T17:31:16.414507+00:00"
+  "quota_used": 2182,
+  "finished_at": "2026-11-06T15:55:51.050825+00:00"
 }

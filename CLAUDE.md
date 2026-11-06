@@ -17,6 +17,10 @@
   trước không.
 - Chỉ thực hiện khi người dùng đồng ý rõ ràng. Mục đích: tiết kiệm token.
 
+## Thumbnail
+- Khi được yêu cầu thiết kế thumbnail, mặc định dùng phong cách trong
+  `prompts/thumbnail_style.md`. Dựng 3–5 phương án rồi gửi ảnh để chọn.
+
 ## Chọn nhánh
 - Khi chưa rõ việc thuộc nhánh nào: hỏi người dùng mô tả việc, chọn nhánh,
   nêu lý do và chờ người dùng xác nhận trước khi thực hiện.

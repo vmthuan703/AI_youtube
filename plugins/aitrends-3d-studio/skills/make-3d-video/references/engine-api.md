@@ -5,7 +5,7 @@
 aitrends-3d-studio/
   render.mjs  player.html  package.json
   channel/  brand.json cast.js        (the channel's choices and hero; updates never overwrite this folder)
-  engine/   core.js styles.js kit3d.js rig3d.js world3d.js fx3d.js player.js gag.js   (+ ui2d.js diagrams2d.js fx2d.js rig2d.js for 2D overlays/cards)
+  engine/   core.js styles.js kit3d.js rig3d.js costume3d.js world3d.js fx3d.js player.js gag.js   (+ ui2d.js diagrams2d.js fx2d.js rig2d.js for 2D overlays/cards)
   tools/    doctor.py verify_kit.py tts_chatterbox.py tts.py script_check.py new_project.py parse_script.py transcribe.py beats.py qc_metrics.py tidy_project.py common.py
   audio/    dsp.py sfx.py music.py mix.py
   examples/speed-demo/   (reference project: a finished 32 s video — cast, sets, shots, story, timeline)
@@ -134,7 +134,8 @@ Outfit (put them in `scenes/cast.js`, one per recurring character, never change 
 ```js
 import { HERO as CHANNEL_HERO } from '/channel/cast.js';
 export const HERO = { ...CHANNEL_HERO, speaker: 'JAY' };                                   // quilted lime puffer, platinum anime hair; 'speaker' = name in the script
-export const NOAH = { ...RIVAL, speaker: 'NOAH' };                                         // import { HERO as CHANNEL_HERO, RIVAL } from '/channel/cast.js'; ready-made: FRIEND, RIVAL, GIRL, GIRL2, PARENT, TEACHER, STRANGER
+export const NOAH = { ...RIVAL, speaker: 'NOAH' };                                         // import { HERO as CHANNEL_HERO, RIVAL, NURSE } from '/channel/cast.js'
+export const PATEL = { ...NURSE, speaker: 'NURSE PATEL' };                                 // a role from the roster: the costume already says the job
 export const MAYA = { top: 'hoodie', color: '#8d4a6b', hair: 'fringe', hairColor: '#34262c', scarf: '#9c7a3a', lashes: true };   // a new character: own hair, one detail, a deep muted colour
 export const BOSS = { top: 'suit', color: '#22222a', tie: '#5e2230', face: 'sunglasses', legs: '#22222a', shoes: '#111111', scale: 1.15 };
 ```
@@ -143,7 +144,20 @@ dress | labcoat | vest | puffer | none · `color`, `color2` (trim, quilting seam
 null (bare stick legs) · `shoes` colour | null (round feet), `shoeSole` · `gloves` colour (default: ball hands in skin) ·
 `head` cap | capBack | beanie | hood | headband | tophat | crown, `headColor` · `hair` anime (tall crown, the hero's) | animeLow (same look, lower) | short | messy | spiky | curls | quiff | sidePart | slick | bob | fringe | long | sidePony |
 ponytail | pigtails | bun (soft hairlines, `engine/hair3d.js`), `hairColor`, `hairShade` (anime only: the shadow between locks), `bow` (colour) · `skirt` (colour, any top) · one-detail accents, each a colour: `sleeves`, `stripe`, `scarf`, `collar`, `bag` · `blush`
-(true | colour) · `lashes: true` · `face` glasses | sunglasses · `kid: true` (74% size) · `scale` · `outline` (colour | false).
+(true | colour) · `lashes: true` · `face` glasses | sunglasses · `kid: true` (74% size) · `scale` · `outline` (colour | false) · `pose` (the resting pose when none is given).
+
+**Role roster** (`/channel/cast.js`, all in muted colours next to the hero): friends and family `BESTIE` (the hero's best friend, a girl), `BRO`, `RIVAL`, `CLASSMATE`,
+`MOM`, `DAD`, `GRANDPA`, `GRANDMA`, `LITTLE_SIB`; school `TEACHER_F`, `TEACHER_M`, `TEACHER_VN` (áo dài), `PRINCIPAL`, `COACH`; hospital and emergency `DOCTOR`, `NURSE`,
+`PARAMEDIC`, `POLICE`, `FIREFIGHTER`; town `GUARD`, `CHEF`, `CASHIER`, `SCIENTIST`, `WORKER`, `REPORTER`, `SHADY`. `ROLES` maps script words to a role
+("nurse" → `NURSE`). Old names still work (`FRIEND` = `BRO`, `GIRL` = `CLASSMATE`, `GIRL2` = `BESTIE`, `STRANGER` = `SHADY`, `PARENT`, `TEACHER`).
+Dress a script's named character from the roster first; change a colour or the hair only when two of them share a scene and look alike.
+
+**Role details** (engine/costume3d.js; colours unless noted): `top` scrubs (V-neck, matching pants) | aodai (long tunic, mandarin collar, over `legs`) ·
+`labcoat` is muted off-white `#d2d3da` (set `color` to change) · `head` nurseCap | policeCap | chefHat | hardhat | fireHelmet (all hats, caps included, cast no shadow on the face) ·
+`hair` balding (a grey ring in `hairColor`) | lowBun · `mustache`, `beard`, `brows` (3D brows that stay on: older faces) · `lanyard` + `card`, `whistle`, `stethoscope: true`,
+`badge` (gold shield), `nameTag`, `patch` ('SECURITY', 'EMS': text on the chest), `epaulettes`, `belt` + `radio: true`, `bands` (two reflective torso bands), `hiVis` (vest),
+`apron`, `buttons` + `buttonRows: 2` + `buttonsTop`, `vee`, `goggles: true` (on the forehead) · `belly` (1.1–1.2) · `skirtLen` (longer skirt or shorter coat, e.g. 1.7 / 0.72) ·
+`prop` cane | book | clipboard | mic | torch | medbag, `propHand` 'L' | 'R' (the cane stands on the floor: use pose `hunchCane`).
 
 Methods (all return the character, so they chain):
 - `.place(x, y, z, yaw)` (yaw 0 faces +z, toward a default camera; π/2 faces +x), `.faceTo(x, z)`.
@@ -158,7 +172,7 @@ Methods (all return the character, so they chain):
 
 Poses: `stand relaxed confident handsInPockets talk explain point pointUp pointAtViewer wave cheer fistPump handsOnHead
 facepalm think crossArms shrug scared shocked sad phone phoneEar holdFront reach ready fight punch kick crouch kneel
-sit sitBack sitDesk lie jump fall superLand flexL`. A pose object:
+sit sitBack sitDesk lie jump fall superLand flexL hunch hunchCane handsOnHips handsOnBelt holdMic`. A pose object:
 `{ y, hips:[pitch,yaw,roll], spine:[…], head:[…], armL:[raise, az, bend, twist] | {to:[x,y,z], pole}, armR, legL:[lift, side,
 knee, twist] | {to}, legR, handL:'fist'|'open'|'point'|'relaxed', handR }` in degrees. Pitch + leans/nods forward, yaw +
 turns to the character's left, arm raise 0 = hanging, 90 = horizontal, 180 = up; az 0 = forward, 90 = sideways. `{to}`

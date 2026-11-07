@@ -28,6 +28,13 @@ giữ nguyên dáng suốt video và chữ luôn nét. Giọng đọc mặc đ�
 
 Có 5 điểm dừng để bạn duyệt: soát kịch bản, nghe thử giọng, chọn phong cách và bảng màu, xem thử kèm bảng điểm, bản cuối.
 
+## Có gì mới ở 0.2.3
+| Nhóm | Thay đổi |
+|---|---|
+| Nhân vật | Dàn 25 vai trong `channel/cast.js`: gia đình, trường học, bệnh viện, cảnh sát, cứu hỏa, bảo vệ, đầu bếp, thu ngân, nhà khoa học, công nhân, phóng viên, cô giáo áo dài · `ROLES` nối từ trong kịch bản với vai |
+| Engine | `engine/costume3d.js`: mũ y tá, kê-pi, mũ đầu bếp, mũ bảo hộ, ống nghe, dây thẻ, còi, phù hiệu, áo phản quang, tạp dề, râu, ria, hói, lông mày bạc, gậy, sách, micro… · áo `scrubs`, `aodai` · tư thế `hunch`, `hunchCane`, `handsOnHips`, `handsOnBelt`, `holdMic` |
+| Sửa lỗi | Vành mũ không còn đổ vệt bóng ngang mặt · áo blouse trắng ngà thay vì trắng tinh |
+
 ## Có gì mới ở 0.2.0
 | Nhóm | Thay đổi |
 |---|---|

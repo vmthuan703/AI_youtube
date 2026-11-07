@@ -156,10 +156,10 @@ function drawShot(buf, shot, lt, opts = {}) {
     if (def.kind === '3d') {
       const st = state3D(shot, def, info); const stg = st.stage || st.st || st; stg.activate?.();
       const nb = Math.max(1, Math.round(shot.mblur ?? def.mblur ?? 1));
-      if (nb <= 1) { const a = performance.now(); def.draw(st, lt, info, three); const b = performance.now(); stg.render(); g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(glCanvas, 0, 0, buf.width, buf.height); g.restore(); PROF.anim = b - a; PROF.gl = performance.now() - b; PROF.calls = stg.calls; PROF.tris = stg.tris; }
+      if (nb <= 1) { const a = performance.now(); def.draw(st, lt, info, three); stg.tick?.(lt); const b = performance.now(); stg.render(); g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(glCanvas, 0, 0, buf.width, buf.height); g.restore(); PROF.anim = b - a; PROF.gl = performance.now() - b; PROF.calls = stg.calls; PROF.tris = stg.tris; }
       else {   // motion blur: average nb sub-frames across a 180° shutter
         const ax = accA.getContext('2d'); ax.globalAlpha = 1;
-        for (let k = 0; k < nb; k++) { const st_ = lt - (0.5 / E.fps) * (1 - k / (nb - 1)); def.draw(st, Math.max(0, st_), { ...info, globalT: shot.start + Math.max(0, st_) }, three); stg.render(); ax.globalAlpha = 1 / (k + 1); ax.drawImage(glCanvas, 0, 0, accA.width, accA.height); }
+        for (let k = 0; k < nb; k++) { const st_ = lt - (0.5 / E.fps) * (1 - k / (nb - 1)); def.draw(st, Math.max(0, st_), { ...info, globalT: shot.start + Math.max(0, st_) }, three); stg.tick?.(Math.max(0, st_)); stg.render(); ax.globalAlpha = 1 / (k + 1); ax.drawImage(glCanvas, 0, 0, accA.width, accA.height); }
         ax.globalAlpha = 1; g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(accA, 0, 0, buf.width, buf.height); g.restore();
       }
       if (def.overlay && !opts.noOverlay) { g.save(); def.overlay(g, lt, info, st); g.restore(); }

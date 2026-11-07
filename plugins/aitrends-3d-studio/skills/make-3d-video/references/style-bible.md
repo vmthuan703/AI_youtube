@@ -60,6 +60,14 @@ simple characters, real staging, real light.
   against a lighter area or give them a rim so the head separates from the background.
 - **Signature elements:** lit windows (warm, some cool), lamps with glow + cone + floor pool, neon signs, lockers,
   big night windows with a city skyline, a moon. Sets extend beyond the frame so camera moves never reveal edges.
+- **Sets look built, not blank:** walls fall off toward the floor and have baseboards and mouldings; furniture sits on soft contact
+  shadows; a location says what it is through 4–8 props (`kind: 'hospital'` comes with bed rails, a heart monitor, a drip stand and a curtain).
+  The `pearl` style keeps sets 16% less saturated than the cast (`setSat`), so the hero's lime is always the loudest colour; pass
+  `keepSat: true` to `T.mat` for a prop that must stay vivid (a red alarm, a brand colour).
+- **Night is dark, faces are not:** night and storm stages light faces from the camera; still put a practical lamp near the faces in
+  night close-ups. The scorecard flags videos with too many frames too dark to read.
+- **Text a phone can read:** speech bubbles at least 38 px, labels 30–36 px, pills and tags 36 px (logical, 1080 high); the UI
+  enforces these floors. `config.textScale` (e.g. 1.1) scales every label for a mostly-mobile audience.
 - **Atmosphere in most shots:** `FX3.dust` indoors, `FX3.rain` for storms, `FX3.bokeh` behind close-ups, fog (stage
   fog), `FX3.frozen` droplets for time-stop.
 

@@ -28,6 +28,17 @@ giữ nguyên dáng suốt video và chữ luôn nét. Giọng đọc mặc đ�
 
 Có 5 điểm dừng để bạn duyệt: soát kịch bản, nghe thử giọng, chọn phong cách và bảng màu, xem thử kèm bảng điểm, bản cuối.
 
+## Có gì mới ở 0.2.4
+| Nhóm | Thay đổi |
+|---|---|
+| Ánh sáng | Bóng mềm dưới chân nhân vật và dưới đồ đạc · cảnh đêm/bão có đèn nhẹ từ phía máy quay làm sáng mặt, viền sáng mạnh hơn |
+| Màu | Phong cách `pearl`: bối cảnh bớt đậm 16% (`setSat`), nhân vật giữ màu; độ bão hòa trung bình 0.488 → 0.451 trên Body Healed |
+| Bối cảnh | Phòng `hospital` (giường có thanh chắn, máy đo tim chạy nhịp, cây truyền dịch, rèm, tủ, bồn rửa) · lớp học thêm đồng hồ, bảng ghim, giá sách · tường có ánh sáng nhạt dần, phào, tường hai màu |
+| Đám đông | Có tóc, tay, màu trầm; nhấp nhô, lắc lư, giơ tay theo đợt |
+| Chuyển động | Tóc trễ nhịp theo đầu, thân hơi kéo giãn khi bật lên/rơi xuống (`posesAt3`) |
+| Chữ | Cỡ chữ tối thiểu cho bong bóng thoại, nhãn, thẻ · `config.textScale` |
+| Kiểm tra | Bảng điểm thêm "tỉ lệ khung quá tối" |
+
 ## Có gì mới ở 0.2.3
 | Nhóm | Thay đổi |
 |---|---|

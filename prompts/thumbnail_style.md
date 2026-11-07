@@ -1,6 +1,6 @@
 # Quy tắc thumbnail (học từ dữ liệu đối thủ)
 
-**Trạng thái:** đề xuất ngày 2026-11-07, chờ bạn duyệt. Thay toàn bộ phong cách "TINY." cũ (đã bỏ).
+**Trạng thái:** bạn đã duyệt ngày 2026-11-07. Thay toàn bộ phong cách "TINY." cũ (đã bỏ).
 
 **Nguồn:** [báo cáo đối thủ 07/11](../reports/2026-11-07_doi_thu_whatif/BAO_CAO.md).
 - 40 thumbnail của Jeremy Bearimy, mã hóa tay rồi so view.

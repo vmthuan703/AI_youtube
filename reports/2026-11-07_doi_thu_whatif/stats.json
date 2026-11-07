@@ -1,0 +1,298 @@
+{
+ "n_channels": 51,
+ "n_long": 793,
+ "n_eligible": 695,
+ "n_original": 560,
+ "tiers": {
+  "C": 24,
+  "B": 17,
+  "A": 10
+ },
+ "base_wwin": 0.2959537219671301,
+ "base_win": 0.2875,
+ "base_hit100k": 0.1767857142857143,
+ "median_views": 8684.5,
+ "title_len_median_win": 41.0,
+ "title_len_median_lose": 42.0,
+ "title_len_JB": 39.5,
+ "tags_by_tier": [
+  {
+   "tier": "A",
+   "share_tags": 0.5,
+   "med_ntags": 20.0
+  },
+  {
+   "tier": "B",
+   "share_tags": 0.526,
+   "med_ntags": 19.0
+  },
+  {
+   "tier": "C",
+   "share_tags": 0.606,
+   "med_ntags": 18.0
+  }
+ ],
+ "tags_wwin_with": 0.2635827500333579,
+ "tags_wwin_without": 0.33083634608106627,
+ "tags_JB": 0,
+ "channels_no_tags": [
+  "DOOMPERK",
+  "IFopposite",
+  "Ifcinema",
+  "Ifsphere",
+  "Jeremy Bearimy",
+  "Nearside",
+  "Nick ifverse",
+  "OTHERWISE",
+  "Price of If",
+  "Super Logic",
+  "The If Lab",
+  "Then What?",
+  "Vanessa Harris",
+  "What If That",
+  "WhatIf Functions"
+ ],
+ "channels_no_tags_tierA": [
+  "DOOMPERK",
+  "Jeremy Bearimy",
+  "OTHERWISE"
+ ],
+ "share_first_tag_is_title": 0.25396825396825395,
+ "desc": [
+  {
+   "tier": "A",
+   "n": 130,
+   "desc_len": 905.0,
+   "paragraphs": 5.0,
+   "hashtags": 3.0,
+   "timestamps": 0.2,
+   "links": 0.58,
+   "ask_comment": 0.63,
+   "subscribe": 0.41,
+   "watch_more": 0.28,
+   "emoji": 0.57,
+   "first_line_question": 0.66
+  },
+  {
+   "tier": "B",
+   "n": 133,
+   "desc_len": 851.0,
+   "paragraphs": 4.0,
+   "hashtags": 3.0,
+   "timestamps": 0.51,
+   "links": 0.23,
+   "ask_comment": 0.54,
+   "subscribe": 0.47,
+   "watch_more": 0.02,
+   "emoji": 0.16,
+   "first_line_question": 0.66
+  },
+  {
+   "tier": "C",
+   "n": 297,
+   "desc_len": 1078.0,
+   "paragraphs": 5.0,
+   "hashtags": 3.0,
+   "timestamps": 0.67,
+   "links": 0.16,
+   "ask_comment": 0.48,
+   "subscribe": 0.35,
+   "watch_more": 0.03,
+   "emoji": 0.3,
+   "first_line_question": 0.45
+  },
+  {
+   "tier": "Jeremy Bearimy",
+   "n": 34,
+   "desc_len": 1583.0,
+   "paragraphs": 7.0,
+   "hashtags": 6.0,
+   "timestamps": 0.0,
+   "links": 0.09,
+   "ask_comment": 0.88,
+   "subscribe": 0.91,
+   "watch_more": 0.85,
+   "emoji": 0.85,
+   "first_line_question": 1.0
+  }
+ ],
+ "jb_chapters_share": 0.55,
+ "top_hashtags": {
+  "#whatif": 338,
+  "#animation": 248,
+  "#superpowers": 35,
+  "#science": 35,
+  "#stickman": 34,
+  "#superpower": 31,
+  "#animatedstories": 28,
+  "#space": 24,
+  "#animatedstory": 24,
+  "#survival": 16,
+  "#pov": 16,
+  "#crush": 16,
+  "#story": 14,
+  "#storytime": 12,
+  "#nearside": 11
+ },
+ "dur_median_by_tier": {
+  "A": 10.6,
+  "B": 9.0,
+  "C": 9.1
+ },
+ "dur_JB": 10.616666666666667,
+ "uploads_per_day_by_tier": {
+  "A": 0.66,
+  "B": 0.39,
+  "C": 0.7
+ },
+ "jb_hours_et": {
+  "3": 5,
+  "4": 7,
+  "5": 1,
+  "11": 5,
+  "12": 4,
+  "14": 3,
+  "15": 5,
+  "16": 1,
+  "17": 1,
+  "20": 1,
+  "21": 1
+ },
+ "jb": {
+  "n": 40,
+  "n_eligible": 34,
+  "median_views": 123648.0,
+  "subs": 43500,
+  "first": "2026-10-10",
+  "per_day": 1.46,
+  "hit100k": 20,
+  "total": 10484404,
+  "like_rate": 0.009705155624440725,
+  "comment_rate": 0.0008707022308951187
+ },
+ "jb_by_expr": [
+  {
+   "expr": "hoang_so",
+   "n": 4,
+   "median_views": 31256.0,
+   "hit100k": 0.0
+  },
+  {
+   "expr": "trung_tinh",
+   "n": 4,
+   "median_views": 55763.5,
+   "hit100k": 0.25
+  },
+  {
+   "expr": "tu_tin",
+   "n": 20,
+   "median_views": 339603.0,
+   "hit100k": 0.75
+  },
+  {
+   "expr": "vang_mat",
+   "n": 6,
+   "median_views": 21653.5,
+   "hit100k": 0.333
+  }
+ ],
+ "jb_by_text": [
+  {
+   "text": "chu",
+   "n": 19,
+   "median_views": 75842.0,
+   "hit100k": 0.474
+  },
+  {
+   "text": "none",
+   "n": 7,
+   "median_views": 38135.0,
+   "hit100k": 0.286
+  },
+  {
+   "text": "ui",
+   "n": 8,
+   "median_views": 264575.0,
+   "hit100k": 0.875
+  }
+ ],
+ "jb_by_girls": [
+  {
+   "girls": 0,
+   "n": 26,
+   "median_views": 48254.0,
+   "hit100k": 0.385
+  },
+  {
+   "girls": 1,
+   "n": 8,
+   "median_views": 399551.5,
+   "hit100k": 1.0
+  }
+ ],
+ "jb_by_split": [
+  {
+   "split": 0,
+   "n": 29,
+   "median_views": 75842.0,
+   "hit100k": 0.483
+  },
+  {
+   "split": 1,
+   "n": 5,
+   "median_views": 286378.0,
+   "hit100k": 0.8
+  }
+ ],
+ "jb_by_crowd": [
+  {
+   "crowd": 0,
+   "n": 27,
+   "median_views": 83420.0,
+   "hit100k": 0.481
+  },
+  {
+   "crowd": 1,
+   "n": 7,
+   "median_views": 516611.0,
+   "hit100k": 0.714
+  }
+ ],
+ "jb_by_phase": [
+  {
+   "phase": "10–21/10 (5–13 phút, 'What if')",
+   "n": 9,
+   "median_views": 38157.0,
+   "hit100k": 3
+  },
+  {
+   "phase": "từ 22/10 (≈10,5 phút, 'What IF')",
+   "n": 25,
+   "median_views": 154661.0,
+   "hit100k": 15
+  }
+ ],
+ "thumb_pixel": [
+  {
+   "group": "Anime",
+   "brightness": 58.6,
+   "saturation": 40.2,
+   "colorfulness": 70.0,
+   "white_share": 2.0
+  },
+  {
+   "group": "Jeremy Bearimy",
+   "brightness": 81.7,
+   "saturation": 57.1,
+   "colorfulness": 134.4,
+   "white_share": 14.9
+  },
+  {
+   "group": "Kênh gốc khác (top 4 video)",
+   "brightness": 50.7,
+   "saturation": 46.2,
+   "colorfulness": 77.0,
+   "white_share": 3.7
+  }
+ ]
+}

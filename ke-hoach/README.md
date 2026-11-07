@@ -11,5 +11,6 @@ Tuyến đang chạy (đã duyệt 2026-11-04):
 Mới nhất ở trên cùng.
 
 <!-- DANH_SACH:START -->
+- [08/11–10/11/2026](2026-11-08.md): lập ngày 2026-11-07, 6 video (A1–A3, B1–B3), dựa trên [báo cáo đối thủ 07/11](../reports/2026-11-07_doi_thu_whatif/BAO_CAO.md) (trọng tâm Jeremy Bearimy)
 - [07/11–09/11/2026](2026-11-07.md): lập ngày 2026-11-06, 6 video (A1–A3, B1–B3), làm lại trên snapshot 06/11
 <!-- DANH_SACH:END -->

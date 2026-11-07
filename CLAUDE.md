@@ -18,8 +18,9 @@
 - Chỉ thực hiện khi người dùng đồng ý rõ ràng. Mục đích: tiết kiệm token.
 
 ## Thumbnail
-- Khi được yêu cầu thiết kế thumbnail, mặc định dùng phong cách trong
-  `prompts/thumbnail_style.md`. Dựng 3–5 phương án rồi gửi ảnh để chọn.
+- Khi được yêu cầu thiết kế thumbnail, dùng quy tắc học từ dữ liệu đối thủ trong
+  `prompts/thumbnail_style.md` (đã bỏ phong cách "TINY." cũ). Dựng 4 phương án
+  theo 4 bố cục A–D trong file đó rồi gửi ảnh để chọn.
 
 ## Chọn nhánh
 - Khi chưa rõ việc thuộc nhánh nào: hỏi người dùng mô tả việc, chọn nhánh,

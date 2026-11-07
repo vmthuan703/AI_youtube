@@ -72,6 +72,9 @@ function toonRamp(steps, hard) {
 export function mat(c, o = {}) {
   const st = S(); const toon = o.toon === false ? null : (o.toon || st.toon || null);
   const { rim: rk = 0, limit = 0, rough = 0.85, metal = 0, flat = false, ...rest } = o; delete rest.toon;
+  // style.setSat < 1 calms the sets (materials without a rim: walls, floors, furniture, props); characters keep their colours
+  const setSat = rk > 0 || limit > 0 || o.keepSat ? 1 : (st.setSat ?? 1); delete rest.keepSat;
+  if (setSat !== 1) { const cc = C(c).clone(), hsl = {}; cc.getHSL(hsl); cc.setHSL(hsl.h, hsl.s * setSat, hsl.l); c = cc; }
   const m = QS.has('lambert') ? new THREE.MeshLambertMaterial({ color: C(c), flatShading: flat, ...rest }) : toon && !(metal > 0.45 && rough < 0.4) ? new THREE.MeshToonMaterial({ color: C(c), gradientMap: toonRamp(toon, st.toonHard), ...rest })
     : new THREE.MeshStandardMaterial({ color: C(c), roughness: rough, metalness: metal, flatShading: flat, ...rest });
   if (rk > 0 || limit > 0) addRim(m, rk, limit);
@@ -90,6 +93,14 @@ const _cache = new Map();
 export const cached = (k, make) => { if (!_cache.has(k)) _cache.set(k, make()); return _cache.get(k); };
 // soft round sprite texture (glows, bokeh, particles)
 export const dotTex = () => cached('dot', () => canvasTex(128, 128, (g, w, h) => { const gr = g.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.25, 'rgba(255,255,255,.55)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, w, h); }));
+// soft contact shadow under a prop or piece of furniture: a dark blurred footprint on the floor, sized from the object's bounds.
+// contactShadow(obj, { opacity, pad, y }) → the shadow mesh (add it to the stage). room() puts one under every floor-standing prop.
+export function contactShadow(obj, o = {}) {
+  obj.updateMatrixWorld(true); const b = new THREE.Box3().setFromObject(obj), sz = b.getSize(new THREE.Vector3()), c = b.getCenter(new THREE.Vector3()), pad = o.pad ?? 1.25;
+  if (sz.y < 0.05) return null;   // rugs and flat things need none
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(Math.max(0.2, sz.x * pad), Math.max(0.2, sz.z * pad)), new THREE.MeshBasicMaterial({ map: dotTex(), color: 0x000000, transparent: true, opacity: o.opacity ?? (S().contact ?? 0.42) * 0.8, depthWrite: false, fog: true }));
+  m.rotation.x = -Math.PI / 2; m.position.set(c.x, (o.y ?? b.min.y) + 0.005, c.z); m.renderOrder = 1; m.name = 'contact'; return m;
+}
 export const discTex = () => cached('disc', () => canvasTex(128, 128, (g, w, h) => { const gr = g.createRadialGradient(w / 2, h / 2, w * 0.3, w / 2, h / 2, w / 2); gr.addColorStop(0, 'rgba(255,255,255,.9)'); gr.addColorStop(0.8, 'rgba(255,255,255,.75)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, w, h); }));
 
 // ---------------------------------------------------------------- stage
@@ -117,7 +128,10 @@ export function stage(o = {}) {
   scene.add(sun, sun.target);
   // back light in the rim colour (separates black figures from dark sets); the fresnel rim does the rest
   const fill = new THREE.DirectionalLight(C(o.fillColor || M.rim), (o.fill ?? 0.9) * (L.fill ?? 1)); fill.position.set(...(o.fillPos || [4, 5, -7])); scene.add(fill, fill.target);
-  const rimState = { color: o.rim || M.rim, strength: (o.rimStrength ?? 0.6) * (L.rim ?? 1), power: o.rimPower ?? 3.4, dir: o.rimDir || null };
+  // night and storm: a soft light from the camera lifts faces off the dark set, and the rim is stronger (o.faceLight 0 turns it off)
+  const darkMood = /^(night|storm)$/.test(moodName), faceK = o.faceLight ?? (darkMood ? 0.55 : 0);
+  const faceLight = faceK > 0 ? new THREE.DirectionalLight(C(o.faceColor || '#e8e0ff'), faceK * (L.fill ?? 1)) : null; if (faceLight) scene.add(faceLight, faceLight.target);
+  const rimState = { color: o.rim || M.rim, strength: (o.rimStrength ?? (darkMood ? 0.85 : 0.6)) * (L.rim ?? 1), power: o.rimPower ?? 3.4, dir: o.rimDir || null };
   rim(rimState);
   const w = Math.round(E.W * E.PX), h = Math.round(E.H * E.PX);
   const composer = new EffectComposer(R, new THREE.WebGLRenderTarget(w, h, { samples: o.msaa ?? (E.quality === 'high' || E.quality === 'max' ? 4 : 0), type: THREE.HalfFloatType }));
@@ -129,10 +143,10 @@ export function stage(o = {}) {
   if (E.quality === 'standard' && o.msaa == null) { const fx = new ShaderPass(FXAAShader); fx.uniforms.resolution.value.set(1 / w, 1 / h); composer.addPass(fx); }   // cheap anti-aliasing
   const tickers = [];
   const api = {
-    scene, camera, composer, sun, hemi, fill, M, bloom, bokeh, tickers, moodName,
+    scene, camera, composer, sun, hemi, fill, M, bloom, bokeh, tickers, moodName, faceLight,
     // re-apply this stage's rim and mood before drawing it: another stage may have been built since (backdrops, transitions)
     activate: () => { rim(rimState); E.curMood = moodName; },
-    add: (...objs) => { objs.forEach(ob => ob && scene.add(ob)); return objs[0]; },
+    add: (...objs) => { objs.forEach(ob => { if (!ob) return; scene.add(ob); if (typeof ob.tick === 'function') tickers.push(ob.tick); }); return objs[0]; },   // objects with .tick(t) animate by themselves (crowds)
     // run every registered animator (particles, blinking signs, cars…) — call once per frame from draw()
     tick: (t) => { for (const f of tickers) f(t); },
     onTick: (f) => { tickers.push(f); return f; },
@@ -141,7 +155,8 @@ export function stage(o = {}) {
     // the depth pass measures along the view axis, so focus uses view depth: off-centre subjects stay sharp
     focusOn: (p) => { if (!bokeh) return; const v = Array.isArray(p) ? new THREE.Vector3(...p) : p.isVector3 ? p.clone() : p.getWorldPosition(new THREE.Vector3()); camera.updateMatrixWorld(); bokeh.uniforms.focus.value = Math.max(0.05, -v.applyMatrix4(camera.matrixWorldInverse).z); },
     exposure: (x) => { R.toneMappingExposure = x; },
-    render: () => { R.toneMappingExposure = (o.exposure ?? 1) * (L.exposure ?? 1); camera.aspect = E.W / E.H; camera.updateProjectionMatrix(); R.info.autoReset = false; R.info.reset(); composer.render(); api.calls = R.info.render.calls; api.tris = R.info.render.triangles; },
+    render: () => { if (faceLight) { camera.updateMatrixWorld(); faceLight.position.copy(camera.position); faceLight.target.position.copy(camera.position).add(camera.getWorldDirection(new THREE.Vector3()).multiplyScalar(6)); faceLight.target.updateMatrixWorld(); }
+      R.toneMappingExposure = (o.exposure ?? 1) * (L.exposure ?? 1); camera.aspect = E.W / E.H; camera.updateProjectionMatrix(); R.info.autoReset = false; R.info.reset(); composer.render(); api.calls = R.info.render.calls; api.tris = R.info.render.triangles; },
     dispose: () => { scene.traverse(x => { x.geometry?.dispose(); [].concat(x.material || []).forEach(m => { m.map?.dispose?.(); m.dispose(); }); }); composer.passes.forEach(p => p.dispose?.()); composer.dispose?.(); },   // free bloom/DOF targets too (long videos visit hundreds of shots per worker)
   };
   return api;

@@ -7,9 +7,12 @@
 // Real point lights are expensive: sets add at most `lights` of them near `focus` (default 4); the rest are glow-only.
 import * as THREE from 'three';
 import { S, mood, shade, mix, rng, clamp, lerp, noise } from './core.js';
-import { mat, box, rbox, cyl, sphere, plane, group, at, canvasTex, lamp, lightCone, glow, glowMat, prep, roundedBoxGeo, textTex, screen, cached, asphalt, tiles, planks, carpet, ground, color, cone, torus, capsule, mesh } from './kit3d.js';
+import { mat, box, rbox, cyl, sphere, plane, group, at, canvasTex, lamp, lightCone, glow, glowMat, prep, roundedBoxGeo, textTex, screen, cached, asphalt, tiles, planks, carpet, ground, color, cone, torus, capsule, mesh, contactShadow } from './kit3d.js';
 
 const R2 = Math.PI / 2;
+// greyscale multiplier for walls: light falls off toward the floor and a faint paint mottle, so walls are never flat slabs
+const wallTex = () => cached('wallTex', () => canvasTex(256, 256, (g, W, H) => { const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#f4f4f4'); gr.addColorStop(0.55, '#ffffff'); gr.addColorStop(1, '#c8c8c8'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  const r = rng(17); for (let i = 0; i < 900; i++) { g.fillStyle = 'rgba(' + (r() < 0.5 ? '0,0,0' : '255,255,255') + ',' + (0.015 + r() * 0.02) + ')'; const s = 4 + r() * 18; g.fillRect(r() * W, r() * H, s, s); } }));
 // ---------------------------------------------------------------- textures
 function windowsTex(cols, rows, o = {}) {
   const { color: base = '#2a2238', win = '#ffcf7a', lit = 0.45, seed = 3, shop = false, shopColor = '#ffd28a', cool = 0.12 } = o; const r = rng(seed);
@@ -123,23 +126,82 @@ export function rug(o = {}) { const m = new THREE.Mesh(new THREE.CircleGeometry(
 export function poster(o = {}) { const w = o.w || 0.6, h = o.h || 0.85; const t = canvasTex(256, Math.round(256 * h / w), (g, W, H) => { const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, o.c1 || '#e05a3a'); gr.addColorStop(1, o.c2 || '#3a2a8a'); g.fillStyle = gr; g.fillRect(0, 0, W, H); g.fillStyle = 'rgba(255,255,255,.85)'; g.beginPath(); g.arc(W / 2, H * 0.4, W * 0.22, 0, 7); g.fill(); if (o.text) { g.font = `900 ${W * 0.16}px Nunito`; g.textAlign = 'center'; g.fillText(o.text, W / 2, H * 0.85); } }); const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshStandardMaterial({ map: t, roughness: 0.8 })); return group(m); }
 export function money(o = {}) { const g = group(); const m = mat('#5aa060', { rough: 0.8 }), band = mat('#f2e6b0'); const n = o.n || 6; for (let i = 0; i < n; i++) { g.add(box(0.16, 0.06, 0.07, m, (i % 3) * 0.17, 0.03 + Math.floor(i / 3) * 0.06, 0), box(0.02, 0.062, 0.072, band, (i % 3) * 0.17, 0.03 + Math.floor(i / 3) * 0.06, 0)); } return g; }
 export function ball(o = {}) { return group(sphere(o.r || 0.11, mat(o.color || '#e8762a', { rough: 0.6 }), 0, o.r || 0.11, 0)); }
-// background people: instanced mini characters (round head, coloured hoodie, stick legs) in the style's skin.
-// area [x0, x1, z0, z1]; colors = hoodie palette; rise/riseFrom/y0 lift rows for bleachers (y += (riseFrom - z) * rise)
+// ---------------------------------------------------------------- location kits (hospital, school…): props that say where we are
+// wall clock with hands at `time` ('10:10' or a function of t → minutes), face toward +z
+export function wallClock(o = {}) { const r = o.r || 0.22, g = group(cyl(r, r, 0.05, mat(o.rim || '#2a2430', { rough: 0.5 }), 0, 0, 0, 32)); g.children[0].rotation.x = R2;
+  const face = new THREE.Mesh(new THREE.CircleGeometry(r * 0.88, 32), mat('#ece6dc', { rough: 0.8, keepSat: true })); face.position.z = 0.027; g.add(face);
+  for (let i = 0; i < 12; i++) { const a = (i / 12) * Math.PI * 2, tk = box(0.012, i % 3 ? 0.03 : 0.05, 0.004, '#2a2430', Math.sin(a) * r * 0.75, Math.cos(a) * r * 0.75, 0.03); tk.rotation.z = -a; g.add(tk); }
+  const hand = (len, wd) => { const h = new THREE.Group(); h.add(box(wd, len, 0.006, '#1a1820', 0, len / 2, 0)); h.position.z = 0.034 + wd * 0.1; g.add(h); return h; };
+  const hh = hand(r * 0.45, 0.022), mh = hand(r * 0.68, 0.014);
+  const set = (min) => { hh.rotation.z = -((min / 60) % 12) / 12 * Math.PI * 2; mh.rotation.z = -(min % 60) / 60 * Math.PI * 2; };
+  set(typeof o.time === 'string' ? (+o.time.split(':')[0]) * 60 + (+o.time.split(':')[1] || 0) : 610);
+  if (typeof o.time === 'function') g.tick = (t) => set(o.time(t)); g.position.y = o.y ?? 2.3; return g; }
+// cork board with pinned paper notes
+export function bulletinBoard(o = {}) { const w = o.w || 1.4, h = o.h || 0.9, r = rng(o.seed || 6); const g = group(box(w + 0.06, h + 0.06, 0.04, '#6a4a36', 0, 0, -0.01), box(w, h, 0.03, mat('#a8805a', { rough: 1 }), 0, 0, 0));
+  const notes = ['#ece6d8', '#e8d890', '#c8d8e8', '#e8c0c0', '#d0e0c0'];
+  for (let i = 0; i < (o.notes || 9); i++) { const nw = 0.16 + r() * 0.12, nh = 0.12 + r() * 0.14; const n = box(nw, nh, 0.004, mat(notes[(r() * notes.length) | 0], { rough: 1 }), (r() - 0.5) * (w - nw), (r() - 0.5) * (h - nh), 0.018); n.rotation.z = (r() - 0.5) * 0.2; g.add(n); g.add(sphere(0.012, '#b83a3a', n.position.x, n.position.y + nh / 2 - 0.03, 0.024, 8, 6)); }
+  g.position.y = o.y ?? 1.5; return g; }
+// hospital bed: metal frame on wheels, side rails, raised head, white sheet and a coloured blanket (foot toward +z)
+export function hospitalBed(o = {}) { const fm = mat('#c8ccd4', { rough: 0.35, metal: 0.55 }), dk = mat('#3a3e48', { rough: 0.5 }); const g = group();
+  g.add(box(1.0, 0.1, 2.1, fm, 0, 0.5, 0)); for (const sx of [-1, 1]) for (const sz of [-1, 1]) { g.add(cyl(0.025, 0.025, 0.42, fm, sx * 0.42, 0.27, sz * 0.92, 8)); const wh = cyl(0.06, 0.06, 0.04, dk, sx * 0.42, 0.06, sz * 0.92, 12); wh.rotation.z = R2; g.add(wh); }
+  g.add(rbox(0.94, 0.16, 2.0, 0.06, mat('#e4e2e8', { rough: 0.9 }), 0, 0.62, 0));
+  const back = rbox(0.94, 0.14, 0.75, 0.06, mat('#e4e2e8', { rough: 0.9 }), 0, 0.82, -0.72); back.rotation.x = 0.55; g.add(back); g.add(rbox(0.5, 0.12, 0.3, 0.05, mat('#f0eef4', { rough: 0.95 }), 0, 1.0, -0.9));
+  g.add(rbox(0.98, 0.07, 1.25, 0.03, mat(o.blanket || '#5a7a96', { rough: 0.95 }), 0, 0.72, 0.38));
+  g.add(box(1.04, 0.65, 0.05, fm, 0, 0.82, -1.07), box(1.04, 0.38, 0.05, fm, 0, 0.7, 1.07));
+  for (const sx of [-1, 1]) { g.add(box(0.03, 0.03, 1.0, fm, sx * 0.52, 0.92, -0.25), box(0.03, 0.03, 1.0, fm, sx * 0.52, 0.78, -0.25)); for (const z of [-0.7, 0.2]) g.add(box(0.03, 0.2, 0.03, fm, sx * 0.52, 0.76, z)); }
+  return g; }
+// IV drip stand with a bag and a line
+export function ivPole(o = {}) { const m = mat('#c8ccd4', { rough: 0.35, metal: 0.55 }); const g = group(cyl(0.015, 0.015, 1.9, m, 0, 0.95, 0, 8), cyl(0.25, 0.25, 0.03, mat('#3a3e48'), 0, 0.05, 0, 5), box(0.3, 0.015, 0.015, m, 0, 1.88, 0));
+  g.add(rbox(0.13, 0.22, 0.04, 0.03, mat('#d8e8f0', { transparent: true, opacity: 0.8, rough: 0.2, keepSat: true }), 0.12, 1.72, 0), cyl(0.004, 0.004, 0.9, mat('#d8e8f0', { keepSat: true }), 0.12, 1.15, 0, 4)); return g; }
+// heart monitor on a stand: a dark screen with a moving green trace and a pulse number (it animates once added with st.add)
+export function heartMonitor(o = {}) { const bpm = o.bpm || 72, col = o.color || '#5fe0a0';
+  const scr = screen(0.5, 0.34, (g, W, H, t) => { g.fillStyle = '#0c1418'; g.fillRect(0, 0, W, H); g.strokeStyle = 'rgba(95,224,160,.15)'; g.lineWidth = 1; for (let x = 0; x < W; x += 24) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, H); g.stroke(); }
+    g.strokeStyle = col; g.lineWidth = 4; g.lineJoin = 'round'; g.beginPath(); const per = 60 / bpm, head = ((t || 0) / (per * 3)) % 1;
+    for (let i = 0; i <= 120; i++) { const u = i / 120; if (Math.abs(u - head) < 0.02) { g.stroke(); g.beginPath(); continue; } const ph = (u * 3) % 1; const y = ph > 0.42 && ph < 0.47 ? -0.9 * Math.sin((ph - 0.42) / 0.05 * Math.PI) : ph > 0.47 && ph < 0.5 ? 0.35 : ph > 0.62 && ph < 0.72 ? -0.18 * Math.sin((ph - 0.62) / 0.1 * Math.PI) : 0; const X = u * W, Y = H * 0.55 + y * H * 0.32; if (i) g.lineTo(X, Y); else g.moveTo(X, Y); }
+    g.stroke(); g.fillStyle = col; g.font = '900 ' + Math.round(H * 0.2) + 'px Nunito'; g.textAlign = 'right'; g.fillText(String(o.bpmText ?? bpm), W - 14, H * 0.24); }, { px: 384, power: 1.1 });
+  scr.position.set(0, 1.45, 0.031); const g = group(rbox(0.56, 0.42, 0.06, 0.03, mat('#2a2e38', { rough: 0.4 }), 0, 1.45, 0), scr, cyl(0.02, 0.02, 1.25, mat('#c8ccd4', { metal: 0.5, rough: 0.35 }), 0, 0.62, -0.02, 8), cyl(0.22, 0.22, 0.03, mat('#3a3e48'), 0, 0.02, 0, 5));
+  g.tick = (t) => scr.update(t); g.screen = scr; return g; }
+// ceiling curtain track with a pleated privacy curtain hanging from it, along x
+export function curtain(o = {}) { const w = o.w || 2.2, h = o.h || 2.2, c = o.color || '#7a9a9a'; const g = group(box(w, 0.04, 0.05, mat('#c8ccd4', { metal: 0.5, rough: 0.35 }), 0, h + 0.3, 0));
+  const n = Math.round(w / 0.16), cm = mat(c, { rough: 1, side: THREE.DoubleSide }); for (let i = 0; i < n; i++) g.add(box(w / n + 0.02, h, 0.03, cm, -w / 2 + (i + 0.5) * w / n, h / 2 + 0.25, (i % 2 ? 0.04 : -0.04)));
+  return g; }
+// small bedside cabinet with a drawer and a cup
+export function bedsideCabinet(o = {}) { const c = o.color || '#c8c2b8'; const g = group(rbox(0.5, 0.75, 0.45, 0.03, mat(c, { rough: 0.7 }), 0, 0.375, 0), box(0.4, 0.015, 0.01, shade(c, -0.3), 0, 0.6, 0.23)); const cp = cup({}); cp.position.set(0.1, 0.75, 0); g.add(cp); return g; }
+
+// background people: instanced mini characters (round head, hair cap, muted top, arms, stick legs) in the style's skin.
+// area [x0, x1, z0, z1]; colors = top palette (muted by default, so the cast and the hero stay in front);
+// rise/riseFrom/y0 lift rows for bleachers (y += (riseFrom - z) * rise). The crowd moves by itself once added with st.add:
+// people bob and sway out of step, and `cheer` (0..1, or a function of t) raises arms in waves. o.still: true freezes it.
 export function crowd(o = {}) {
   const { n = 40, area = [-10, 10, -6, -2], seed = 5, s = 1, rise = 0, riseFrom = 0, y0 = 0 } = o; const r = rng(seed); const g = group();
   const st = S(), skinC = st.skin === 'ink' ? st.ink : (st.paleSkin || '#e8e0f2');
-  const colors = o.colors || ['#e0402e', '#3a78e0', '#2f9a6a', '#e0a830', '#e070a8', '#8a5ad6', '#3ab0c0', '#d65a2a'];
-  const skinM = mat(skinC, { rough: 0.5, rim: 1 }), hoodM = mat('#ffffff', { rough: 0.85, rim: 0.5 });
+  const colors = o.colors || ['#7a3a34', '#2c3e6e', '#3f6a58', '#8d4a6b', '#5f6a2e', '#2f6f6a', '#6a4a36', '#4a4a62', '#9a7a3a'];
+  const hairs = o.hairColors || ['#2a2024', '#4a3226', '#1e1a20', '#6a4a30', '#34262c', '#8a4426'];
+  const skinM = mat(skinC, { rough: 0.5, rim: 1 }), hoodM = mat('#ffffff', { rough: 0.85, rim: 0.5 }), hairM = mat('#ffffff', { rough: 0.9, rim: 0.3 });
   const bodyG = new THREE.CapsuleGeometry(0.17, 0.3, 4, 10), headG = new THREE.SphereGeometry(0.25, 16, 12), legG = new THREE.CapsuleGeometry(0.03, 0.4, 3, 6);
-  const bodies = new THREE.InstancedMesh(bodyG, hoodM, n), heads = new THREE.InstancedMesh(headG, skinM, n), legs = new THREE.InstancedMesh(legG, skinM, n * 2);
-  const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), sc = new THREE.Vector3(), p = new THREE.Vector3(), col = new THREE.Color();
+  const hairG = new THREE.SphereGeometry(0.262, 14, 8, 0, Math.PI * 2, 0, Math.PI * 0.42), armG = new THREE.CapsuleGeometry(0.045, 0.3, 3, 6); armG.translate(0, -0.17, 0);
+  const bodies = new THREE.InstancedMesh(bodyG, hoodM, n), heads = new THREE.InstancedMesh(headG, skinM, n), hairsM = new THREE.InstancedMesh(hairG, hairM, n), legs = new THREE.InstancedMesh(legG, skinM, n * 2), arms = new THREE.InstancedMesh(armG, hoodM, n * 2);
+  const P = [], col = new THREE.Color();
   for (let i = 0; i < n; i++) { const x = lerp(area[0], area[1], r()), z = lerp(area[2], area[3], r()), k = s * (0.85 + r() * 0.25), yaw = (r() - 0.5) * 1.2 + (o.yaw || 0);
-    const y = y0 + Math.max(0, riseFrom - z) * rise;
-    q.setFromEuler(new THREE.Euler(0, yaw, 0)); sc.set(k, k, k);
-    m4.compose(p.set(x, y + 0.8 * k, z), q, sc); bodies.setMatrixAt(i, m4); bodies.setColorAt(i, col.set(colors[(r() * colors.length) | 0]));
-    m4.compose(p.set(x, y + 1.42 * k, z), q, sc); heads.setMatrixAt(i, m4);
-    for (const sx of [-1, 1]) { m4.compose(p.set(x + sx * 0.07 * k * Math.cos(yaw), y + 0.26 * k, z - sx * 0.07 * k * Math.sin(yaw)), q, sc); legs.setMatrixAt(i * 2 + (sx > 0 ? 1 : 0), m4); } }
-  [bodies, heads, legs].forEach(m => { m.castShadow = true; g.add(m); }); return g;
+    P.push({ x, z, k, yaw, y: y0 + Math.max(0, riseFrom - z) * rise, ph: r() * 6.28, sp: 0.7 + r() * 0.8, fan: r(), bald: r() < 0.12 });
+    const cc = colors[(r() * colors.length) | 0]; bodies.setColorAt(i, col.set(cc)); for (const a of [0, 1]) arms.setColorAt(i * 2 + a, col.set(cc)); hairsM.setColorAt(i, col.set(hairs[(r() * hairs.length) | 0])); }
+  const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), qa = new THREE.Quaternion(), sc = new THREE.Vector3(), p = new THREE.Vector3(), e = new THREE.Euler();
+  const pose = (t) => {
+    const cheerAll = typeof o.cheer === 'function' ? o.cheer(t) : (o.cheer ?? 0.25);
+    P.forEach((c, i) => { const { x, z, k, yaw, y } = c; const bob = o.still ? 0 : Math.abs(Math.sin(t * c.sp * 2.2 + c.ph)) * 0.035 * k, sway = o.still ? 0 : Math.sin(t * c.sp + c.ph) * 0.08;
+      const up = o.still ? 0 : clamp((Math.sin(t * 1.3 + c.x * 0.35 + c.ph * 0.3) * 0.5 + 0.5) * 1.6 - (1.4 - cheerAll * 1.4) - c.fan * 0.4, 0, 1);
+      q.setFromEuler(e.set(0, yaw + sway, 0)); sc.set(k, k, k);
+      m4.compose(p.set(x, y + 0.8 * k + bob, z), q, sc); bodies.setMatrixAt(i, m4);
+      m4.compose(p.set(x, y + 1.42 * k + bob, z), q, sc); heads.setMatrixAt(i, m4);
+      m4.compose(p.set(x, y + 1.42 * k + bob, z), q, c.bald ? sc.set(0, 0, 0) : sc); hairsM.setMatrixAt(i, m4); sc.set(k, k, k);
+      for (const sx of [-1, 1]) { const cx = Math.cos(yaw), sz = Math.sin(yaw);
+        m4.compose(p.set(x + sx * 0.07 * k * cx, y + 0.26 * k, z - sx * 0.07 * k * sz), q, sc); legs.setMatrixAt(i * 2 + (sx > 0 ? 1 : 0), m4);
+        const raise = lerp(0.12, 2.75, up) * sx; qa.setFromEuler(e.set(0, 0, raise)); qa.premultiply(q);
+        m4.compose(p.set(x + sx * 0.2 * k * cx, y + 1.08 * k + bob, z - sx * 0.2 * k * sz), qa, sc); arms.setMatrixAt(i * 2 + (sx > 0 ? 1 : 0), m4); } });
+    [bodies, heads, hairsM, legs, arms].forEach(m => { m.instanceMatrix.needsUpdate = true; });
+  };
+  pose(0); [bodies, heads, hairsM, legs, arms].forEach(m => { m.castShadow = true; m.receiveShadow = true; m.frustumCulled = false; g.add(m); });
+  g.tick = o.still ? null : pose; return g;
 }
 
 // ---------------------------------------------------------------- sets
@@ -211,16 +273,25 @@ export function house(o = {}) {
   return g;
 }
 // room: interior. Floor w×d centred at the origin, back wall at z = -d/2, side walls at x = ±w/2 (open toward +z).
-// kind: bedroom | living | office | classroom | kitchen | hallway | empty.  window: 'back'|'left'|'right'|false with a city view at night.
+// kind: bedroom | living | office | classroom | kitchen | hallway | hospital | empty.  window: 'back'|'left'|'right'|false with a city view at night.
+// Walls get a soft top-to-bottom light falloff, baseboards, a crown moulding and (hospital, classroom, office) a two-tone wainscot with a rail.
 export function room(st, o = {}) {
   const M = st.M, w = o.w || 8, d = o.d || (o.kind === 'hallway' ? 22 : 7), h = o.h || 3.0, kind = o.kind || 'empty'; const r = rng(o.seed || 2);
-  const wallC = o.wall || M.wall, floorC = o.floor || M.floor;
-  const floorTex = kind === 'office' || kind === 'hallway' || kind === 'classroom' || kind === 'kitchen' ? tiles(floorC, 6, [w / 2, d / 2], 'rgba(0,0,0,.22)') : planks(floorC, 12, [w / 3, d / 3]);
-  st.add(ground(w + 0.4, d + 8, floorC, floorTex, { rough: kind === 'hallway' ? 0.35 : 0.75 }));
-  const wm = mat(wallC, { rough: 0.95 });
+  const hosp = kind === 'hospital';
+  const wallC = o.wall || (hosp ? mix(M.wall, '#8aa898', 0.5) : M.wall), floorC = o.floor || (hosp ? mix(M.floor, '#b8bcc4', 0.55) : M.floor);
+  const floorTex = kind === 'office' || kind === 'hallway' || kind === 'classroom' || kind === 'kitchen' || hosp ? tiles(floorC, 6, [w / 2, d / 2], 'rgba(0,0,0,.22)') : planks(floorC, 12, [w / 3, d / 3]);
+  st.add(ground(w + 0.4, d + 8, floorC, floorTex, { rough: kind === 'hallway' || hosp ? 0.35 : 0.75 }));
+  const wm = mat(wallC, { rough: 0.95, map: wallTex() });
   st.add(box(w + 0.4, h, 0.2, wm, 0, h / 2, -d / 2 - 0.1));
-  for (const sx of [-1, 1]) if (o['wall' + (sx < 0 ? 'L' : 'R')] !== false) st.add(box(0.2, h, d + 8, wm, sx * (w / 2 + 0.1), h / 2, 4));
-  st.add(box(w + 0.4, 0.12, 0.03, shade(wallC, -0.3), 0, 0.06, -d / 2 + 0.01));
+  const sides = [-1, 1].filter(sx => o['wall' + (sx < 0 ? 'L' : 'R')] !== false);
+  for (const sx of sides) st.add(box(0.2, h, d + 8, wm, sx * (w / 2 + 0.1), h / 2, 4));
+  // trims: baseboards, crown moulding, and a wainscot (lower wall a shade darker under a rail) where rooms usually have one
+  const trimC = shade(wallC, -0.3), crownC = shade(wallC, 0.12), wains = o.wainscot ?? (hosp || kind === 'classroom' || kind === 'office');
+  st.add(box(w + 0.4, 0.12, 0.03, trimC, 0, 0.06, -d / 2 + 0.01), box(w + 0.4, 0.07, 0.06, crownC, 0, h - 0.035, -d / 2 + 0.03));
+  for (const sx of sides) st.add(box(0.03, 0.12, d + 8, trimC, sx * (w / 2 - 0.01), 0.06, 4), box(0.06, 0.07, d + 8, crownC, sx * (w / 2 - 0.03), h - 0.035, 4));
+  if (wains) { const lowC = shade(wallC, -0.12), railC = shade(wallC, 0.18), wy = 0.95;
+    st.add(box(w + 0.4, wy, 0.01, mat(lowC, { rough: 0.9 }), 0, wy / 2, -d / 2 + 0.005), box(w + 0.4, 0.05, 0.04, railC, 0, wy, -d / 2 + 0.02));
+    for (const sx of sides) st.add(box(0.01, wy, d + 8, mat(lowC, { rough: 0.9 }), sx * (w / 2 - 0.005), wy / 2, 4), box(0.04, 0.05, d + 8, railC, sx * (w / 2 - 0.02), wy, 4)); }
   if (o.ceiling) st.add(box(w + 0.4, 0.1, d + 8, shade(wallC, -0.2), 0, h + 0.05, 4));
   // window with a night (or day) view
   const winSide = o.window ?? 'back'; let win = null;
@@ -234,8 +305,9 @@ export function room(st, o = {}) {
     st.add(win);
     const ml = new THREE.SpotLight(color(night ? '#9fb0ff' : '#fff2d8'), (o.windowLight ?? (night ? 14 : 30)) * (S().light?.practical ?? 1), 14, 0.7, 0.8, 1.2); ml.position.copy(win.position).add(new THREE.Vector3(0, 0.6, 0)).add(new THREE.Vector3(0, 0, winSide === 'back' ? -1.5 : 0)); ml.target.position.set(0, 0, 0); ml.castShadow = true; ml.shadow.mapSize.set(1024, 1024); st.add(ml, ml.target);
   }
-  const lamps = [];
-  const put = (obj, x, z, yaw = 0, y = 0) => { obj.position.set(x, y, z); obj.rotation.y = yaw; st.add(obj); return obj; };
+  const lamps = []; let bedTop = null, monitor = null;
+  // floor-standing props get a soft contact shadow so beds, desks and chairs sit on the floor instead of floating (o.contact: false to skip)
+  const put = (obj, x, z, yaw = 0, y = 0) => { obj.position.set(x, y, z); obj.rotation.y = yaw; st.add(obj); if (y === 0 && o.contact !== false) st.add(contactShadow(obj)); return obj; };
   const backZ = -d / 2;
   if (kind === 'bedroom') {
     put(bed({ color: o.bedColor || '#3a5aa0' }), -w / 2 + 1.1, backZ + 1.3, 0);
@@ -245,11 +317,21 @@ export function room(st, o = {}) {
   } else if (kind === 'living') {
     put(sofa({ color: o.sofaColor || '#7a3a4a' }), 0, backZ + 0.8); put(table({ w: 1.1, d: 0.55, h: 0.42, color: '#3a2a2a' }), 0, backZ + 2.1); put(rug({ r: 1.8 }), 0, backZ + 2.0);
     put(plant({}), -w / 2 + 0.5, backZ + 0.5); const fl = put(group(cyl(0.02, 0.02, 1.5, '#1a1a20', 0, 0.75, 0, 6), cone(0.2, 0.3, mat('#e8d8c0', { side: THREE.DoubleSide }), 0, 1.55, 0, 16)), w / 2 - 0.6, backZ + 0.5); const L = lamp(M.practical, 4, 6, { bulbR: 0.05 }); L.position.set(0, 1.45, 0); fl.add(L); lamps.push(fl);
+  } else if (hosp) {
+    // hospital room: bed against the back wall with the monitor and drip at its head, a privacy curtain, a visitor chair, a sink
+    const bx = o.bedX ?? -w / 2 + 1.6, bz = o.bedZ ?? backZ + 1.15; bedTop = [bx, 0.75, bz];
+    put(hospitalBed({ blanket: o.bedColor }), bx, bz); monitor = put(heartMonitor({ bpm: o.bpm, bpmText: o.bpmText }), bx - 0.85, bz - 0.8, 0.35); put(ivPole({}), bx + 0.8, bz - 0.7);
+    put(bedsideCabinet({}), bx + 1.15, backZ + 1.5, -R2); put(curtain({ w: 1.1, color: o.curtainColor || mix(wallC, '#6a8a8a', 0.5) }), bx - 1.35, bz + 0.1, R2);   // pulled open along the wall at the bed's head side
+    put(chair({ color: '#4a5a6a' }), bx + 1.3, bz + 0.9, -R2 * 0.8); put(wallClock({ time: o.clock || '10:10' }), bx + 2.6, backZ + 0.03, 0, 2.4);
+    put(group(box(0.6, 0.08, 0.45, mat('#e4e6ec', { rough: 0.3, keepSat: true }), 0, 0.85, 0), box(0.5, 0.75, 0.4, mat('#c8ccd4', { rough: 0.6 }), 0, 0.42, 0), cyl(0.015, 0.015, 0.25, mat('#c8ccd4', { metal: 0.6, rough: 0.3 }), 0, 1.0, -0.12, 8)), w / 2 - 0.45, backZ + 2.6, -R2);
   } else if (kind === 'office') {
+    put(wallClock({ time: o.clock || '3:40' }), w / 2 - 1.2, backZ + 0.03, 0, 2.4);
     for (let i = 0; i < (o.desks ?? 4); i++) { const x = -w / 2 + 1.4 + (i % 2) * 3.0, z = backZ + 1.4 + Math.floor(i / 2) * 2.6; put(desk({ color: '#3a3a48' }), x, z); put(officeChair({}), x, z + 0.65, Math.PI); put(tv({ w: 0.6, y: 1.05, color: '#5a8ad6' }), x, z - 0.1); }
     put(whiteboard({ text: o.boardText || '' }), 0, backZ + 0.03); put(plant({}), w / 2 - 0.5, backZ + 0.5);
   } else if (kind === 'classroom') {
     put(whiteboard({ text: o.boardText || '', dark: true, w: 3.6, h: 1.4 }), 0, backZ + 0.03); put(desk({ color: '#5a3a2a' }), -w / 2 + 1.5, backZ + 1.0);
+    put(wallClock({ time: o.clock || '8:55' }), 0, backZ + 0.03, 0, 2.55); put(bulletinBoard({ seed: o.seed || 6 }), w / 2 - 1.2, backZ + 0.03, 0, 1.5);
+    put(poster({ text: 'READ', c1: '#5a7a96', c2: '#3a2a5a', w: 0.55, h: 0.75 }), -w / 2 + 0.02, backZ + 2.2, R2, 1.65); put(shelf({ seed: 5 }), -w / 2 + 0.25, backZ + 4.2, R2);
     for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) { const x = -2 + j * 2, z = backZ + 2.6 + i * 1.5; put(table({ w: 0.9, d: 0.5, h: 0.72, color: '#8a6a4a' }), x, z); put(chair({ color: '#3a4a7a' }), x, z + 0.5, Math.PI); }
   } else if (kind === 'kitchen') {
     put(counter({ w: w * 0.7 }), -w * 0.1, backZ + 0.35); put(fridge({}), w / 2 - 0.6, backZ + 0.45); put(table({ w: 1.2, d: 0.9 }), 0, backZ + 3); for (const sx of [-1, 1]) put(chair({}), sx * 0.8, backZ + 3, -sx * R2);
@@ -262,7 +344,7 @@ export function room(st, o = {}) {
     for (let z = backZ + 1.5; z < backZ + d; z += 3) { const s2 = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.04, 0.18), glowMat('#fff4e6', 1.6)); s2.position.set(0, h - 0.03, z); st.add(s2); }
     for (const z of [backZ + 3, backZ + d * 0.6]) { const L = lamp('#fff0dc', o.lampIntensity ?? 6, 10, { bulb: false, shadow: z === backZ + 3 }); L.position.set(0, h - 0.3, z); st.add(L); lamps.push(L); }
   } else if (o.ceilingLights !== false && kind !== 'empty') { const n = kind === 'hallway' ? 3 : 1; for (let i = 0; i < n; i++) { const cl = ceilingLamp({ intensity: o.lampIntensity ?? 7, shadow: i === 0 }); cl.position.set(0, h, backZ + (kind === 'hallway' ? 3 + i * 6 : d / 2)); st.add(cl); lamps.push(cl); } }
-  return { w, d, h, window: win, lamps, backZ };
+  return { w, d, h, window: win, lamps, backZ, bedTop, monitor };
 }
 // park: grass, a curved path, trees, benches and lamps
 export function park(st, o = {}) {

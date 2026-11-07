@@ -32,7 +32,7 @@ export function readout(g, o = {}) {
   text(g, value, xx + lw, y, { size, color, glow: 16, glowColor: alpha(color, 0.6), font: FONTS.ui, weight: 900, align: 'left' }); g.restore();
 }
 // Callout label with leader line pointing at something
-export function callout(g, t, o = {}) { const { at = [E.W / 2, E.H / 2], to = [E.W / 2 + 200, E.H / 2 - 150], str = 'LABEL', color = S().ui.cream, size = V(30, 36), start = 0 } = o; const p = ease.out(prog(t, start, start + 0.5)); if (p <= 0) return; const ex = lerp(at[0], to[0], p), ey = lerp(at[1], to[1], p); circle(g, at[0], at[1], 6, color); seg(g, [at, [ex, ey]], 2, alpha(color, 0.8)); text(g, str, to[0] + (to[0] > at[0] ? 12 : -12), to[1], { size, color, font: FONTS.ui, weight: 900, align: to[0] > at[0] ? 'left' : 'right', alpha: clamp((p - 0.6) / 0.4), spacing: 1.5 }); }
+export function callout(g, t, o = {}) { o = sized(o, V(34, 38), V(30, 34)); const { at = [E.W / 2, E.H / 2], to = [E.W / 2 + 200, E.H / 2 - 150], str = 'LABEL', color = S().ui.cream, size = V(30, 36), start = 0 } = o; const p = ease.out(prog(t, start, start + 0.5)); if (p <= 0) return; const ex = lerp(at[0], to[0], p), ey = lerp(at[1], to[1], p); circle(g, at[0], at[1], 6, color); seg(g, [at, [ex, ey]], 2, alpha(color, 0.8)); text(g, str, to[0] + (to[0] > at[0] ? 12 : -12), to[1], { size, color, font: FONTS.ui, weight: 900, align: to[0] > at[0] ? 'left' : 'right', alpha: clamp((p - 0.6) / 0.4), spacing: 1.5 }); }
 // Dimension line with arrows: "30 m"
 export function dimension(g, t, o = {}) { const { x1, y1, x2, y2, str = '30 m', color = S().ui.gold, start = 0 } = o; const p = ease.out(prog(t, start, start + 0.6)); if (p <= 0) return; const ex = lerp(x1, x2, p), ey = lerp(y1, y2, p); seg(g, [[x1, y1], [ex, ey]], 3, color); const ang = Math.atan2(y2 - y1, x2 - x1), ar = (x, y, a) => poly(g, [[x, y], [x - Math.cos(a - 0.4) * 16, y - Math.sin(a - 0.4) * 16], [x - Math.cos(a + 0.4) * 16, y - Math.sin(a + 0.4) * 16]], color); ar(x1, y1, ang + Math.PI); if (p > 0.98) ar(x2, y2, ang); text(g, str, (x1 + x2) / 2 + 24, (y1 + y2) / 2, { size: V(40, 46), color, font: FONTS.ui, weight: 900, align: 'left', glow: 12, glowColor: alpha(color, 0.6), alpha: clamp((p - 0.5) * 2) }); }
 // Data card: title, subtitle, animated counter + curve drawing on
@@ -98,7 +98,12 @@ const popK = (t, start = 0) => (t == null ? 1 : ease.outBack(prog(t, start, star
 // "1 IN 1,000", "$10,000", "40,000": dark translucent pill, thin light border, bold caps (gold: true for key numbers)
 // full width of a pill, to place it against something
 export const pillWidth = (g, str, size, icon = null) => { const f = LF(), w8 = f === FONTS.serif ? 700 : 900; return measure(g, str, size, f, w8) + (icon ? size * 1.05 : 0) + size * 1.1; };
+// Text never gets smaller than a phone can read: each label has a default size and a floor (logical px at 1080 high).
+// E.cfg.textScale (config.json) scales every default, e.g. 1.1 for a mostly-mobile audience.
+const TS = () => E.cfg?.textScale ?? 1;
+const sized = (o, def, min) => ({ ...o, size: Math.max((o.size ?? def * TS()), min) });
 export function pill(g, o = {}) {
+  o = sized(o, V(50, 58), V(36, 42));
   const { str = '1 IN 1,000', x = E.W / 2, y = V(140, 260), size = V(48, 56), gold = false, color = null, a = 1, t = null, start = 0, icon = null, bg = null, line = null } = o;
   const k = popK(t, start); if (k <= 0.001 || a <= 0) return; const f = LF(), w8 = f === FONTS.serif ? 700 : 900;
   const tw = measure(g, str, size, f, w8) + (icon ? size * 1.05 : 0), w = tw + size * 1.1, h = size * 1.5;
@@ -119,7 +124,7 @@ export function drawIcon(g, kind, x, y, r) {
   g.restore();
 }
 // "✓ SMARTER" tag (serif in the crush look)
-export const tag = (g, o = {}) => pill(g, { icon: 'check', ...o, size: o.size || V(40, 48), bg: o.bg || 'rgba(30,18,30,.72)', line: o.line || 'rgba(255,214,150,.55)' });
+export const tag = (g, o = {}) => pill(g, { icon: 'check', ...o, size: o.size || V(44, 50) * TS(), bg: o.bg || 'rgba(30,18,30,.72)', line: o.line || 'rgba(255,214,150,.55)' });
 // counter pill with a heart (crush meter), e.g. heartPill(g, { n: 26, x, y })
 export const heartPill = (g, o = {}) => pill(g, { str: String(o.n ?? 3), icon: 'heart', bg: 'rgba(60,14,40,.82)', line: 'rgba(255,120,170,.75)', color: '#ffe0ea', ...o });
 // stat card: small spaced label over a big gold number ("TRIES / 1,000")
@@ -135,11 +140,12 @@ export function statCard(g, o = {}) {
 // red roulette-style number ball ("17")
 export function numberBall(g, o = {}) { const { n = 17, x, y, r = V(42, 50), color = '#c8303a', t = null, start = 0 } = o; const k = popK(t, start); if (k <= 0.001) return; g.save(); g.translate(x, y); g.scale(k, k); circle(g, 0, 0, r, color); ring(g, 0, 0, r * 0.86, r * 0.08, 'rgba(255,255,255,.55)'); text(g, String(n), 0, r * 0.04, { size: r * 0.95, font: FONTS.ui, weight: 900, color: '#fff' }); g.restore(); }
 // letter-spaced heading at the top ("THE RULES", "RULE 3 · IT BALANCES")
-export function heading(g, o = {}) { const { str = 'THE RULES', x = E.W / 2, y = V(120, 240), size = V(46, 54), a = 1, t = null, start = 0, color = '#fff2e2' } = o; const k = t == null ? 1 : ease.out(prog(t, start, start + 0.4)); if (k <= 0) return; const f = LF(); text(g, str, x, y, { size, font: f, weight: f === FONTS.serif ? 700 : 900, color, spacing: 6, alpha: a * k, glow: 10, glowColor: 'rgba(255,200,140,.35)' }); }
+export function heading(g, o = {}) { o = sized(o, V(50, 56), V(40, 46)); const { str = 'THE RULES', x = E.W / 2, y = V(120, 240), size = V(46, 54), a = 1, t = null, start = 0, color = '#fff2e2' } = o; const k = t == null ? 1 : ease.out(prog(t, start, start + 0.4)); if (k <= 0) return; const f = LF(); text(g, str, x, y, { size, font: f, weight: f === FONTS.serif ? 700 : 900, color, spacing: 6, alpha: a * k, glow: 10, glowColor: 'rgba(255,200,140,.35)' }); }
 // small spaced label under a character ("JAKE", "YOU")
-export function nameLabel(g, o = {}) { const { str = 'YOU', x, y, size = V(32, 38), a = 1, color = '#fff2e2' } = o; const f = LF(); text(g, str, x, y, { size, font: f, weight: f === FONTS.serif ? 700 : 900, color, spacing: 4, alpha: a }); }
+export function nameLabel(g, o = {}) { o = sized(o, V(36, 40), V(30, 34)); const { str = 'YOU', x, y, size = V(32, 38), a = 1, color = '#fff2e2' } = o; const f = LF(); text(g, str, x, y, { size, font: f, weight: f === FONTS.serif ? 700 : 900, color, spacing: 4, alpha: a }); }
 // white speech bubble with a tail toward [tx, ty] ("Sir. You're done for tonight.")
 export function speech(g, o = {}) {
+  o = sized(o, V(42, 46), V(38, 42));
   const { str = 'Hello!', x = E.W / 2, y = 200, tx = null, ty = null, size = V(34, 40), a = 1, t = null, start = 0, maxW = V(620, 700) } = o;
   const k = popK(t, start); if (k <= 0.001) return; const f = FONTS.ui;
   const words = str.split(' '), lines = []; let cur = ''; for (const w of words) { const n = cur ? cur + ' ' + w : w; if (measure(g, n, size, f, 900) > maxW && cur) { lines.push(cur); cur = w; } else cur = n; } lines.push(cur);

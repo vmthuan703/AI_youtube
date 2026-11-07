@@ -97,7 +97,8 @@ export function breathe3(pose, t, k = 1, seed = 1) {
   return out;
 }
 // posesAt3(t, [[0,'stand'], [0.8,'point'], [2.4, poseObj]], blend=0.3) — hold each pose, blend into the next
-export function posesAt3(t, keys, blend = 0.3) {
+export function posesAt3(t, keys, blend = 0.3) { return { ...poseAt3(t, keys, blend), _prev: poseAt3(t - 0.1, keys, blend) }; }   // _prev: hair and body follow-through
+function poseAt3(t, keys, blend) {
   const get = (p) => (typeof p === 'string' ? POSES3[p] || POSES3.stand : p);
   let i = 0; while (i + 1 < keys.length && t >= keys[i + 1][0]) i++;
   const cur = get(keys[i][1]); const nxt = keys[i + 1]; const prev = i > 0 ? get(keys[i - 1][1]) : null;
@@ -254,6 +255,9 @@ export function character(outfit = {}, opts = {}) {
   const root = new THREE.Group(); root.name = 'character'; { const who = opts.speaker || outfit.speaker; if (who) root.userData.speaker = String(who).toUpperCase(); }
   const scale = (outfit.scale || 1) * (outfit.kid ? 0.74 : 1) * (opts.s || 1);
   const body = new THREE.Group(); body.scale.setScalar(scale); root.add(body);
+  // soft contact shadow on the floor under the feet (outfit.contact: false to drop it; style.contact = opacity)
+  const contact = outfit.contact === false || opts.ghost ? null : new THREE.Mesh(new THREE.PlaneGeometry(0.78 * scale, 0.62 * scale), new THREE.MeshBasicMaterial({ map: contactTex(), color: 0x000000, transparent: true, opacity: S().contact ?? 0.42, depthWrite: false, fog: true }));
+  if (contact) { contact.rotation.x = -Math.PI / 2; contact.position.y = 0.006; contact.renderOrder = 1; contact.castShadow = contact.receiveShadow = false; contact.name = 'contact'; root.add(contact); }
   const ghost = opts.ghost ? new THREE.MeshBasicMaterial({ color: new THREE.Color(opts.ghost.color || '#9fd0ff'), transparent: true, opacity: opts.ghost.opacity ?? 0.35, blending: THREE.AdditiveBlending, depthWrite: false, fog: false }) : null;
   const MAT = (c, o = {}) => ghost || mat(c, { rim: 1, rough: 0.6, ...o });
   // pale skin glows faintly (as in the references: heads never go muddy, even back-lit); style.skinGlow 0..0.3
@@ -334,7 +338,8 @@ export function character(outfit = {}, opts = {}) {
   if (outfit.head === 'tophat') { hat(new THREE.Mesh(new THREE.CylinderGeometry(hr * 1.2, hr * 1.2, 0.015, 28), hM)).position.y = hr * 0.78; hat(new THREE.Mesh(new THREE.CylinderGeometry(hr * 0.72, hr * 0.75, hr * 1.1, 28), hM)).position.y = hr * 1.33; }
   if (outfit.head === 'crown') { const cr = add(new THREE.Mesh(new THREE.CylinderGeometry(hr * 0.7, hr * 0.6, hr * 0.45, 8, 1, true), MAT('#f2c21a', { metal: 0.6, rough: 0.35, rim: 0.4, side: THREE.DoubleSide })), head); cr.position.y = hr * 1.05; }
   head.children.slice(nHead).forEach(m => { m.castShadow = false; });
-  if (outfit.hair && outfit.hair !== 'balding') buildHair(outfit.hair === 'lowBun' ? 'slick' : outfit.hair, { head, hr, MAT, add, hull, olM, olW, color: hairC, shade: outfit.hairShade, dark, ghost });
+  const hairG = new THREE.Group(); head.add(hairG);
+  if (outfit.hair && outfit.hair !== 'balding') buildHair(outfit.hair === 'lowBun' ? 'slick' : outfit.hair, { head: hairG, hr, MAT, add, hull, olM, olW, color: hairC, shade: outfit.hairShade, dark, ghost });
   if (outfit.bow) { const bowM = MAT(outfit.bow, { rim: 0.4 }); const bow = new THREE.Group(); for (const sx of [-1, 1]) { const b = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.08, 4), bowM); b.rotation.z = sx * Math.PI / 2; b.position.x = sx * 0.04; bow.add(b); } bow.add(new THREE.Mesh(new THREE.SphereGeometry(0.022, 10, 8), bowM)); bow.position.set(hr * 0.42, hr * 0.86, hr * 0.2); bow.rotation.z = -0.4; add(bow, head); }
   if (outfit.face === 'glasses' || outfit.face === 'sunglasses') {
     const fm = MAT(outfit.face === 'sunglasses' ? '#111111' : '#2a2a2a', { rough: 0.3, rim: 0.2 });
@@ -416,6 +421,13 @@ export function character(outfit = {}, opts = {}) {
   };
   root.pose = (p) => {
     p = typeof p === 'string' ? POSES3[p] : p;
+    // follow-through: hair lags the head and the body stretches a little when it rises or drops fast (poses from posesAt3 carry _prev)
+    const q = p._prev; let sy = 1;
+    if (q) { const dp = (p.head?.[0] || 0) + (p.spine?.[0] || 0) - (q.head?.[0] || 0) - (q.spine?.[0] || 0), dyw = (p.head?.[1] || 0) + (p.spine?.[1] || 0) - (q.head?.[1] || 0) - (q.spine?.[1] || 0);
+      hairG.rotation.set(clamp(-dp * 0.35, -9, 9) * D2R, clamp(-dyw * 0.3, -9, 9) * D2R, 0); sy = 1 + clamp(((p.y || 0) - (q.y || 0)) * 0.9, -0.06, 0.06); }
+    else hairG.rotation.set(0, 0, 0);
+    body.scale.set(scale / Math.sqrt(sy), scale * sy, scale / Math.sqrt(sy));
+    if (contact) { const lying = Math.abs((p.hips || [0])[0]) > 45, up = Math.max(0, p.y || 0); contact.visible = !lying; const k = clamp(1 - up * 1.6, 0.35, 1); contact.scale.set(k, k, 1); contact.material.opacity = (S().contact ?? 0.42) * k * (contact.userData.fade ?? 1); }
     pelvis.position.set(0, B.hipY + (p.y || 0), 0); pelvis.rotation.copy(eul(p.hips || [0, 0, 0]));
     chest.rotation.copy(eul(p.spine || [0, 0, 0])); head.rotation.copy(eul(p.head || [0, 0, 0]));
     body.updateMatrixWorld(true);
@@ -460,13 +472,14 @@ export function character(outfit = {}, opts = {}) {
   root.headWorld = () => head.getWorldPosition(new THREE.Vector3());
   root.handWorld = (side = 'L') => hands[side].g.getWorldPosition(new THREE.Vector3());
   root.chestWorld = () => chest.localToWorld(new THREE.Vector3(0, 0.3, 0));
-  root.parts = { body, pelvis, chest, head, neck, hands, feet, skull, faceMesh, torso, skirt };
+  root.parts = { body, pelvis, chest, head, neck, hands, feet, skull, faceMesh, torso, skirt, hair: hairG, contact };
   root.hold = (obj, side = 'L', o = {}) => { const h = hands[side].g; h.add(obj); obj.position.set(...(o.pos || [0, -0.1, 0.04])); obj.rotation.set(...(o.rot || [0, 0, 0])); return obj; };
-  root.setOpacity = (a) => { root.traverse(m => { if (m.material) [].concat(m.material).forEach(mm => { mm.transparent = a < 1; mm.opacity = a; }); }); };
+  root.setOpacity = (a) => { root.traverse(m => { if (m === contact) { m.userData.fade = a; m.material.opacity = (S().contact ?? 0.42) * a; return; } if (m.material) [].concat(m.material).forEach(mm => { mm.transparent = a < 1; mm.opacity = a; }); }); };   // the contact shadow stays see-through
   root.outfit = outfit; root.look = { skin, eyeStyle, dark };
   if (prop) root.hold(prop.obj, prop.side, { pos: prop.pos, rot: prop.rot });
   root.pose(opts.pose || outfit.pose || 'stand'); root.face({ expr: opts.expr || 'neutral' });
   return root;
 }
-let _sole = null;
+let _sole = null, _contactTex = null;
+function contactTex() { if (_contactTex) return _contactTex; const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'); const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.45, 'rgba(255,255,255,.55)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); _contactTex = new THREE.CanvasTexture(c); return _contactTex; }
 function roundedSole() { if (_sole) return _sole; const s = new THREE.Shape(); s.absellipse(0, 0, 0.064, 0.14, 0, Math.PI * 2); _sole = new THREE.ExtrudeGeometry(s, { depth: 0.03, bevelEnabled: true, bevelThickness: 0.008, bevelSize: 0.008, bevelSegments: 2 }); _sole.rotateX(Math.PI / 2); _sole.translate(0, 0.03, 0); return _sole; }

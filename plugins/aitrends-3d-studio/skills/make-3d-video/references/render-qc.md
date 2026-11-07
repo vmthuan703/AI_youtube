@@ -35,7 +35,7 @@ Every final encode is H.264 High, yuv420p, BT.709, GOP = fps/2, B-frames 2, with
 
 ## Render
 **Preview first, then the scorecard.** `node render.mjs --project projects/<slug> --from 0 --to 20 --scale 0.5` writes `build/preview.mp4`
-(draft encode, JPEG). Add `--fps 30` to preview a 60 fps project at half the frames. Then `python tools/qc_metrics.py --project projects/<slug>` prints brightness, near-black share, saturation, bars, cut pace, words per minute and loudness against the reference ranges, and writes `build/qc_scorecard.md`. Send it with the preview.
+(draft encode, JPEG). Add `--fps 30` to preview a 60 fps project at half the frames. Then `python tools/qc_metrics.py --project projects/<slug>` prints brightness, near-black share, saturation, frames too dark to read, bars, cut pace, words per minute and loudness against the reference ranges, and writes `build/qc_scorecard.md`. Send it with the preview.
 
 **Final:**
 ```bash

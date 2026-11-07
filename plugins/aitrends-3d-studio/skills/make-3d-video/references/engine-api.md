@@ -103,7 +103,10 @@ T.dolly(cam, t, [[0, { pos: [0.2, 0.45, 9], look: [0, 1.35, 3] }], [3, { pos: [0
 
 ## Stage, materials, lights — `T` (engine/kit3d.js)
 - `T.stage({ mood, fov, fog:[near,far]|false, fogColor, sky:[top..bottom]|colour, keyPos, keyColor, keyIntensity, ambient,
-  fill, fillPos, rim, rimStrength, bloom, bloomThreshold, exposure, dof:{focus, aperture, maxblur}, shadowSize, shadows })`
+  fill, fillPos, rim, rimStrength, bloom, bloomThreshold, exposure, dof:{focus, aperture, maxblur}, shadowSize, shadows, faceLight })`
+  Night and storm moods add a soft light from the camera that lifts faces off the dark set (`faceLight` 0.55; 0 turns it off,
+  any mood can set it) and a stronger rim. `st.add(obj)` animates objects that carry `obj.tick(t)` (crowds, heart monitors, clocks);
+  the player calls `st.tick(t)` every frame, so shots no longer need to.
   → `st = { scene, camera, composer, sun, hemi, fill, M, add(...objs), onTick(fn), tick(t), focus(d), focusOn(obj|[x,y,z]),
   exposure(x), render() }`. `M = st.M` is the mood palette (sky, ambient, key, rim, wall, floor, dark, practical, grass,
   road, fog, accent). Default fog [14, 70], fov 35 (16:9) / 50 (9:16).
@@ -161,7 +164,8 @@ Dress a script's named character from the roster first; change a colour or the h
 
 Methods (all return the character, so they chain):
 - `.place(x, y, z, yaw)` (yaw 0 faces +z, toward a default camera; π/2 faces +x), `.faceTo(x, z)`.
-- `.pose(p)`: a name from `T.POSES3`, a pose object, `T.posesAt3(t, [[0,'stand'],[0.8,'point'],[2,'shrug']], blend)`,
+- `.pose(p)`: a name from `T.POSES3`, a pose object, `T.posesAt3(t, [[0,'stand'],[0.8,'point'],[2,'shrug']], blend)` (it carries the pose
+  0.1 s earlier, so the hair lags a turn of the head and the body stretches a little on fast rises and drops; keep using it for acting),
   `T.walkPose3(phase, {run, sprint, lean})`, `T.breathe3(pose, t, k, seed)`, `T.blendPose3(a, b, k)`.
 - `.face({ expr, talk, blink: true, t, look: [x, y] })`: expressions `neutral smile happy joy smirk smug determined
   angry surprised shocked scared worried nervous sad cry sleepy thinking confused awe evil dead deadpan unimpressed`, or a custom
@@ -194,9 +198,15 @@ Sets build into the stage and return anchors:
   street along x: road z ∈ [−4, 4], sidewalks to ±7 at y = 0.15, building row behind z < −7, street lamps, parked cars,
   skyline, moon. Returns `{ lamps, lane:[-2, 2], sidewalk: 0.15 }`.
 - `T.W.suburb(st, { seed, length, lights, focus, fence, moon, stars })` → houses with lit windows, lawns, fences, trees, road along x. Colours follow the stage mood (`M.houses`, `M.tree`); moon and stars only at night unless asked.
-- `T.W.room(st, { kind: bedroom|living|office|classroom|kitchen|hallway|empty, w, d, h, wall, floor, window:
-  'back'|'left'|'right'|false, view: 'day'|'night', ceiling, curtains, lockerColor, boardText, desks })` → floor centred at the origin, back wall
-  at z = −d/2, side walls at x = ±w/2, open toward +z. Returns `{ w, d, h, window, lamps, backZ }`.
+- `T.W.room(st, { kind: bedroom|living|office|classroom|kitchen|hallway|hospital|empty, w, d, h, wall, floor, window:
+  'back'|'left'|'right'|false, view: 'day'|'night', ceiling, curtains, lockerColor, boardText, desks, clock, wainscot, contact })` → floor centred at the origin, back wall
+  at z = −d/2, side walls at x = ±w/2, open toward +z. Returns `{ w, d, h, window, lamps, backZ, bedTop, monitor }`.
+  Walls have a light falloff, baseboards and a crown moulding; hospital, classroom and office add a two-tone wainscot. Every floor-standing
+  prop gets a soft contact shadow (`contact: false` skips them). **Location kits:** `hospital` builds a bed with rails (`bedX`, `bedZ`,
+  `bedColor`), a heart monitor (`bpm`, `bpmText`), a drip stand, a privacy curtain, a bedside cabinet, a visitor chair, a sink and a clock;
+  `classroom` adds a wall clock, a cork board, a poster and a bookcase. The props alone: `T.W.hospitalBed`, `heartMonitor`, `ivPole`,
+  `curtain`, `bedsideCabinet`, `wallClock({time: '10:10' | t => minutes})`, `bulletinBoard`. `T.contactShadow(obj)` gives any prop a soft
+  shadow on the floor (add it with `st.add`).
 - `T.W.explainer(st, { color, lineZ, light, line })` → the purple diagram stage of the references: flat backdrop with a
   fine faint grid, a floor meeting it in a thin light line at z = lineZ (default 0). Stand characters on the line, frame
   front-on with fov 18–28 (`T.dolly` from z ≈ 10–13), and add `UI.pill/statCard/tag/heading/nameLabel` in `overlay`.
@@ -220,8 +230,9 @@ Sets build into the stage and return anchors:
   `desk`, `chair({h})`, `officeChair`, `bed({color})`, `sofa`, `shelf`, `door`, `tv({w, draw})`, `laptop({draw})`,
   `phone({draw})` (screen = `phone.screen.update(t)`), `cup`, `bottle({color, label})`, `book`, `plant`, `deskLamp`,
   `ceilingLamp`, `whiteboard({text, dark, draw})`, `locker({color})`, `counter`, `fridge`, `rug`, `poster({text})`,
-  `money({n})`, `ball`, `crowd({n, area:[x0,x1,z0,z1], colors, s, yaw, rise, riseFrom, y0})` (instanced mini people in the
-style's skin with coloured hoodies; `rise` lifts rows for bleachers: y = y0 + (riseFrom − z) × rise).
+  `money({n})`, `ball`, `crowd({n, area:[x0,x1,z0,z1], colors, hairColors, s, yaw, rise, riseFrom, y0, cheer, still})` (instanced mini people in the
+style's skin with hair, arms and muted tops; `rise` lifts rows for bleachers: y = y0 + (riseFrom − z) × rise). Added with `st.add`, they bob, sway
+and raise their arms in waves; `cheer` 0–1 (or a function of t) sets how many cheer, `still: true` freezes them).
 - Project sets: write `scenes/sets/<name>.js` exporting `function build(T, st, o)` that composes these, so every shot in
   a location uses the same geometry. Invent new props from boxes/cylinders/rounded boxes when the script needs them.
 

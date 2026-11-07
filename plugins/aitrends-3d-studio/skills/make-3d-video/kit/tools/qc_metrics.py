@@ -14,6 +14,7 @@ TARGETS = {
     "luma": (0.19, 0.40, "median brightness 0-1", "Too dark: raise ambient, use the pearl style or a brighter palette."),
     "dark": (0.03, 0.22, "share of near-black pixels", "Lift the shadows: pearl style, more ambient, lighter walls."),
     "sat": (0.35, 0.47, "mean saturation 0-1", "Too intense: pearl style; keep only the hero outfit loud."),
+    "murky": (0.0, 0.12, "share of frames too dark to read (median < 0.13)", "Night scenes: keep the stage faceLight on, add a practical lamp near the faces, lighter walls."),
     "cuts": (16.0, 22.0, "shots per minute", "Add or merge cuts on phrase boundaries."),
     "median": (2.0, 2.7, "median shot, seconds", "Shorten holds or add inserts."),
     "p25": (1.2, 1.7, "a quarter of shots are shorter than, seconds", "Add one-second inserts and reaction cuts."),
@@ -44,7 +45,7 @@ def picture(path):
         F, y = F[:, top:-top], y[:, top:-top]
     mx, mn = F.max(axis=3), F.min(axis=3)
     sat = (mx - mn) / (mx + 1e-4)
-    return {"bars": float(bars), "luma": float(np.median(y)), "dark": float((y < 0.08).mean()), "sat": float(sat.mean())}
+    return {"bars": float(bars), "luma": float(np.median(y)), "dark": float((y < 0.08).mean()), "sat": float(sat.mean()), "murky": float((np.median(y.reshape(len(y), -1), axis=1) < 0.13).mean())}
 
 
 def cuts(path):

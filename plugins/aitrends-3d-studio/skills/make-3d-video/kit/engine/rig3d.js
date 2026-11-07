@@ -13,6 +13,7 @@ import * as THREE from 'three';
 import { buildHair } from './hair3d.js';
 import { S, clamp, lerp, mixVal, ease, prog, noise, shade } from './core.js';
 import { mat } from './kit3d.js';
+import { dressUp } from './costume3d.js';
 
 const D2R = Math.PI / 180;
 // body proportions (metres). Head is big on purpose (cartoon stick figure).
@@ -66,6 +67,12 @@ export const POSES3 = {
   fall: P({ y: -0.1, spine: [-25, 0, 10], armL: [120, 80, 30, 0], armR: [130, 70, 20, 0], handL: 'open', handR: 'open', legL: [40, 15, 30, 0], legR: [10, 15, 50, 0] }),
   superLand: P({ y: -0.3, spine: [35, 0, 0], head: [-25, 0, 0], armL: [60, -10, 10, 0], armR: [30, 60, 20, 0], handL: 'open', handR: 'fist', legL: [80, 12, 120, 0], legR: [-20, 15, 120, 0] }),
   flexL: P({ armL: [90, 85, 120, -90], handL: 'fist' }),
+  // role poses (costume3d.js): an older body, a cane in the right hand (outfit.prop 'cane'), hands on hips, hands on the belt, a microphone
+  hunch: P({ spine: [16, 0, 0], head: [-14, 0, 0], armL: [10, 5, 30, 0], armR: [10, 5, 30, 0], legL: [6, 4, 10, 0], legR: [6, 4, 10, 0] }),
+  hunchCane: P({ spine: [16, 0, 0], head: [-14, 0, 0], armL: [10, 5, 30, 0], armR: { to: [-0.27, 0.68, 0.14] }, handR: 'fist', legL: [6, 4, 10, 0], legR: [6, 4, 10, 0] }),
+  handsOnHips: P({ spine: [-4, 0, 0], armL: { to: [0.23, 0.64, 0.0], pole: [0.6, 0.9, -0.3] }, armR: { to: [-0.23, 0.64, 0.0], pole: [-0.6, 0.9, -0.3] }, handL: 'fist', handR: 'fist', legL: [0, 8, 0, 0], legR: [0, 8, 0, 0] }),
+  handsOnBelt: P({ spine: [-3, 0, 0], armL: { to: [0.2, 0.6, 0.06] }, armR: { to: [-0.2, 0.6, 0.06] }, handL: 'fist', handR: 'fist' }),
+  holdMic: P({ armL: [62, 12, 118, 0], handL: 'fist' }),
 };
 
 // ---------------------------------------------------------------- cycles
@@ -225,11 +232,14 @@ const lum = (c) => { const k = new THREE.Color(c); return 0.2126 * k.r + 0.7152 
 
 // ---------------------------------------------------------------- character builder
 // outfit: { skin: 'pale' | 'ink' | '#hex' (head, neck, bare limbs, hands), eyes: 'dot' | 'big', outline: '#hex' | false,
-//           top: 'hoodie'|'tshirt'|'jacket'|'suit'|'dress'|'labcoat'|'vest'|'none', color, color2 (trim), shirt,
+//           top: 'hoodie'|'tshirt'|'jacket'|'suit'|'dress'|'labcoat'|'vest'|'scrubs'|'aodai'|'none', color, color2 (trim), shirt,
 //           legs: pants colour | 'shorts:#hex' | null (bare stick legs), shoes: colour | null (round feet), shoeSole,
 //           gloves: colour (default: skin, i.e. ball hands), head: 'cap'|'capBack'|'beanie'|'hood'|'headband'|'crown'|'tophat',
 //           headColor, hair: see engine/hair3d.js, hairColor, hairShade, bow, sleeves, stripe, scarf, collar, bag (colours),
-//           face: 'glasses'|'sunglasses', tie, kid: bool, scale }
+//           face: 'glasses'|'sunglasses', tie, kid: bool, scale,
+//           role details (engine/costume3d.js): head 'nurseCap'|'policeCap'|'chefHat'|'hardhat'|'fireHelmet', hair 'balding'|'lowBun',
+//           mustache, beard, brows, lanyard, card, whistle, stethoscope, badge, nameTag, patch, epaulettes, belt, radio, bands,
+//           hiVis, apron, buttons, buttonRows, vee, goggles, belly, skirtLen, prop: 'cane'|'book'|'clipboard'|'mic'|'torch'|'medbag', propHand }
 export function character(outfit = {}, opts = {}) {
   const st = S();
   const skinKey = outfit.skin || st.skin || 'pale';
@@ -265,9 +275,11 @@ export function character(outfit = {}, opts = {}) {
   const top = outfit.top ?? 'hoodie', topC = outfit.color || '#2f6fe0', trim = outfit.color2 || shade(topC, -0.18);
   const clothM = (c, o = {}) => MAT(c, { rough: 0.9, rim: 0.55, ...o });
   const popK = outfit.pop ?? (top === 'puffer' ? 0.35 : 0);   // outfit.pop 0..1: self-lit cloth, a loud hero outfit stays loud in dim sets
-  const topM = top === 'none' ? skinM : clothM(top === 'labcoat' ? '#eef0f4' : topC, popK ? { emissive: new THREE.Color(topC).multiplyScalar(popK) } : {});
+  // labcoat: muted off-white by default so a doctor never outshines the hero (outfit.color overrides); aodai: a long tunic in topC
+  const coatC = top === 'labcoat' ? (outfit.color || '#d2d3da') : topC, coat = top === 'labcoat' || top === 'aodai';
+  const topM = top === 'none' ? skinM : clothM(coat ? coatC : topC, popK ? { emissive: new THREE.Color(topC).multiplyScalar(popK) } : {});
   const trimM = clothM(trim, { rim: 0.4 });
-  const sleeveLong = ['hoodie', 'jacket', 'puffer', 'suit', 'labcoat'].includes(top), sleeveShort = ['tshirt', 'dress'].includes(top);
+  const sleeveLong = ['hoodie', 'jacket', 'puffer', 'suit', 'labcoat', 'aodai'].includes(top), sleeveShort = ['tshirt', 'dress', 'scrubs'].includes(top);
   const chunky = top === 'hoodie' || top === 'jacket' || top === 'puffer';
   // torso (lathe profile, elliptical section). Hoodies are boxy and generous, like a 3D cartoon.
   const prof = top === 'none' ? [[0.001, -0.02], [0.06, 0], [0.065, 0.2], [0.07, 0.4], [0.05, 0.47], [0.001, 0.48]]
@@ -305,7 +317,7 @@ export function character(outfit = {}, opts = {}) {
   if (outfit.bag) { const bm = clothM(outfit.bag, { rim: 0.3 }); const pivot = new THREE.Group(); pivot.position.y = 0.19; pivot.rotation.z = -0.72; chest.add(pivot); const strap = add(new THREE.Mesh(new THREE.TorusGeometry(torsoR / Math.cos(0.72) + 0.005, 0.0105, 8, 48), bm), pivot); strap.rotation.x = Math.PI / 2; strap.scale.set(1, 0.56, 1); const pouch = add(new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.115, 0.055), bm), chest); pouch.position.set(0.16, -0.02, chunky ? 0.125 : 0.105); hull(pouch, 1.08); }
   let skirt = null;
   if (outfit.skirt && top !== 'dress') { const len = 0.26; skirt = add(new THREE.Mesh(new THREE.CylinderGeometry(0.178, 0.3, len, 28, 1, true), MAT(outfit.skirt, { rough: 0.85, rim: 0.4, side: THREE.DoubleSide })), pelvis); skirt.scale.z = 0.74; skirt.position.y = -len / 2 - 0.045; hull(skirt, 1 + olW / 0.25); }
-  if (top === 'dress' || top === 'labcoat') { const len = top === 'dress' ? 0.42 : 0.55; skirt = add(new THREE.Mesh(new THREE.CylinderGeometry(0.17, top === 'dress' ? 0.3 : 0.22, len, 28, 1, true), MAT(top === 'dress' ? topC : '#eef0f4', { rough: 0.85, rim: 0.4, side: THREE.DoubleSide })), pelvis); skirt.scale.z = 0.75; skirt.position.y = -len / 2 + 0.02; hull(skirt, 1 + olW / 0.25); }
+  if (top === 'dress' || coat) { const len = top === 'dress' ? 0.42 : 0.55; skirt = add(new THREE.Mesh(new THREE.CylinderGeometry(0.17, top === 'dress' ? 0.3 : 0.22, len, 28, 1, true), MAT(top === 'dress' ? topC : coatC, { rough: 0.85, rim: 0.4, side: THREE.DoubleSide })), pelvis); skirt.scale.z = 0.75; skirt.position.y = -len / 2 + 0.02; hull(skirt, 1 + olW / 0.25); }
   // --- head
   const skull = add(new THREE.Mesh(new THREE.SphereGeometry(B.headR, 48, 32), skinM), head); hull(skull, 1 + (olW * 1.15) / B.headR);
   const faceMat = ghost ? null : new THREE.MeshBasicMaterial({ color: new THREE.Color(dark ? 0.86 : 1, dark ? 0.86 : 1, dark ? 0.86 : 1), transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, fog: true });
@@ -314,13 +326,15 @@ export function character(outfit = {}, opts = {}) {
   const hc = outfit.headColor || '#f2c21a', hM = MAT(hc, { rough: 0.8, rim: 0.4 }); const hr = B.headR;
   const hairC = outfit.hairColor || (dark ? skin : '#6a3f26');
   const hat = (m, k = 1.03) => { add(m, head); hull(m, k); return m; };
+  const nHead = head.children.length;   // everything a hat adds below: no shadow band across the face
   if (outfit.head === 'cap' || outfit.head === 'capBack') { hat(new THREE.Mesh(new THREE.SphereGeometry(hr * 1.04, 32, 12, 0, Math.PI * 2, 0, Math.PI * 0.42), hM)).position.y = 0.01; const brim = add(new THREE.Mesh(new THREE.CylinderGeometry(hr * 0.75, hr * 0.75, 0.016, 28, 1, false, -1.1, 2.2), hM), head); brim.scale.set(1, 1, 1.2); brim.position.set(0, hr * 0.42, outfit.head === 'cap' ? hr * 0.72 : -hr * 0.72); if (outfit.head === 'capBack') brim.rotation.y = Math.PI; hull(brim, 1.04); }
   if (outfit.head === 'beanie') { const d = hat(new THREE.Mesh(new THREE.SphereGeometry(hr * 1.05, 32, 12, 0, Math.PI * 2, 0, Math.PI * 0.45), hM)); d.scale.y = 1.12; const cuff = add(new THREE.Mesh(new THREE.TorusGeometry(hr * 1.0, 0.028, 8, 32), hM), head); cuff.rotation.x = Math.PI / 2; cuff.position.y = hr * 0.25; const pom = add(new THREE.Mesh(unitSph, MAT(shade(hc, 0.25), { rim: 0.3 })), head); pom.scale.setScalar(0.055); pom.position.y = hr * 1.18; }
   if (outfit.head === 'headband') { const band = add(new THREE.Mesh(new THREE.TorusGeometry(hr * 1.0, 0.024, 8, 32), hM), head); band.rotation.x = Math.PI / 2 - 0.15; band.position.y = hr * 0.45; }
   if (outfit.head === 'hood') { hat(new THREE.Mesh(new THREE.SphereGeometry(hr * 1.12, 32, 16, Math.PI * 0.85, Math.PI * 1.3, 0, Math.PI * 0.72), MAT(outfit.headColor || topC, { rough: 0.9, rim: 0.5, side: THREE.DoubleSide }))).position.set(0, 0.01, -0.01); }
   if (outfit.head === 'tophat') { hat(new THREE.Mesh(new THREE.CylinderGeometry(hr * 1.2, hr * 1.2, 0.015, 28), hM)).position.y = hr * 0.78; hat(new THREE.Mesh(new THREE.CylinderGeometry(hr * 0.72, hr * 0.75, hr * 1.1, 28), hM)).position.y = hr * 1.33; }
   if (outfit.head === 'crown') { const cr = add(new THREE.Mesh(new THREE.CylinderGeometry(hr * 0.7, hr * 0.6, hr * 0.45, 8, 1, true), MAT('#f2c21a', { metal: 0.6, rough: 0.35, rim: 0.4, side: THREE.DoubleSide })), head); cr.position.y = hr * 1.05; }
-  if (outfit.hair) buildHair(outfit.hair, { head, hr, MAT, add, hull, olM, olW, color: hairC, shade: outfit.hairShade, dark, ghost });
+  head.children.slice(nHead).forEach(m => { m.castShadow = false; });
+  if (outfit.hair && outfit.hair !== 'balding') buildHair(outfit.hair === 'lowBun' ? 'slick' : outfit.hair, { head, hr, MAT, add, hull, olM, olW, color: hairC, shade: outfit.hairShade, dark, ghost });
   if (outfit.bow) { const bowM = MAT(outfit.bow, { rim: 0.4 }); const bow = new THREE.Group(); for (const sx of [-1, 1]) { const b = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.08, 4), bowM); b.rotation.z = sx * Math.PI / 2; b.position.x = sx * 0.04; bow.add(b); } bow.add(new THREE.Mesh(new THREE.SphereGeometry(0.022, 10, 8), bowM)); bow.position.set(hr * 0.42, hr * 0.86, hr * 0.2); bow.rotation.z = -0.4; add(bow, head); }
   if (outfit.face === 'glasses' || outfit.face === 'sunglasses') {
     const fm = MAT(outfit.face === 'sunglasses' ? '#111111' : '#2a2a2a', { rough: 0.3, rim: 0.2 });
@@ -331,7 +345,7 @@ export function character(outfit = {}, opts = {}) {
   // --- limbs: segments (cylinder + joint spheres) re-oriented every frame; outlines follow with a bigger radius
   const segs = [];
   const seg = (r, m, capEnd = true) => { const c = add(new THREE.Mesh(unitCyl, m), body); const j = capEnd ? add(new THREE.Mesh(unitSph, m), body) : null; const s = { r, c, j }; if (olM) { s.oc = new THREE.Mesh(unitCyl, olM); s.oj = capEnd ? new THREE.Mesh(unitSph, olM) : null; body.add(s.oc); if (s.oj) body.add(s.oj); } segs.push(s); return s; };
-  const pantsC = outfit.legs ?? null, shorts = typeof pantsC === 'string' && /^shorts:/.test(pantsC), bareLegs = !pantsC;
+  const pantsC = outfit.legs ?? (top === 'scrubs' ? topC : null), shorts = typeof pantsC === 'string' && /^shorts:/.test(pantsC), bareLegs = !pantsC;
   const pantsM = bareLegs ? skinM : MAT(shorts ? pantsC.slice(7) : pantsC, { rough: 0.85, rim: 0.55 });
   const sleeveM = top === 'none' || top === 'vest' ? skinM : outfit.sleeves ? clothM(outfit.sleeves) : topM;
   const limbR = dark ? B.limbR : B.limbR * 0.85;
@@ -372,6 +386,8 @@ export function character(outfit = {}, opts = {}) {
     } else { const ft = add(new THREE.Mesh(unitSph, skinM), f); ft.scale.set(0.05, 0.04, 0.09); ft.position.set(0, 0.03, 0.04); hull(ft, 1.18); }
     feet[side] = f;
   }
+  // role costume details (engine/costume3d.js): lanyards, badges, nurse/police caps, beards, a cane...
+  const prop = dressUp({ ...outfit, top }, { MAT, add, hull, chest, head, body, hr, chunky, hairC, ghost: !!ghost, parts: { torso, skirt } });
   // ---------------------------------------------------------------- posing
   const tmp = new THREE.Vector3(), up = new THREE.Vector3(0, 1, 0);
   const place = (s, A, Bp, r) => {
@@ -448,7 +464,8 @@ export function character(outfit = {}, opts = {}) {
   root.hold = (obj, side = 'L', o = {}) => { const h = hands[side].g; h.add(obj); obj.position.set(...(o.pos || [0, -0.1, 0.04])); obj.rotation.set(...(o.rot || [0, 0, 0])); return obj; };
   root.setOpacity = (a) => { root.traverse(m => { if (m.material) [].concat(m.material).forEach(mm => { mm.transparent = a < 1; mm.opacity = a; }); }); };
   root.outfit = outfit; root.look = { skin, eyeStyle, dark };
-  root.pose(opts.pose || 'stand'); root.face({ expr: opts.expr || 'neutral' });
+  if (prop) root.hold(prop.obj, prop.side, { pos: prop.pos, rot: prop.rot });
+  root.pose(opts.pose || outfit.pose || 'stand'); root.face({ expr: opts.expr || 'neutral' });
   return root;
 }
 let _sole = null;

@@ -1,7 +1,7 @@
 # AI_youtube
 
 <!-- KE_HOACH_MOI_NHAT:START -->
-> **Kế hoạch nội dung 3 ngày tới:** [07/11–09/11 · 6 video (tuyến A + B)](ke-hoach/2026-11-07.md) · lập ngày 2026-11-06 · cập nhật 3 ngày một lần · [các kế hoạch trước](ke-hoach/README.md)
+> **Kế hoạch nội dung 3 ngày tới:** [08/11–10/11 · 6 video (tuyến A + B)](ke-hoach/2026-11-08.md) · lập ngày 2026-11-07 · kèm [báo cáo đối thủ What If 07/11](reports/2026-11-07_doi_thu_whatif/BAO_CAO.md) · [các kế hoạch trước](ke-hoach/README.md)
 <!-- KE_HOACH_MOI_NHAT:END -->
 
 ## Tự động nghiên cứu thị trường
@@ -14,34 +14,34 @@
 <!-- DAILY:START -->
 ## Báo cáo hôm nay
 
-_Cập nhật tự động 2026-11-06. Số liệu từ YouTube Data API, đối chiếu bằng tay trước khi quyết định._
+_Cập nhật tự động 2026-11-07. Số liệu từ YouTube Data API, đối chiếu bằng tay trước khi quyết định._
 
-### Tóm tắt thu thập 2026-11-06
+### Tóm tắt thu thập 2026-11-07
 
-- Quota đã dùng: 2176 / ngân sách 6000 đơn vị
-- Kênh theo dõi: 54 · video đã chụp: 1229
+- Quota đã dùng: 2182 / ngân sách 6000 đơn vị
+- Kênh theo dõi: 56 · video đã chụp: 1318
 
 #### What-If Fiction × Mỹ
 
 - Truy vấn đã chạy: 20 · bỏ qua: 0 · lỗi: 0
-- Kênh mới thêm vào theo dõi: Matal, BrainBracket, Stick Knows, The Hypothetical Room, Just Suppose ?, Stick Saga
-- Kênh bỏ khỏi theo dõi vì lệch ngách: Matal (14% khớp), BrainBracket (43% khớp), Stick Knows (4% khớp), Stick Saga (33% khớp)
-- Bảng chấm nhanh (chỉ dữ liệu hôm nay): **CẦN THEO DÕI** · tuổi trung vị top 5: 19.3 tháng · video ≥ 100k: 231
+- Kênh mới thêm vào theo dõi: Matal, BrainBracket, Stick Saga, Stick Knows, Lookif, IFANIME
+- Kênh bỏ khỏi theo dõi vì lệch ngách: Matal (12% khớp), BrainBracket (44% khớp), Stick Saga (43% khớp), Stick Knows (5% khớp)
+- Bảng chấm nhanh (chỉ dữ liệu hôm nay): **CẦN THEO DÕI** · tuổi trung vị top 5: 57.4 tháng · video ≥ 100k: 255
 
 | Kênh mới thắng | Tuổi (ngày) | Sub | Video to nhất |
 |---|---|---|---|
-| Minute Zero | 26 | 21.900 | 2.271.217 |
-| Araragi | 117 | 23.000 | 1.394.135 |
-| ConChaser | 12 | 16.400 | 1.376.773 |
-|  Jeremy Bearimy | 25 | 37.500 | 1.364.122 |
-| OminiAM | 30 | 6.480 | 1.155.348 |
-| Earth Tipping | 37 | 1.500 | 950.658 |
-| Manifesting | 24 | 4.970 | 949.746 |
-| IFOLOGY | 26 | 52.800 | 914.845 |
-| What If Animations | 33 | 6.090 | 876.803 |
-| Miko | 19 | 7.630 | 751.384 |
+| Minute Zero | 27 | 22.200 | 2.305.801 |
+|  Jeremy Bearimy | 27 | 43.500 | 1.572.883 |
+| ConChaser | 14 | 18.200 | 1.500.560 |
+| Araragi | 119 | 23.400 | 1.421.042 |
+| OminiAM | 32 | 6.680 | 1.172.909 |
+| Manifesting | 26 | 5.170 | 959.675 |
+| Earth Tipping | 38 | 1.510 | 958.220 |
+| IFOLOGY | 28 | 54.100 | 936.081 |
+| What If Animations | 35 | 6.090 | 877.535 |
+| Miko | 20 | 8.170 | 799.532 |
 
-Xem thêm: [dữ liệu ngày 2026-11-06](https://github.com/vmthuan703/AI_youtube/blob/research/reports/data/2026-11-06/TOM_TAT.md)
+Xem thêm: [dữ liệu ngày 2026-11-07](https://github.com/vmthuan703/AI_youtube/blob/research/reports/data/2026-11-07/TOM_TAT.md)
 
 <!-- DAILY:END -->
 

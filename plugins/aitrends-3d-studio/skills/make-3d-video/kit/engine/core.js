@@ -17,7 +17,10 @@ export const ease = {
   sine: x => -(Math.cos(Math.PI * clamp(x)) - 1) / 2,
   outBack: x => { x = clamp(x); const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * (x - 1) ** 3 + c1 * (x - 1) ** 2; },
   outElastic: x => { x = clamp(x); return x === 0 || x === 1 ? x : 2 ** (-10 * x) * Math.sin((x * 10 - 0.75) * (2 * Math.PI) / 3) + 1; },
+  // in-out with a little anticipation (dips back first) and overshoot (passes the target, then settles); a = 1 ≈ 10 %
+  back: (x, a = 0.5) => { x = clamp(x); const c2 = 1.70158 * a * 1.525; return x < 0.5 ? ((2 * x) ** 2 * ((c2 + 1) * 2 * x - c2)) / 2 : ((2 * x - 2) ** 2 * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2; },
 };
+ease.backK = (a) => (x) => ease.back(x, a);
 // keyframes: key(t, [[0, 1], [2, 1.2], [4, 1]], ease.inOut) -> number | array | object of numbers
 export function key(t, frames, fn = ease.inOut) {
   if (t <= frames[0][0]) return frames[0][1];
@@ -32,8 +35,30 @@ export function mixVal(a, b, k) {
   if (Array.isArray(a)) return a.map((v, i) => mixVal(v, b[i], k));
   const o = {}; for (const kk in a) o[kk] = typeof a[kk] === 'number' || Array.isArray(a[kk]) ? mixVal(a[kk], b[kk] ?? a[kk], k) : (k < 0.5 ? a[kk] : b[kk] ?? a[kk]); return o;
 }
+// smoothKey(t, [[0, v0], [2, v1], [5, v2]]) — like key(), but one smooth curve through every key: it eases in at the first key,
+// keeps moving through the middle keys (no stop at each one) and eases out at the last. Monotone, so it never swings past a
+// key and two equal keys hold still. Values: numbers, arrays, or objects of numbers/arrays (camera keys {pos, look, fov, roll}).
+export function smoothKey(t, frames) {
+  const n = frames.length;
+  const flat = (v, out = []) => { if (typeof v === 'number') out.push(v); else if (Array.isArray(v)) v.forEach(x => flat(x, out)); else if (v && typeof v === 'object') for (const k of Object.keys(v).sort()) flat(v[k], out); return out; };
+  // every key gets the same fields: a field missing on a key (a fov given only on some keys) carries over from the nearest key that has it
+  let vals = frames.map(f => f[1]);
+  if (vals[0] && typeof vals[0] === 'object' && !Array.isArray(vals[0])) {
+    vals = vals.map(v => ({ ...v }));
+    for (const k of new Set(vals.flatMap(v => Object.keys(v)))) { let last = vals.find(v => v[k] !== undefined)[k]; for (const v of vals) { if (v[k] === undefined) v[k] = last; else last = v[k]; } }
+  }
+  if (n === 1 || t <= frames[0][0]) return vals[0]; if (t >= frames[n - 1][0]) return vals[n - 1];
+  const ts = frames.map(f => f[0]), Y = vals.map(v => flat(v)); let i = 0; while (i < n - 2 && t > ts[i + 1]) i++;
+  const h = ts[i + 1] - ts[i], u = (t - ts[i]) / h, h00 = 2 * u ** 3 - 3 * u ** 2 + 1, h10 = u ** 3 - 2 * u ** 2 + u, h01 = -2 * u ** 3 + 3 * u ** 2, h11 = u ** 3 - u ** 2;
+  const slope = (j, c) => (Y[j + 1][c] - Y[j][c]) / (ts[j + 1] - ts[j]);
+  const tan = (j, c) => { if (j === 0 || j === n - 1) return 0; const d0 = slope(j - 1, c), d1 = slope(j, c); if (d0 * d1 <= 0) return 0; const a = ts[j] - ts[j - 1], b = ts[j + 1] - ts[j]; return 3 * (a + b) / ((2 * b + a) / d0 + (b + 2 * a) / d1); };
+  const out = Y[i].map((y0, c) => h00 * y0 + h10 * h * tan(i, c) + h01 * Y[i + 1][c] + h11 * h * tan(i + 1, c));
+  let p = 0; const unflat = (ref) => { if (typeof ref === 'number') return out[p++]; if (Array.isArray(ref)) return ref.map(unflat); if (ref && typeof ref === 'object') { const o = {}; for (const k of Object.keys(ref).sort()) o[k] = unflat(ref[k]); return o; } return ref; };
+  return unflat(vals[i]);
+}
 export function rng(seed = 1) { return () => { seed |= 0; seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 const hash = (n) => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+export const hash01 = (n, seed = 0) => hash(n * 1.618 + seed * 91.7);   // deterministic 0..1 for an integer n
 export function noise(x, seed = 0) { const i = Math.floor(x), f = x - i, u = f * f * (3 - 2 * f); return lerp(hash(i + seed * 57), hash(i + 1 + seed * 57), u) * 2 - 1; }
 export const shake = (t, amp = 4, freq = 1.3, seed = 3) => [noise(t * freq, seed) * amp, noise(t * freq, seed + 9) * amp];
 // talking mouth amount (0..1) driven by the real word timings when available
@@ -46,10 +71,28 @@ export function talkAmount(globalT, from = -1, to = 1e9) {
 
 // mouth amount for a named speaker (from the TTS word timeline: words carry .speaker). Narrator lines return 0 for characters.
 //   hero.face({ expr: 'smile', talk: talkFor('MOM', info.globalT) })
-export function talkFor(speaker, globalT) {
+// The mouth follows the letters of the word being spoken: a/e/i open wide, o/u/w round, m/b/p close, f/v nearly close.
+export function talkFor(speaker, globalT) { return talkShape(speaker, globalT).open; }
+const SPK = (w) => String(w.speaker || 'NARRATOR').toUpperCase();
+const VIS = (c) => ('aeiy'.includes(c) ? [0.95, 0] : 'ouw'.includes(c) ? [0.65, 1] : 'mbp'.includes(c) ? [0.02, 0] : 'fv'.includes(c) ? [0.2, 0] : 'lnrdt'.includes(c) ? [0.45, 0] : [0.55, 0]);
+// talkShape('MIA', info.globalT) -> { open 0..1, round 0..1 } (face() takes it as talk, or pass face({ speaker, gt }))
+export function talkShape(speaker, globalT) {
   const w = E.words.find(w => globalT >= w.start - 0.03 && globalT <= w.end + 0.03);
-  if (!w || String(w.speaker || 'NARRATOR').toUpperCase() !== String(speaker).toUpperCase()) return 0;
-  return clamp(0.25 + 0.75 * Math.abs(Math.sin(globalT * 17)) * (0.6 + 0.4 * Math.sin(globalT * 5.3)));
+  if (!w || (speaker != null && SPK(w) !== String(speaker).toUpperCase())) return { open: 0, round: 0 };
+  let s = String(w.word || '').toLowerCase().replace(/[^a-z]/g, '').replace(/(.)\1+/g, '$1'); if (s.length > 3) s = s.replace(/e$/, '');
+  if (/\d/.test(w.word || '') || !s) s = 'aea';
+  const dur = Math.max(0.06, w.end - w.start), u = clamp((globalT - w.start) / dur) * s.length, i = Math.min(s.length - 1, Math.floor(u)), f = u - i;
+  const [o1, r1] = VIS(s[i]), [o2, r2] = VIS(s[Math.min(s.length - 1, i + 1)]), k = ease.inOut(prog(f, 0.55, 1));
+  const env = clamp(Math.min((globalT - w.start + 0.03) / 0.07, (w.end + 0.03 - globalT) / 0.08));
+  return { open: clamp(lerp(o1, o2, k) * env * (0.75 + 0.25 * Math.min(1, dur / 0.25))), round: lerp(r1, r2, k) };
+}
+// who is speaking around globalT: { speaker, since (s since their run of words began), prev (the speaker before), word }
+export function speakerAt(globalT, gap = 0.6) {
+  const W = E.words; let i = -1; for (let k = 0; k < W.length; k++) { if (W[k].start - 0.03 <= globalT) i = k; else break; }
+  if (i < 0) return { speaker: null, since: 0, prev: null, word: null };
+  const w = W[i], live = globalT <= w.end + gap, sp = SPK(w); let j = i; while (j > 0 && SPK(W[j - 1]) === sp && W[j].start - W[j - 1].end < 1.5) j--;
+  const prev = j > 0 ? SPK(W[j - 1]) : null;
+  return live ? { speaker: sp, since: globalT - W[j].start, prev, word: w } : { speaker: null, since: globalT - w.end - gap, prev: sp, word: null };
 }
 // time (global seconds) when a word is spoken: wordTime('brain', 40) -> 43.78 (null if not found)
 export function wordTime(match, after = 0) {

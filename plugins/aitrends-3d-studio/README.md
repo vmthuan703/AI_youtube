@@ -28,6 +28,16 @@ giữ nguyên dáng suốt video và chữ luôn nét. Giọng đọc mặc đ�
 
 Có 5 điểm dừng để bạn duyệt: soát kịch bản, nghe thử giọng, chọn phong cách và bảng màu, xem thử kèm bảng điểm, bản cuối.
 
+## Có gì mới ở 0.2.5 (chuyển động)
+| Nhóm | Thay đổi |
+|---|---|
+| Diễn xuất | Chuyển tư thế có lấy đà và vượt đà, hông đi trước, đầu đến sau (`posesAt3`) · nhân vật nghỉ dồn trọng tâm, liếc nhìn (`idle3`) · người nói gật đầu, đánh tay theo từ (`speak3`) · người nghe quay đầu về phía người nói mà mặt vẫn hướng camera (`lookAtSpeaker`) · đi/chạy có tăng tốc, giảm tốc, không trượt chân (`walkTo`) |
+| Khuôn mặt | Biểu cảm chuyển mượt 0,16 s, chớp mắt khi đổi biểu cảm · chớp mắt không đều, có chớp đôi · mắt liếc nhẹ · miệng theo chữ cái đang nói (a/e/i mở, o/u tròn, m/b/p khép) |
+| Camera | `dolly` chạy một đường cong mượt qua mọi điểm · rung tay máy nhẹ cho mọi shot 3D (`config.handheld`) · `crashZoom`, `punch`, `dutch`, `rackFocus`, `chase` |
+| Dựng phim | Whip pan có nhòe thật · smash cut · slow-motion cục bộ (`ramp` trong shots.json) |
+| Đồ họa | Nhãn và thẻ thu nhỏ rời đi trước khi cắt (`end: 'shot'`) · số đếm tăng dần (`count: true`) · sân khấu tím có vệt sáng trôi và bụi bay (2D và 3D) |
+| Kiểm tra | Bảng điểm thêm "khung gần như trống" (kèm thời điểm) và "nửa giây không có gì chuyển động" |
+
 ## Có gì mới ở 0.2.4
 | Nhóm | Thay đổi |
 |---|---|

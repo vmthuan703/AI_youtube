@@ -2,7 +2,7 @@
 // Import in a shot: import * as D from '/engine/diagrams2d.js';  then in overlay() or a 2D draw(): D.scale(g, { x, y, value: 0.7, t, start: 0.2 })
 // Every function takes logical coordinates (1920x1080 / 1080x1920), a size, t (shot time) and start (pop-in time).
 // Look: flat fills, a dark outline, small letter-spaced labels. Colours come from S().ui so a style switch re-themes them.
-import { E, V, S, FONTS, clamp, ease, lerp, prog, rr, text, circle, ring, alpha, shade, measure } from './core.js';
+import { E, V, S, FONTS, clamp, ease, lerp, prog, rr, text, circle, ring, alpha, shade, measure, hash01 } from './core.js';
 
 const LINE = '#241a38', PAPER = '#f6efe4', SOFT = 'rgba(255,241,220,.92)', MUTE = 'rgba(255,241,220,.45)';
 const gold = () => S().ui?.gold || '#ffd98a', accent = () => S().ui?.accent || '#ff5a6a', good = () => S().ui?.good || '#5fd39a';
@@ -20,6 +20,21 @@ export function stage2d(g, o = {}) {
   gr.addColorStop(0, shade(c, 0.12)); gr.addColorStop(1, shade(c, -0.35)); g.fillStyle = gr; g.fillRect(0, 0, E.W, E.H);
   g.strokeStyle = 'rgba(255,255,255,.035)'; g.lineWidth = 1.5; for (let x = 0; x <= E.W; x += 48) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, E.H); g.stroke(); } for (let y = 0; y <= E.H; y += 48) { g.beginPath(); g.moveTo(0, y); g.lineTo(E.W, y); g.stroke(); }
   if (o.floor !== false) { g.fillStyle = 'rgba(10,6,24,.28)'; g.fillRect(0, fy, E.W, E.H - fy); g.fillStyle = 'rgba(255,241,220,.3)'; g.fillRect(0, fy, E.W, 2); }
+  if (o.live !== false) stageLife(g, o.t ?? E.shotT ?? 0, { floorY: fy, ...o });
+}
+// the stage never sits still: a warm light pool drifts slowly across the back and dust motes float up through it
+// (stage2d does this by itself; call it alone on a backdrop shot). The time comes from the shot, so it is deterministic.
+export function stageLife(g, t, o = {}) {
+  const px = E.W / 2 + Math.sin(t * 0.21) * E.W * 0.14, py = E.H * 0.42 + Math.cos(t * 0.16) * E.H * 0.05, R = E.W * 0.4;
+  g.save(); g.globalCompositeOperation = 'lighter';
+  const lg = g.createRadialGradient(px, py, 0, px, py, R); lg.addColorStop(0, 'rgba(255,224,186,.085)'); lg.addColorStop(1, 'rgba(255,224,186,0)'); g.fillStyle = lg; g.fillRect(0, 0, E.W, E.H);
+  const n = o.motes ?? 48, H = E.H + 60;
+  for (let i = 0; i < n; i++) {
+    const h1 = hash01(i, 3), h2 = hash01(i, 5), h3 = hash01(i, 7), x = h1 * E.W + Math.sin(t * 0.5 + i * 1.7) * 22, y = E.H + 30 - ((h2 * H + t * (12 + h3 * 22)) % H);
+    const near = Math.hypot(x - px, y - py) < R ? 1 : 0.5;
+    g.fillStyle = `rgba(255,240,222,${((0.08 + 0.2 * h2) * near).toFixed(3)})`; g.beginPath(); g.arc(x, y, 1.4 + h3 * 2.8, 0, Math.PI * 2); g.fill();
+  }
+  g.restore();
 }
 // ---------------------------------------------------------------- people
 // flat 2D stand-in for a cast member: flatFigure(g, { x, y, h: 420, color, hairColor, hair: 'anime'|'spiky'|'short'|'bob'|'none', expr: 'neutral'|'deadpan'|'happy'|'shock', pose: 'stand'|'point'|'cheer'|'shrug', mirror })

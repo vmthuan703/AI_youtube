@@ -94,7 +94,19 @@ export function captions(g, globalT, o = {}) {
 // Labels use S().ui.labelFont: 'ui' (rounded heavy sans, letter-spaced) or 'serif' (Playfair small caps). All take t/start
 // for a pop-in (ease.outBack) and fade with a.
 const LF = () => (S().ui.labelFont === 'serif' ? FONTS.serif : FONTS.ui);
-const popK = (t, start = 0) => (t == null ? 1 : ease.outBack(prog(t, start, start + 0.35)));
+// pop in at `start`; with `end` (a time, or 'shot' = the end of the current shot) shrink away in the 0.22 s before it,
+// so labels leave before the cut instead of vanishing with it
+const popK = (t, start = 0, end = null) => {
+  if (t == null) return 1; const k = ease.outBack(prog(t, start, start + 0.35)); if (end == null) return k;
+  const e = end === 'shot' ? (E.shotDur ?? Infinity) - 0.03 : end; return k * (1 - ease.in(prog(t, e - 0.22, e)));
+};
+// count: true — the first number in a label counts up from 0 as it pops in ("$5,000", "2.4x", "40,000 FT")
+export function countStr(str, t, start = 0, dur = 0.8) {
+  if (t == null) return str; const m = String(str).match(/\d[\d,]*(\.\d+)?/); if (!m) return str;
+  const v = parseFloat(m[0].replace(/,/g, '')), dec = m[1] ? m[1].length - 1 : 0, p = ease.out(prog(t, start + 0.08, start + 0.08 + dur)), x = v * p;
+  const out = m[0].includes(',') || v >= 10000 ? x.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec }) : x.toFixed(dec);
+  return str.slice(0, m.index) + out + str.slice(m.index + m[0].length);
+}
 // "1 IN 1,000", "$10,000", "40,000": dark translucent pill, thin light border, bold caps (gold: true for key numbers)
 // full width of a pill, to place it against something
 export const pillWidth = (g, str, size, icon = null) => { const f = LF(), w8 = f === FONTS.serif ? 700 : 900; return measure(g, str, size, f, w8) + (icon ? size * 1.05 : 0) + size * 1.1; };
@@ -104,9 +116,10 @@ const TS = () => E.cfg?.textScale ?? 1;
 const sized = (o, def, min) => ({ ...o, size: Math.max((o.size ?? def * TS()), min) });
 export function pill(g, o = {}) {
   o = sized(o, V(50, 58), V(36, 42));
-  const { str = '1 IN 1,000', x = E.W / 2, y = V(140, 260), size = V(48, 56), gold = false, color = null, a = 1, t = null, start = 0, icon = null, bg = null, line = null } = o;
-  const k = popK(t, start); if (k <= 0.001 || a <= 0) return; const f = LF(), w8 = f === FONTS.serif ? 700 : 900;
-  const tw = measure(g, str, size, f, w8) + (icon ? size * 1.05 : 0), w = tw + size * 1.1, h = size * 1.5;
+  const { x = E.W / 2, y = V(140, 260), size = V(48, 56), gold = false, color = null, a = 1, t = null, start = 0, end = null, icon = null, bg = null, line = null } = o;
+  const k = popK(t, start, end); if (k <= 0.001 || a <= 0) return; const f = LF(), w8 = f === FONTS.serif ? 700 : 900;
+  const full = o.str ?? '1 IN 1,000', str = o.count ? countStr(full, t, start, o.countDur) : full;
+  const tw = measure(g, full, size, f, w8) + (icon ? size * 1.05 : 0), w = tw + size * 1.1, h = size * 1.5;
   g.save(); g.globalAlpha *= a * clamp(k * 1.4); g.translate(x, y); g.scale(k, k);
   rr(g, -w / 2, -h / 2, w, h, h / 2); g.fillStyle = bg || 'rgba(22,14,42,.8)'; g.fill(); g.lineWidth = Math.max(2, size * 0.06); g.strokeStyle = line || 'rgba(255,236,210,.4)'; g.stroke();
   let tx = 0; if (icon) { tx = size * 0.5; drawIcon(g, icon, -tw / 2 + size * 0.38, 0, size * 0.5); }
@@ -129,8 +142,9 @@ export const tag = (g, o = {}) => pill(g, { icon: 'check', ...o, size: o.size ||
 export const heartPill = (g, o = {}) => pill(g, { str: String(o.n ?? 3), icon: 'heart', bg: 'rgba(60,14,40,.82)', line: 'rgba(255,120,170,.75)', color: '#ffe0ea', ...o });
 // stat card: small spaced label over a big gold number ("TRIES / 1,000")
 export function statCard(g, o = {}) {
-  const { label = 'TRIES', value = '1,000', x = E.W / 2, y = V(E.H - 220, E.H * 0.72), size = V(72, 84), a = 1, t = null, start = 0 } = o;
-  const k = popK(t, start); if (k <= 0.001) return; const f = LF(), w = Math.max(measure(g, value, size, f, 900), size * 3.2) + size * 1.6, h = size * 2.3;
+  const { label = 'TRIES', x = E.W / 2, y = V(E.H - 220, E.H * 0.72), size = V(72, 84), a = 1, t = null, start = 0, end = null } = o;
+  const k = popK(t, start, end); if (k <= 0.001) return; const full = String(o.value ?? '1,000'), value = o.count ? countStr(full, t, start, o.countDur) : full;
+  const f = LF(), w = Math.max(measure(g, full, size, f, 900), size * 3.2) + size * 1.6, h = size * 2.3;
   g.save(); g.globalAlpha *= a * clamp(k * 1.4); g.translate(x, y); g.scale(k, k);
   rr(g, -w / 2, -h / 2, w, h, size * 0.3); g.fillStyle = 'rgba(22,14,42,.82)'; g.fill(); g.lineWidth = 2; g.strokeStyle = 'rgba(255,236,210,.3)'; g.stroke();
   text(g, label, 0, -h * 0.22, { size: size * 0.32, font: f, weight: 900, color: alpha('#fff6ea', 0.85), spacing: 4 });
@@ -138,9 +152,9 @@ export function statCard(g, o = {}) {
   g.restore();
 }
 // red roulette-style number ball ("17")
-export function numberBall(g, o = {}) { const { n = 17, x, y, r = V(42, 50), color = '#c8303a', t = null, start = 0 } = o; const k = popK(t, start); if (k <= 0.001) return; g.save(); g.translate(x, y); g.scale(k, k); circle(g, 0, 0, r, color); ring(g, 0, 0, r * 0.86, r * 0.08, 'rgba(255,255,255,.55)'); text(g, String(n), 0, r * 0.04, { size: r * 0.95, font: FONTS.ui, weight: 900, color: '#fff' }); g.restore(); }
+export function numberBall(g, o = {}) { const { n = 17, x, y, r = V(42, 50), color = '#c8303a', t = null, start = 0, end = null } = o; const k = popK(t, start, end); if (k <= 0.001) return; g.save(); g.translate(x, y); g.scale(k, k); circle(g, 0, 0, r, color); ring(g, 0, 0, r * 0.86, r * 0.08, 'rgba(255,255,255,.55)'); text(g, String(n), 0, r * 0.04, { size: r * 0.95, font: FONTS.ui, weight: 900, color: '#fff' }); g.restore(); }
 // letter-spaced heading at the top ("THE RULES", "RULE 3 · IT BALANCES")
-export function heading(g, o = {}) { o = sized(o, V(50, 56), V(40, 46)); const { str = 'THE RULES', x = E.W / 2, y = V(120, 240), size = V(46, 54), a = 1, t = null, start = 0, color = '#fff2e2' } = o; const k = t == null ? 1 : ease.out(prog(t, start, start + 0.4)); if (k <= 0) return; const f = LF(); text(g, str, x, y, { size, font: f, weight: f === FONTS.serif ? 700 : 900, color, spacing: 6, alpha: a * k, glow: 10, glowColor: 'rgba(255,200,140,.35)' }); }
+export function heading(g, o = {}) { o = sized(o, V(50, 56), V(40, 46)); const { str = 'THE RULES', x = E.W / 2, y = V(120, 240), size = V(46, 54), a = 1, t = null, start = 0, color = '#fff2e2' } = o; const k = t == null ? 1 : ease.out(prog(t, start, start + 0.4)) * (o.end == null ? 1 : 1 - ease.in(prog(t, (o.end === 'shot' ? (E.shotDur ?? Infinity) - 0.03 : o.end) - 0.22, o.end === 'shot' ? (E.shotDur ?? Infinity) - 0.03 : o.end))); if (k <= 0) return; const f = LF(); text(g, str, x, y, { size, font: f, weight: f === FONTS.serif ? 700 : 900, color, spacing: 6, alpha: a * k, glow: 10, glowColor: 'rgba(255,200,140,.35)' }); }
 // small spaced label under a character ("JAKE", "YOU")
 export function nameLabel(g, o = {}) { o = sized(o, V(36, 40), V(30, 34)); const { str = 'YOU', x, y, size = V(32, 38), a = 1, color = '#fff2e2' } = o; const f = LF(); text(g, str, x, y, { size, font: f, weight: f === FONTS.serif ? 700 : 900, color, spacing: 4, alpha: a }); }
 // white speech bubble with a tail toward [tx, ty] ("Sir. You're done for tonight.")

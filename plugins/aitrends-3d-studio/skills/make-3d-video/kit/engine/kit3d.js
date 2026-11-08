@@ -12,7 +12,7 @@ import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { E, S, V, mood, shade, rng, key, ease, clamp, lerp, noise } from './core.js';
+import { E, S, V, mood, shade, rng, key, smoothKey, ease, clamp, lerp, noise } from './core.js';
 export { THREE };
 
 // ---------------------------------------------------------------- renderer (one per worker)
@@ -239,8 +239,10 @@ export function glow(c = '#ffcf8a', size = 1, opacity = 0.8, o = {}) {
 // ---------------------------------------------------------------- cameras
 // Every helper takes the camera, the shot-local time t and options; all positions are [x,y,z] arrays.
 export function orbit(camera, t, o = {}) { const { target = [0, 1, 0], radius = 8, height = 3, from = -0.6, to = 0.2, dur = 5, e = ease.inOut } = o; const k = e(clamp(t / dur)); const a = lerp(from, to, k), r = typeof radius === 'number' ? radius : lerp(radius[0], radius[1], k), h = typeof height === 'number' ? height : lerp(height[0], height[1], k); camera.position.set(target[0] + Math.sin(a) * r, h, target[2] + Math.cos(a) * r); camera.lookAt(...target); }
-// dolly(camera, t, [[0, {pos, look, fov?, roll?}], [3, {...}]]) — keyframed move, eased between keys
-export function dolly(camera, t, keys, fn = ease.inOut) { const v = key(t, keys, fn); camera.position.set(...v.pos); camera.up.set(0, 1, 0); camera.lookAt(...v.look); if (v.roll) camera.rotateZ(v.roll); if (v.fov && camera.fov !== v.fov) { camera.fov = v.fov; camera.updateProjectionMatrix(); } }
+// dolly(camera, t, [[0, {pos, look, fov?, roll?}], [3, {...}]]) — keyframed move along one smooth curve: eases out of the
+// first key, flows through the middle keys without stopping, eases into the last (two equal keys hold still). Pass an
+// easing fn (e.g. ease.inOut) for the old behaviour: each stretch eased on its own, stopping at every key.
+export function dolly(camera, t, keys, fn = null) { const v = fn || keys.some(k => k[2]) ? key(t, keys, fn || ease.inOut) : smoothKey(t, keys); camera.position.set(...v.pos); camera.up.set(0, 1, 0); camera.lookAt(...v.look); if (v.roll) camera.rotateZ(v.roll); if (v.fov && camera.fov !== v.fov) { camera.fov = v.fov; camera.updateProjectionMatrix(); } }
 // push(camera, t, {from:[..], to:[..], look:[..] | lookFrom/lookTo, dur}) — a straight move (push-in, pull-out, truck)
 export function push(camera, t, o = {}) { const k = (o.e || ease.inOut)(clamp(t / (o.dur || 4))); const p = o.from.map((v, i) => lerp(v, o.to[i], k)); const l = o.look || o.lookFrom.map((v, i) => lerp(v, o.lookTo[i], k)); camera.position.set(...p); camera.lookAt(...l); if (o.roll) camera.rotateZ(o.roll); }
 // follow(camera, target, {offset:[x,y,z], look:[dx,dy,dz], lag}) — tracks a moving object (chases, walks)
@@ -286,7 +288,8 @@ export function optimize(st, keep = []) {
 }
 
 // re-export the rest of the 3D toolkit so shots only need `T`
-export { character, POSES3, posesAt3, walkPose3, breathe3, blendPose3, EXPRESSIONS, BODY } from './rig3d.js';
+export { character, POSES3, posesAt3, exprAt, walkPose3, breathe3, blendPose3, EXPRESSIONS, BODY } from './rig3d.js';
+export { walkTo, idle3, speak3, lookAtSpeaker, handheld, chase, crashZoom, punch, dutch, rackFocus } from './motion3d.js';
 export * as W from './world3d.js';
 export * as FX3 from './fx3d.js';
-export { rng, key, ease, clamp, lerp, noise };
+export { rng, key, smoothKey, ease, clamp, lerp, noise };

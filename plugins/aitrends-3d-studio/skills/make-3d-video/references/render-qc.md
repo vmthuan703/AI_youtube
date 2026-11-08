@@ -80,6 +80,10 @@ The render log prints frames, fps, elapsed time and ETA every 48 frames; report 
 - [ ] Bars: nothing important under them; text between y = 90 and y = 990. Speech bubbles sit near the right head and cover no face.
 - [ ] Size variety: giant foreground heads, macro inserts, wides, no run of same-sized faces.
 - [ ] Every shot has camera motion and some atmosphere (dust, bokeh, rain, glows).
+- [ ] **Motion reads as acting** (check in a moving preview): pose changes anticipate and settle (`posesAt3`), nobody stands frozen (`idle3`),
+      speakers nod on their words (`speak3`) and listeners turn toward them with their face still to camera (`lookAtSpeaker`), walks start and stop
+      without sliding feet (`walkTo`), expressions blend (`expr` keys). Camera accents (crash zoom, punch, smash, ramp) land on the word, one per shot at most.
+- [ ] Scorecard rows "almost nothing in them" and "nothing moves" are in range; open the listed near-empty times and fill those frames.
 - [ ] Text short, inside the safe area, legible at phone size; numbers match the narration.
 - [ ] Variety: no more than 3 consecutive shots of the same type or framing.
 - [ ] 9:16: subjects in the middle, nothing important under the captions.

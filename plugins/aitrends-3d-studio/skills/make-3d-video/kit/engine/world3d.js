@@ -6,6 +6,7 @@
 //   st.add(T.at(T.W.car({ color: '#d63a2a' }), x, 0, z, yaw));
 // Real point lights are expensive: sets add at most `lights` of them near `focus` (default 4); the rest are glow-only.
 import * as THREE from 'three';
+import { dust } from './fx3d.js';
 import { S, mood, shade, mix, rng, clamp, lerp, noise } from './core.js';
 import { mat, box, rbox, cyl, sphere, plane, group, at, canvasTex, lamp, lightCone, glow, glowMat, prep, roundedBoxGeo, textTex, screen, cached, asphalt, tiles, planks, carpet, ground, color, cone, torus, capsule, mesh, contactShadow } from './kit3d.js';
 
@@ -382,6 +383,8 @@ export function explainer(st, o = {}) {
   const floor = ground(o.w || 40, 20, shade(c, -0.18), null, { rough: 0.95 }); floor.position.z = lineZ + 9.4; st.add(floor);
   if (o.line !== false) { const ln = new THREE.Mesh(new THREE.PlaneGeometry(o.w || 40, 0.012), new THREE.MeshBasicMaterial({ color: color('#d8c8ff'), transparent: true, opacity: 0.45 })); ln.rotation.x = -R2; ln.position.set(0, 0.002, lineZ - 0.55); st.add(ln); }
   const sp = new THREE.SpotLight(color('#fff2e6'), (o.light ?? 22) * (S().light?.practical ?? 1), 30, 0.6, 0.9, 1.2); sp.position.set(0, 8, lineZ + 6); sp.target.position.set(0, 0.8, lineZ); sp.castShadow = true; sp.shadow.mapSize.set(1024, 1024); st.add(sp, sp.target);
+  // the stage is never dead air: fine dust floats up through the light (dust: false turns it off)
+  if (o.dust !== false) { const d = dust(st, { n: 110, area: [-7, 7, 0.1, 4.5, lineZ - 0.4, lineZ + 3.5], c: '#f2e4ff', size: 0.035, speed: 0.06, rise: 0.05, opacity: 0.5, seed: 17 }); st.onTick(d.update); }
   return { lineZ, back, floor };
 }
 // dark transparent sheet to push a busy background back (put it between the set and the foreground subjects)

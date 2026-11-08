@@ -146,20 +146,36 @@ function drawBubble(g, shot, lt, st, stg, def, info) {
   if (shot.bubble) ({ x = x, y = y, tx = tx, ty = ty } = shot.bubble);
   g.save(); speech(g, { str, x, y, tx, ty, t: t - start, start: 0 }); g.restore();
 }
+// shots.json "ramp": [[0, 1], [0.8, 0.25], [2.2, 0.25], [2.6, 1]] — speed keys (shot-local seconds → playback speed, linear
+// between keys): the shot's animation slows down or speeds up while the voice runs on. Returns the animation time.
+function rampT(shot, lt) {
+  const R = shot.ramp; if (!Array.isArray(R) || !R.length) return lt;
+  const pts = [[0, R[0][0] <= 0 ? R[0][1] : R[0][1]], ...R.filter(r => r[0] > 0)]; let acc = 0;
+  for (let i = 0; i < pts.length; i++) {
+    const [t0, s0] = pts[i], [t1, s1] = pts[i + 1] || [Infinity, s0];
+    if (lt <= t1) { const d = lt - t0, sl = isFinite(t1) ? (s1 - s0) / (t1 - t0) : 0; return acc + s0 * d + 0.5 * sl * d * d; }
+    acc += (s0 + s1) / 2 * (t1 - t0);
+  }
+  return acc;
+}
 function drawShot(buf, shot, lt, opts = {}) {
   const g = buf.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; g.filter = 'none';
   g.fillStyle = '#000'; g.fillRect(0, 0, buf.width, buf.height); g.setTransform(E.PX, 0, 0, E.PX, 0, 0);
   const def = getShot(shot.id); const dur = shot.end - shot.start;
   const info = { ...(shot.params || {}), shot, dur, globalT: shot.start + lt, p: clamp(lt / dur), line: shot.line };
+  E.shotT = lt; E.shotDur = dur;   // overlays read these for exits (end: 'shot') and the living purple stage
   if (!def) { g.fillStyle = '#20141c'; g.fillRect(0, 0, E.W, E.H); text(g, `MISSING SHOT ${shot.id}`, E.W / 2, E.H / 2 - 30, { size: 60, color: '#ff6f61' }); text(g, (shot.line || '').slice(0, 80), E.W / 2, E.H / 2 + 50, { size: 30, color: '#fff', font: FONTS.ui, weight: 800 }); return; }
   try {
     if (def.kind === '3d') {
       const st = state3D(shot, def, info); const stg = st.stage || st.st || st; stg.activate?.();
       const nb = Math.max(1, Math.round(shot.mblur ?? def.mblur ?? 1));
-      if (nb <= 1) { const a = performance.now(); def.draw(st, lt, info, three); stg.tick?.(lt); const b = performance.now(); stg.render(); g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(glCanvas, 0, 0, buf.width, buf.height); g.restore(); PROF.anim = b - a; PROF.gl = performance.now() - b; PROF.calls = stg.calls; PROF.tris = stg.tris; }
+      // a light hand-held drift on every 3D shot (config.handheld, shots.json/shot "handheld"), added only for the render
+      const hh = shot.handheld ?? def.handheld ?? E.cfg.handheld ?? 0.35, cam = stg.camera, hseed = 1 + Math.round(shot.start * 7) % 97;
+      const render = (gt) => { let sv = null; if (hh && cam && three.handheld) { sv = [cam.position.clone(), cam.quaternion.clone()]; three.handheld(cam, gt, hh, hseed); cam.updateMatrixWorld(); } stg.render(); if (sv) { cam.position.copy(sv[0]); cam.quaternion.copy(sv[1]); cam.updateMatrixWorld(); } };
+      if (nb <= 1) { const a = performance.now(); const at = rampT(shot, lt); def.draw(st, at, info, three); stg.tick?.(at); const b = performance.now(); render(shot.start + lt); g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(glCanvas, 0, 0, buf.width, buf.height); g.restore(); PROF.anim = b - a; PROF.gl = performance.now() - b; PROF.calls = stg.calls; PROF.tris = stg.tris; }
       else {   // motion blur: average nb sub-frames across a 180° shutter
         const ax = accA.getContext('2d'); ax.globalAlpha = 1;
-        for (let k = 0; k < nb; k++) { const st_ = lt - (0.5 / E.fps) * (1 - k / (nb - 1)); def.draw(st, Math.max(0, st_), { ...info, globalT: shot.start + Math.max(0, st_) }, three); stg.tick?.(Math.max(0, st_)); stg.render(); ax.globalAlpha = 1 / (k + 1); ax.drawImage(glCanvas, 0, 0, accA.width, accA.height); }
+        for (let k = 0; k < nb; k++) { const st_ = Math.max(0, lt - (0.5 / E.fps) * (1 - k / (nb - 1))), at = rampT(shot, st_); def.draw(st, at, { ...info, globalT: shot.start + st_ }, three); stg.tick?.(at); render(shot.start + st_); ax.globalAlpha = 1 / (k + 1); ax.drawImage(glCanvas, 0, 0, accA.width, accA.height); }
         ax.globalAlpha = 1; g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(accA, 0, 0, buf.width, buf.height); g.restore();
       }
       if (def.overlay && !opts.noOverlay) { g.save(); def.overlay(g, lt, info, st); g.restore(); }
@@ -179,15 +195,22 @@ window.renderFrame = function (f) {
   const T0 = performance.now();
   const t = f / E.fps, i = shotIndexAt(t), shot = E.shots[i], lt = t - shot.start;
   drawShot(bufA, shot, lt);
-  const tr = shot.in || { type: 'cut' }, tdur = tr.dur ?? (tr.type === 'whip' ? 0.35 : 0.5);
+  const tr = shot.in || { type: 'cut' }, tdur = tr.dur ?? (tr.type === 'whip' ? 0.35 : tr.type === 'smash' ? 0.3 : 0.5);
   const W = main.width, H = main.height; mg.setTransform(1, 0, 0, 1, 0, 0); mg.globalAlpha = 1; mg.globalCompositeOperation = 'source-over';
   const GL = gradeFor(shot), grade = GL.grade; mg.filter = grade.filter && grade.filter !== 'none' ? grade.filter : 'none';
-  if (tr.type !== 'cut' && i > 0 && lt < tdur) {
+  if (tr.type === 'smash' && i > 0 && lt < tdur) {   // smash cut: one white frame, then the new shot lands with a punch and a dying shake
+    const k = lt / tdur, d = (1 - k) ** 2, sh = Math.sin(lt * 70) * 0.012 * d * W, sc = 1 + 0.07 * d;
+    mg.translate(W / 2 + sh, H / 2 + Math.cos(lt * 83) * 0.008 * d * H); mg.scale(sc, sc); mg.drawImage(bufA, -W / 2, -H / 2); mg.setTransform(1, 0, 0, 1, 0, 0);
+    if (lt < 1.5 / E.fps) { mg.filter = 'none'; mg.fillStyle = '#fff'; mg.fillRect(0, 0, W, H); }
+  } else if (tr.type !== 'cut' && i > 0 && lt < tdur) {
     const prev = E.shots[i - 1], k = ease.inOut(lt / tdur); drawShot(bufB, prev, t - prev.start);
     if (tr.type === 'fade') { mg.drawImage(bufB, 0, 0); mg.globalAlpha = k; mg.drawImage(bufA, 0, 0); }
     else if (tr.type === 'dip' || tr.type === 'dipWhite') { const c = tr.type === 'dip' ? '#000' : '#fff'; mg.drawImage(k < 0.5 ? bufB : bufA, 0, 0); mg.filter = 'none'; mg.globalAlpha = k < 0.5 ? k * 2 : (1 - k) * 2; mg.fillStyle = c; mg.fillRect(0, 0, W, H); }
     else if (tr.type === 'flash') { mg.drawImage(bufA, 0, 0); mg.filter = 'none'; mg.globalAlpha = (1 - lt / tdur) ** 2; mg.fillStyle = '#fff'; mg.fillRect(0, 0, W, H); }
-    else if (tr.type === 'whip') { const dir = tr.dir || 1; for (let s = 0; s < 4; s++) { mg.globalAlpha = 0.3; mg.drawImage(bufB, -dir * k * W * 1.1 - dir * s * W * 0.02, 0); mg.drawImage(bufA, dir * (1 - k) * W * 1.1 + dir * s * W * 0.02, 0); } }
+    else if (tr.type === 'whip') {   // a real whip pan: both shots slide together, smeared along the move (strongest mid-way)
+      const dir = tr.dir || 1, N = 10, smear = W * 0.22 * Math.sin(Math.PI * clamp(lt / tdur));
+      for (let s = 0; s < N; s++) { const o = (s / (N - 1) - 0.5) * smear * dir; mg.globalAlpha = 1 / (s + 1); mg.drawImage(bufB, -dir * k * W + o, 0); mg.drawImage(bufA, dir * (1 - k) * W + o, 0); }
+    }
     else if (tr.type === 'zoom') { mg.drawImage(bufB, 0, 0); const s = 1.15 - 0.15 * k; mg.globalAlpha = k; mg.translate(W / 2, H / 2); mg.scale(s, s); mg.drawImage(bufA, -W / 2, -H / 2); mg.setTransform(1, 0, 0, 1, 0, 0); }
     else mg.drawImage(bufA, 0, 0);
   } else mg.drawImage(bufA, 0, 0);

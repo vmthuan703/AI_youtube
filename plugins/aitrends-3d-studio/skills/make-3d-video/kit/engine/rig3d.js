@@ -11,7 +11,7 @@
 //   hero.lookAt3([x, y, z])                      // turn the head toward a world point (call after pose)
 import * as THREE from 'three';
 import { buildHair } from './hair3d.js';
-import { S, clamp, lerp, mixVal, ease, prog, noise, shade } from './core.js';
+import { S, clamp, lerp, mixVal, ease, prog, noise, shade, hash01, talkShape } from './core.js';
 import { mat } from './kit3d.js';
 import { dressUp } from './costume3d.js';
 
@@ -96,14 +96,59 @@ export function breathe3(pose, t, k = 1, seed = 1) {
   if (Array.isArray(p.armR)) out.armR = [p.armR[0] + 2 * b, p.armR[1], p.armR[2] + 3 * b, p.armR[3]];
   return out;
 }
-// posesAt3(t, [[0,'stand'], [0.8,'point'], [2.4, poseObj]], blend=0.3) — hold each pose, blend into the next
-export function posesAt3(t, keys, blend = 0.3) { return { ...poseAt3(t, keys, blend), _prev: poseAt3(t - 0.1, keys, blend) }; }   // _prev: hair and body follow-through
-function poseAt3(t, keys, blend) {
+// posesAt3(t, [[0,'stand'], [0.8,'point'], [2.4, poseObj]], blend=0.3, { lively }) — hold each pose, blend into the next.
+// Acting, not tweening: each change dips back a little first and settles past the target (ease.back), and the body moves in
+// order: hips and legs lead, the spine follows 35 ms later, the arms 60 ms, the head 90 ms. lively 0 = the old even blend,
+// 1 = default, up to 1.5 for cartoon snap. _prev (the pose 0.1 s earlier) drives the hair lag and the body stretch.
+const LAG3 = { spine: 0.035, armL: 0.06, armR: 0.06, handL: 0.06, handR: 0.06, head: 0.09 };
+export function posesAt3(t, keys, blend = 0.3, o = {}) {
+  const lv = o.lively ?? 1;
+  if (!lv) return { ...poseAt3(t, keys, blend, ease.inOut), _prev: poseAt3(t - 0.1, keys, blend, ease.inOut) };
+  const fn = ease.backK(0.9 * lv);
+  const at = (tt) => { const out = { ...poseAt3(tt, keys, blend, fn) }; for (const [j, lag] of Object.entries(LAG3)) { const p = poseAt3(tt - lag * lv, keys, blend, fn); if (p[j] !== undefined) out[j] = p[j]; } return out; };
+  return { ...at(t), _prev: at(t - 0.1) };
+}
+function poseAt3(t, keys, blend, fn = ease.inOut) {
   const get = (p) => (typeof p === 'string' ? POSES3[p] || POSES3.stand : p);
   let i = 0; while (i + 1 < keys.length && t >= keys[i + 1][0]) i++;
-  const cur = get(keys[i][1]); const nxt = keys[i + 1]; const prev = i > 0 ? get(keys[i - 1][1]) : null;
-  const into = i > 0 ? ease.inOut(prog(t, keys[i][0], keys[i][0] + blend)) : 1;
-  return prev && into < 1 ? blendPose3(prev, cur, into) : cur;
+  const cur = get(keys[i][1]); const prev = i > 0 ? get(keys[i - 1][1]) : null;
+  const x = i > 0 ? prog(t, keys[i][0], keys[i][0] + blend) : 1;
+  return prev && x < 1 ? blendPose3(prev, cur, fn(x)) : cur;
+}
+// exprAt(t, [[0,'deadpan'], [1.2,'shocked']], blend=0.16) — the expression at t, blended into each new one (eyes close down
+// and open up through a squint, the mouth eases). face({ expr: [[t, name], …], t }) calls this for you.
+export function exprAt(t, keys, blend = 0.16) {
+  const get = (e) => (typeof e === 'string' ? EXPRESSIONS[e] || EXPRESSIONS.neutral : e);
+  let i = 0; while (i + 1 < keys.length && t >= keys[i + 1][0]) i++;
+  const cur = get(keys[i][1]); if (i === 0) return cur;
+  const k = Math.round(ease.out(prog(t, keys[i][0], keys[i][0] + blend)) * 8) / 8;
+  return k >= 1 ? cur : mixExpr(get(keys[i - 1][1]), cur, k);
+}
+const EYE0 = { open: 0.82, lid: 0, low: 0, pupil: 0.5, lookUp: 0, squintR: 0 };
+function mixExpr(a, b, k) {
+  const num = (x, y, d) => { const o = { ...x, ...y }; for (const key of Object.keys(o)) { const va = x[key] ?? d[key], vb = y[key] ?? d[key]; o[key] = typeof va === 'number' && typeof vb === 'number' ? lerp(va, vb, k) : (k < 0.5 ? x[key] : y[key]); } return o; };
+  const ea = a.eye, eb = b.eye; let eye;
+  if ((ea.closed || null) === (eb.closed || null)) eye = ea.closed ? (k < 0.5 ? ea : eb) : num(ea, eb, EYE0);
+  else if (k < 0.5) eye = ea.closed ? ea : { ...ea, open: (ea.open ?? 0.82) * (1 - 2 * k) };
+  else eye = eb.closed ? eb : { ...eb, open: (eb.open ?? 0.82) * (2 * k - 1) };
+  const ma = a.mouth, mb = b.mouth, M0 = { w: 0.45, open: 0, curve: 0 };
+  const wc = { w: lerp(ma.w ?? 0.45, mb.w ?? 0.45, k), curve: lerp(ma.curve ?? 0, mb.curve ?? 0, k) };
+  const mouth = ma.type === mb.type ? num(ma, mb, M0) : k < 0.5 ? { ...ma, ...wc } : { ...mb, ...wc };
+  return { eye, mouth };
+}
+// blinks that don't tick like a clock: 2.2–5.5 s apart, one in five doubled, plus one on every expression change (extra = key times)
+function blinkAt(t, seed, extra = []) {
+  const shape = (d) => (d < 0 || d > 0.15 ? 0 : d < 0.045 ? d / 0.045 : d < 0.08 ? 1 : 1 - (d - 0.08) / 0.07);
+  let b = 0; for (const x of extra) b = Math.max(b, shape(t - x - 0.02));
+  let at = -hash01(0, seed) * 3;
+  for (let n = 1; at < t + 0.2 && n < 400; n++) { b = Math.max(b, shape(t - at)); if (hash01(n, seed + 7) < 0.2) b = Math.max(b, shape(t - at - 0.24)); at += 2.2 + 3.3 * hash01(n, seed); }
+  return b;
+}
+// small eye darts while a face is otherwise still: a new gaze point every 0.7–2 s, reached in 50 ms
+function saccade(t, seed, amp = 1) {
+  let at = 0, n = 0, cur = [0, 0], prev = [0, 0];
+  while (n < 400) { const len = 0.7 + 1.3 * hash01(n, seed + 3); if (at + len > t) break; at += len; n++; prev = cur; cur = [(hash01(n, seed + 5) - 0.5) * 0.4 * amp, (hash01(n, seed + 9) - 0.5) * 0.18 * amp]; }
+  const k = n ? clamp((t - at) / 0.05) : 1; return [lerp(prev[0], cur[0], k), lerp(prev[1], cur[1], k)];
 }
 export function blendPose3(a, b, k) {
   a = typeof a === 'string' ? POSES3[a] : a; b = typeof b === 'string' ? POSES3[b] : b; const o = {};
@@ -454,18 +499,33 @@ export function character(outfit = {}, opts = {}) {
   let faceKey = '';
   root.face = (o = {}) => {
     if (!faceMesh) return root;
-    const ex = typeof o.expr === 'object' ? o.expr : EXPRESSIONS[o.expr || 'neutral'] || EXPRESSIONS.neutral;
-    let blink = !!o.blink && o.blink !== true ? o.blink : false;
-    if (o.blink === true && o.t != null) { const per = 3.1 + (opts.seed || 0) * 0.37; blink = (o.t % per) > per - 0.12; }
-    const talk = Math.round(clamp(o.talk || 0) * 4) / 4, look = (o.look || [0, 0]).map(v => Math.round(v * 6) / 6);
-    const k = JSON.stringify([ex, talk, blink, look, eyeStyle, pal]);
-    if (k !== faceKey) { faceKey = k; faceMat.map = faceTexture(k, (g) => drawFace(g, { eye: ex.eye, mouth: ex.mouth, talk, blink, look, style: eyeStyle, pal })); faceMat.needsUpdate = true; }
+    const seed = (opts.seed || 0) * 13 + 1;
+    const keys = Array.isArray(o.expr) ? o.expr : null;
+    const ex = keys ? exprAt(o.t ?? 0, keys, o.exprBlend ?? 0.16) : typeof o.expr === 'object' ? o.expr : EXPRESSIONS[o.expr || 'neutral'] || EXPRESSIONS.neutral;
+    let bl = typeof o.blink === 'number' ? o.blink : o.blink && o.blink !== true ? 1 : 0;
+    if (o.blink === true && o.t != null) bl = blinkAt(o.t, seed, keys ? keys.slice(1).map(k => k[0]) : []);
+    let talk = o.talk || 0, round = 0;
+    if (o.speaker && o.gt != null) talk = talkShape(o.speaker, o.gt);
+    if (typeof talk === 'object') { round = talk.round || 0; talk = talk.open || 0; }
+    talk = Math.round(clamp(talk) * 4) / 4;
+    let look = o.look; if (!look) look = o.t != null && o.saccade !== false && !ex.eye.closed ? saccade(o.t, seed, typeof o.saccade === 'number' ? o.saccade : 1) : [0, 0];
+    look = look.map(v => Math.round(v * 12) / 12);
+    let eye = ex.eye, mouth = ex.mouth; const blink = bl >= 0.7;
+    if (!blink && bl > 0.05 && !eye.closed) eye = { ...eye, open: (eye.open ?? 0.82) * Math.round((1 - bl) * 4) / 4 };
+    if (talk > 0.05 && round > 0.5 && ['flat', 'smile', 'smirk', 'frown'].includes(mouth.type)) mouth = { ...mouth, type: 'o', w: Math.max(0.22, (mouth.w || 0.5) * 0.6), open: 0 };
+    const k = JSON.stringify([eye, mouth, talk, blink, look, eyeStyle, pal]);
+    if (k !== faceKey) { faceKey = k; faceMat.map = faceTexture(k, (g) => drawFace(g, { eye, mouth, talk, blink, look, style: eyeStyle, pal })); faceMat.needsUpdate = true; }
     return root;
   };
-  root.lookAt3 = (pt) => {
-    const hw = head.getWorldPosition(new THREE.Vector3()); const local = neck.worldToLocal(new THREE.Vector3(...pt)).sub(neck.worldToLocal(hw.clone()));
-    const yaw = Math.atan2(local.x, local.z), pitch = -Math.atan2(local.y, Math.hypot(local.x, local.z));
-    head.rotation.set(clamp(pitch, -0.6, 0.6), clamp(yaw, -1.1, 1.1), head.rotation.z, 'YXZ'); return root;
+  // lookAt3(point, k = 1): turn the head toward a world point; k < 1 blends from the pose's own head angle (smooth turns)
+  root.lookAt3 = (pt, k = 1) => {
+    const a = root.lookAngles(pt); if (!a) return root;
+    head.rotation.set(lerp(head.rotation.x, a[0], k), lerp(head.rotation.y, a[1], k), head.rotation.z, 'YXZ'); return root;
+  };
+  root.lookAngles = (pt) => {   // [pitch, yaw] the head would need to face pt (radians, clamped)
+    if (!pt) return null; const p = pt.isVector3 ? pt : new THREE.Vector3(...pt); root.updateMatrixWorld(true);
+    const hw = head.getWorldPosition(new THREE.Vector3()); const local = neck.worldToLocal(p.clone()).sub(neck.worldToLocal(hw.clone()));
+    return [clamp(-Math.atan2(local.y, Math.hypot(local.x, local.z)), -0.6, 0.6), clamp(Math.atan2(local.x, local.z), -1.1, 1.1)];
   };
   root.place = (x = 0, y = 0, z = 0, yaw = 0) => { root.position.set(x, y, z); root.rotation.y = yaw; return root; };
   root.faceTo = (x, z) => { root.rotation.y = Math.atan2(x - root.position.x, z - root.position.z); return root; };

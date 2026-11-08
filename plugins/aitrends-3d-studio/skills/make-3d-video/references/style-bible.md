@@ -41,7 +41,7 @@ simple characters, real staging, real light.
   hats never throw a shadow band across the face. A role's detail is small; the hero is still the loudest thing in every frame.
 - **Legs:** bare stick legs and round feet by default, hero included. Add `legs` or `shoes` only when the story needs them (a suit, a uniform, sports).
 - **Identity = own hair + one outfit detail.** Each recurring character has a hair shape nobody else has and one outfit detail (`bag`, `sleeves`, `collar`, `stripe`, `scarf`, `tie`, glasses),
-  identical all video. Start from `channel/cast.js`. Colours stay deep and muted: brick `#7a3a34`, navy `#2c3e6e`, plum `#8d4a6b`, teal `#2f6f6a`, forest `#3f6a58`, olive `#5f6a2e`, charcoal `#33313f`.
+  identical all video. Every character starts from a role in `channel/cast.js` (extras: `CLASSMATE_2/3`, `BRO_2`, `RIVAL_2`, `STUDENTS`), never from scratch. Colours stay deep and muted: brick `#7a3a34`, navy `#2c3e6e`, plum `#8d4a6b`, teal `#2f6f6a`, forest `#3f6a58`, olive `#5f6a2e`, charcoal `#33313f`.
   Only the hero wears a loud, bright colour. Background people: `T.W.crowd` or plain characters in muted colours.
 - **Faces are the acting, and the comedy.** The hero's resting face is `deadpan` (two flat dashes) or `unimpressed` (heavy lids); it plays against
   chaos around them. Big expressions are saved for the beats that earn them. Change `expr` on the beat of the words, not randomly. Blink (`blink: true, t`). Look where

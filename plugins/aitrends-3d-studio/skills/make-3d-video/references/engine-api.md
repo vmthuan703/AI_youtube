@@ -176,7 +176,9 @@ ponytail | pigtails | bun (soft hairlines, `engine/hair3d.js`), `hairColor`, `ha
 `MOM`, `DAD`, `GRANDPA`, `GRANDMA`, `LITTLE_SIB`; school `TEACHER_F`, `TEACHER_M`, `TEACHER_VN` (áo dài), `PRINCIPAL`, `COACH`; hospital and emergency `DOCTOR`, `NURSE`,
 `PARAMEDIC`, `POLICE`, `FIREFIGHTER`; town `GUARD`, `CHEF`, `CASHIER`, `SCIENTIST`, `WORKER`, `REPORTER`, `SHADY`. `ROLES` maps script words to a role
 ("nurse" → `NURSE`). Old names still work (`FRIEND` = `BRO`, `GIRL` = `CLASSMATE`, `GIRL2` = `BESTIE`, `STRANGER` = `SHADY`, `PARENT`, `TEACHER`).
-Dress a script's named character from the roster first; change a colour or the hair only when two of them share a scene and look alike.
+More teens: `CLASSMATE_2` (navy, bob, scarf), `CLASSMATE_3` (olive, bun, glasses), `BRO_2`, `RIVAL_2`, and `STUDENTS` (six background kids, pick by index).
+**Every character, named or not, is a roster role**: `{ ...ROLE, speaker }`, changing a colour or the hair only when two of them share a scene and look alike.
+Never write an outfit from scratch; `python tools/cast_check.py --project P` fails on one.
 
 **Role details** (engine/costume3d.js; colours unless noted): `top` scrubs (V-neck, matching pants) | aodai (long tunic, mandarin collar, over `legs`) ·
 `labcoat` is muted off-white `#d2d3da` (set `color` to change) · `head` nurseCap | policeCap | chefHat | hardhat | fireHelmet (all hats, caps included, cast no shadow on the face) ·

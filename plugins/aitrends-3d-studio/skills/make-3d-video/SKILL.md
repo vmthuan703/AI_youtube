@@ -2,7 +2,7 @@
 name: make-3d-video
 description: "This skill should be used when the user wants a narrated 3D animated story video from a SCRIPT in the aiTrends 3D style (toy-like 3D stick characters with big round heads, a loud channel hero in a lime puffer, simple cinematic sets, soft pastel dusk light, a 2:1 picture, animated explainer diagrams), e.g. \"make a 3D video from this script\", \"turn my script into a 3D animation\", \"tạo video 3D từ kịch bản\", \"làm video what if 3D\", \"animate this story in 3D\", or \"do the whole 3D video\". It runs the full pipeline: channel settings, script check, emotional voiceover (Chatterbox, with Kokoro as fallback) with word timings, story breakdown, style and palette choice, 3D scene building, rendering up to 4K/60 fps, music, SFX, scorecard and the final MP4.\n"
 metadata:
-  version: "0.2.5"
+  version: "0.2.6"
   author: aiTrends
 ---
 
@@ -87,7 +87,9 @@ If the user brought a finished voiceover instead, use the Whisper route in `refe
 ## Stage 4: Story breakdown
 Read `references/style-bible.md` and `references/story-breakdown.md`. Write `story/bible.md` (logline, cast with one
 signature colour each and their voices, locations with mood and light, **this video's palette**, **its one signature device**,
-motifs, music plan), `scenes/cast.js` (import the hero and every supporting role from `/channel/cast.js`: a nurse is `NURSE`, a grandpa `GRANDPA`, see `ROLES`; give every speaking character its `speaker` name), and
+motifs, music plan), `scenes/cast.js` (import the hero and every supporting role from `/channel/cast.js`: a nurse is `NURSE`, a grandpa `GRANDPA`, see `ROLES`; give every speaking character its `speaker` name;
+**every character comes from the roster, extras included**: a second or third girl is `CLASSMATE_2` / `CLASSMATE_3`, a second boy `BRO_2` / `RIVAL_2`, background
+students `STUDENTS`; change one colour or the hair at most, never write an outfit from scratch; then run `python tools/cast_check.py --project projects/<slug>`), and
 rewrite `story/shots.json` (contiguous shots, cut on phrase boundaries 0.1–0.2 s early, 17–21 shots per minute, median 2.2–2.5 s,
 a quarter of shots under about 1.5 s, an establishing shot per location, a concrete `scene` per shot). Send a 5–10 line plan
 summary and continue unless the user objects.

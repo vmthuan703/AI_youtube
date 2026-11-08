@@ -30,7 +30,7 @@
 - **1 power = 1 quy tắc rõ ràng + 1 cái giá.** Quy tắc nói ngay từ đầu. Cái giá thường xuất hiện trong phần "cost".
 - **Không đổi luật vật lý/sinh học ngoài power.** Ví dụ: "You get the power and nothing else… the universe doesn't change a single law for you." Mọi chi tiết khoa học phải đúng.
 - **Mỗi power có một bằng chứng/số liệu thật** kèm giải thích ngắn: 1–3 câu, dạng "In one study…", "A normal human heart beats about 70 times a minute." Đây là dấu hiệu nổi bật nhất của kênh.
-- **Power thường được cho theo chuỗi** (ngày 1, ngày 2… hoặc level tăng dần): video 9RyF0brSUM4 dùng 6 ngày, video 8QUGyGRY9zs và các "Every girl/guy" dùng chuỗi nhân vật.
+- **Nhiều power được cho theo chuỗi** (ngày 1, ngày 2…): video 9RyF0brSUM4 dùng 6 ngày, mỗi ngày một power.
 - **Kết thúc bằng một hành động đạo đức hoặc cứu người** (bạn thân, người lạ, bé trong xe đẩy, cậu bé trên núi). Đây là khoảnh khắc cao trào trong hầu hết video.
 
 ## 3. Giọng văn và câu chữ

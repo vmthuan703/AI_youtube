@@ -136,7 +136,7 @@ export function drawIcon(g, kind, x, y, r) {
   if (kind === 'x') { g.strokeStyle = '#ff5a6a'; g.lineWidth = r * 0.32; g.beginPath(); g.moveTo(-r * 0.6, -r * 0.6); g.lineTo(r * 0.6, r * 0.6); g.moveTo(r * 0.6, -r * 0.6); g.lineTo(-r * 0.6, r * 0.6); g.stroke(); }
   if (kind === 'heart') { g.fillStyle = '#ff5a8a'; g.beginPath(); g.moveTo(0, r * 0.8); g.bezierCurveTo(-r * 1.4, -r * 0.2, -r * 0.6, -r * 1.2, 0, -r * 0.45); g.bezierCurveTo(r * 0.6, -r * 1.2, r * 1.4, -r * 0.2, 0, r * 0.8); g.fill(); }
   if (kind === 'star') { g.fillStyle = S().ui.gold; g.beginPath(); for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + (i * Math.PI) / 5, rr2 = i % 2 ? r * 0.45 : r; g.lineTo(Math.cos(a) * rr2, Math.sin(a) * rr2); } g.closePath(); g.fill(); }
-  if (kind === 'up' || kind === 'down') { const s = kind === 'up' ? -1 : 1; g.strokeStyle = kind === 'up' ? '#5fd39a' : '#ff5a6a'; g.lineWidth = r * 0.3; g.beginPath(); g.moveTo(0, -s * r); g.lineTo(0, s * r); g.moveTo(-r * 0.6, s * -r * 0.3); g.lineTo(0, -s * r); g.lineTo(r * 0.6, s * -r * 0.3); g.stroke(); }
+  if (kind === 'up' || kind === 'down') { const s = kind === 'up' ? -1 : 1; g.strokeStyle = kind === 'up' ? '#5fd39a' : '#ff5a6a'; g.lineWidth = r * 0.3; g.beginPath(); g.moveTo(0, -s * r); g.lineTo(0, s * r); g.moveTo(-r * 0.6, s * r * 0.4); g.lineTo(0, s * r); g.lineTo(r * 0.6, s * r * 0.4); g.stroke(); }   // the head sits at the tip (fixed: it was drawn at the tail)
   g.restore();
 }
 // "✓ SMARTER" tag (serif in the crush look)

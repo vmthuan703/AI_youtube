@@ -14,7 +14,7 @@ const GREY = '#8e8a94';
 
 // friends and family
 export const BESTIE = { top: 'tshirt', color: '#2f6f6a', stripe: '#d8ccb4', skirt: '#533a78', hair: 'sidePony', hairColor: '#8a4426', lashes: true };   // the hero's best friend (a girl)
-export const BRO = { top: 'hoodie', color: '#7a3a34', color2: '#622e28', bag: '#a8843c', strings: '#e8dcc8', hair: 'curls', hairColor: '#4a2f24' };
+export const BRO = { top: 'hoodie', color: '#7a3a34', color2: '#622e28', bag: '#a8843c', strings: '#e8dcc8', hair: 'curls', hairColor: '#4a2f24' };   // speaks with a girl's voice (brand.json voice.roles BRO = af_nova); the look stays
 export const RIVAL = { top: 'jacket', color: '#2c3e6e', sleeves: '#b0a68c', shirt: '#243158', hair: 'quiff', hairColor: '#2b2d3c' };
 export const CLASSMATE = { top: 'tshirt', color: '#8d4a6b', collar: '#e0d4c8', skirt: '#3e3048', hair: 'fringe', hairColor: '#34262c', bow: '#b89c5c', lashes: true };
 export const MOM = { top: 'dress', color: '#3f6a58', scarf: '#9c7a3a', hair: 'bob', hairColor: '#4a3226', lashes: true, shoes: '#3a2a26', scale: 1.06 };

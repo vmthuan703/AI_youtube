@@ -1,0 +1,17 @@
+{
+ "title": "School demo (0.2.8)",
+ "aspect": "16:9",
+ "resolution": "720p",
+ "fps": 30,
+ "quality": "high",
+ "style": "pearl",
+ "palette": null,
+ "voiceover": null,
+ "duration": 33,
+ "captions": false,
+ "bars": "cine",
+ "fadeIn": 0,
+ "fadeOut": 0,
+ "speechBubbles": false,
+ "handheld": 0.35
+}

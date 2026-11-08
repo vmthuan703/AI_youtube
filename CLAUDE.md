@@ -13,6 +13,9 @@
 ## Hỏi trước khi chỉnh sửa
 - Hỏi trước khi xuất bản bản xem trước (theo quy tắc chung trong CLAUDE.md của người dùng).
 
+## Góp ý sau khi video đã duyệt
+- Góp ý lỗi của một video đã chấp nhận là để sửa plugin cho video sau; không làm lại video cũ trừ khi người dùng nói rõ.
+
 ## Thumbnail
 - Khi được yêu cầu thiết kế thumbnail, dùng quy tắc học từ dữ liệu đối thủ trong
   `prompts/thumbnail_style.md` (đã bỏ phong cách "TINY." cũ). Dựng 4 phương án

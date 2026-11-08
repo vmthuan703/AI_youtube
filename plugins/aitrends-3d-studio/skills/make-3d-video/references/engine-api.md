@@ -5,7 +5,7 @@
 aitrends-3d-studio/
   render.mjs  player.html  package.json
   channel/  brand.json cast.js        (the channel's choices and hero; updates never overwrite this folder)
-  engine/   core.js styles.js kit3d.js rig3d.js motion3d.js costume3d.js world3d.js nature3d.js animals3d.js sports3d.js screens3d.js fx3d.js player.js gag.js   (+ ui2d.js diagrams2d.js icons2d.js fx2d.js rig2d.js for 2D overlays/cards)
+  engine/   core.js styles.js kit3d.js rig3d.js motion3d.js costume3d.js world3d.js nature3d.js animals3d.js sports3d.js screens3d.js school3d.js fx3d.js player.js gag.js   (+ ui2d.js diagrams2d.js icons2d.js fx2d.js rig2d.js for 2D overlays/cards)
   tools/    doctor.py verify_kit.py tts_chatterbox.py tts.py script_check.py new_project.py parse_script.py transcribe.py beats.py qc_metrics.py tidy_project.py common.py
   audio/    dsp.py sfx.py music.py mix.py
   examples/speed-demo/   (reference project: a finished 32 s video — cast, sets, shots, story, timeline)
@@ -13,6 +13,7 @@ aitrends-3d-studio/
   examples/diagram-gallery/ (every picture in diagrams2d.js and a diagram on a blurred scene)
   examples/worlds-demo/  (0.2.7: beach, sunrise wading, island, snow, aurora, farm, underwater, campfire, blade, torch, phone light, game HUD + counters, POV, icons, versus, planet;
                           wave2.js: slice, debris, pool splash, farm animals, beach critters, stadium, boxing ring, track + results board, clone army, news wall, billboard, phone feed)
+  examples/school-demo/  (0.2.8: bus stop, inside the bus, locker hall, school front, cafeteria arm wrestling, outdoor court, PE yard, bed and floor poses, car lift, body3)
   projects/<slug>/
      config.json   input/ (voiceover, script, music)   timeline/ (words, sentences, beats, lines)
      story/shots.json  story/bible.md   scenes/cast.js  scenes/sets/*.js  scenes/shots/*.js
@@ -208,6 +209,14 @@ Methods (all return the character, so they chain):
   later, the arms 60 ms, the head 90 ms). `lively` 0 = the old even blend, 1 default, 1.5 cartoon snap. It also carries the pose 0.1 s
   earlier, so the hair lags a turn of the head and the body stretches a little on fast rises and drops.
   `T.walkPose3(phase, {run, sprint, lean})`, `T.breathe3(pose, t, k, seed)`, `T.blendPose3(a, b, k)`.
+- Body and contact helpers (engine/motion3d.js, 0.2.8):
+  `T.body3(pose, t, kind, amount, { t0 })` layers living movement on any pose: 'pant' (out of breath), 'sob', 'laugh', 'shiver', 'nod', 'shake' (no), 'sigh' (once from t0),
+  'strain' (trembling effort), 'fidget' (nervous). Use it in every held emotional beat instead of a frozen pose.
+  `T.reachPose({ grip: [height, distance], width, squat, scale, lean })` → hands gripping something in front (lifting a car, pushing a door, holding a beam).
+  **Contact rule:** whoever lifts, pushes or holds a thing must stand within reach of it (0.25–0.45 m in front), with the grip on its real edge; if the
+  object moves, recompute the grip from it every frame. A character a metre away with hands in the air reads as "nothing is being lifted".
+  `T.armWrestle(k, { t, strain, reach })` → { a, b } seated poses, right hands gripped over the table, k −1..1 (+1 a wins). Sit them at tableZ ∓ 0.6 and film
+  from the side, low and level with the table (camera ~3 m away, y ≈ 1.0); from behind a player the big heads hide the hands.
 - Acting helpers (engine/motion3d.js): `T.idle3(pose, t, {seed, k, weight, glance})` (breathing plus a weight shift between the legs and a
   slow glance now and then: use it on everyone standing or sitting, `k: 0.5` for the hero's deadpan holds) · `T.speak3(pose, speaker,
   globalT, {k, hand})` (a nod on each of the speaker's words, a bigger one and a free-hand beat on long words and numbers) ·
@@ -227,7 +236,7 @@ Methods (all return the character, so they chain):
 - `.setOpacity(a)`; `.parts` = { body, pelvis, chest, head, neck, hands, feet, … } for special effects.
 
 Poses: `stand relaxed confident handsInPockets talk explain point pointUp pointAtViewer wave cheer fistPump handsOnHead
-facepalm think crossArms shrug scared shocked sad phone phoneEar holdFront reach ready fight punch kick crouch kneel
+facepalm think crossArms crossArmsAngry crossArmsLean armsBehindHead shrug scared shocked sad phone phoneEar holdFront reach ready fight punch kick crouch kneel kneelBoth kneelSad kneelPlead sitBed sitBedSad sitBedPhone sitFloor hugKnees liftSquat liftOverhead pushHeavy
 sit sitBack sitDesk lie jump fall superLand flexL hunch hunchCane handsOnHips handsOnBelt holdMic`. A pose object:
 `{ y, hips:[pitch,yaw,roll], spine:[…], head:[…], armL:[raise, az, bend, twist] | {to:[x,y,z], pole}, armR, legL:[lift, side,
 knee, twist] | {to}, legR, handL:'fist'|'open'|'point'|'relaxed', handR }` in degrees. Pitch + leans/nods forward, yaw +
@@ -311,6 +320,15 @@ and raise their arms in waves; `cheer` 0–1 (or a function of t) sets how many 
   `T.W.billboard({ title, sub, icon, color })` → a lit roadside billboard on posts. Draw functions for any screen (`T.screen`, `T.W.tv/phone/laptop({ draw })`):
   `T.W.newsDraw({ tag, text, ticker })`, `T.W.feedDraw({ title, user, views: [from, to], t0, dur, live })` (a post whose view count climbs), `T.W.boardDraw({...})`.
   Animate a phone screen with `phone.screen.update(t)`.
+- **School sets, ready-made** (engine/school3d.js, 0.2.8). Use these before writing a project set: every teen story goes through them.
+  `T.W.busStop(st, { busX, door })` → sidewalk z −2..1 (top y 0.15 = `walk`), road z 1..8, a school bus at the curb, door open; `step[0]`, `step[1]` are the two
+  step positions [x, y, z] for getting off (move the character down them with a small hop, then onto `walk`), `door` the top of the steps.
+  `T.W.schoolBus({ door })` → the bus alone (front +x, door on +z, `.door` swings). `T.W.busInside(st, { rows, moving, night })` → aisle along x, front +x,
+  `seat(row, side)` → [x, z] for pose 'sit' with yaw π/2 (facing the front); call `b.update(t)` in draw so the street slides past the windows.
+  `T.W.lockerHall(st, { w, d, banner })` → lockers on both walls; `locker(i, side)` → { x, z, yaw, door, front }: stand at `front` facing the locker, open with `door.rotation.y = −1.7`.
+  `T.W.schoolFront(st, { name, bus })` → facade with the name, steps, flag, path, sidewalk and bus (as busStop). `T.W.cafeteria(st, { tables })` → long tables (top 0.76),
+  benches at z ± 0.72, `seat(table, side, i)`. `T.W.court(st)` → outdoor basketball court, hoops at x ±11.5 (rim 3.05), fence, benches; `T.W.hoop()` alone.
+  `T.W.schoolYard(st)` → PE field 40 × 24 with a running lane, goals at x ±18, coach bench `coach`, school behind. Indoor basketball / dodgeball: `T.W.gym`.
 - Project sets: write `scenes/sets/<name>.js` exporting `function build(T, st, o)` that composes these, so every shot in
   a location uses the same geometry. Invent new props from boxes/cylinders/rounded boxes when the script needs them.
 

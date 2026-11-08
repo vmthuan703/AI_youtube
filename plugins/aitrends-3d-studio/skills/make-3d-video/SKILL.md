@@ -2,7 +2,7 @@
 name: make-3d-video
 description: "This skill should be used when the user wants a narrated 3D animated story video from a SCRIPT in the aiTrends 3D style (toy-like 3D stick characters with big round heads, a loud channel hero in a lime puffer, simple cinematic sets, soft pastel dusk light, a 2:1 picture, animated explainer diagrams), e.g. \"make a 3D video from this script\", \"turn my script into a 3D animation\", \"tạo video 3D từ kịch bản\", \"làm video what if 3D\", \"animate this story in 3D\", or \"do the whole 3D video\". It runs the full pipeline: channel settings, script check, emotional voiceover (Chatterbox, with Kokoro as fallback) with word timings, story breakdown, style and palette choice, 3D scene building, rendering up to 4K/60 fps, music, SFX, scorecard and the final MP4.\n"
 metadata:
-  version: "0.2.2"
+  version: "0.2.5"
   author: aiTrends
 ---
 
@@ -87,7 +87,7 @@ If the user brought a finished voiceover instead, use the Whisper route in `refe
 ## Stage 4: Story breakdown
 Read `references/style-bible.md` and `references/story-breakdown.md`. Write `story/bible.md` (logline, cast with one
 signature colour each and their voices, locations with mood and light, **this video's palette**, **its one signature device**,
-motifs, music plan), `scenes/cast.js` (import the hero from `/channel/cast.js`, give every speaking character its `speaker` name), and
+motifs, music plan), `scenes/cast.js` (import the hero and every supporting role from `/channel/cast.js`: a nurse is `NURSE`, a grandpa `GRANDPA`, see `ROLES`; give every speaking character its `speaker` name), and
 rewrite `story/shots.json` (contiguous shots, cut on phrase boundaries 0.1–0.2 s early, 17–21 shots per minute, median 2.2–2.5 s,
 a quarter of shots under about 1.5 s, an establishing shot per location, a concrete `scene` per shot). Send a 5–10 line plan
 summary and continue unless the user objects.
@@ -115,7 +115,9 @@ Work in batches of 8–12:
    QC checklist in `references/render-qc.md`. Fix MISSING shots, errors printed by the renderer, composition, poses.
 3. Check motion with `--stills t1,t2,t3` or `--from A --to B --scale 0.5` (writes `build/preview.mp4`, draft encode).
 
-Non-negotiables: a camera move in every shot; expressions on the beat, deadpan as the hero's resting comedy face; hands and feet in
+Non-negotiables: a camera move in every shot; expressions on the beat (`expr` keys, so they blend), deadpan as the hero's resting comedy face;
+**people act, not tween** (engine-api.md → Acting recipe: `posesAt3`, `idle3`, `speak3` + `face({ speaker, gt })`, `lookAtSpeaker`, `walkTo`);
+camera accents on the words that earn them (`crashZoom`, `punch`, `smash` cut, `ramp` slow motion, `rackFocus`); hands and feet in
 contact; colours from `st.M`/`S()` and the cast; every number the narrator says on screen (`wordTime()`); **no empty stage: every
 explainer has a moving picture from `engine/diagrams2d.js`, and most sit on the blurred scene (`backdrop`), not the bare purple stage**;
 text between y = 90 and y = 990 so the bars don't cut it;

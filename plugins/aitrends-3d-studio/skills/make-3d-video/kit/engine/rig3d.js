@@ -11,8 +11,9 @@
 //   hero.lookAt3([x, y, z])                      // turn the head toward a world point (call after pose)
 import * as THREE from 'three';
 import { buildHair } from './hair3d.js';
-import { S, clamp, lerp, mixVal, ease, prog, noise, shade } from './core.js';
+import { S, clamp, lerp, mixVal, ease, prog, noise, shade, hash01, talkShape } from './core.js';
 import { mat } from './kit3d.js';
+import { dressUp } from './costume3d.js';
 
 const D2R = Math.PI / 180;
 // body proportions (metres). Head is big on purpose (cartoon stick figure).
@@ -66,6 +67,12 @@ export const POSES3 = {
   fall: P({ y: -0.1, spine: [-25, 0, 10], armL: [120, 80, 30, 0], armR: [130, 70, 20, 0], handL: 'open', handR: 'open', legL: [40, 15, 30, 0], legR: [10, 15, 50, 0] }),
   superLand: P({ y: -0.3, spine: [35, 0, 0], head: [-25, 0, 0], armL: [60, -10, 10, 0], armR: [30, 60, 20, 0], handL: 'open', handR: 'fist', legL: [80, 12, 120, 0], legR: [-20, 15, 120, 0] }),
   flexL: P({ armL: [90, 85, 120, -90], handL: 'fist' }),
+  // role poses (costume3d.js): an older body, a cane in the right hand (outfit.prop 'cane'), hands on hips, hands on the belt, a microphone
+  hunch: P({ spine: [16, 0, 0], head: [-14, 0, 0], armL: [10, 5, 30, 0], armR: [10, 5, 30, 0], legL: [6, 4, 10, 0], legR: [6, 4, 10, 0] }),
+  hunchCane: P({ spine: [16, 0, 0], head: [-14, 0, 0], armL: [10, 5, 30, 0], armR: { to: [-0.27, 0.68, 0.14] }, handR: 'fist', legL: [6, 4, 10, 0], legR: [6, 4, 10, 0] }),
+  handsOnHips: P({ spine: [-4, 0, 0], armL: { to: [0.23, 0.64, 0.0], pole: [0.6, 0.9, -0.3] }, armR: { to: [-0.23, 0.64, 0.0], pole: [-0.6, 0.9, -0.3] }, handL: 'fist', handR: 'fist', legL: [0, 8, 0, 0], legR: [0, 8, 0, 0] }),
+  handsOnBelt: P({ spine: [-3, 0, 0], armL: { to: [0.2, 0.6, 0.06] }, armR: { to: [-0.2, 0.6, 0.06] }, handL: 'fist', handR: 'fist' }),
+  holdMic: P({ armL: [62, 12, 118, 0], handL: 'fist' }),
 };
 
 // ---------------------------------------------------------------- cycles
@@ -89,13 +96,59 @@ export function breathe3(pose, t, k = 1, seed = 1) {
   if (Array.isArray(p.armR)) out.armR = [p.armR[0] + 2 * b, p.armR[1], p.armR[2] + 3 * b, p.armR[3]];
   return out;
 }
-// posesAt3(t, [[0,'stand'], [0.8,'point'], [2.4, poseObj]], blend=0.3) — hold each pose, blend into the next
-export function posesAt3(t, keys, blend = 0.3) {
+// posesAt3(t, [[0,'stand'], [0.8,'point'], [2.4, poseObj]], blend=0.3, { lively }) — hold each pose, blend into the next.
+// Acting, not tweening: each change dips back a little first and settles past the target (ease.back), and the body moves in
+// order: hips and legs lead, the spine follows 35 ms later, the arms 60 ms, the head 90 ms. lively 0 = the old even blend,
+// 1 = default, up to 1.5 for cartoon snap. _prev (the pose 0.1 s earlier) drives the hair lag and the body stretch.
+const LAG3 = { spine: 0.035, armL: 0.06, armR: 0.06, handL: 0.06, handR: 0.06, head: 0.09 };
+export function posesAt3(t, keys, blend = 0.3, o = {}) {
+  const lv = o.lively ?? 1;
+  if (!lv) return { ...poseAt3(t, keys, blend, ease.inOut), _prev: poseAt3(t - 0.1, keys, blend, ease.inOut) };
+  const fn = ease.backK(0.9 * lv);
+  const at = (tt) => { const out = { ...poseAt3(tt, keys, blend, fn) }; for (const [j, lag] of Object.entries(LAG3)) { const p = poseAt3(tt - lag * lv, keys, blend, fn); if (p[j] !== undefined) out[j] = p[j]; } return out; };
+  return { ...at(t), _prev: at(t - 0.1) };
+}
+function poseAt3(t, keys, blend, fn = ease.inOut) {
   const get = (p) => (typeof p === 'string' ? POSES3[p] || POSES3.stand : p);
   let i = 0; while (i + 1 < keys.length && t >= keys[i + 1][0]) i++;
-  const cur = get(keys[i][1]); const nxt = keys[i + 1]; const prev = i > 0 ? get(keys[i - 1][1]) : null;
-  const into = i > 0 ? ease.inOut(prog(t, keys[i][0], keys[i][0] + blend)) : 1;
-  return prev && into < 1 ? blendPose3(prev, cur, into) : cur;
+  const cur = get(keys[i][1]); const prev = i > 0 ? get(keys[i - 1][1]) : null;
+  const x = i > 0 ? prog(t, keys[i][0], keys[i][0] + blend) : 1;
+  return prev && x < 1 ? blendPose3(prev, cur, fn(x)) : cur;
+}
+// exprAt(t, [[0,'deadpan'], [1.2,'shocked']], blend=0.16) — the expression at t, blended into each new one (eyes close down
+// and open up through a squint, the mouth eases). face({ expr: [[t, name], …], t }) calls this for you.
+export function exprAt(t, keys, blend = 0.16) {
+  const get = (e) => (typeof e === 'string' ? EXPRESSIONS[e] || EXPRESSIONS.neutral : e);
+  let i = 0; while (i + 1 < keys.length && t >= keys[i + 1][0]) i++;
+  const cur = get(keys[i][1]); if (i === 0) return cur;
+  const k = Math.round(ease.out(prog(t, keys[i][0], keys[i][0] + blend)) * 8) / 8;
+  return k >= 1 ? cur : mixExpr(get(keys[i - 1][1]), cur, k);
+}
+const EYE0 = { open: 0.82, lid: 0, low: 0, pupil: 0.5, lookUp: 0, squintR: 0 };
+function mixExpr(a, b, k) {
+  const num = (x, y, d) => { const o = { ...x, ...y }; for (const key of Object.keys(o)) { const va = x[key] ?? d[key], vb = y[key] ?? d[key]; o[key] = typeof va === 'number' && typeof vb === 'number' ? lerp(va, vb, k) : (k < 0.5 ? x[key] : y[key]); } return o; };
+  const ea = a.eye, eb = b.eye; let eye;
+  if ((ea.closed || null) === (eb.closed || null)) eye = ea.closed ? (k < 0.5 ? ea : eb) : num(ea, eb, EYE0);
+  else if (k < 0.5) eye = ea.closed ? ea : { ...ea, open: (ea.open ?? 0.82) * (1 - 2 * k) };
+  else eye = eb.closed ? eb : { ...eb, open: (eb.open ?? 0.82) * (2 * k - 1) };
+  const ma = a.mouth, mb = b.mouth, M0 = { w: 0.45, open: 0, curve: 0 };
+  const wc = { w: lerp(ma.w ?? 0.45, mb.w ?? 0.45, k), curve: lerp(ma.curve ?? 0, mb.curve ?? 0, k) };
+  const mouth = ma.type === mb.type ? num(ma, mb, M0) : k < 0.5 ? { ...ma, ...wc } : { ...mb, ...wc };
+  return { eye, mouth };
+}
+// blinks that don't tick like a clock: 2.2–5.5 s apart, one in five doubled, plus one on every expression change (extra = key times)
+function blinkAt(t, seed, extra = []) {
+  const shape = (d) => (d < 0 || d > 0.15 ? 0 : d < 0.045 ? d / 0.045 : d < 0.08 ? 1 : 1 - (d - 0.08) / 0.07);
+  let b = 0; for (const x of extra) b = Math.max(b, shape(t - x - 0.02));
+  let at = -hash01(0, seed) * 3;
+  for (let n = 1; at < t + 0.2 && n < 400; n++) { b = Math.max(b, shape(t - at)); if (hash01(n, seed + 7) < 0.2) b = Math.max(b, shape(t - at - 0.24)); at += 2.2 + 3.3 * hash01(n, seed); }
+  return b;
+}
+// small eye darts while a face is otherwise still: a new gaze point every 0.7–2 s, reached in 50 ms
+function saccade(t, seed, amp = 1) {
+  let at = 0, n = 0, cur = [0, 0], prev = [0, 0];
+  while (n < 400) { const len = 0.7 + 1.3 * hash01(n, seed + 3); if (at + len > t) break; at += len; n++; prev = cur; cur = [(hash01(n, seed + 5) - 0.5) * 0.4 * amp, (hash01(n, seed + 9) - 0.5) * 0.18 * amp]; }
+  const k = n ? clamp((t - at) / 0.05) : 1; return [lerp(prev[0], cur[0], k), lerp(prev[1], cur[1], k)];
 }
 export function blendPose3(a, b, k) {
   a = typeof a === 'string' ? POSES3[a] : a; b = typeof b === 'string' ? POSES3[b] : b; const o = {};
@@ -225,11 +278,14 @@ const lum = (c) => { const k = new THREE.Color(c); return 0.2126 * k.r + 0.7152 
 
 // ---------------------------------------------------------------- character builder
 // outfit: { skin: 'pale' | 'ink' | '#hex' (head, neck, bare limbs, hands), eyes: 'dot' | 'big', outline: '#hex' | false,
-//           top: 'hoodie'|'tshirt'|'jacket'|'suit'|'dress'|'labcoat'|'vest'|'none', color, color2 (trim), shirt,
+//           top: 'hoodie'|'tshirt'|'jacket'|'suit'|'dress'|'labcoat'|'vest'|'scrubs'|'aodai'|'none', color, color2 (trim), shirt,
 //           legs: pants colour | 'shorts:#hex' | null (bare stick legs), shoes: colour | null (round feet), shoeSole,
 //           gloves: colour (default: skin, i.e. ball hands), head: 'cap'|'capBack'|'beanie'|'hood'|'headband'|'crown'|'tophat',
 //           headColor, hair: see engine/hair3d.js, hairColor, hairShade, bow, sleeves, stripe, scarf, collar, bag (colours),
-//           face: 'glasses'|'sunglasses', tie, kid: bool, scale }
+//           face: 'glasses'|'sunglasses', tie, kid: bool, scale,
+//           role details (engine/costume3d.js): head 'nurseCap'|'policeCap'|'chefHat'|'hardhat'|'fireHelmet', hair 'balding'|'lowBun',
+//           mustache, beard, brows, lanyard, card, whistle, stethoscope, badge, nameTag, patch, epaulettes, belt, radio, bands,
+//           hiVis, apron, buttons, buttonRows, vee, goggles, belly, skirtLen, prop: 'cane'|'book'|'clipboard'|'mic'|'torch'|'medbag', propHand }
 export function character(outfit = {}, opts = {}) {
   const st = S();
   const skinKey = outfit.skin || st.skin || 'pale';
@@ -244,6 +300,9 @@ export function character(outfit = {}, opts = {}) {
   const root = new THREE.Group(); root.name = 'character'; { const who = opts.speaker || outfit.speaker; if (who) root.userData.speaker = String(who).toUpperCase(); }
   const scale = (outfit.scale || 1) * (outfit.kid ? 0.74 : 1) * (opts.s || 1);
   const body = new THREE.Group(); body.scale.setScalar(scale); root.add(body);
+  // soft contact shadow on the floor under the feet (outfit.contact: false to drop it; style.contact = opacity)
+  const contact = outfit.contact === false || opts.ghost ? null : new THREE.Mesh(new THREE.PlaneGeometry(0.78 * scale, 0.62 * scale), new THREE.MeshBasicMaterial({ map: contactTex(), color: 0x000000, transparent: true, opacity: S().contact ?? 0.42, depthWrite: false, fog: true }));
+  if (contact) { contact.rotation.x = -Math.PI / 2; contact.position.y = 0.006; contact.renderOrder = 1; contact.castShadow = contact.receiveShadow = false; contact.name = 'contact'; root.add(contact); }
   const ghost = opts.ghost ? new THREE.MeshBasicMaterial({ color: new THREE.Color(opts.ghost.color || '#9fd0ff'), transparent: true, opacity: opts.ghost.opacity ?? 0.35, blending: THREE.AdditiveBlending, depthWrite: false, fog: false }) : null;
   const MAT = (c, o = {}) => ghost || mat(c, { rim: 1, rough: 0.6, ...o });
   // pale skin glows faintly (as in the references: heads never go muddy, even back-lit); style.skinGlow 0..0.3
@@ -265,9 +324,11 @@ export function character(outfit = {}, opts = {}) {
   const top = outfit.top ?? 'hoodie', topC = outfit.color || '#2f6fe0', trim = outfit.color2 || shade(topC, -0.18);
   const clothM = (c, o = {}) => MAT(c, { rough: 0.9, rim: 0.55, ...o });
   const popK = outfit.pop ?? (top === 'puffer' ? 0.35 : 0);   // outfit.pop 0..1: self-lit cloth, a loud hero outfit stays loud in dim sets
-  const topM = top === 'none' ? skinM : clothM(top === 'labcoat' ? '#eef0f4' : topC, popK ? { emissive: new THREE.Color(topC).multiplyScalar(popK) } : {});
+  // labcoat: muted off-white by default so a doctor never outshines the hero (outfit.color overrides); aodai: a long tunic in topC
+  const coatC = top === 'labcoat' ? (outfit.color || '#d2d3da') : topC, coat = top === 'labcoat' || top === 'aodai';
+  const topM = top === 'none' ? skinM : clothM(coat ? coatC : topC, popK ? { emissive: new THREE.Color(topC).multiplyScalar(popK) } : {});
   const trimM = clothM(trim, { rim: 0.4 });
-  const sleeveLong = ['hoodie', 'jacket', 'puffer', 'suit', 'labcoat'].includes(top), sleeveShort = ['tshirt', 'dress'].includes(top);
+  const sleeveLong = ['hoodie', 'jacket', 'puffer', 'suit', 'labcoat', 'aodai'].includes(top), sleeveShort = ['tshirt', 'dress', 'scrubs'].includes(top);
   const chunky = top === 'hoodie' || top === 'jacket' || top === 'puffer';
   // torso (lathe profile, elliptical section). Hoodies are boxy and generous, like a 3D cartoon.
   const prof = top === 'none' ? [[0.001, -0.02], [0.06, 0], [0.065, 0.2], [0.07, 0.4], [0.05, 0.47], [0.001, 0.48]]
@@ -305,7 +366,7 @@ export function character(outfit = {}, opts = {}) {
   if (outfit.bag) { const bm = clothM(outfit.bag, { rim: 0.3 }); const pivot = new THREE.Group(); pivot.position.y = 0.19; pivot.rotation.z = -0.72; chest.add(pivot); const strap = add(new THREE.Mesh(new THREE.TorusGeometry(torsoR / Math.cos(0.72) + 0.005, 0.0105, 8, 48), bm), pivot); strap.rotation.x = Math.PI / 2; strap.scale.set(1, 0.56, 1); const pouch = add(new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.115, 0.055), bm), chest); pouch.position.set(0.16, -0.02, chunky ? 0.125 : 0.105); hull(pouch, 1.08); }
   let skirt = null;
   if (outfit.skirt && top !== 'dress') { const len = 0.26; skirt = add(new THREE.Mesh(new THREE.CylinderGeometry(0.178, 0.3, len, 28, 1, true), MAT(outfit.skirt, { rough: 0.85, rim: 0.4, side: THREE.DoubleSide })), pelvis); skirt.scale.z = 0.74; skirt.position.y = -len / 2 - 0.045; hull(skirt, 1 + olW / 0.25); }
-  if (top === 'dress' || top === 'labcoat') { const len = top === 'dress' ? 0.42 : 0.55; skirt = add(new THREE.Mesh(new THREE.CylinderGeometry(0.17, top === 'dress' ? 0.3 : 0.22, len, 28, 1, true), MAT(top === 'dress' ? topC : '#eef0f4', { rough: 0.85, rim: 0.4, side: THREE.DoubleSide })), pelvis); skirt.scale.z = 0.75; skirt.position.y = -len / 2 + 0.02; hull(skirt, 1 + olW / 0.25); }
+  if (top === 'dress' || coat) { const len = top === 'dress' ? 0.42 : 0.55; skirt = add(new THREE.Mesh(new THREE.CylinderGeometry(0.17, top === 'dress' ? 0.3 : 0.22, len, 28, 1, true), MAT(top === 'dress' ? topC : coatC, { rough: 0.85, rim: 0.4, side: THREE.DoubleSide })), pelvis); skirt.scale.z = 0.75; skirt.position.y = -len / 2 + 0.02; hull(skirt, 1 + olW / 0.25); }
   // --- head
   const skull = add(new THREE.Mesh(new THREE.SphereGeometry(B.headR, 48, 32), skinM), head); hull(skull, 1 + (olW * 1.15) / B.headR);
   const faceMat = ghost ? null : new THREE.MeshBasicMaterial({ color: new THREE.Color(dark ? 0.86 : 1, dark ? 0.86 : 1, dark ? 0.86 : 1), transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, fog: true });
@@ -314,13 +375,16 @@ export function character(outfit = {}, opts = {}) {
   const hc = outfit.headColor || '#f2c21a', hM = MAT(hc, { rough: 0.8, rim: 0.4 }); const hr = B.headR;
   const hairC = outfit.hairColor || (dark ? skin : '#6a3f26');
   const hat = (m, k = 1.03) => { add(m, head); hull(m, k); return m; };
+  const nHead = head.children.length;   // everything a hat adds below: no shadow band across the face
   if (outfit.head === 'cap' || outfit.head === 'capBack') { hat(new THREE.Mesh(new THREE.SphereGeometry(hr * 1.04, 32, 12, 0, Math.PI * 2, 0, Math.PI * 0.42), hM)).position.y = 0.01; const brim = add(new THREE.Mesh(new THREE.CylinderGeometry(hr * 0.75, hr * 0.75, 0.016, 28, 1, false, -1.1, 2.2), hM), head); brim.scale.set(1, 1, 1.2); brim.position.set(0, hr * 0.42, outfit.head === 'cap' ? hr * 0.72 : -hr * 0.72); if (outfit.head === 'capBack') brim.rotation.y = Math.PI; hull(brim, 1.04); }
   if (outfit.head === 'beanie') { const d = hat(new THREE.Mesh(new THREE.SphereGeometry(hr * 1.05, 32, 12, 0, Math.PI * 2, 0, Math.PI * 0.45), hM)); d.scale.y = 1.12; const cuff = add(new THREE.Mesh(new THREE.TorusGeometry(hr * 1.0, 0.028, 8, 32), hM), head); cuff.rotation.x = Math.PI / 2; cuff.position.y = hr * 0.25; const pom = add(new THREE.Mesh(unitSph, MAT(shade(hc, 0.25), { rim: 0.3 })), head); pom.scale.setScalar(0.055); pom.position.y = hr * 1.18; }
   if (outfit.head === 'headband') { const band = add(new THREE.Mesh(new THREE.TorusGeometry(hr * 1.0, 0.024, 8, 32), hM), head); band.rotation.x = Math.PI / 2 - 0.15; band.position.y = hr * 0.45; }
   if (outfit.head === 'hood') { hat(new THREE.Mesh(new THREE.SphereGeometry(hr * 1.12, 32, 16, Math.PI * 0.85, Math.PI * 1.3, 0, Math.PI * 0.72), MAT(outfit.headColor || topC, { rough: 0.9, rim: 0.5, side: THREE.DoubleSide }))).position.set(0, 0.01, -0.01); }
   if (outfit.head === 'tophat') { hat(new THREE.Mesh(new THREE.CylinderGeometry(hr * 1.2, hr * 1.2, 0.015, 28), hM)).position.y = hr * 0.78; hat(new THREE.Mesh(new THREE.CylinderGeometry(hr * 0.72, hr * 0.75, hr * 1.1, 28), hM)).position.y = hr * 1.33; }
   if (outfit.head === 'crown') { const cr = add(new THREE.Mesh(new THREE.CylinderGeometry(hr * 0.7, hr * 0.6, hr * 0.45, 8, 1, true), MAT('#f2c21a', { metal: 0.6, rough: 0.35, rim: 0.4, side: THREE.DoubleSide })), head); cr.position.y = hr * 1.05; }
-  if (outfit.hair) buildHair(outfit.hair, { head, hr, MAT, add, hull, olM, olW, color: hairC, shade: outfit.hairShade, dark, ghost });
+  head.children.slice(nHead).forEach(m => { m.castShadow = false; });
+  const hairG = new THREE.Group(); head.add(hairG);
+  if (outfit.hair && outfit.hair !== 'balding') buildHair(outfit.hair === 'lowBun' ? 'slick' : outfit.hair, { head: hairG, hr, MAT, add, hull, olM, olW, color: hairC, shade: outfit.hairShade, dark, ghost });
   if (outfit.bow) { const bowM = MAT(outfit.bow, { rim: 0.4 }); const bow = new THREE.Group(); for (const sx of [-1, 1]) { const b = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.08, 4), bowM); b.rotation.z = sx * Math.PI / 2; b.position.x = sx * 0.04; bow.add(b); } bow.add(new THREE.Mesh(new THREE.SphereGeometry(0.022, 10, 8), bowM)); bow.position.set(hr * 0.42, hr * 0.86, hr * 0.2); bow.rotation.z = -0.4; add(bow, head); }
   if (outfit.face === 'glasses' || outfit.face === 'sunglasses') {
     const fm = MAT(outfit.face === 'sunglasses' ? '#111111' : '#2a2a2a', { rough: 0.3, rim: 0.2 });
@@ -331,7 +395,7 @@ export function character(outfit = {}, opts = {}) {
   // --- limbs: segments (cylinder + joint spheres) re-oriented every frame; outlines follow with a bigger radius
   const segs = [];
   const seg = (r, m, capEnd = true) => { const c = add(new THREE.Mesh(unitCyl, m), body); const j = capEnd ? add(new THREE.Mesh(unitSph, m), body) : null; const s = { r, c, j }; if (olM) { s.oc = new THREE.Mesh(unitCyl, olM); s.oj = capEnd ? new THREE.Mesh(unitSph, olM) : null; body.add(s.oc); if (s.oj) body.add(s.oj); } segs.push(s); return s; };
-  const pantsC = outfit.legs ?? null, shorts = typeof pantsC === 'string' && /^shorts:/.test(pantsC), bareLegs = !pantsC;
+  const pantsC = outfit.legs ?? (top === 'scrubs' ? topC : null), shorts = typeof pantsC === 'string' && /^shorts:/.test(pantsC), bareLegs = !pantsC;
   const pantsM = bareLegs ? skinM : MAT(shorts ? pantsC.slice(7) : pantsC, { rough: 0.85, rim: 0.55 });
   const sleeveM = top === 'none' || top === 'vest' ? skinM : outfit.sleeves ? clothM(outfit.sleeves) : topM;
   const limbR = dark ? B.limbR : B.limbR * 0.85;
@@ -372,6 +436,8 @@ export function character(outfit = {}, opts = {}) {
     } else { const ft = add(new THREE.Mesh(unitSph, skinM), f); ft.scale.set(0.05, 0.04, 0.09); ft.position.set(0, 0.03, 0.04); hull(ft, 1.18); }
     feet[side] = f;
   }
+  // role costume details (engine/costume3d.js): lanyards, badges, nurse/police caps, beards, a cane...
+  const prop = dressUp({ ...outfit, top }, { MAT, add, hull, chest, head, body, hr, chunky, hairC, ghost: !!ghost, parts: { torso, skirt } });
   // ---------------------------------------------------------------- posing
   const tmp = new THREE.Vector3(), up = new THREE.Vector3(0, 1, 0);
   const place = (s, A, Bp, r) => {
@@ -400,6 +466,13 @@ export function character(outfit = {}, opts = {}) {
   };
   root.pose = (p) => {
     p = typeof p === 'string' ? POSES3[p] : p;
+    // follow-through: hair lags the head and the body stretches a little when it rises or drops fast (poses from posesAt3 carry _prev)
+    const q = p._prev; let sy = 1;
+    if (q) { const dp = (p.head?.[0] || 0) + (p.spine?.[0] || 0) - (q.head?.[0] || 0) - (q.spine?.[0] || 0), dyw = (p.head?.[1] || 0) + (p.spine?.[1] || 0) - (q.head?.[1] || 0) - (q.spine?.[1] || 0);
+      hairG.rotation.set(clamp(-dp * 0.35, -9, 9) * D2R, clamp(-dyw * 0.3, -9, 9) * D2R, 0); sy = 1 + clamp(((p.y || 0) - (q.y || 0)) * 0.9, -0.06, 0.06); }
+    else hairG.rotation.set(0, 0, 0);
+    body.scale.set(scale / Math.sqrt(sy), scale * sy, scale / Math.sqrt(sy));
+    if (contact) { const lying = Math.abs((p.hips || [0])[0]) > 45, up = Math.max(0, p.y || 0); contact.visible = !lying; const k = clamp(1 - up * 1.6, 0.35, 1); contact.scale.set(k, k, 1); contact.material.opacity = (S().contact ?? 0.42) * k * (contact.userData.fade ?? 1); }
     pelvis.position.set(0, B.hipY + (p.y || 0), 0); pelvis.rotation.copy(eul(p.hips || [0, 0, 0]));
     chest.rotation.copy(eul(p.spine || [0, 0, 0])); head.rotation.copy(eul(p.head || [0, 0, 0]));
     body.updateMatrixWorld(true);
@@ -426,30 +499,47 @@ export function character(outfit = {}, opts = {}) {
   let faceKey = '';
   root.face = (o = {}) => {
     if (!faceMesh) return root;
-    const ex = typeof o.expr === 'object' ? o.expr : EXPRESSIONS[o.expr || 'neutral'] || EXPRESSIONS.neutral;
-    let blink = !!o.blink && o.blink !== true ? o.blink : false;
-    if (o.blink === true && o.t != null) { const per = 3.1 + (opts.seed || 0) * 0.37; blink = (o.t % per) > per - 0.12; }
-    const talk = Math.round(clamp(o.talk || 0) * 4) / 4, look = (o.look || [0, 0]).map(v => Math.round(v * 6) / 6);
-    const k = JSON.stringify([ex, talk, blink, look, eyeStyle, pal]);
-    if (k !== faceKey) { faceKey = k; faceMat.map = faceTexture(k, (g) => drawFace(g, { eye: ex.eye, mouth: ex.mouth, talk, blink, look, style: eyeStyle, pal })); faceMat.needsUpdate = true; }
+    const seed = (opts.seed || 0) * 13 + 1;
+    const keys = Array.isArray(o.expr) ? o.expr : null;
+    const ex = keys ? exprAt(o.t ?? 0, keys, o.exprBlend ?? 0.16) : typeof o.expr === 'object' ? o.expr : EXPRESSIONS[o.expr || 'neutral'] || EXPRESSIONS.neutral;
+    let bl = typeof o.blink === 'number' ? o.blink : o.blink && o.blink !== true ? 1 : 0;
+    if (o.blink === true && o.t != null) bl = blinkAt(o.t, seed, keys ? keys.slice(1).map(k => k[0]) : []);
+    let talk = o.talk || 0, round = 0;
+    if (o.speaker && o.gt != null) talk = talkShape(o.speaker, o.gt);
+    if (typeof talk === 'object') { round = talk.round || 0; talk = talk.open || 0; }
+    talk = Math.round(clamp(talk) * 4) / 4;
+    let look = o.look; if (!look) look = o.t != null && o.saccade !== false && !ex.eye.closed ? saccade(o.t, seed, typeof o.saccade === 'number' ? o.saccade : 1) : [0, 0];
+    look = look.map(v => Math.round(v * 12) / 12);
+    let eye = ex.eye, mouth = ex.mouth; const blink = bl >= 0.7;
+    if (!blink && bl > 0.05 && !eye.closed) eye = { ...eye, open: (eye.open ?? 0.82) * Math.round((1 - bl) * 4) / 4 };
+    if (talk > 0.05 && round > 0.5 && ['flat', 'smile', 'smirk', 'frown'].includes(mouth.type)) mouth = { ...mouth, type: 'o', w: Math.max(0.22, (mouth.w || 0.5) * 0.6), open: 0 };
+    const k = JSON.stringify([eye, mouth, talk, blink, look, eyeStyle, pal]);
+    if (k !== faceKey) { faceKey = k; faceMat.map = faceTexture(k, (g) => drawFace(g, { eye, mouth, talk, blink, look, style: eyeStyle, pal })); faceMat.needsUpdate = true; }
     return root;
   };
-  root.lookAt3 = (pt) => {
-    const hw = head.getWorldPosition(new THREE.Vector3()); const local = neck.worldToLocal(new THREE.Vector3(...pt)).sub(neck.worldToLocal(hw.clone()));
-    const yaw = Math.atan2(local.x, local.z), pitch = -Math.atan2(local.y, Math.hypot(local.x, local.z));
-    head.rotation.set(clamp(pitch, -0.6, 0.6), clamp(yaw, -1.1, 1.1), head.rotation.z, 'YXZ'); return root;
+  // lookAt3(point, k = 1): turn the head toward a world point; k < 1 blends from the pose's own head angle (smooth turns)
+  root.lookAt3 = (pt, k = 1) => {
+    const a = root.lookAngles(pt); if (!a) return root;
+    head.rotation.set(lerp(head.rotation.x, a[0], k), lerp(head.rotation.y, a[1], k), head.rotation.z, 'YXZ'); return root;
+  };
+  root.lookAngles = (pt) => {   // [pitch, yaw] the head would need to face pt (radians, clamped)
+    if (!pt) return null; const p = pt.isVector3 ? pt : new THREE.Vector3(...pt); root.updateMatrixWorld(true);
+    const hw = head.getWorldPosition(new THREE.Vector3()); const local = neck.worldToLocal(p.clone()).sub(neck.worldToLocal(hw.clone()));
+    return [clamp(-Math.atan2(local.y, Math.hypot(local.x, local.z)), -0.6, 0.6), clamp(Math.atan2(local.x, local.z), -1.1, 1.1)];
   };
   root.place = (x = 0, y = 0, z = 0, yaw = 0) => { root.position.set(x, y, z); root.rotation.y = yaw; return root; };
   root.faceTo = (x, z) => { root.rotation.y = Math.atan2(x - root.position.x, z - root.position.z); return root; };
   root.headWorld = () => head.getWorldPosition(new THREE.Vector3());
   root.handWorld = (side = 'L') => hands[side].g.getWorldPosition(new THREE.Vector3());
   root.chestWorld = () => chest.localToWorld(new THREE.Vector3(0, 0.3, 0));
-  root.parts = { body, pelvis, chest, head, neck, hands, feet, skull, faceMesh, torso, skirt };
+  root.parts = { body, pelvis, chest, head, neck, hands, feet, skull, faceMesh, torso, skirt, hair: hairG, contact };
   root.hold = (obj, side = 'L', o = {}) => { const h = hands[side].g; h.add(obj); obj.position.set(...(o.pos || [0, -0.1, 0.04])); obj.rotation.set(...(o.rot || [0, 0, 0])); return obj; };
-  root.setOpacity = (a) => { root.traverse(m => { if (m.material) [].concat(m.material).forEach(mm => { mm.transparent = a < 1; mm.opacity = a; }); }); };
+  root.setOpacity = (a) => { root.traverse(m => { if (m === contact) { m.userData.fade = a; m.material.opacity = (S().contact ?? 0.42) * a; return; } if (m.material) [].concat(m.material).forEach(mm => { mm.transparent = a < 1; mm.opacity = a; }); }); };   // the contact shadow stays see-through
   root.outfit = outfit; root.look = { skin, eyeStyle, dark };
-  root.pose(opts.pose || 'stand'); root.face({ expr: opts.expr || 'neutral' });
+  if (prop) root.hold(prop.obj, prop.side, { pos: prop.pos, rot: prop.rot });
+  root.pose(opts.pose || outfit.pose || 'stand'); root.face({ expr: opts.expr || 'neutral' });
   return root;
 }
-let _sole = null;
+let _sole = null, _contactTex = null;
+function contactTex() { if (_contactTex) return _contactTex; const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'); const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.45, 'rgba(255,255,255,.55)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); _contactTex = new THREE.CanvasTexture(c); return _contactTex; }
 function roundedSole() { if (_sole) return _sole; const s = new THREE.Shape(); s.absellipse(0, 0, 0.064, 0.14, 0, Math.PI * 2); _sole = new THREE.ExtrudeGeometry(s, { depth: 0.03, bevelEnabled: true, bevelThickness: 0.008, bevelSize: 0.008, bevelSegments: 2 }); _sole.rotateX(Math.PI / 2); _sole.translate(0, 0.03, 0); return _sole; }

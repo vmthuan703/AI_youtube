@@ -35,7 +35,7 @@ Every final encode is H.264 High, yuv420p, BT.709, GOP = fps/2, B-frames 2, with
 
 ## Render
 **Preview first, then the scorecard.** `node render.mjs --project projects/<slug> --from 0 --to 20 --scale 0.5` writes `build/preview.mp4`
-(draft encode, JPEG). Add `--fps 30` to preview a 60 fps project at half the frames. Then `python tools/qc_metrics.py --project projects/<slug>` prints brightness, near-black share, saturation, bars, cut pace, words per minute and loudness against the reference ranges, and writes `build/qc_scorecard.md`. Send it with the preview.
+(draft encode, JPEG). Add `--fps 30` to preview a 60 fps project at half the frames. Then `python tools/qc_metrics.py --project projects/<slug>` prints brightness, near-black share, saturation, frames too dark to read, bars, cut pace, words per minute and loudness against the reference ranges, and writes `build/qc_scorecard.md`. Send it with the preview.
 
 **Final:**
 ```bash
@@ -80,6 +80,10 @@ The render log prints frames, fps, elapsed time and ETA every 48 frames; report 
 - [ ] Bars: nothing important under them; text between y = 90 and y = 990. Speech bubbles sit near the right head and cover no face.
 - [ ] Size variety: giant foreground heads, macro inserts, wides, no run of same-sized faces.
 - [ ] Every shot has camera motion and some atmosphere (dust, bokeh, rain, glows).
+- [ ] **Motion reads as acting** (check in a moving preview): pose changes anticipate and settle (`posesAt3`), nobody stands frozen (`idle3`),
+      speakers nod on their words (`speak3`) and listeners turn toward them with their face still to camera (`lookAtSpeaker`), walks start and stop
+      without sliding feet (`walkTo`), expressions blend (`expr` keys). Camera accents (crash zoom, punch, smash, ramp) land on the word, one per shot at most.
+- [ ] Scorecard rows "almost nothing in them" and "nothing moves" are in range; open the listed near-empty times and fill those frames.
 - [ ] Text short, inside the safe area, legible at phone size; numbers match the narration.
 - [ ] Variety: no more than 3 consecutive shots of the same type or framing.
 - [ ] 9:16: subjects in the middle, nothing important under the captions.

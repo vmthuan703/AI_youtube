@@ -14,6 +14,9 @@ TARGETS = {
     "luma": (0.19, 0.40, "median brightness 0-1", "Too dark: raise ambient, use the pearl style or a brighter palette."),
     "dark": (0.03, 0.22, "share of near-black pixels", "Lift the shadows: pearl style, more ambient, lighter walls."),
     "sat": (0.35, 0.47, "mean saturation 0-1", "Too intense: pearl style; keep only the hero outfit loud."),
+    "murky": (0.0, 0.12, "share of frames too dark to read (median < 0.13)", "Night scenes: keep the stage faceLight on, add a practical lamp near the faces, lighter walls."),
+    "empty": (0.0, 0.02, "share of frames with almost nothing in them", "Fill the purple stage: a bigger figure (a third of the height), a bigger diagram, a backdrop; see style-bible Explainers."),
+    "still": (0.0, 0.10, "share of half-seconds where nothing moves", "Every shot moves: a camera drift, idle3 on people, a diagram that builds."),
     "cuts": (16.0, 22.0, "shots per minute", "Add or merge cuts on phrase boundaries."),
     "median": (2.0, 2.7, "median shot, seconds", "Shorten holds or add inserts."),
     "p25": (1.2, 1.7, "a quarter of shots are shorter than, seconds", "Add one-second inserts and reaction cuts."),
@@ -44,7 +47,24 @@ def picture(path):
         F, y = F[:, top:-top], y[:, top:-top]
     mx, mn = F.max(axis=3), F.min(axis=3)
     sat = (mx - mn) / (mx + 1e-4)
-    return {"bars": float(bars), "luma": float(np.median(y)), "dark": float((y < 0.08).mean()), "sat": float(sat.mean())}
+    # detail: share of pixels on an edge; under 4.5 % is a near-empty picture (a bare stage with one small label)
+    gx, gy = np.abs(np.diff(y, axis=2))[:, :-1, :], np.abs(np.diff(y, axis=1))[:, :, :-1]
+    edge = ((gx + gy) > 0.05).reshape(len(y), -1).mean(axis=1)
+    return {"bars": float(bars), "luma": float(np.median(y)), "dark": float((y < 0.08).mean()), "sat": float(sat.mean()), "murky": float((np.median(y.reshape(len(y), -1), axis=1) < 0.13).mean()),
+            "empty": float((edge < 0.045).mean()), "empty_at": [i * 2 for i in np.nonzero(edge < 0.045)[0].tolist()]}
+
+
+def stillness(path, top_share):
+    """Share of half-second steps where the picture barely changes (cuts excluded): frozen holds read as a slideshow."""
+    F = frames(path, "fps=2,scale=96:54", 96, 54)
+    if len(F) < 3:
+        return None
+    t = int(round(top_share * 54))
+    if t:
+        F = F[:, t:-t]
+    d = np.abs(np.diff(F, axis=0)).mean(axis=(1, 2, 3))
+    d = d[d < 0.12]   # bigger jumps are cuts
+    return float((d < 0.0025).mean()) if len(d) else None
 
 
 def cuts(path):
@@ -81,6 +101,7 @@ def main():
         sys.exit("no video found: pass --video or render a preview first")
     dur = duration(v)
     M = picture(v)
+    M["still"] = stillness(v, M["bars"])
     ts = cuts(v)
     c = [0.0] + ts + [dur]
     d = np.array([b - a_ for a_, b in zip(c, c[1:])])
@@ -100,6 +121,8 @@ def main():
         fmt = (lambda x: f"{x:.2f}") if k not in ("cuts", "wpm", "loud") else (lambda x: f"{x:.1f}")
         rows.append(f"| {unit} | {fmt(M[k])} | {fmt(lo)} to {fmt(hi)} | {'OK' if ok else 'CHECK: ' + fix} |")
     md = f"# Scorecard: {os.path.basename(v)} ({dur:.0f} s)\n\n" + "\n".join(rows) + f"\n\n{len(rows) - 2 - bad} in range, {bad} to check. Targets describe one winning channel's template, not a rule.\n"
+    if M.get("empty_at"):
+        md += "\nNear-empty frames at (s): " + ", ".join(str(x) for x in M["empty_at"][:30]) + "\n"
     print(md)
     out = a.out or (os.path.join(a.project, "build", "qc_scorecard.md") if a.project else None)
     if out:

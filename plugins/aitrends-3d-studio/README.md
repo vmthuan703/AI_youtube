@@ -28,6 +28,34 @@ giữ nguyên dáng suốt video và chữ luôn nét. Giọng đọc mặc đ�
 
 Có 5 điểm dừng để bạn duyệt: soát kịch bản, nghe thử giọng, chọn phong cách và bảng màu, xem thử kèm bảng điểm, bản cuối.
 
+## Có gì mới ở 0.2.5 (chuyển động)
+| Nhóm | Thay đổi |
+|---|---|
+| Diễn xuất | Chuyển tư thế có lấy đà và vượt đà, hông đi trước, đầu đến sau (`posesAt3`) · nhân vật nghỉ dồn trọng tâm, liếc nhìn (`idle3`) · người nói gật đầu, đánh tay theo từ (`speak3`) · người nghe quay đầu về phía người nói mà mặt vẫn hướng camera (`lookAtSpeaker`) · đi/chạy có tăng tốc, giảm tốc, không trượt chân (`walkTo`) |
+| Khuôn mặt | Biểu cảm chuyển mượt 0,16 s, chớp mắt khi đổi biểu cảm · chớp mắt không đều, có chớp đôi · mắt liếc nhẹ · miệng theo chữ cái đang nói (a/e/i mở, o/u tròn, m/b/p khép) |
+| Camera | `dolly` chạy một đường cong mượt qua mọi điểm · rung tay máy nhẹ cho mọi shot 3D (`config.handheld`) · `crashZoom`, `punch`, `dutch`, `rackFocus`, `chase` |
+| Dựng phim | Whip pan có nhòe thật · smash cut · slow-motion cục bộ (`ramp` trong shots.json) |
+| Đồ họa | Nhãn và thẻ thu nhỏ rời đi trước khi cắt (`end: 'shot'`) · số đếm tăng dần (`count: true`) · sân khấu tím có vệt sáng trôi và bụi bay (2D và 3D) |
+| Kiểm tra | Bảng điểm thêm "khung gần như trống" (kèm thời điểm) và "nửa giây không có gì chuyển động" |
+
+## Có gì mới ở 0.2.4
+| Nhóm | Thay đổi |
+|---|---|
+| Ánh sáng | Bóng mềm dưới chân nhân vật và dưới đồ đạc · cảnh đêm/bão có đèn nhẹ từ phía máy quay làm sáng mặt, viền sáng mạnh hơn |
+| Màu | Phong cách `pearl`: bối cảnh bớt đậm 16% (`setSat`), nhân vật giữ màu; độ bão hòa trung bình 0.488 → 0.451 trên Body Healed |
+| Bối cảnh | Phòng `hospital` (giường có thanh chắn, máy đo tim chạy nhịp, cây truyền dịch, rèm, tủ, bồn rửa) · lớp học thêm đồng hồ, bảng ghim, giá sách · tường có ánh sáng nhạt dần, phào, tường hai màu |
+| Đám đông | Có tóc, tay, màu trầm; nhấp nhô, lắc lư, giơ tay theo đợt |
+| Chuyển động | Tóc trễ nhịp theo đầu, thân hơi kéo giãn khi bật lên/rơi xuống (`posesAt3`) |
+| Chữ | Cỡ chữ tối thiểu cho bong bóng thoại, nhãn, thẻ · `config.textScale` |
+| Kiểm tra | Bảng điểm thêm "tỉ lệ khung quá tối" |
+
+## Có gì mới ở 0.2.3
+| Nhóm | Thay đổi |
+|---|---|
+| Nhân vật | Dàn 25 vai trong `channel/cast.js`: gia đình, trường học, bệnh viện, cảnh sát, cứu hỏa, bảo vệ, đầu bếp, thu ngân, nhà khoa học, công nhân, phóng viên, cô giáo áo dài · `ROLES` nối từ trong kịch bản với vai |
+| Engine | `engine/costume3d.js`: mũ y tá, kê-pi, mũ đầu bếp, mũ bảo hộ, ống nghe, dây thẻ, còi, phù hiệu, áo phản quang, tạp dề, râu, ria, hói, lông mày bạc, gậy, sách, micro… · áo `scrubs`, `aodai` · tư thế `hunch`, `hunchCane`, `handsOnHips`, `handsOnBelt`, `holdMic` |
+| Sửa lỗi | Vành mũ không còn đổ vệt bóng ngang mặt · áo blouse trắng ngà thay vì trắng tinh |
+
 ## Có gì mới ở 0.2.0
 | Nhóm | Thay đổi |
 |---|---|

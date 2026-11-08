@@ -5,7 +5,7 @@
 aitrends-3d-studio/
   render.mjs  player.html  package.json
   channel/  brand.json cast.js        (the channel's choices and hero; updates never overwrite this folder)
-  engine/   core.js styles.js kit3d.js rig3d.js world3d.js fx3d.js player.js gag.js   (+ ui2d.js diagrams2d.js fx2d.js rig2d.js for 2D overlays/cards)
+  engine/   core.js styles.js kit3d.js rig3d.js motion3d.js costume3d.js world3d.js fx3d.js player.js gag.js   (+ ui2d.js diagrams2d.js fx2d.js rig2d.js for 2D overlays/cards)
   tools/    doctor.py verify_kit.py tts_chatterbox.py tts.py script_check.py new_project.py parse_script.py transcribe.py beats.py qc_metrics.py tidy_project.py common.py
   audio/    dsp.py sfx.py music.py mix.py
   examples/speed-demo/   (reference project: a finished 32 s video — cast, sets, shots, story, timeline)
@@ -26,20 +26,22 @@ paths (`'/engine/core.js'`) and project files relatively (`'../cast.js'`, `'../s
   "bars": "cine", "fadeIn": 0.5, "fadeOut": 0.8, "speechBubbles": true,
   "subscribeGag": {"enabled": true, "at": 90, "dur": 5, "label": "SUBSCRIBE", "done": "SUBSCRIBED"},
   "music": {"enabled": true, "gainDb": -15, "duckDb": -6, "releaseS": 0.16}, "sfx": {"enabled": true, "gainDb": -6},
-  "loudness": -14, "export": {"upscale": "1440p"} }
+  "loudness": -14, "export": {"upscale": "1440p"}, "handheld": 0.35 }
 ```
 - `resolution` 720p | 1080p | 1440p | 2160p. `fps` 24 | 30 | 60. `quality` draft | standard | high | max (render-qc.md).
 - `export.upscale` 1440p | 2160p: the final MP4 is upscaled for YouTube (better VP9/AV1 encodes). Optional.
 - `bars`: "cine" (channel default: 68 px, a 2:1 picture) | null/"none" (full frame) | "wide" | "scope" | number. Keep text between y = 90 and y = 990.
 - `palette`: dusk | cozy | tropic | alert | school | midnight (engine/styles.js `PALETTES`), this video's colour world on top of the style. Add your own there.
+- `handheld`: a light hand-held drift the player adds to every 3D shot at render time (0 = locked-off tripod, 0.35 default, 1 = documentary).
+  It never changes what `draw()` set, so shots stay deterministic; a shot can override it in shots.json (`"handheld": 0` for macros and diagrams on a 3D stage).
 - `speechBubbles`: every line of a named character gets a bubble while spoken (from `timeline/lines.json`). `subscribeGag`: the hero's silent mid-video button gag, drawn across cuts by `engine/gag.js`; audio/mix.py adds its small sounds.
 
 ## story/shots.json
 ```json
 { "title": "…", "duration": 312.4,
   "shots": [ { "id": "s001", "start": 0, "end": 3.4, "line": "spoken words", "scene": "what we see", "set": "city",
-               "in": {"type": "cut|fade|dip|dipWhite|flash|whip|zoom", "dur": 0.4, "dir": 1},
-               "look": null, "mblur": 1, "bars": null,
+               "in": {"type": "cut|fade|dip|dipWhite|flash|whip|zoom|smash", "dur": 0.4, "dir": 1},
+               "look": null, "mblur": 1, "bars": null, "handheld": 0.35, "ramp": [[0, 1], [0.8, 0.25], [2.2, 0.25], [2.6, 1]],
                "sfx": [{"at": 0.4, "name": "whoosh", "gain": -10}], "amb": {"name": "city", "gain": -24},
                "params": {}, "captions": true, "notes": "",
                "bubbles": true, "bubble": {"x": 900, "y": 240, "tx": 1000, "ty": 400},
@@ -49,6 +51,11 @@ paths (`'/engine/core.js'`) and project files relatively (`'../cast.js'`, `'../s
 - `look`: `freeze` (cold, desaturated time-stop), `flashback`, `dream`, `danger`, or an object of grade overrides
   (`{sat, contrast, lift:[r,g,b], gamma, gain, vignette}`). Applied on top of the style.
 - `mblur`: sub-frames per frame for motion blur (2–4). Multiplies render time; use only on fast action shots.
+- `in`: `whip` slides both shots together smeared along the move (a real whip pan, `dir` 1 or −1); `smash` is a smash cut: one white
+  frame, then the new shot lands with a small punch-in and a dying shake (impacts, a punchline, "and then it happened"). Cut is still the default.
+- `ramp`: speed keys `[shot-local seconds, playback speed]`, linear between keys. The shot's animation slows (0.2–0.35 = slow motion) or
+  speeds up while the voice runs on: the dive in slow motion, the fall that hangs in the air. `draw()` receives the ramped time; overlays,
+  bubbles and lip-sync keep real time. Keep it to 1–3 moments a video.
 - `backdrop` (2D shots): a still of another shot, without its overlays, blurred and dimmed behind this shot's drawing. Built once per worker, so it costs almost nothing.
 - `bubbles: false` turns the automatic speech bubble off for one shot; `bubble` places it by hand.
 
@@ -84,6 +91,15 @@ registerShot('s012', {
 registerShot('s013', { kind: '2d', draw(g, t, info) { D.stage2d(g); D.scale(g, { value: 0.7, label: '15 LB', t }); } });   // 2D card; add "backdrop" in shots.json to sit on a blurred scene
 ```
 
+**Acting recipe** (what makes people look alive; every helper is a pure function of time):
+```js
+const p = T.posesAt3(t, [[0, 'stand'], [0.9, 'point'], [2.2, 'shrug']]);   // dips back, overshoots, hips → spine → arms → head
+s.mia.pose(T.speak3(T.idle3(p, t, { seed: 2 }), 'MIA', info.globalT));     // weight shifts + glances, nods and hand beats on her words
+s.mia.face({ expr: [[0, 'smile'], [1.4, 'worried']], t, blink: true, speaker: 'MIA', gt: info.globalT });   // blended faces, letter-shaped mouth
+T.lookAtSpeaker(s.leo, { MIA: s.mia, MOM: s.mom }, info.globalT);         // after .pose(): Leo's head follows whoever talks
+s.leo.pose(T.walkTo(s.leo, t, { path: [[-3, 2], [0, 1], [2, 1]], t0: 0.3, t1: 3.2, end: 'handsOnHips' }));   // no skating, real start and stop
+```
+
 **Size and comedy recipes** (tested numbers; head centre ≈ y 1.45, eyes ≈ y 1.40, face toward +z):
 ```js
 // macro on one eye, deadpan
@@ -103,7 +119,10 @@ T.dolly(cam, t, [[0, { pos: [0.2, 0.45, 9], look: [0, 1.35, 3] }], [3, { pos: [0
 
 ## Stage, materials, lights — `T` (engine/kit3d.js)
 - `T.stage({ mood, fov, fog:[near,far]|false, fogColor, sky:[top..bottom]|colour, keyPos, keyColor, keyIntensity, ambient,
-  fill, fillPos, rim, rimStrength, bloom, bloomThreshold, exposure, dof:{focus, aperture, maxblur}, shadowSize, shadows })`
+  fill, fillPos, rim, rimStrength, bloom, bloomThreshold, exposure, dof:{focus, aperture, maxblur}, shadowSize, shadows, faceLight })`
+  Night and storm moods add a soft light from the camera that lifts faces off the dark set (`faceLight` 0.55; 0 turns it off,
+  any mood can set it) and a stronger rim. `st.add(obj)` animates objects that carry `obj.tick(t)` (crowds, heart monitors, clocks);
+  the player calls `st.tick(t)` every frame, so shots no longer need to.
   → `st = { scene, camera, composer, sun, hemi, fill, M, add(...objs), onTick(fn), tick(t), focus(d), focusOn(obj|[x,y,z]),
   exposure(x), render() }`. `M = st.M` is the mood palette (sky, ambient, key, rim, wall, floor, dark, practical, grass,
   road, fog, accent). Default fog [14, 70], fov 35 (16:9) / 50 (9:16).
@@ -122,11 +141,18 @@ T.dolly(cam, t, [[0, { pos: [0.2, 0.45, 9], look: [0, 1.35, 3] }], [3, { pos: [0
 - Lights: `T.lamp(colour, intensity, dist, {shadow, bulb})` (point + glowing bulb), `T.spot(colour, intensity, {pos,
   target, angle, penumbra})`, `T.lightCone(r,h,colour,opacity)` (fake volumetric cone), `T.glow(colour, size, opacity)`
   (additive sprite). Every real point/spot light costs render time; keep ≤ 4–5 per shot and fake the rest with glows.
-- Cameras (`camera = st.camera`): `T.dolly(camera, t, [[0,{pos,look,fov,roll}],[3,{…}]])`, `T.push(camera, t, {from,to,
-  look | lookFrom/lookTo, dur, roll})`, `T.orbit(camera, t, {target, radius, height, from, to, dur})`,
-  `T.follow(camera, obj, {offset, look, roll})`, `T.aim(camera, [x,y,z], {dist, yaw, pitch, fov})` (close-ups, macro),
-  `T.shake(camera, t, amp, freq, rot)`, `T.setFov(camera, fov)`.
-- Utils: `T.THREE`, `T.v3`, `T.worldPos(obj)`, `T.rng(seed)`, `T.key`, `T.ease`, `T.clamp`, `T.lerp`, `T.noise`,
+- Cameras (`camera = st.camera`): `T.dolly(camera, t, [[0,{pos,look,fov,roll}],[3,{…}]])` (one smooth curve through every key: eases out
+  of the first, flows through the middle keys, eases into the last; two equal keys hold; pass `T.ease.inOut` as a 4th argument for the
+  old stop-at-every-key move), `T.push(camera, t, {from,to, look | lookFrom/lookTo, dur, roll})`, `T.orbit(camera, t, {target, radius,
+  height, from, to, dur})`, `T.follow(camera, obj, {offset, look, roll})` (rigid), `T.chase(camera, t, tt => [x,y,z], {offset, look,
+  lag, ahead})` (an operator following a runner: trails by `lag` s, aims a little ahead), `T.aim(camera, [x,y,z], {dist, yaw, pitch, fov})`
+  (close-ups, macro), `T.shake(camera, t, amp, freq, rot)`, `T.setFov(camera, fov)`.
+- Camera accents, called after the camera is placed: `T.crashZoom(camera, t, {at, dur: 0.2, to, push})` (snap onto a face on a word),
+  `T.punch(camera, t, at, {amp, dur})` (impact bump and dying shake), `T.dutch(camera, deg)` (tilted horizon for tension),
+  `T.handheld(camera, t, amount, seed)` (the player already adds `config.handheld`), `T.rackFocus(st, t, [[0, mia], [1.6, leo]], 0.45)`
+  (focus moves from one subject to the next; needs `dof`).
+- Utils: `T.THREE`, `T.v3`, `T.worldPos(obj)`, `T.rng(seed)`, `T.key`, `T.smoothKey` (key() as one smooth curve), `T.ease` (adds
+  `ease.back(x, a)`: anticipation + overshoot), `T.clamp`, `T.lerp`, `T.noise`,
   `T.optimize(st, keep)` (called automatically).
 
 ## Characters — `T.character(outfit, {pose, expr, seed})` (engine/rig3d.js)
@@ -134,7 +160,8 @@ Outfit (put them in `scenes/cast.js`, one per recurring character, never change 
 ```js
 import { HERO as CHANNEL_HERO } from '/channel/cast.js';
 export const HERO = { ...CHANNEL_HERO, speaker: 'JAY' };                                   // quilted lime puffer, platinum anime hair; 'speaker' = name in the script
-export const NOAH = { ...RIVAL, speaker: 'NOAH' };                                         // import { HERO as CHANNEL_HERO, RIVAL } from '/channel/cast.js'; ready-made: FRIEND, RIVAL, GIRL, GIRL2, PARENT, TEACHER, STRANGER
+export const NOAH = { ...RIVAL, speaker: 'NOAH' };                                         // import { HERO as CHANNEL_HERO, RIVAL, NURSE } from '/channel/cast.js'
+export const PATEL = { ...NURSE, speaker: 'NURSE PATEL' };                                 // a role from the roster: the costume already says the job
 export const MAYA = { top: 'hoodie', color: '#8d4a6b', hair: 'fringe', hairColor: '#34262c', scarf: '#9c7a3a', lashes: true };   // a new character: own hair, one detail, a deep muted colour
 export const BOSS = { top: 'suit', color: '#22222a', tie: '#5e2230', face: 'sunglasses', legs: '#22222a', shoes: '#111111', scale: 1.15 };
 ```
@@ -143,22 +170,49 @@ dress | labcoat | vest | puffer | none · `color`, `color2` (trim, quilting seam
 null (bare stick legs) · `shoes` colour | null (round feet), `shoeSole` · `gloves` colour (default: ball hands in skin) ·
 `head` cap | capBack | beanie | hood | headband | tophat | crown, `headColor` · `hair` anime (tall crown, the hero's) | animeLow (same look, lower) | short | messy | spiky | curls | quiff | sidePart | slick | bob | fringe | long | sidePony |
 ponytail | pigtails | bun (soft hairlines, `engine/hair3d.js`), `hairColor`, `hairShade` (anime only: the shadow between locks), `bow` (colour) · `skirt` (colour, any top) · one-detail accents, each a colour: `sleeves`, `stripe`, `scarf`, `collar`, `bag` · `blush`
-(true | colour) · `lashes: true` · `face` glasses | sunglasses · `kid: true` (74% size) · `scale` · `outline` (colour | false).
+(true | colour) · `lashes: true` · `face` glasses | sunglasses · `kid: true` (74% size) · `scale` · `outline` (colour | false) · `pose` (the resting pose when none is given).
+
+**Role roster** (`/channel/cast.js`, all in muted colours next to the hero): friends and family `BESTIE` (the hero's best friend, a girl), `BRO`, `RIVAL`, `CLASSMATE`,
+`MOM`, `DAD`, `GRANDPA`, `GRANDMA`, `LITTLE_SIB`; school `TEACHER_F`, `TEACHER_M`, `TEACHER_VN` (áo dài), `PRINCIPAL`, `COACH`; hospital and emergency `DOCTOR`, `NURSE`,
+`PARAMEDIC`, `POLICE`, `FIREFIGHTER`; town `GUARD`, `CHEF`, `CASHIER`, `SCIENTIST`, `WORKER`, `REPORTER`, `SHADY`. `ROLES` maps script words to a role
+("nurse" → `NURSE`). Old names still work (`FRIEND` = `BRO`, `GIRL` = `CLASSMATE`, `GIRL2` = `BESTIE`, `STRANGER` = `SHADY`, `PARENT`, `TEACHER`).
+Dress a script's named character from the roster first; change a colour or the hair only when two of them share a scene and look alike.
+
+**Role details** (engine/costume3d.js; colours unless noted): `top` scrubs (V-neck, matching pants) | aodai (long tunic, mandarin collar, over `legs`) ·
+`labcoat` is muted off-white `#d2d3da` (set `color` to change) · `head` nurseCap | policeCap | chefHat | hardhat | fireHelmet (all hats, caps included, cast no shadow on the face) ·
+`hair` balding (a grey ring in `hairColor`) | lowBun · `mustache`, `beard`, `brows` (3D brows that stay on: older faces) · `lanyard` + `card`, `whistle`, `stethoscope: true`,
+`badge` (gold shield), `nameTag`, `patch` ('SECURITY', 'EMS': text on the chest), `epaulettes`, `belt` + `radio: true`, `bands` (two reflective torso bands), `hiVis` (vest),
+`apron`, `buttons` + `buttonRows: 2` + `buttonsTop`, `vee`, `goggles: true` (on the forehead) · `belly` (1.1–1.2) · `skirtLen` (longer skirt or shorter coat, e.g. 1.7 / 0.72) ·
+`prop` cane | book | clipboard | mic | torch | medbag, `propHand` 'L' | 'R' (the cane stands on the floor: use pose `hunchCane`).
 
 Methods (all return the character, so they chain):
 - `.place(x, y, z, yaw)` (yaw 0 faces +z, toward a default camera; π/2 faces +x), `.faceTo(x, z)`.
-- `.pose(p)`: a name from `T.POSES3`, a pose object, `T.posesAt3(t, [[0,'stand'],[0.8,'point'],[2,'shrug']], blend)`,
+- `.pose(p)`: a name from `T.POSES3`, a pose object, `T.posesAt3(t, [[0,'stand'],[0.8,'point'],[2,'shrug']], blend, { lively })`: each change
+  dips back a little first, passes the target and settles (`ease.back`), and the body moves in order (hips and legs, then the spine 35 ms
+  later, the arms 60 ms, the head 90 ms). `lively` 0 = the old even blend, 1 default, 1.5 cartoon snap. It also carries the pose 0.1 s
+  earlier, so the hair lags a turn of the head and the body stretches a little on fast rises and drops.
   `T.walkPose3(phase, {run, sprint, lean})`, `T.breathe3(pose, t, k, seed)`, `T.blendPose3(a, b, k)`.
-- `.face({ expr, talk, blink: true, t, look: [x, y] })`: expressions `neutral smile happy joy smirk smug determined
+- Acting helpers (engine/motion3d.js): `T.idle3(pose, t, {seed, k, weight, glance})` (breathing plus a weight shift between the legs and a
+  slow glance now and then: use it on everyone standing or sitting, `k: 0.5` for the hero's deadpan holds) · `T.speak3(pose, speaker,
+  globalT, {k, hand})` (a nod on each of the speaker's words, a bigger one and a free-hand beat on long words and numbers) ·
+  `T.lookAtSpeaker(ch, {MIA: s.mia, …}, globalT, {blend})` (after `.pose`: the head turns to whoever talks and back, never snapping) ·
+  `T.walkTo(ch, t, {from, to | path, t0, t1, run, sprint, idle, end, yaw0, yaw1, y, accel})` (moves and turns the character and returns the
+  pose: speeds up and slows down, cadence from the distance covered so the feet don't slide, the stride grows out of `idle` and settles into `end`).
+- `.face({ expr, talk, blink: true, t, look: [x, y], speaker, gt, saccade })`: expressions `neutral smile happy joy smirk smug determined
   angry surprised shocked scared worried nervous sad cry sleepy thinking confused awe evil dead deadpan unimpressed`, or a custom
-  `{eye:{open, lid, low, pupil, closed, sparkle, tears}, mouth:{type, w, open, curve}}`. `look` moves the eyes (−1..1).
-- `.lookAt3([x, y, z])` turns the head toward a world point (after `.pose`).
+  `{eye:{open, lid, low, pupil, closed, sparkle, tears}, mouth:{type, w, open, curve}}`. **`expr` may be keys** `[[0, 'deadpan'], [1.2, 'shocked']]`
+  (with `t`): each change blends in 0.16 s (`exprBlend`), eyes close down and open through a squint, and the eyes blink on the change.
+  `blink: true` blinks 2.2–5.5 s apart with the odd double blink (a number 0..1 closes the eyes that far). Without `look` the eyes make small
+  darts every 0.7–2 s (`saccade: false` holds them still, a number scales them). `speaker` + `gt` (= `info.globalT`) shape the mouth from the
+  letters being spoken (a/e/i open, o/u/w round, m/b/p closed); `talk` still takes a number or `T.talkShape(...)`.
+- `.lookAt3([x, y, z], k)` turns the head toward a world point (after `.pose`; `k` < 1 blends from the pose's head angle). `.lookAngles(p)`
+  returns the [pitch, yaw] it would use.
 - `.hold(obj, 'L'|'R', {pos, rot})` attaches a prop to a hand. `.headWorld()`, `.handWorld('L')`, `.chestWorld()`.
 - `.setOpacity(a)`; `.parts` = { body, pelvis, chest, head, neck, hands, feet, … } for special effects.
 
 Poses: `stand relaxed confident handsInPockets talk explain point pointUp pointAtViewer wave cheer fistPump handsOnHead
 facepalm think crossArms shrug scared shocked sad phone phoneEar holdFront reach ready fight punch kick crouch kneel
-sit sitBack sitDesk lie jump fall superLand flexL`. A pose object:
+sit sitBack sitDesk lie jump fall superLand flexL hunch hunchCane handsOnHips handsOnBelt holdMic`. A pose object:
 `{ y, hips:[pitch,yaw,roll], spine:[…], head:[…], armL:[raise, az, bend, twist] | {to:[x,y,z], pole}, armR, legL:[lift, side,
 knee, twist] | {to}, legR, handL:'fist'|'open'|'point'|'relaxed', handR }` in degrees. Pitch + leans/nods forward, yaw +
 turns to the character's left, arm raise 0 = hanging, 90 = horizontal, 180 = up; az 0 = forward, 90 = sideways. `{to}`
@@ -168,8 +222,9 @@ uses IK in character space (metres, +z forward, y up; shoulders at y ≈ 1.02 an
 Walking/running: phase = t × 2π × cadence (walk 0.9, run 1.4, sprint 1.9 Hz); move the character at about 1.3 / 4 / 9
 m/s × scale. Super-speed: sprint + `T.FX3.speedLines` + `T.FX3.ghosts` + camera shake.
 
-Lip-sync: only characters who speak a quoted line, with `talk: talkFor('JAKE', info.globalT)` (the TTS word timeline
-knows who speaks each word). The narrator is never lip-synced.
+Lip-sync: only characters who speak a quoted line, with `face({ speaker: 'JAKE', gt: info.globalT })` (or `talk: talkFor('JAKE',
+info.globalT)`, the mouth opening alone). The TTS word timeline knows who speaks each word; `speakerAt(globalT)` (core.js) says who is
+talking now and since when. The narrator is never lip-synced.
 
 Body: 1.75 m tall incl. a 0.54 m head (≈ ⅓); hips 0.62 m; head centre ≈ 1.45 m; a seat is 0.4 m high (`T.W.chair`),
 a table 0.76 m. Raised-arm poses (cheer, wave, pointUp) open sideways so the big head stays visible.
@@ -180,11 +235,17 @@ Sets build into the stage and return anchors:
   street along x: road z ∈ [−4, 4], sidewalks to ±7 at y = 0.15, building row behind z < −7, street lamps, parked cars,
   skyline, moon. Returns `{ lamps, lane:[-2, 2], sidewalk: 0.15 }`.
 - `T.W.suburb(st, { seed, length, lights, focus, fence, moon, stars })` → houses with lit windows, lawns, fences, trees, road along x. Colours follow the stage mood (`M.houses`, `M.tree`); moon and stars only at night unless asked.
-- `T.W.room(st, { kind: bedroom|living|office|classroom|kitchen|hallway|empty, w, d, h, wall, floor, window:
-  'back'|'left'|'right'|false, view: 'day'|'night', ceiling, curtains, lockerColor, boardText, desks })` → floor centred at the origin, back wall
-  at z = −d/2, side walls at x = ±w/2, open toward +z. Returns `{ w, d, h, window, lamps, backZ }`.
-- `T.W.explainer(st, { color, lineZ, light, line })` → the purple diagram stage of the references: flat backdrop with a
-  fine faint grid, a floor meeting it in a thin light line at z = lineZ (default 0). Stand characters on the line, frame
+- `T.W.room(st, { kind: bedroom|living|office|classroom|kitchen|hallway|hospital|empty, w, d, h, wall, floor, window:
+  'back'|'left'|'right'|false, view: 'day'|'night', ceiling, curtains, lockerColor, boardText, desks, clock, wainscot, contact })` → floor centred at the origin, back wall
+  at z = −d/2, side walls at x = ±w/2, open toward +z. Returns `{ w, d, h, window, lamps, backZ, bedTop, monitor }`.
+  Walls have a light falloff, baseboards and a crown moulding; hospital, classroom and office add a two-tone wainscot. Every floor-standing
+  prop gets a soft contact shadow (`contact: false` skips them). **Location kits:** `hospital` builds a bed with rails (`bedX`, `bedZ`,
+  `bedColor`), a heart monitor (`bpm`, `bpmText`), a drip stand, a privacy curtain, a bedside cabinet, a visitor chair, a sink and a clock;
+  `classroom` adds a wall clock, a cork board, a poster and a bookcase. The props alone: `T.W.hospitalBed`, `heartMonitor`, `ivPole`,
+  `curtain`, `bedsideCabinet`, `wallClock({time: '10:10' | t => minutes})`, `bulletinBoard`. `T.contactShadow(obj)` gives any prop a soft
+  shadow on the floor (add it with `st.add`).
+- `T.W.explainer(st, { color, lineZ, light, line, dust })` → the purple diagram stage of the references: flat backdrop with a
+  fine faint grid, a floor meeting it in a thin light line at z = lineZ (default 0), fine dust floating up through the light (`dust: false` off). Stand characters on the line, frame
   front-on with fov 18–28 (`T.dolly` from z ≈ 10–13), and add `UI.pill/statCard/tag/heading/nameLabel` in `overlay`.
 - `T.W.veil(st, { pos, w, h, opacity, color, lookAt })` → a dark transparent sheet that pushes a busy set back behind
   small foreground characters (the "blurred scene" explainer variant, with `dof`).
@@ -206,8 +267,9 @@ Sets build into the stage and return anchors:
   `desk`, `chair({h})`, `officeChair`, `bed({color})`, `sofa`, `shelf`, `door`, `tv({w, draw})`, `laptop({draw})`,
   `phone({draw})` (screen = `phone.screen.update(t)`), `cup`, `bottle({color, label})`, `book`, `plant`, `deskLamp`,
   `ceilingLamp`, `whiteboard({text, dark, draw})`, `locker({color})`, `counter`, `fridge`, `rug`, `poster({text})`,
-  `money({n})`, `ball`, `crowd({n, area:[x0,x1,z0,z1], colors, s, yaw, rise, riseFrom, y0})` (instanced mini people in the
-style's skin with coloured hoodies; `rise` lifts rows for bleachers: y = y0 + (riseFrom − z) × rise).
+  `money({n})`, `ball`, `crowd({n, area:[x0,x1,z0,z1], colors, hairColors, s, yaw, rise, riseFrom, y0, cheer, still})` (instanced mini people in the
+style's skin with hair, arms and muted tops; `rise` lifts rows for bleachers: y = y0 + (riseFrom − z) × rise). Added with `st.add`, they bob, sway
+and raise their arms in waves; `cheer` 0–1 (or a function of t) sets how many cheer, `still: true` freezes them).
 - Project sets: write `scenes/sets/<name>.js` exporting `function build(T, st, o)` that composes these, so every shot in
   a location uses the same geometry. Invent new props from boxes/cylinders/rounded boxes when the script needs them.
 
@@ -220,13 +282,16 @@ Build in `init`, then `fx.update(t)` in `draw` (or `st.onTick(fx.update)` once +
 
 ## Diagrams (engine/diagrams2d.js) — `import * as D from '/engine/diagrams2d.js'`
 Flat animated pictures for explainers, in `overlay()` or a 2D `draw()`. All take logical `x, y`, a size, `t` and `start` (pop-in); `examples/diagram-gallery` shows every call.
-- Base: `D.stage2d(g, {floor})` (the purple stage in 2D), `D.flatFigure(g, {x, y, h, color, hairColor, hair: anime|spiky|short|bob|none, seams, pose: stand|point|cheer|shrug, expr: neutral|deadpan|happy|shock})` (a cast member as a 2D figure, for diagrams on a blurred scene), `D.label(g, str, x, y, {size, color})`.
+- Base: `D.stage2d(g, {floor, live})` (the purple stage in 2D; it is alive by itself: a warm light pool drifts across the back and dust
+  motes float up, `live: false` freezes it; `D.stageLife(g, t)` adds the same life to any 2D shot), `D.flatFigure(g, {x, y, h, color, hairColor, hair: anime|spiky|short|bob|none, seams, pose: stand|point|cheer|shrug, expr: neutral|deadpan|happy|shock})` (a cast member as a 2D figure, for diagrams on a blurred scene), `D.label(g, str, x, y, {size, color})`.
 - Things: `crossSection` (a house cut open, pipes, `cut` 0–1 snaps them), `scale`, `calendarCard`, `growthBars`, `stopwatch`, `radar`, `seismo`, `mapPins`, `usMap`, `globe`, `organ` (`kind`: brain, lungs, kidneys, heart; `pulse`), `thermometer`, `jar`.
 - Screens: `phoneChat` (messages arrive), `phoneStat` (one big number), `videoFrame` (view counter or LIVE badge around the scene, `views`, `live`, `viewers`).
 - Lists and meters: `checklist`, `stamp` (slams down), `scoreboard` (`head` + `value`, or `left` + `right`), `progressRing`, `meterBar`, `chips` (items, the first `lit` stay bright from `litAt`), `arrow` (`bend`, `dashed`, draws itself), `compare` (two panels).
 
 ## 2D overlays (engine/ui2d.js, fx2d.js) — logical 1920×1080 (16:9) or 1080×1920 (9:16)
-`overlay(g, t, info, s)` draws on top of the 3D frame. Reference-style graphics (all accept `t` + `start` for a pop-in):
+`overlay(g, t, info, s)` draws on top of the 3D frame. Reference-style graphics (all accept `t` + `start` for a pop-in, and `end` for an
+exit: a time, or `'shot'` to shrink away in the 0.22 s before the cut instead of vanishing with it; leave `end` off a label that carries on
+into the next shot). `count: true` on `pill`/`statCard` counts the first number up from 0 as it pops in ("$5,000", "40,000 FT"):
 - `UI.pill(g, { str: '1 IN 1,000', x, y, size, gold, icon: 'check'|'heart'|'star'|'x'|'up'|'down', color, bg, line })`
 - `UI.statCard(g, { label: 'TRIES', value: '1,000', x, y })`, `UI.tag(g, { str: 'SMARTER', x, y })` (✓ tag),
   `UI.heartPill(g, { n: 26, x, y })`, `UI.numberBall(g, { n: 17, x, y })`, `UI.heading(g, { str: 'THE RULES' })`,

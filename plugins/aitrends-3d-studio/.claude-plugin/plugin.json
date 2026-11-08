@@ -1,6 +1,6 @@
 {
   "name": "aitrends-3d-studio",
-  "version": "0.2.2",
+  "version": "0.2.5",
   "description": "Turn a script into a finished 3D animated story video: channel identity kit, script check, emotional open-source voiceover (Chatterbox, Kokoro fallback), word timings, story breakdown, code-built 3D sets and stick characters (Three.js), animated explainer diagrams, style and palette choice, frame-by-frame render up to 4K / 60 fps, generated music and SFX, quality scorecard, final MP4.",
   "author": {
     "name": "aiTrends"

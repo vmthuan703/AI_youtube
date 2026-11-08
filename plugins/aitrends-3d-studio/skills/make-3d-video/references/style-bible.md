@@ -35,6 +35,10 @@ simple characters, real staging, real light.
 - **Girls and variety** (as in the references): soft bob, `fringe`, long, ponytail or `sidePony` hair (`hair`, `hairColor`), a bow,
   `lashes`, a `skirt` under a tee or hoodie, or a `dress`. Boys: `curls`, `quiff`, `sidePart`, `slick`, short hair, caps (`cap`/`capBack`), beanies.
   Adults: `suit` + `tie`, `vest` (dealer, waiter), `labcoat`, `scale` 1.1–1.2. `blush` only on a character the story calls for, not by default.
+- **Roles read at a glance.** A nurse wears scrubs and a nurse cap, a doctor a stethoscope, a teacher a lanyard, police a cap and badge, a coach a whistle:
+  take them from the roster in `channel/cast.js` (engine-api.md → Role roster). Age shows in the body, not in white hair: older people get ash-grey hair `#8e8a94`
+  (mid value, never near-white), balding, grey `brows`, glasses, a stoop (`hunch`) or a cane. Whites stay dimmed (`#d2d3da` lab coats, `#bdb8b0` chef jackets) and
+  hats never throw a shadow band across the face. A role's detail is small; the hero is still the loudest thing in every frame.
 - **Legs:** bare stick legs and round feet by default, hero included. Add `legs` or `shoes` only when the story needs them (a suit, a uniform, sports).
 - **Identity = own hair + one outfit detail.** Each recurring character has a hair shape nobody else has and one outfit detail (`bag`, `sleeves`, `collar`, `stripe`, `scarf`, `tie`, glasses),
   identical all video. Start from `channel/cast.js`. Colours stay deep and muted: brick `#7a3a34`, navy `#2c3e6e`, plum `#8d4a6b`, teal `#2f6f6a`, forest `#3f6a58`, olive `#5f6a2e`, charcoal `#33313f`.
@@ -46,7 +50,11 @@ simple characters, real staging, real light.
   nobody is frozen (except during a time-freeze where only the hero moves). Contact: feet on the floor, hands on the
   object they touch (IK `{to:[x,y,z]}`), sitting on the seat.
 - **Super-human moments** (speed, strength, powers): sprint pose + forward lean, `FX3.speedLines`, `FX3.ghosts`
-  afterimages in the hero's colour, `FX3.trail`, `mblur: 3`, camera shake, a `whoosh` SFX.
+  afterimages in the hero's colour, `FX3.trail`, `mblur: 3`, camera shake, a `whoosh` SFX, a slow-motion `ramp` on the peak.
+- **Acting, not tweening** (engine-api.md → Acting recipe): pose changes go through `posesAt3` (anticipation, overshoot, the head arriving
+  last); everyone not walking runs on `idle3` (a weight shift, a glance), speakers on `speak3` (nods and hand beats on their words); listeners
+  turn their heads to the speaker with `lookAtSpeaker`; walks use `walkTo` (start, stop, no sliding feet); faces change with `expr` keys so they
+  blend and blink on the change. A figure that holds perfectly still reads as a frozen frame; the scorecard counts those.
 
 ## Sets and environments
 - Build every location once as `scenes/sets/<name>.js` from `T.W.*` (city, suburb, room kinds, park, studio) plus
@@ -56,6 +64,14 @@ simple characters, real staging, real light.
   against a lighter area or give them a rim so the head separates from the background.
 - **Signature elements:** lit windows (warm, some cool), lamps with glow + cone + floor pool, neon signs, lockers,
   big night windows with a city skyline, a moon. Sets extend beyond the frame so camera moves never reveal edges.
+- **Sets look built, not blank:** walls fall off toward the floor and have baseboards and mouldings; furniture sits on soft contact
+  shadows; a location says what it is through 4–8 props (`kind: 'hospital'` comes with bed rails, a heart monitor, a drip stand and a curtain).
+  The `pearl` style keeps sets 16% less saturated than the cast (`setSat`), so the hero's lime is always the loudest colour; pass
+  `keepSat: true` to `T.mat` for a prop that must stay vivid (a red alarm, a brand colour).
+- **Night is dark, faces are not:** night and storm stages light faces from the camera; still put a practical lamp near the faces in
+  night close-ups. The scorecard flags videos with too many frames too dark to read.
+- **Text a phone can read:** speech bubbles at least 38 px, labels 30–36 px, pills and tags 36 px (logical, 1080 high); the UI
+  enforces these floors. `config.textScale` (e.g. 1.1) scales every label for a mostly-mobile audience.
 - **Atmosphere in most shots:** `FX3.dust` indoors, `FX3.rain` for storms, `FX3.bokeh` behind close-ups, fog (stage
   fog), `FX3.frozen` droplets for time-stop.
 
@@ -69,7 +85,12 @@ simple characters, real staging, real light.
 - The final grade (lift/gamma/gain, saturation, vignette, grain) comes from the style and applies to every frame.
 
 ## Camera (never static)
-Every shot moves: slow push-in, lateral truck, orbit, crane up/down, follow, or handheld shake for action.
+Every shot moves: slow push-in, lateral truck, orbit, crane up/down, follow, or handheld shake for action. The player adds a light
+hand-held drift to every 3D shot (`config.handheld` 0.35), so even a locked shot breathes; set `"handheld": 0` on macros and tripod-still comedy beats.
+Moves through several keys flow without stopping (`T.dolly` is one smooth curve). Accents, used on the beat of the words:
+**crash zoom** onto a face on the punch word (`T.crashZoom`, with a whoosh), **punch** on impacts (`T.punch`), **rack focus** from the
+speaker to the listener in a two-shot (`T.rackFocus`), a **dutch** tilt of 4–8° when something is wrong (`T.dutch`), and a **chase** cam that
+trails a runner (`T.chase`). One accent per shot at most.
 Use real lenses: wide (fov 45–60) low angles for drama and kids-in-a-big-world; normal (35–40) for dialogue;
 long (20–28) for close-ups with `dof`.
 
@@ -100,8 +121,9 @@ set geometry and time of day in every shot of a scene.
 Frame: 16:9 with `bars: "cine"`, so the picture is 2:1. Keep important things and text between y = 90 and y = 990.
 
 Hard **cut** by default (80%+). **flash** (white) into freezes, powers and realisations. **dip** (black) for time skips
-and chapters. **fade** for dreamy moments and the title. **whip** for energetic jumps between places. **zoom** into an
-explanation.
+and chapters. **fade** for dreamy moments and the title. **whip** for energetic jumps between places (a smeared pan). **zoom** into an
+explanation. **smash** for an impact or a hard punchline (a white frame, the shot lands with a punch). **Speed ramp** (`ramp` in shots.json)
+for the one moment in a sequence that should hang in the air: the dive, the slip, the catch.
 
 ## On-screen graphics and typography
 - Fonts: Fredoka Bold for titles and big lines (ALL CAPS), Nunito Black for labels and numbers, Playfair Display Black
@@ -110,6 +132,9 @@ explanation.
 - **Explainers show, they don't caption.** Every explainer has a moving picture from `engine/diagrams2d.js`: cut a house open, weigh the thing, draw the path, count the slots.
   Two presentations, alternated: **on the scene** (the story's own set blurred and dimmed behind the diagram, `backdrop`, with a flat 2D figure) so the viewer never leaves the moment;
   **on the purple stage** for rules and the big numbers, with a small figure on the floor line reacting. Never an empty stage with only a label.
+- **Fill the stage frame:** the figure stands at least a third of the frame height, the main picture spans at least 40% of the width,
+  1–2 labels at once, and something builds or moves for the whole shot (the stage itself drifts light and dust). Labels that won't carry
+  into the next shot leave before the cut (`end: 'shot'`); numbers count up as they appear (`count: true`). The scorecard lists near-empty frames.
 - **Speech bubbles:** every line of a named character shows in a white bubble over their head while spoken (automatic, `speaker` on the character).
 - Captions (`captions: true`, default for 9:16): word-by-word, current word highlighted.
 

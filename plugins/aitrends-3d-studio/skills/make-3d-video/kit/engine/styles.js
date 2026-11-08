@@ -26,7 +26,8 @@ export const STYLES = {
     ink: '#0b0a10', inkFar: '#2b2333', feature: '#f6f2ea', skin: 'pale', paleSkin: '#e6deee', skinGlow: 0.07, outline: '#2a2040', outlineW: 0.006,
     toon: null, ui: { ...UI, labelFont: 'serif', explainBg: '#34264f', explainBg3d: '#463a5c', card: 'rgba(28,20,48,.82)', gold: '#ffd98a', cream: '#fff1dc' },
     light: { ambient: 1.55, key: 0.8, fill: 1.15, rim: 1.0, practical: 0.8, exposure: 1.02 },
-    grade: { contrast: 0.97, sat: 1.2, lift: [0.04, 0.02, 0.06], gamma: [1.02, 1.0, 1.04], gain: [1.0, 0.98, 1.0], vignette: 0.4, grain: 0.04, bloom: 0.42, bloomThreshold: 0.98 },
+    setSat: 0.84,   // sets 16% calmer than the cast: the hero's lime stays the loudest thing
+    grade: { contrast: 0.97, sat: 1.12, lift: [0.04, 0.02, 0.06], gamma: [1.02, 1.0, 1.04], gain: [1.0, 0.98, 1.0], vignette: 0.4, grain: 0.04, bloom: 0.42, bloomThreshold: 0.98 },
     moods: {
       day: { sky: ['#7f9fe0', '#b6c8f2', '#f2dcd8'], fog: '#d8d4ec', ambient: '#c8c8e0', key: '#fff0dc', rim: '#fff0e0', wall: '#a79bc4', floor: '#8d8498', dark: '#6a6280', grass: '#86b070', road: '#77708a', houses: ['#e0a98f', '#a99be0', '#e8c47e', '#8fc4b4', '#e096ac'], tree: '#6f9a62', skyline: false },
       golden: { rim: '#ffe0b8', dark: '#5a4048', grass: '#8aa060', houses: ['#e0a080', '#c890a0', '#e8c070', '#a0b090'], tree: '#7a8a50', skyline: false },

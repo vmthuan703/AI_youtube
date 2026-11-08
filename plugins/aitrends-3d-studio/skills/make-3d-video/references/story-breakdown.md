@@ -48,7 +48,7 @@ Read the whole transcript (`timeline/transcript.txt`) twice. Then write `story/b
 - **Palette:** this video's colour world (`dusk`, `cozy`, `tropic`, `alert`, `school`, `midnight`, or a new one). Pick from where most of the story happens. Set `config.json` → `palette`.
 - **Signature device:** one visual invented for this story's power, built in the first minute and recurring all video, with the UI part that draws it. Don't reuse one from a reference.
 - **Cast table.** For each recurring character: id, role, outfit (see engine-api.md, Characters), signature colour,
-  personality, the expressions they use most, and their TTS voice. Put the outfits in `scenes/cast.js`: import the hero (`import { HERO } from '/channel/cast.js'`), give every speaking character `speaker: 'NAME'` as written in the script, so bubbles and lip-sync find them.
+  personality, the expressions they use most, and their TTS voice. Put the outfits in `scenes/cast.js`: import the hero and the supporting roles (`import { HERO, NURSE, GRANDPA } from '/channel/cast.js'`; `ROLES` maps script words such as "nurse" or "grandpa" to a role, so the costume matches the job and the age), give every speaking character `speaker: 'NAME'` as written in the script, so bubbles and lip-sync find them.
 - **Locations (sets).** For each: name, the `T.W` base (city, suburb, room kind, park, studio) or custom build, mood
   (`day|golden|dusk|night|storm|interiorWarm|interiorCool|void`), time of day, key light and practicals, 4–8 signature
   props, where the camera usually sits. One `scenes/sets/<name>.js` each.

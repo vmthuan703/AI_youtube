@@ -1,0 +1,56 @@
+{
+  "snapshot_date": "2026-11-08",
+  "started_at": "2026-11-08T14:37:16.376848+00:00",
+  "quota_budget": 6000,
+  "markets": {
+    "whatif-us": {
+      "name": "What-If Fiction × Mỹ",
+      "region": "US",
+      "queries_run": [
+        "what if you",
+        "what if story animated",
+        "what if you had infinite iq",
+        "what if you had 1000 iq",
+        "what if you could see the future",
+        "what if you were reborn with memories",
+        "what if you could read minds",
+        "what if you could stop time",
+        "what if you had superpowers",
+        "what if you could see everyone's secrets",
+        "what if you woke up",
+        "what if everyone could",
+        "what if you were the only one",
+        "what if you could rewind time",
+        "what if you became invisible",
+        "what if you got one impossible ability",
+        "what if you could control luck",
+        "what if you lived forever",
+        "what if your phone",
+        "hypothetical story animation"
+      ],
+      "queries_skipped": [],
+      "errors": [],
+      "discovery_rows": 962,
+      "seeded": [
+        "All Answers",
+        "IfYou Films",
+        "Stupid Dupid ",
+        "Milo Whatsit"
+      ],
+      "added": [],
+      "not_added_registry_full": [
+        "Matal",
+        "BrainBracket",
+        "Stick Saga",
+        "Stick Knows",
+        "Questionverse"
+      ]
+    }
+  },
+  "pruned_off_niche": [],
+  "tracked_channels": 60,
+  "tracked_videos": 1398,
+  "tracking_skipped": [],
+  "quota_used": 2178,
+  "finished_at": "2026-11-08T14:38:05.593616+00:00"
+}

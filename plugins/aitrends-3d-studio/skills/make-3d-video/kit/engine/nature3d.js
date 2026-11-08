@@ -290,7 +290,7 @@ export function planet(st, o = {}) {
   if (o.atmosphere !== false) {   // a soft fresnel glow at the rim, not a hard ring
     const at = new THREE.Mesh(new THREE.SphereGeometry(R * 1.06, 48, 32), new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: { c: { value: color(o.halo || '#7ab8ff') } },
       vertexShader: 'varying vec3 vN; varying vec3 vV; void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.0); vN = normalize(normalMatrix * normal); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }',
-      fragmentShader: 'uniform vec3 c; varying vec3 vN; varying vec3 vV; void main(){ float f = 1.0 - abs(dot(vN, vV)); float a = pow(f, 2.6) * smoothstep(1.0, 0.86, f); gl_FragColor = vec4(c * 1.4, a * 0.9); }' }));
+      fragmentShader: 'uniform vec3 c; varying vec3 vN; varying vec3 vV; void main(){ float f = clamp(1.0 - abs(dot(normalize(vN), normalize(vV))), 0.0, 1.0); float a = pow(f, 2.6) * (1.0 - smoothstep(0.86, 1.0, f)); gl_FragColor = vec4(c * 1.4, clamp(a * 0.9, 0.0, 1.0)); }' }));
     g.add(at); const hl = glow(o.halo || '#7ab8ff', R * 3.0, 0.22); g.add(hl); }
   const spin = (o.spin ?? 1.2) * Math.PI * 2 / 60; g.tick = (t) => { ball.rotation.y = (o.phase ?? 0) + t * spin; if (cl) cl.rotation.y = (o.phase ?? 0) + t * spin * 1.25; };
   g.tick(0); st.add(g); g.ball = ball; return g;

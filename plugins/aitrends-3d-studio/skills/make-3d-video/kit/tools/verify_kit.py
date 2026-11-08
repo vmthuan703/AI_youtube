@@ -63,7 +63,7 @@ EXPECTED = {
     "tools/transcribe.py": "ecd48d05a6655d13",
     "tools/tts.py": "bae62a46f9d68395",
     "tools/tts_chatterbox.py": "d5e959c509ae0c21",
-    "engine/nature3d.js": "24b9279547fd2996",
+    "engine/nature3d.js": "a058ae18ad5745ab",
     "engine/icons2d.js": "e0eab43b5fd93c7a",
     "examples/worlds-demo/config.json": "1cf1dd0f420acfae",
     "examples/worlds-demo/scenes/cast.js": "19cc3da1956f35d8",

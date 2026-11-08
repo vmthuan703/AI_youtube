@@ -74,7 +74,7 @@ the GPU line it printed (GPU or CPU) and its time estimate, which feeds the expo
 Follow `references/voiceover.md` (inside `aitrends-3d-studio/`). **Keep the GPU free while Chatterbox runs: no renders, no other
 GPU work.** Measure the pace from a full-length sentence before quoting a finish time.
 1. Preview: `.venvs/chatterbox/Scripts/python tools/tts_chatterbox.py --script <file> --out-dir build_voice/<slug> --voices
-   "NARRATOR=am_puck,JAKE=am_liam" --lexicon <file> --preview 6`. Send the MP3 (SendUserFile) and ask if voices and pace are OK.
+   "NARRATOR=am_puck+1.5,JAKE=am_liam+3" --lexicon <file> --preview 6`. Send the MP3 (SendUserFile) and ask if voices and pace are OK.
 2. Full voiceover: the same without `--preview` (background). Read the pace line it prints. Outside 160–175 words/min, re-run with
    the `--pace` it suggests (finished chunks are cached). Check `tts_report.json` and `qc.json`.
 3. Project: `python tools/new_project.py --name <slug> --voice build_voice/<slug>/voiceover.mp3 --lines

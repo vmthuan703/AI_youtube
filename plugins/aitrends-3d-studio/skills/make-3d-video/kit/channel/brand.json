@@ -1,12 +1,46 @@
 {
   "_note": "Choices the channel has already made. new_project.py, tts_chatterbox.py and the survey read this file, so they are not asked again. Edit freely; the plugin never overwrites this folder on update.",
-  "voice": { "engine": "chatterbox", "narrator": "am_puck", "exaggeration": 0.75, "cfg": 0.3, "targetWpm": [160, 175] },
+  "voice": {
+    "engine": "chatterbox",
+    "narrator": "am_puck+1.5",
+    "exaggeration": 1.0,
+    "cfg": 0.3,
+    "targetWpm": [
+      160,
+      175
+    ],
+    "roles": {
+      "_note": "default voice per roster role (channel/cast.js); a speaker played by that role gets it unless the script's .voices says otherwise",
+      "HERO": "am_liam+3",
+      "BESTIE": "af_sky",
+      "BRO": "af_nova",
+      "RIVAL": "am_onyx",
+      "MOM": "af_sarah",
+      "COACH": "am_fenrir",
+      "SHADY": "am_echo"
+    }
+  },
   "style": "pearl",
   "palette": null,
   "bars": "cine",
   "aspect": "16:9",
-  "export": { "resolution": "1080p", "fps": 60, "quality": "high", "upscale": "1440p", "captions": false },
+  "export": {
+    "resolution": "1080p",
+    "fps": 60,
+    "quality": "high",
+    "upscale": "1440p",
+    "captions": false
+  },
   "speechBubbles": true,
-  "subscribeGag": { "enabled": true, "at": 90, "dur": 5, "label": "SUBSCRIBE", "done": "SUBSCRIBED" },
-  "cleanup": { "enabled": true, "folder": "_xoa_duoc" }
+  "subscribeGag": {
+    "enabled": true,
+    "at": 90,
+    "dur": 5,
+    "label": "SUBSCRIBE",
+    "done": "SUBSCRIBED"
+  },
+  "cleanup": {
+    "enabled": true,
+    "folder": "_xoa_duoc"
+  }
 }

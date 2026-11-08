@@ -163,3 +163,49 @@ export function povArms(o = {}) {
   const r = o.reach ?? 0.5, h = o.height ?? 1.12, sp = o.spread ?? 0.36, base = typeof o.base === 'string' ? POSES3[o.base] : (o.base || POSES3.stand);
   return { ...base, armL: { to: [sp / 2, h, r] }, armR: { to: [-sp / 2, h, r] }, handL: o.hands || 'open', handR: o.hands || 'open', head: [0, 0, 0] };
 }
+
+// ---------------------------------------------------------------- arm wrestling (0.2.8)
+// armWrestle(k, o) → { a, b }: two seated poses across a table, right hands gripped over the middle. k −1..1 is who is winning:
+// +1 = a pins b's hand down to a's left, −1 = b pins a. The rig's arms are short (0.5 m), so sit them close: a at [x, tableZ − 0.6]
+// yaw 0 and b at [x, tableZ + 0.6] yaw PI ('sitDesk' height, bench 0.42). o.strain 0..1 adds the shake of two arms pushing.
+// Camera: on the side (x ± 3.2 from them), just above the table (y ≈ 1.0, look at y 0.95), fov 26–30, so both forearms and the grip read
+// as one shape between the two heads. From behind one player the big head hides the hands (lesson from Every Hit Stronger 3:33).
+export function armWrestle(k, o = {}) {
+  const t = o.t ?? 0, sh = (o.strain ?? 0.5) * 0.05 * Math.sin(t * 37), th = clamp(k, -1, 1) * 1.15 + sh;   // radians off vertical
+  const L = 0.24, hx = L * Math.sin(th), hy = 0.8 + L * Math.cos(th), hz = (o.reach ?? 0.6);
+  const seat = { y: -0.2, legL: [88, 6, 88, 0], legR: [88, 6, 88, 0] };
+  const side = (s) => ({ ...seat, spine: [14 + 4 * Math.abs(k), -8 * s * k, -6 * s * k], head: [-4, 0, 0],
+    armR: { to: [s * hx, hy, hz], pole: [-0.6, 0.6, 0.3] }, handR: 'fist',
+    armL: { to: [0.3, 0.86, 0.35] }, handL: 'open' });
+  return { a: side(1), b: side(-1) };
+}
+
+// ---------------------------------------------------------------- hands on an object (lifting, pushing, holding) (0.2.8)
+// reachPose(o) → a pose whose hands grip at a point in front: o.grip [height above the ground, distance in front] in metres
+// (world units, the character's scale o.scale is taken out), o.width hand spacing, o.squat 0..1 bends the knees and back.
+// Stand the character so the object really is within reach: distance in front 0.25–0.45. A hand that stops in the air
+// a metre from the car reads as "nothing is being lifted" (lesson from the car shot in Every Hit Stronger).
+export function reachPose(o = {}) {
+  const sc = o.scale ?? 1, sq = o.squat ?? 0, y = -0.25 * sq, [gy, gd] = o.grip || [0.9, 0.35], w = (o.width ?? 0.6) / 2;
+  return { y, spine: [lerp(-4, 30, sq) + (o.lean ?? 0), 0, 0], head: [-14 * sq, 0, 0], legL: [60 * sq, 12, 90 * sq, 0], legR: [60 * sq, 12, 90 * sq, 0],
+    armL: { to: [w, (gy - y) / sc, gd / sc] }, armR: { to: [-w, (gy - y) / sc, gd / sc] }, handL: o.hand || 'fist', handR: o.hand || 'fist' };
+}
+
+// ---------------------------------------------------------------- body motion layered on any pose (0.2.8)
+// body3(pose, t, kind, amount) adds the small movements that make people look alive and feel things:
+// 'pant' (heavy breathing after effort), 'sob' (shoulders jerk, head low), 'laugh' (bounce + head back), 'shiver' (cold/fear),
+// 'nod', 'shake' (head no), 'sigh' (rise then slump, once over 1.6 s from t0), 'strain' (trembling effort), 'fidget' (nervous weight shifts).
+export function body3(pose, t, kind, amount = 1, o = {}) {
+  const p = { ...getPose(pose) }, a = amount, add = (k, v) => { const b = p[k] || [0, 0, 0]; p[k] = Array.isArray(b) ? b.map((x, i) => x + (v[i] || 0)) : b; };
+  const s = Math.sin, T0 = o.t0 ?? 0;
+  if (kind === 'pant') { const b = s(t * 9); add('spine', [6 * a * b, 0, 0]); add('head', [-4 * a * b, 0, 0]); p.y = (p.y || 0) - 0.01 * a * (1 + b); }
+  else if (kind === 'sob') { const j = Math.max(0, s(t * 11)) ** 3; add('spine', [10 * a + 8 * a * j, 0, 0]); add('head', [16 * a, 0, 0]); p.y = (p.y || 0) + 0.015 * a * j; }
+  else if (kind === 'laugh') { const j = Math.abs(s(t * 12)); add('spine', [-6 * a - 6 * a * j, 0, 0]); add('head', [-14 * a * j, 0, 0]); p.y = (p.y || 0) + 0.02 * a * j; }
+  else if (kind === 'shiver') { add('spine', [0, 0, 2.5 * a * s(t * 45)]); add('head', [0, 3 * a * s(t * 51), 0]); }
+  else if (kind === 'nod') add('head', [14 * a * Math.max(0, s(t * 7)), 0, 0]);
+  else if (kind === 'shake') add('head', [4 * a, 22 * a * s(t * 9), 0]);
+  else if (kind === 'sigh') { const u = clamp((t - T0) / 1.6), up = s(Math.PI * clamp(u * 2)) * (u < 0.5 ? 1 : 0), dn = ease.inOut(clamp((u - 0.4) / 0.6)); add('spine', [-6 * a * up + 12 * a * dn, 0, 0]); add('head', [-8 * a * up + 14 * a * dn, 0, 0]); p.y = (p.y || 0) + 0.02 * a * up - 0.02 * a * dn; }
+  else if (kind === 'strain') { add('spine', [0, 0, 1.5 * a * s(t * 31)]); add('head', [2 * a * s(t * 27), 0, 3 * a * s(t * 23)]); }
+  else if (kind === 'fidget') { const w = noise(t * 0.8, 3); add('hips', [0, 0, 6 * a * w]); add('spine', [0, 0, -5 * a * w]); add('head', [0, 10 * a * noise(t * 0.6, 9), 0]); }
+  return p;
+}

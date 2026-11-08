@@ -1,0 +1,72 @@
+{
+ "title": "school-demo",
+ "duration": 33,
+ "shots": [
+  {
+   "id": "busstop",
+   "start": 0,
+   "end": 3,
+   "line": ""
+  },
+  {
+   "id": "businside",
+   "start": 3,
+   "end": 6,
+   "line": ""
+  },
+  {
+   "id": "lockers",
+   "start": 6,
+   "end": 9,
+   "line": ""
+  },
+  {
+   "id": "front",
+   "start": 9,
+   "end": 12,
+   "line": ""
+  },
+  {
+   "id": "armwrestle",
+   "start": 12,
+   "end": 15,
+   "line": ""
+  },
+  {
+   "id": "court",
+   "start": 15,
+   "end": 18,
+   "line": ""
+  },
+  {
+   "id": "yard",
+   "start": 18,
+   "end": 21,
+   "line": ""
+  },
+  {
+   "id": "bedposes",
+   "start": 21,
+   "end": 24,
+   "line": ""
+  },
+  {
+   "id": "floorposes",
+   "start": 24,
+   "end": 27,
+   "line": ""
+  },
+  {
+   "id": "carlift",
+   "start": 27,
+   "end": 30,
+   "line": ""
+  },
+  {
+   "id": "body",
+   "start": 30,
+   "end": 33,
+   "line": ""
+  }
+ ]
+}

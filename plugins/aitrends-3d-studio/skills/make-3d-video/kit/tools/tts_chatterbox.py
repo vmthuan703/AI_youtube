@@ -9,6 +9,7 @@ Outputs in --out-dir: voiceover.wav/.mp3, words.json, lines.json, script.txt, tt
 
 --voices values, per speaker:
   am_michael ...   a Kokoro voice: its timbre is cloned from a clip made locally with tools/tts.py (refs/<voice>.wav)
+  am_puck+1.5      the same clone with its pitch raised 1.5 semitones (younger); am_liam+3 sounds about 15. A minus lowers it.
   default          Chatterbox's built-in voice
   path/to/x.wav    your own recording (10+ s, one speaker, no music). Only clone a voice you have the right to use.
 
@@ -92,6 +93,14 @@ def make_ref(voice: str, ref_dir: str) -> str:
     wav = os.path.join(ref_dir, f"{voice}.wav")
     if os.path.exists(wav):
         return wav
+    m = re.fullmatch(r"(.+?)([+-]\d+(?:\.\d+)?)", voice)
+    if m:   # "am_liam+3": pitch-shift the base clone (formants move too, so it sounds younger, not chipmunk at +1..+3)
+        base, st = make_ref(m.group(1), ref_dir), float(m.group(2))
+        sr = int(subprocess.run(["ffprobe", "-v", "error", "-select_streams", "a:0", "-show_entries", "stream=sample_rate", "-of", "csv=p=0", base],
+                                capture_output=True, text=True, check=True).stdout.strip())
+        f = 2 ** (st / 12)
+        subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", base, "-af", f"asetrate={sr}*{f:.5f},aresample={sr},atempo={1 / f:.5f}", wav], check=True)
+        return wav
     tmp = os.path.join(ref_dir, "_tmp")
     os.makedirs(tmp, exist_ok=True)
     txt = os.path.join(tmp, "ref.txt")
@@ -157,7 +166,7 @@ def main(argv=None):
     p.add_argument("--narrator-voice", default=B.get("narrator", "am_puck"))
     p.add_argument("--ref-dir", default=os.path.join(ROOT, "refs"))
     p.add_argument("--lexicon", help="file of 'word=how to say it' lines")
-    p.add_argument("--exaggeration", type=float, default=float(B.get("exaggeration", 0.75)), help="0.25 flat .. 1 dramatic")
+    p.add_argument("--exaggeration", type=float, default=float(B.get("exaggeration", 1.0)), help="0.25 flat .. 1 dramatic")
     p.add_argument("--speaker-exaggeration", help="JAY=0.6,MOM=0.45")
     p.add_argument("--cfg", type=float, default=float(B.get("cfg", 0.3)), help="lower = looser, slower pacing")
     p.add_argument("--temperature", type=float, default=0.8)

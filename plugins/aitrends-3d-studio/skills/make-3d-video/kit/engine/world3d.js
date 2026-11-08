@@ -478,3 +478,5 @@ export * from './nature3d.js';
 export * from './animals3d.js';
 export * from './sports3d.js';
 export * from './screens3d.js';
+// ready-made school sets: bus stop, inside the bus, locker hall, school front, cafeteria, PE yard, outdoor court (0.2.8)
+export * from './school3d.js';

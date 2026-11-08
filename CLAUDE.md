@@ -43,5 +43,5 @@
   thành quy tắc trong `CLAUDE.md` (rồi tự commit và push như ngoại lệ ở trên).
 
 ## Dọn dẹp sau mỗi lần thay đổi
-- Sau mỗi lần push hoặc sửa file trên máy, đề xuất danh sách có thể xóa (file, nhánh, thư mục, mục trong file) kèm lý do.
-- Chỉ đề xuất, không xóa; chỉ xóa đúng mục người dùng đồng ý. Im lặng không phải đồng ý.
+- Tự chuyển file/thư mục có thể xóa vào `D:\_xoa_duoc\<ngày>\`, không hỏi, không xóa; người dùng tự xóa. Báo lại đã chuyển gì.
+- Nhánh git, PR và mục trên GitHub không chuyển được: vẫn hỏi trước khi xóa.

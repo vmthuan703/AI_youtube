@@ -52,6 +52,7 @@ EXPECTED = {
     "examples/speed-demo/timeline/transcript.txt": "6981a3aadec77096",
     "examples/speed-demo/timeline/words.json": "0104848974427879",
     "tools/beats.py": "eb42a8aef4d87584",
+    "tools/cast_check.py": "31e7fdbf3b9b2f49",
     "tools/common.py": "e237321f2f12416e",
     "tools/doctor.py": "8d037a2b0fa634f5",
     "tools/new_project.py": "cb5dd45c811db41a",

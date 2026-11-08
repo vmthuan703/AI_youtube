@@ -23,6 +23,20 @@ export const GRANDPA = { top: 'jacket', color: '#6a4a36', shirt: '#c8b8a0', butt
   hair: 'balding', hairColor: GREY, mustache: GREY, brows: GREY, prop: 'cane', pose: 'hunchCane' };
 export const GRANDMA = { top: 'jacket', color: '#6a4a5e', shirt: '#d8ccb8', buttons: '#d8ccb8', buttonsTop: 0.26, skirt: '#4a4048', skirtLen: 1.7, shoes: '#3a2a26', face: 'glasses',
   hair: 'bun', hairColor: GREY, brows: GREY, lashes: true, scale: 0.97, pose: 'hunch' };
+// more teens: a second or third girl/boy in the same scenes and background students. Roster roles with one colour or hair change each,
+// so a video never needs an outfit written from scratch (tools/cast_check.py flags any that is).
+export const CLASSMATE_2 = { ...CLASSMATE, color: '#2c3e6e', collar: '#c8b8a0', hair: 'bob', hairColor: '#24181a', bow: null, scarf: '#9c7a3a' };   // navy tee, bob, gold scarf
+export const CLASSMATE_3 = { ...CLASSMATE, color: '#5f6a2e', hair: 'bun', hairColor: '#2a1e1a', bow: null, face: 'glasses' };                     // olive tee, bun, glasses
+export const BRO_2 = { ...BRO, color: '#3f6a58', color2: '#2f5244', hair: 'short', hairColor: '#3a2a20', bag: null };                               // forest hoodie, short hair
+export const RIVAL_2 = { ...RIVAL, color: '#2f6f6a', shirt: '#24504c', hair: 'sidePart', hairColor: '#2a2420' };                                    // teal jacket, side part
+export const STUDENTS = [   // background students (crowds of named-less kids), in this order: pick by index, never invent new ones
+  BRO_2,
+  { ...CLASSMATE, color: '#7a3a34', hair: 'ponytail', hairColor: '#2a1e1a', bow: null },
+  { ...RIVAL, color: '#33313f', shirt: '#26242e', hair: 'messy', hairColor: '#4a3226' },
+  { ...BESTIE, color: '#5f6a2e', hair: 'fringe', hairColor: '#34262c' },
+  RIVAL_2,
+  { ...CLASSMATE, color: '#6a4a5e', hair: 'pigtails', hairColor: '#3a2620', bow: null },
+];
 export const LITTLE_SIB = { top: 'tshirt', color: '#a8843c', skirt: '#3e3048', hair: 'pigtails', hairColor: '#4a3226', lashes: true, kid: true };
 
 // school
@@ -56,7 +70,8 @@ export const SHADY = { top: 'suit', color: '#33313f', shirt: '#c8c4cc', tie: '#5
 
 // Script words → role. The script check and the story breakdown use this to dress a named character for their job.
 export const ROLES = {
-  BESTIE: ['best friend', 'bestie'], BRO: ['buddy', 'bro'], RIVAL: ['rival', 'bully'], CLASSMATE: ['classmate', 'crush'],
+  BESTIE: ['best friend', 'bestie'], BRO: ['buddy', 'bro'], RIVAL: ['rival', 'bully'], CLASSMATE: ['classmate', 'crush', 'popular girl'],
+  CLASSMATE_2: ['new girl', 'second girl'], CLASSMATE_3: ['lab partner', 'third girl'], BRO_2: ['second boy', 'teammate'], RIVAL_2: ['third boy'], STUDENTS: ['students', 'kids', 'crowd'],
   MOM: ['mom', 'mum', 'mother'], DAD: ['dad', 'father'], GRANDPA: ['grandpa', 'grandfather', 'old man'], GRANDMA: ['grandma', 'grandmother', 'old woman', 'old lady'],
   LITTLE_SIB: ['little sister', 'little brother', 'baby sister', 'baby brother'],
   TEACHER_F: ['teacher', 'miss', 'mrs.', 'ms.'], TEACHER_M: ['teacher', 'mr.', 'sir'], TEACHER_VN: ['cô giáo', 'thầy giáo'], PRINCIPAL: ['principal', 'headmaster'], COACH: ['coach'],

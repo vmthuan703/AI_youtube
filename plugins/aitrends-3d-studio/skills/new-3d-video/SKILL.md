@@ -34,7 +34,7 @@ A user-supplied voiceover goes through the Whisper route in `voiceover.md` inste
 
 ## 4. Story breakdown
 Read `../make-3d-video/references/style-bible.md` and `story-breakdown.md` fully, then write `story/bible.md`,
-`scenes/cast.js` (hero from `/channel/cast.js`, `speaker` on every speaking character) and the rewritten `story/shots.json`, and send a 5–10 line summary (cast with colours, locations, palette,
+`scenes/cast.js` (hero and every other character from the `/channel/cast.js` roster, extras included: `CLASSMATE_2/3`, `BRO_2`, `RIVAL_2`, `STUDENTS`; `speaker` on every speaking character; `python tools/cast_check.py --project projects/<slug>` must pass) and the rewritten `story/shots.json`, and send a 5–10 line summary (cast with colours, locations, palette,
 signature device, shot count, highlights per act).
 
 Finish by saying the next step is `/3d-video-styles` (or continue with `make-3d-video` if the user asked for the whole

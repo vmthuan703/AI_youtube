@@ -28,6 +28,17 @@ giữ nguyên dáng suốt video và chữ luôn nét. Giọng đọc mặc đ�
 
 Có 5 điểm dừng để bạn duyệt: soát kịch bản, nghe thử giọng, chọn phong cách và bảng màu, xem thử kèm bảng điểm, bản cuối.
 
+## Có gì mới ở 0.2.7 (thế giới, ánh sáng, HUD)
+| Nhóm | Thay đổi |
+|---|---|
+| Bối cảnh thiên nhiên | `T.W.beach` (bãi cát, biển trong thấy chân khi lội, bọt sóng, cọ, mặt trời và vệt nắng trên nước lúc bình minh) · `island` (đảo giữa biển) · `snow` (dốc tuyết, thông phủ tuyết, núi, tuyết rơi, cực quang) · `farm` (chuồng đỏ, silo, hàng rào, ruộng, rơm) · `underwater` (đáy cát, tia nắng, rong lắc, vân sáng, đàn cá) · `space` + `planet` (trái đất xoay) |
+| Tâm trạng mới | `beach`, `sunrise`, `snow`, `arctic`, `underwater`: cảnh sáng ban ngày, không chỉ đêm và trong nhà |
+| Ánh sáng từ đồ vật | `FX3.fire` / `T.W.campfire` (lửa lập lòe chiếu mặt), `FX3.blade` (lưỡi sáng chiếu tay, mặt, tường), `FX3.torch` (đèn pin có tia), `FX3.glowLight` (ánh điện thoại trong bóng tối); ánh sáng đi theo đồ vật |
+| HUD kiểu game | `userData.hud` trên nhân vật: bảng kính tên, cấp, thanh máu, chỉ số, tự thu nhỏ theo khoảng cách · `counters` trong shots.json: bộ đếm ở góc chạy xuyên các cảnh (DAY 15, 39/50, YOU 15 – 4 THEM) |
+| Góc nhìn thứ nhất | `T.pov` + `T.povArms`: nhìn qua mắt hero, thấy tay áo phao chanh và bàn tay tròn đang cầm đồ |
+| Sơ đồ | 47 icon (`D.icon`, `D.iconRow`, mọi pill/tag/HUD dùng chung tên) · `D.versus` (NGƯỜI THƯỜNG vs BẠN) |
+| Ví dụ | `examples/worlds-demo`: mỗi tính năng mới một shot |
+
 ## Có gì mới ở 0.2.5 (chuyển động)
 | Nhóm | Thay đổi |
 |---|---|

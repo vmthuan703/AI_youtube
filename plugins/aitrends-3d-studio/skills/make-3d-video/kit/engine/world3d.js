@@ -472,3 +472,5 @@ export function store(st, o = {}) {
   st.add(counter({ w: 2.4, color: '#f4f0ea', base: '#3a78e0' }).translateZ(5).translateX(-2.5));
   return {};
 }
+// outdoor nature sets and props (beach, island, snow, farm, underwater, palm, pine, rock, bush, mountain, water, foam, fishSchool, seaweed, aurora, sun)
+export * from './nature3d.js';

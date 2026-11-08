@@ -5,8 +5,8 @@
 //   const lines = T.FX3.speedLines(st, { axis: 'x', dir: -1, around: [0, 1.2, 0] });
 //   const echo = T.FX3.ghosts(st, HERO, 5, { color: '#7fd8ff' });           echo.update(t, tt => ({ pos, yaw, pose }))
 import * as THREE from 'three';
-import { rng, clamp, lerp, ease, prog, noise } from './core.js';
-import { dotTex, glow, color, character, canvasTex, cached } from './kit3d.js';
+import { S, rng, clamp, lerp, ease, prog, noise } from './core.js';
+import { dotTex, glow, glowMat, mat, color, character, canvasTex, cached, cyl, group, lightCone } from './kit3d.js';
 
 const pts = (n, size, c, o = {}) => { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(n * 3), 3)); const m = new THREE.PointsMaterial({ color: color(c), size, map: dotTex(), transparent: true, opacity: o.opacity ?? 0.7, depthWrite: false, blending: o.additive === false ? THREE.NormalBlending : THREE.AdditiveBlending, sizeAttenuation: true, fog: o.fog ?? true, toneMapped: false }); const p = new THREE.Points(g, m); p.frustumCulled = false; return p; };
 // floating dust motes / pollen / embers. area: [x0, x1, y0, y1, z0, z1]
@@ -87,4 +87,67 @@ export function trail(st, o = {}) {
   const mesh = new THREE.Mesh(geo, m); mesh.frustumCulled = false; st.add(mesh);
   const update = (t, at) => { for (let i = 0; i < n; i++) { const p = at(t - i * gap); const w = width * (1 - i / n); pos.set([p[0], p[1] + w / 2, p[2], p[0], p[1] - w / 2, p[2]], i * 6); alphaA[i * 2] = alphaA[i * 2 + 1] = 1 - i / n; } geo.attributes.position.needsUpdate = true; geo.attributes.alpha.needsUpdate = true; };
   return { obj: mesh, update };
+}
+
+// ================================================================ light that comes from props (0.2.7)
+// A glowing thing in the story lights the faces around it, and the light travels with it: a campfire, an energy blade, a torch,
+// a phone screen in the dark. Each costs one real light (keep ≤ 4–5 per shot). All flicker from t only, so renders stay deterministic.
+const practical = () => S().light?.practical ?? 1;
+// glowLight(obj, { color, intensity, dist, at: [x, y, z], flicker, halo }) → attaches a point light (and a soft halo) to any object:
+// a phone screen, a lantern, a magic orb. It moves with the object. Returns { light, halo, update(t) } (update matters with flicker).
+export function glowLight(obj, o = {}) {
+  const c = color(o.color || '#bfe0ff'), L = new THREE.PointLight(c, (o.intensity ?? 2.5) * practical(), o.dist ?? 3, o.decay ?? 1.6); L.position.set(...(o.at || [0, 0, 0.12])); obj.add(L);
+  const halo = o.halo === false ? null : glow(c, o.halo ?? 0.5, 0.35); if (halo) { halo.position.copy(L.position); obj.add(halo); }
+  obj.userData.dynamic = true; const base = L.intensity, fk = o.flicker ?? 0;
+  const update = (t) => { const k = 1 + fk * (0.6 * noise(t * 9, 3) + 0.4 * noise(t * 23, 5)); L.intensity = base * k; if (halo) halo.material.opacity = 0.35 * k; };
+  return { light: L, halo, update };
+}
+// fire(st, { pos, size, colors, light, intensity, dist, smoke, embers, shadow }) — a living campfire / torch flame: layered flame tongues
+// that lick and sway, a white-hot core, rising embers, a few smoke puffs and a warm flickering light on everything nearby. Animates itself.
+export function fire(st, o = {}) {
+  const { pos = [0, 0, 0], size = 1, seed = 4 } = o, r = rng(seed), g = group(); g.position.set(...pos); g.userData.dynamic = true; st.add(g);
+  const cols = o.colors || ['#ff5a1e', '#ff9a2a', '#ffd25a'], flames = [];
+  const shape = new THREE.SphereGeometry(0.5, 14, 10); { const p = shape.attributes.position; for (let i = 0; i < p.count; i++) { const y = p.getY(i); const k = y > 0 ? 1 - y * 1.25 : 1; p.setX(i, p.getX(i) * k); p.setZ(i, p.getZ(i) * k); p.setY(i, y > 0 ? y * 2.2 : y * 0.6); } shape.computeVertexNormals(); }
+  [[7, 0.62, 0], [6, 0.42, 1], [4, 0.24, 2]].forEach(([n, rad, layer]) => { for (let i = 0; i < n; i++) { const a = (i / n) * Math.PI * 2 + r(), m = new THREE.Mesh(shape, new THREE.MeshBasicMaterial({ color: color(cols[layer]).multiplyScalar(1.6 + layer * 0.4), transparent: true, opacity: 0.75, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }));
+    m.userData = { x: Math.cos(a) * rad * 0.45 * size, z: Math.sin(a) * rad * 0.45 * size, s: (0.55 + r() * 0.35) * size * (1 - layer * 0.22), ph: r() * 20, sp: 5 + r() * 4 }; g.add(m); flames.push(m); } });
+  const core = glow('#fff2c0', 0.9 * size, 0.9); core.position.y = 0.25 * size; g.add(core); const halo = glow(cols[1], 3.2 * size, 0.35); halo.position.y = 0.4 * size; g.add(halo);
+  let L = null; if (o.light !== false) { L = new THREE.PointLight(color(o.lightColor || '#ffa04a'), (o.intensity ?? 9) * size * practical(), o.dist ?? 9 * size, 1.5); L.position.y = 0.6 * size; L.castShadow = !!o.shadow; if (o.shadow) { L.shadow.mapSize.set(512, 512); L.shadow.bias = -0.003; } g.add(L); }
+  const emb = o.embers === false ? null : dust(st, { n: 40, area: [pos[0] - 0.5 * size, pos[0] + 0.5 * size, pos[1] + 0.2, pos[1] + 2.6 * size, pos[2] - 0.5 * size, pos[2] + 0.5 * size], c: '#ffb050', size: 0.035 * size, speed: 0.9, seed: seed + 1, rise: 1.1 * size, opacity: 0.9 });
+  const smoke = []; if (o.smoke !== false) { const sm = new THREE.SpriteMaterial({ map: dotTex(), color: color('#6a6070'), transparent: true, opacity: 0, depthWrite: false }); for (let i = 0; i < 6; i++) { const s = new THREE.Sprite(sm.clone()); s.userData.ph = i / 6; g.add(s); smoke.push(s); } }
+  const update = (t) => {
+    flames.forEach(m => { const u = m.userData, lick = 0.75 + 0.35 * Math.abs(noise(t * u.sp + u.ph, 1)) + 0.15 * Math.sin(t * u.sp * 1.7 + u.ph); m.scale.set(u.s * (0.9 + 0.15 * noise(t * 7 + u.ph, 2)), u.s * lick, u.s * (0.9 + 0.15 * noise(t * 6 + u.ph, 4)));
+      m.position.set(u.x + 0.06 * size * noise(t * 3 + u.ph, 5), 0.1 * size, u.z + 0.06 * size * noise(t * 3 + u.ph, 6)); m.rotation.set(0.18 * noise(t * 2.5 + u.ph, 7), 0, 0.18 * noise(t * 2.2 + u.ph, 8)); });
+    const fl = 0.82 + 0.12 * noise(t * 11, 3) + 0.08 * noise(t * 27, 9); if (L) L.intensity = (o.intensity ?? 9) * size * practical() * fl; halo.material.opacity = 0.3 * fl; core.material.opacity = 0.85 * fl;
+    smoke.forEach(s => { const k = ((t * 0.35 + s.userData.ph) % 1 + 1) % 1; s.position.set(0.25 * size * noise(t * 0.5 + s.userData.ph * 9, 2), (0.9 + k * 2.6) * size, 0.15 * size * noise(t * 0.4 + s.userData.ph * 7, 3)); s.scale.setScalar((0.4 + k * 1.4) * size); s.material.opacity = 0.22 * Math.sin(Math.PI * k); });
+    if (emb) emb.update(t);
+  };
+  update(0); st.onTick(update); return { obj: g, light: L, update };
+}
+// blade(o) → a hand-held energy blade: a ribbed metal hilt, a white-hot core inside a coloured glow, and a light along the blade that
+// lights the hand, the face and the walls as it moves. Hold it: hero.hold(b, 'R', { rot: [Math.PI / 2, 0, 0] }), then b.update(t, { on, hum }).
+// on 0..1 extends the blade (ignite / retract). o: { color, len, width, light, intensity, dist }
+export function blade(o = {}) {
+  const c = color(o.color || '#ffd86a'), len = o.len ?? 1.0, w = o.width ?? 0.022, g = group(); g.userData.dynamic = true;
+  const metal = mat('#9a9aa8', { metal: 0.8, rough: 0.3 }), dark = mat('#2a2a34', { rough: 0.6 });
+  g.add(cyl(0.022, 0.024, 0.24, metal, 0, 0, 0, 14)); for (let i = 0; i < 4; i++) g.add(cyl(0.026, 0.026, 0.018, dark, 0, -0.08 + i * 0.045, 0, 14)); g.add(cyl(0.03, 0.026, 0.035, metal, 0, 0.135, 0, 14));
+  const bl = group(); bl.position.y = 0.15; g.add(bl);
+  const core = new THREE.Mesh(new THREE.CapsuleGeometry(w, 1, 4, 10), glowMat('#ffffff', 2.4)); core.geometry.translate(0, 0.5, 0); bl.add(core);
+  const shell = new THREE.Mesh(new THREE.CapsuleGeometry(w * 2.4, 1, 4, 12), new THREE.MeshBasicMaterial({ color: c.clone().multiplyScalar(2.2), transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false })); shell.geometry.translate(0, 0.5, 0); bl.add(shell);
+  const outer = new THREE.Mesh(new THREE.CapsuleGeometry(w * 6, 1, 4, 12), new THREE.MeshBasicMaterial({ color: c.clone(), transparent: true, opacity: 0.16, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false })); outer.geometry.translate(0, 0.5, 0); bl.add(outer);
+  const L = o.light === false ? null : new THREE.PointLight(c, (o.intensity ?? 8) * practical(), o.dist ?? 5, 1.5); if (L) bl.add(L);
+  g.update = (t, s = {}) => { const on = clamp(s.on ?? 1), hum = 1 + (s.hum ?? 1) * (0.05 * Math.sin(t * 47) + 0.04 * noise(t * 13, 2)); bl.visible = on > 0.01; bl.scale.set(hum, Math.max(0.001, on * len), hum);
+    if (L) { L.position.y = 0.5; L.intensity = (o.intensity ?? 8) * practical() * on * hum; } outer.material.opacity = 0.16 * hum; };
+  g.update(0); g.light = L; return g;
+}
+// torch(o) → a flashlight: body, glowing lens and a real spotlight with a soft visible beam along its +y axis. Hold it like the blade
+// (hero.hold(f, 'R', { rot: [Math.PI / 2, 0, 0] }) points it forward). f.update(t, { on }) switches it. o: { color, angle, dist, intensity, beam, shadow }
+export function torch(o = {}) {
+  const c = color(o.color || '#fff0d0'), g = group(); g.userData.dynamic = true;
+  g.add(cyl(0.024, 0.024, 0.16, mat('#2a2a34', { rough: 0.5 }), 0, 0, 0, 12), cyl(0.04, 0.026, 0.06, mat('#3a3a46', { rough: 0.4, metal: 0.5 }), 0, 0.105, 0, 14));
+  const lens = new THREE.Mesh(new THREE.CircleGeometry(0.036, 16), glowMat(c, 2.2)); lens.rotation.x = -Math.PI / 2; lens.position.y = 0.137; g.add(lens);
+  const S_ = new THREE.SpotLight(c, (o.intensity ?? 40) * practical(), o.dist ?? 14, o.angle ?? 0.38, o.penumbra ?? 0.55, 1.3); S_.position.y = 0.14; S_.target.position.set(0, 5, 0); S_.castShadow = !!o.shadow; if (o.shadow) { S_.shadow.mapSize.set(512, 512); S_.shadow.bias = -0.002; } g.add(S_, S_.target);
+  const beam = o.beam === false ? null : lightCone(Math.tan(o.angle ?? 0.38) * 4, 4, c, o.beamOpacity ?? 0.08); if (beam) { beam.rotation.x = Math.PI; beam.position.y = 0.14; g.add(beam); }
+  const halo = glow(c, 0.2, 0.6); halo.position.y = 0.15; g.add(halo);
+  g.update = (t, s = {}) => { const on = clamp(s.on ?? 1), k = on * (1 + 0.03 * noise(t * 17, 4)); S_.intensity = (o.intensity ?? 40) * practical() * k; if (beam) beam.material.opacity = (o.beamOpacity ?? 0.08) * on; halo.material.opacity = 0.6 * on; lens.visible = on > 0.05; };
+  g.update(0); g.light = S_; return g;
 }

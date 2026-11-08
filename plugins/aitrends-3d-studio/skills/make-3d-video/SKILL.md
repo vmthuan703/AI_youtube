@@ -2,7 +2,7 @@
 name: make-3d-video
 description: "This skill should be used when the user wants a narrated 3D animated story video from a SCRIPT in the aiTrends 3D style (toy-like 3D stick characters with big round heads, a loud channel hero in a lime puffer, simple cinematic sets, soft pastel dusk light, a 2:1 picture, animated explainer diagrams), e.g. \"make a 3D video from this script\", \"turn my script into a 3D animation\", \"tạo video 3D từ kịch bản\", \"làm video what if 3D\", \"animate this story in 3D\", or \"do the whole 3D video\". It runs the full pipeline: channel settings, script check, emotional voiceover (Chatterbox, with Kokoro as fallback) with word timings, story breakdown, style and palette choice, 3D scene building, rendering up to 4K/60 fps, music, SFX, scorecard and the final MP4.\n"
 metadata:
-  version: "0.2.6"
+  version: "0.2.7"
   author: aiTrends
 ---
 
@@ -109,7 +109,8 @@ Tweaks: add a custom entry to `STYLES` or `PALETTES` in `engine/styles.js` and r
 
 ## Stage 6: Build every shot
 Read `references/engine-api.md` and the example scenes in `examples/speed-demo/scenes/` (a full 32 s video),
-`examples/look-demo/scenes/` (sets and UI) and `examples/diagram-gallery/scenes/` (every diagram, a blurred-scene backdrop) once.
+`examples/look-demo/scenes/` (sets and UI), `examples/diagram-gallery/scenes/` (every diagram, a blurred-scene backdrop) and
+`examples/worlds-demo/scenes/` (nature sets, light from props, game HUD and counters, first person, icons, planet) once.
 Work in batches of 8–12:
 1. Write `scenes/sets/<location>.js` (reusable builders on top of `T.W.*`) and `scenes/shots/NN_<name>.js` with
    `registerShot('<id>', { init, draw, overlay? })` for the ids in shots.json.
@@ -122,7 +123,8 @@ Non-negotiables: a camera move in every shot; expressions on the beat (`expr` ke
 camera accents on the words that earn them (`crashZoom`, `punch`, `smash` cut, `ramp` slow motion, `rackFocus`); hands and feet in
 contact; colours from `st.M`/`S()` and the cast; every number the narrator says on screen (`wordTime()`); **no empty stage: every
 explainer has a moving picture from `engine/diagrams2d.js`, and most sit on the blurred scene (`backdrop`), not the bare purple stage**;
-text between y = 90 and y = 990 so the bars don't cut it;
+text between y = 90 and y = 990 so the bars don't cut it; **at least one bright or outdoor sequence when the story allows** (nature sets);
+**glowing props light the faces** (`FX3.fire/blade/torch/glowLight`, dim stage); game-like powers get one HUD layer (`userData.hud`, `counters`);
 **props read as the real thing** (a receipt has printed lines, a torn edge and paper size, never a plain grey slab); **no missing or
 sunk limbs** (seated legs visible in front of the seat, not swallowed by it); **hands rest on a table top, never pass through it**;
 **every prop the script names is visible** (headphones in a contrasting colour, at least one close-up); `V()` for aspect-dependent values; `draw()` a pure function of `t`; ≤ 5 real lights per

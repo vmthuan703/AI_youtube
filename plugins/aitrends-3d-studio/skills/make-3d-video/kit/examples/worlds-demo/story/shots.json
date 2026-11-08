@@ -1,0 +1,160 @@
+{
+ "title": "worlds-demo",
+ "duration": 48,
+ "shots": [
+  {
+   "id": "beach",
+   "start": 0,
+   "end": 3,
+   "line": ""
+  },
+  {
+   "id": "wade",
+   "start": 3,
+   "end": 6,
+   "line": ""
+  },
+  {
+   "id": "island",
+   "start": 6,
+   "end": 9,
+   "line": ""
+  },
+  {
+   "id": "snow",
+   "start": 9,
+   "end": 12,
+   "line": ""
+  },
+  {
+   "id": "arctic",
+   "start": 12,
+   "end": 15,
+   "line": ""
+  },
+  {
+   "id": "farm",
+   "start": 15,
+   "end": 18,
+   "line": ""
+  },
+  {
+   "id": "under",
+   "start": 18,
+   "end": 21,
+   "line": ""
+  },
+  {
+   "id": "camp",
+   "start": 21,
+   "end": 24,
+   "line": ""
+  },
+  {
+   "id": "blade",
+   "start": 24,
+   "end": 27,
+   "line": ""
+  },
+  {
+   "id": "torch",
+   "start": 27,
+   "end": 30,
+   "line": ""
+  },
+  {
+   "id": "phone",
+   "start": 30,
+   "end": 33,
+   "line": ""
+  },
+  {
+   "id": "hud",
+   "start": 33,
+   "end": 36,
+   "line": ""
+  },
+  {
+   "id": "pov",
+   "start": 36,
+   "end": 39,
+   "line": ""
+  },
+  {
+   "id": "icongrid",
+   "start": 39,
+   "end": 42,
+   "line": "",
+   "counters": false
+  },
+  {
+   "id": "versus",
+   "start": 42,
+   "end": 45,
+   "line": "",
+   "counters": false
+  },
+  {
+   "id": "planet",
+   "start": 45,
+   "end": 48,
+   "line": "",
+   "counters": false
+  }
+ ],
+ "counters": [
+  {
+   "from": 0,
+   "to": 39,
+   "kind": "pill",
+   "label": "DAY",
+   "keys": [
+    [
+     0,
+     "1"
+    ],
+    [
+     34.0,
+     "15"
+    ]
+   ],
+   "corner": "tr"
+  },
+  {
+   "from": 33,
+   "to": 36,
+   "kind": "bar",
+   "label": "BALLS CUT",
+   "max": 50,
+   "keys": [
+    [
+     33,
+     0.2
+    ],
+    [
+     34.2,
+     0.78
+    ]
+   ],
+   "corner": "tl"
+  },
+  {
+   "from": 36,
+   "to": 39,
+   "kind": "score",
+   "left": "YOU",
+   "right": "THEM",
+   "keys": [
+    [
+     36,
+     "3 - 4"
+    ],
+    [
+     37.5,
+     "15 - 4"
+    ]
+   ],
+   "corner": "tc"
+  }
+ ]
+}

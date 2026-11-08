@@ -129,7 +129,7 @@ export function stage(o = {}) {
   // back light in the rim colour (separates black figures from dark sets); the fresnel rim does the rest
   const fill = new THREE.DirectionalLight(C(o.fillColor || M.rim), (o.fill ?? 0.9) * (L.fill ?? 1)); fill.position.set(...(o.fillPos || [4, 5, -7])); scene.add(fill, fill.target);
   // night and storm: a soft light from the camera lifts faces off the dark set, and the rim is stronger (o.faceLight 0 turns it off)
-  const darkMood = /^(night|storm)$/.test(moodName), faceK = o.faceLight ?? (darkMood ? 0.55 : 0);
+  const darkMood = /^(night|storm|arctic)$/.test(moodName), faceK = o.faceLight ?? (darkMood ? 0.55 : 0);
   const faceLight = faceK > 0 ? new THREE.DirectionalLight(C(o.faceColor || '#e8e0ff'), faceK * (L.fill ?? 1)) : null; if (faceLight) scene.add(faceLight, faceLight.target);
   const rimState = { color: o.rim || M.rim, strength: (o.rimStrength ?? (darkMood ? 0.85 : 0.6)) * (L.rim ?? 1), power: o.rimPower ?? 3.4, dir: o.rimDir || null };
   rim(rimState);
@@ -256,6 +256,10 @@ export const v3 = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
 // project a world point (or object) to overlay coordinates [x, y] in logical units (1920×1080 / 1080×1920); z > 1 = behind the camera
 export function toScreen(p, camera) { const v = Array.isArray(p) ? new THREE.Vector3(...p) : p.isVector3 ? p.clone() : p.getWorldPosition(new THREE.Vector3()); camera.updateMatrixWorld(); v.project(camera); return [((v.x + 1) / 2) * E.W, ((1 - v.y) / 2) * E.H, v.z]; }
 export const worldPos = (obj, out = new THREE.Vector3()) => obj.getWorldPosition(out);
+// headTag(character, camera, { lift, ref }) → { x, y, s, on }: where a tag over this head goes on screen, and how big it should be
+// (s = 1 at `ref` metres, smaller farther away). For UI.hud / pills that ride on a head; the player does this itself for ch.userData.hud.
+export function headTag(ch, camera, o = {}) { const v = ch.headWorld(); v.y += o.lift ?? 0.62 * (ch.scale?.y || 1); camera.updateMatrixWorld(); const d = v.distanceTo(camera.getWorldPosition(new THREE.Vector3())); const [x, y, z] = toScreen(v, camera);
+  return { x, y, s: clamp((o.ref ?? 4.5) / Math.max(0.1, d), 0.12, 1.35), on: z < 1 && x > -200 && x < E.W + 200 && y > -100 && y < E.H + 300 }; }
 
 // ---------------------------------------------------------------- static merge (big speed-up on CPU renderers)
 // Merges every static opaque mesh that shares a look into one draw call. Anything the shot keeps a reference to
@@ -289,7 +293,7 @@ export function optimize(st, keep = []) {
 
 // re-export the rest of the 3D toolkit so shots only need `T`
 export { character, POSES3, posesAt3, exprAt, walkPose3, breathe3, blendPose3, EXPRESSIONS, BODY } from './rig3d.js';
-export { walkTo, idle3, speak3, lookAtSpeaker, handheld, chase, crashZoom, punch, dutch, rackFocus } from './motion3d.js';
+export { walkTo, idle3, speak3, lookAtSpeaker, handheld, chase, crashZoom, punch, dutch, rackFocus, pov, povArms } from './motion3d.js';
 export * as W from './world3d.js';
 export * as FX3 from './fx3d.js';
 export { rng, key, smoothKey, ease, clamp, lerp, noise };

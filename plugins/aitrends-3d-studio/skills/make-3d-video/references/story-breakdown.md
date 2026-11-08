@@ -46,11 +46,12 @@ Read the whole transcript (`timeline/transcript.txt`) twice. Then write `story/b
 - **Logline and tone** (wonder / suspense / comedy / drama). The "you" of the script is the channel's hero from `channel/cast.js`: a boy. If the script gives him a girl's name or she/her, raise it at the script check, before the voice.
 - **Props list:** every prop the narration names, with the shot that shows it and the one detail that makes it readable (a receipt's printed lines and torn edge, headphones in a contrasting colour).
 - **Palette:** this video's colour world (`dusk`, `cozy`, `tropic`, `alert`, `school`, `midnight`, or a new one). Pick from where most of the story happens. Set `config.json` → `palette`.
+- **Game layer (if the power is game-like):** what the HUD over heads shows and which story variable the corner counter tracks (shots.json `counters`).
 - **Signature device:** one visual invented for this story's power, built in the first minute and recurring all video, with the UI part that draws it. Don't reuse one from a reference.
 - **Cast table.** For each recurring character: id, role, outfit (see engine-api.md, Characters), signature colour,
   personality, the expressions they use most, and their TTS voice. Put the outfits in `scenes/cast.js`: import the hero and the supporting roles (`import { HERO, NURSE, GRANDPA } from '/channel/cast.js'`; `ROLES` maps script words such as "nurse" or "grandpa" to a role, so the costume matches the job and the age), give every speaking character `speaker: 'NAME'` as written in the script, so bubbles and lip-sync find them. **Every character comes from the roster, extras included:** a second or third girl is `CLASSMATE_2` / `CLASSMATE_3`, a second or third boy `BRO_2` / `RIVAL_2`, nameless students `STUDENTS[i]`; change one colour or the hair at most and never write an outfit from scratch. `python tools/cast_check.py --project projects/<slug>` must pass before the style samples.
-- **Locations (sets).** For each: name, the `T.W` base (city, suburb, room kind, park, studio) or custom build, mood
-  (`day|golden|dusk|night|storm|interiorWarm|interiorCool|void`), time of day, key light and practicals, 4–8 signature
+- **Locations (sets).** For each: name, the `T.W` base (city, suburb, room kind, park, studio, beach, island, snow, farm, underwater, space) or custom build, mood
+  (`day|golden|dusk|night|storm|interiorWarm|interiorCool|void|beach|sunrise|snow|arctic|underwater`), and at least one bright or outdoor location when the story allows, time of day, key light and practicals, 4–8 signature
   props, where the camera usually sits. One `scenes/sets/<name>.js` each.
 - **Motifs:** recurring devices tied to the story (a corner multiplier badge "10x", a ticking clock, the hero's colour
   as the colour of the power, a freeze look for slowed time).

@@ -3,6 +3,8 @@
 // Every function takes logical coordinates (1920x1080 / 1080x1920), a size, t (shot time) and start (pop-in time).
 // Look: flat fills, a dark outline, small letter-spaced labels. Colours come from S().ui so a style switch re-themes them.
 import { E, V, S, FONTS, clamp, ease, lerp, prog, rr, text, circle, ring, alpha, shade, measure, hash01 } from './core.js';
+import { drawGlyph, ICON_KINDS } from './icons2d.js';
+export { ICON_KINDS };
 
 const LINE = '#241a38', PAPER = '#f6efe4', SOFT = 'rgba(255,241,220,.92)', MUTE = 'rgba(255,241,220,.45)';
 const gold = () => S().ui?.gold || '#ffd98a', accent = () => S().ui?.accent || '#ff5a6a', good = () => S().ui?.good || '#5fd39a';
@@ -222,4 +224,42 @@ export function arrow(g, o = {}) {
 export function compare(g, o = {}) {
   const { x = E.W / 2, y = 560, w = 620, h = 620, gap = 60, left = 'A', right = 'B', leftC = '#6ab8f2', rightC = '#ff8ac0', t = null, start = 0 } = o;
   [[-1, left, leftC, 0], [1, right, rightC, 0.15]].forEach(([sx, str, c, d]) => enter(g, t, start + d, x + sx * (w + gap) / 2, y, 1, () => { rr(g, -w / 2, -h / 2, w, h, 18); g.fillStyle = 'rgba(20,14,40,.72)'; g.fill(); stroke(g, 4, alpha(c, 0.8)); label(g, str, 0, -h / 2 + 50, { size: 34 }); }));
+}
+
+// ================================================================ pictograms and comparisons (0.2.7)
+// icon(g, { kind, x, y, r, label, t, start, badge, color, glow, cross, check, pulse }) — one pictogram from engine/icons2d.js (ICON_KINDS),
+// on a round dark-glass badge by default (badge: false = bare), a label under it, popping in at `start`. cross / check stamp a red ✗ or
+// a green ✓ over it at that time (a number = shot time) for "no more meat", "bones = normal".
+export function icon(g, o = {}) {
+  const { kind = 'brain', x = E.W / 2, y = 480, r = 70, t = null, start = 0 } = o, b = 1 + (o.pulse ?? 0) * 0.06 * Math.sin((t ?? 0) * 6);
+  enter(g, t, start, x, y, b, () => {
+    if (o.badge !== false) { g.beginPath(); g.arc(0, 0, r * 1.45, 0, 7); g.fillStyle = 'rgba(20,14,40,.72)'; g.fill(); stroke(g, Math.max(2, r * 0.05), o.ring || 'rgba(255,241,220,.42)'); if (o.glow) { g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(0, 0, r * 0.3, 0, 0, r * 1.6); gr.addColorStop(0, alpha(o.glow, 0.35)); gr.addColorStop(1, alpha(o.glow, 0)); g.fillStyle = gr; g.fillRect(-r * 1.6, -r * 1.6, r * 3.2, r * 3.2); g.restore(); } }
+    drawGlyph(g, kind, 0, 0, r * (o.badge === false ? 1 : 0.92), { color: o.color });
+    if (o.label) label(g, o.label, 0, r * (o.badge === false ? 1.45 : 1.95), { size: o.labelSize || Math.max(26, r * 0.42) });
+  });
+  const mark = (at, kindM) => { if (at == null || at === false) return; const s0 = at === true ? start + 0.4 : at; const k = t == null ? 1 : ease.outBack(prog(t, s0, s0 + 0.3)); if (k <= 0) return; g.save(); g.translate(x + r * 0.95, y - r * 0.95); g.scale(k, k);
+    g.beginPath(); g.arc(0, 0, r * 0.48, 0, 7); g.fillStyle = kindM === 'x' ? accent() : good(); g.fill(); g.strokeStyle = '#fff'; g.lineWidth = r * 0.11; g.lineCap = 'round'; g.beginPath();
+    if (kindM === 'x') { g.moveTo(-r * 0.2, -r * 0.2); g.lineTo(r * 0.2, r * 0.2); g.moveTo(r * 0.2, -r * 0.2); g.lineTo(-r * 0.2, r * 0.2); } else { g.moveTo(-r * 0.22, 0); g.lineTo(-r * 0.05, r * 0.18); g.lineTo(r * 0.24, -r * 0.18); } g.stroke(); g.restore(); };
+  mark(o.cross, 'x'); mark(o.check, 'v');
+}
+// iconRow(g, { items: [{ kind, label, cross, check }], x, y, r, gap, t, start, stagger }) — a row of badges that pop in one after another
+// ("3 MIN · AIR", "3 DAYS · WATER", "3 WEEKS · FOOD").
+export function iconRow(g, o = {}) {
+  const items = o.items || [], r = o.r ?? 64, gap = o.gap ?? r * 3.6, x0 = (o.x ?? E.W / 2) - (gap * (items.length - 1)) / 2;
+  items.forEach((it, i) => icon(g, { r, ...it, x: x0 + i * gap, y: o.y ?? 500, t: o.t, start: (o.start ?? 0) + i * (o.stagger ?? 0.18) }));
+}
+// versus(g, { left: {title, value, icon, figure, note}, right: {…}, x, y, w, h, t, start, winner: 'right' }) — two glass panels side by side,
+// "NORMAL PERSON" vs "YOU": a small title, a picture (an icon, or a flat cast figure: figure = flatFigure options), a big value. The winner's
+// panel gets a gold edge and a slight lift.
+export function versus(g, o = {}) {
+  const { x = E.W / 2, y = 560, w = 560, h = 600, gap = 70, t = null, start = 0 } = o;
+  [['left', -1, 0], ['right', 1, 0.18]].forEach(([side, sx, d]) => { const p = o[side] || {}, win = o.winner === side;
+    enter(g, t, start + d, x + sx * (w + gap) / 2, y - (win ? 10 : 0), 1, () => {
+      rr(g, -w / 2, -h / 2, w, h, 22); g.fillStyle = 'rgba(20,14,40,.74)'; g.fill(); stroke(g, win ? 5 : 3, win ? gold() : 'rgba(255,241,220,.38)');
+      label(g, p.title || (side === 'left' ? 'NORMAL PERSON' : 'YOU'), 0, -h / 2 + 52, { size: 32, color: win ? gold() : SOFT });
+      if (p.figure) flatFigure(g, { x: 0, y: h * 0.12, h: h * 0.42, ...p.figure }); else if (p.icon) drawGlyph(g, p.icon, 0, -h * 0.02, h * 0.17);
+      if (p.value != null) { const vs = p.valueSize || 64; rr(g, -w * 0.36, h / 2 - 118, w * 0.72, 84, 42); g.fillStyle = 'rgba(10,6,24,.6)'; g.fill(); text(g, String(p.value), 0, h / 2 - 74, { size: vs, font: LF(), weight: 900, color: win ? gold() : '#fff6ea' }); }
+      if (p.note) label(g, p.note, 0, h / 2 - 140, { size: 26, color: MUTE });
+    }); });
+  const k = pop(t, start + 0.36); if (k > 0.01) { g.save(); g.translate(x, y); g.scale(k, k); g.beginPath(); g.arc(0, 0, 40, 0, 7); g.fillStyle = gold(); g.fill(); text(g, 'VS', 0, 2, { size: 32, font: FONTS.ui, weight: 900, color: '#2a1a10' }); g.restore(); }
 }

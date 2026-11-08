@@ -18,8 +18,8 @@ _Cập nhật tự động 2026-11-08. Số liệu từ YouTube Data API, đối
 
 ### Tóm tắt thu thập 2026-11-08
 
-- Quota đã dùng: 2178 / ngân sách 6000 đơn vị
-- Kênh theo dõi: 60 · video đã chụp: 1398
+- Quota đã dùng: 2174 / ngân sách 6000 đơn vị
+- Kênh theo dõi: 60 · video đã chụp: 1399
 
 #### What-If Fiction × Mỹ
 
@@ -30,15 +30,15 @@ _Cập nhật tự động 2026-11-08. Số liệu từ YouTube Data API, đối
 
 | Kênh mới thắng | Tuổi (ngày) | Sub | Video to nhất |
 |---|---|---|---|
-| Minute Zero | 28 | 22.400 | 2.320.921 |
-|  Jeremy Bearimy | 28 | 46.100 | 1.712.027 |
-| ConChaser | 15 | 19.300 | 1.587.558 |
-| Araragi | 120 | 23.600 | 1.434.852 |
-| OminiAM | 33 | 6.780 | 1.185.527 |
-| Manifesting | 27 | 5.270 | 964.531 |
-| Earth Tipping | 39 | 1.510 | 962.307 |
-| IFOLOGY | 29 | 54.900 | 950.468 |
-| The Hypothetical Room | 6 | 4.980 | 878.843 |
+| Minute Zero | 28 | 22.400 | 2.321.374 |
+|  Jeremy Bearimy | 28 | 46.200 | 1.715.109 |
+| ConChaser | 15 | 19.300 | 1.590.112 |
+| Araragi | 120 | 23.600 | 1.435.194 |
+| OminiAM | 33 | 6.780 | 1.185.836 |
+| Manifesting | 27 | 5.270 | 964.640 |
+| Earth Tipping | 39 | 1.510 | 962.421 |
+| IFOLOGY | 29 | 54.900 | 950.875 |
+| The Hypothetical Room | 6 | 5.000 | 881.575 |
 | What If Animations | 36 | 6.090 | 877.902 |
 
 Xem thêm: [dữ liệu ngày 2026-11-08](https://github.com/vmthuan703/AI_youtube/blob/research/reports/data/2026-11-08/TOM_TAT.md)
@@ -54,22 +54,22 @@ _Báo cáo 2026-W45 · nguồn `SO_LIEU.md`. Chỉ trích phần đầu, bản �
 
 | Điều kiện | Ngưỡng | Số đo | Kết quả |
 |---|---|---|---|
-| Có kênh ≤ 3 tháng đã có video ≥ 100k | có |  Jeremy Bearimy, ConChaser, DOOMPERK, Earth Tipping, IFOLOGY (+28 kênh) | đạt |
-| Tuổi trung vị 5 kênh có video to nhất | ≤ 12 tháng | 57.3 tháng (ngày tạo kênh, video cũ nhất) | không |
-| view/sub trung vị (5 kênh đó) | ≥ 10× | 78.6 | đạt |
-| Số video dài ≥ 100k | ≥ 8 (cần, không đủ) | 220 | đạt |
-| View trung vị của video ≥ 100k | 150k–600k | 256.989 | đạt |
+| Có kênh ≤ 3 tháng đã có video ≥ 100k | có |  Jeremy Bearimy, ConChaser, DOOMPERK, Earth Tipping, IFANIME (+37 kênh) | đạt |
+| Tuổi trung vị 5 kênh có video to nhất | ≤ 12 tháng | 57.4 tháng (ngày tạo kênh, video cũ nhất) | không |
+| view/sub trung vị (5 kênh đó) | ≥ 10× | 77.3 | đạt |
+| Số video dài ≥ 100k | ≥ 8 (cần, không đủ) | 283 | đạt |
+| View trung vị của video ≥ 100k | 150k–600k | 248.532 | đạt |
 | Kênh đúng ngách (top 5, tự động theo tiêu đề) | ≥ 80% | 2/2 kênh có đủ tiêu đề | — |
 
 5 kênh có video to nhất (dùng cho 3 dòng tuổi, view/sub, đúng ngách; **cần đọc tay xác minh đúng ngách**, kênh sai thì thêm vào `exclude_channels` trong config):
 
 | Kênh | Tuổi (ngày) | Sub | Video to nhất | Tỉ lệ tiêu đề khớp |
 |---|---|---|---|---|
-| Ifverse | 1.742 | 59.500 | 4.679.653 | chưa theo dõi |
-| Minute Zero | 25 | 21.600 | 2.241.643 | 100% |
-| Peekaboo Kidz | 4.533 | 7.910.000 | 1.886.460 | chưa theo dõi |
-| Kian Odyssey | 2.401 | 4.940 | 1.862.452 | chưa theo dõi |
-| Itadorists | 316 | 42.700 | 1.830.971 | 85% |
+| Ifverse | 1.746 | 60.800 | 4.701.947 | chưa theo dõi |
+| Minute Zero | 29 | 22.400 | 2.321.374 | 100% |
+| Peekaboo Kidz | 4.537 | 7.920.000 | 1.910.634 | chưa theo dõi |
+| Kian Odyssey | 2.405 | 4.960 | 1.873.995 | chưa theo dõi |
+| Itadorists | 320 | 42.900 | 1.849.487 | 85% |
 
 **Kết luận số: CẦN THEO DÕI.** Tuổi kênh dự báo mạnh nhất. View trung vị càng cao thì cửa càng đóng.
 

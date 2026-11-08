@@ -1,6 +1,6 @@
 {
   "snapshot_date": "2026-11-08",
-  "started_at": "2026-11-08T14:37:16.376848+00:00",
+  "started_at": "2026-11-08T15:11:30.714887+00:00",
   "quota_budget": 6000,
   "markets": {
     "whatif-us": {
@@ -30,27 +30,23 @@
       ],
       "queries_skipped": [],
       "errors": [],
-      "discovery_rows": 962,
-      "seeded": [
-        "All Answers",
-        "IfYou Films",
-        "Stupid Dupid ",
-        "Milo Whatsit"
-      ],
+      "discovery_rows": 965,
+      "seeded": [],
       "added": [],
       "not_added_registry_full": [
         "Matal",
         "BrainBracket",
-        "Stick Saga",
         "Stick Knows",
-        "Questionverse"
+        "Questionverse",
+        "Stick Saga",
+        "Kokishin"
       ]
     }
   },
   "pruned_off_niche": [],
   "tracked_channels": 60,
-  "tracked_videos": 1398,
+  "tracked_videos": 1399,
   "tracking_skipped": [],
-  "quota_used": 2178,
-  "finished_at": "2026-11-08T14:38:05.593616+00:00"
+  "quota_used": 2174,
+  "finished_at": "2026-11-08T15:11:56.451109+00:00"
 }

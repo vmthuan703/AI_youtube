@@ -1,6 +1,7 @@
 // engine/ui2d.js — on-screen graphics: titles, data cards, counters, callouts, blueprint diagrams, end screen, captions.
 import { E, S, V, clamp, lerp, prog, ease, alpha, shade, mix, seg, circle, ring, rr, poly, text, measure, glow, linGrad, FONTS } from './core.js';
 import { drawFigure, POSES } from './rig2d.js';
+import { drawGlyph } from './icons2d.js';
 
 const fadeIO = (t, dur, inT = 0.35, outT = 0.35) => clamp(Math.min(t / inT, (dur - t) / outT));
 
@@ -126,8 +127,10 @@ export function pill(g, o = {}) {
   text(g, str, tx, size * 0.04, { size, font: f, weight: w8, color: color || (gold ? S().ui.gold : '#fff6ea'), spacing: f === FONTS.serif ? 2 : 0.5 });
   g.restore();
 }
-// small icons for pills/tags: 'check', 'heart', 'star', 'x', 'up', 'down'
+// small icons for pills/tags: 'check', 'heart', 'star', 'x', 'up', 'down', and every pictogram in engine/icons2d.js (ICON_KINDS):
+// brain eye clock calendar sun moon drop fire bolt leaf tree fish cow house city car plane phone money coin pill virus atom globe skull…
 export function drawIcon(g, kind, x, y, r) {
+  if (!['check', 'x', 'heart', 'star', 'up', 'down'].includes(kind)) { drawGlyph(g, kind, x, y, r); return; }
   g.save(); g.translate(x, y); g.lineCap = 'round'; g.lineJoin = 'round';
   if (kind === 'check') { g.strokeStyle = '#5fd39a'; g.lineWidth = r * 0.32; g.beginPath(); g.moveTo(-r * 0.7, 0); g.lineTo(-r * 0.15, r * 0.55); g.lineTo(r * 0.8, -r * 0.6); g.stroke(); }
   if (kind === 'x') { g.strokeStyle = '#ff5a6a'; g.lineWidth = r * 0.32; g.beginPath(); g.moveTo(-r * 0.6, -r * 0.6); g.lineTo(r * 0.6, r * 0.6); g.moveTo(r * 0.6, -r * 0.6); g.lineTo(-r * 0.6, r * 0.6); g.stroke(); }
@@ -186,4 +189,57 @@ export function subscribeRow(g, o = {}) {
   if (done) pill(g, { str: 'SUBSCRIBED', icon: 'check', x: E.W / 2 + V(150, 120), y, size: V(42, 48), t, start: 0.35, bg: 'rgba(120,120,140,.85)', line: 'rgba(255,255,255,.5)' });
   else pill(g, { str: 'SUBSCRIBE', x: E.W / 2 + V(150, 120), y, size: V(46, 52), t, start: 0.35, bg: '#e0303a', line: 'rgba(255,255,255,.6)', color: '#ffffff' });
   heading(g, { str: label, y: y + V(150, 170), t, start: 0.6, size: V(40, 46) });
+}
+
+// ================================================================ game HUD (0.2.7)
+// The story's rule drawn as a game layer, in the channel's colours (dark glass, cream text, gold level, green life bar).
+// hud(g, { x, y, name, level, hp, bars: [{ label, value, color }], s, t, start, end, a, tail, mini })
+//   x, y = the point it hangs above (a head); s = scale from distance (T.headTag gives it). Below s 0.72 the name hides and only
+//   the level chip and the life bar stay, so text never drops under the phone-readable floor; below 0.32 it is a bare bar.
+export function hud(g, o = {}) {
+  const k = popK(o.t ?? null, o.start ?? 0, o.end ?? null); if (k <= 0.001 || (o.a ?? 1) <= 0) return;
+  const s = (o.s ?? 1) * TS(), mini = o.mini ?? s < 0.72, bare = s < 0.32, f = LF(), w8 = f === FONTS.serif ? 700 : 900, ui = S().ui;
+  const hp = clamp(o.hp ?? 1), hpC = o.hpColor || (hp < 0.3 ? ui.accent : ui.good || '#5fd39a'), bars = o.bars || [];
+  const fs = Math.max(30, 32 * s), w = bare ? 120 * Math.max(s, 0.18) : mini ? 190 * Math.max(s, 0.45) : Math.max(300 * s, measure(g, o.name || '', fs, f, w8) + 150 * s);
+  const bh = Math.max(8, 14 * s), rowH = mini ? 0 : fs * 1.25, rh = Math.max(34, 34 * s), extra = mini ? 0 : bars.length * rh, pad = Math.max(8, 14 * s);
+  const h = bare ? bh + 8 : pad * 2 + rowH + bh + (mini ? 0 : 6 * s) + extra + (mini ? 22 * Math.max(s, 0.6) : 0);
+  g.save(); g.globalAlpha *= (o.a ?? 1) * clamp(k * 1.4); g.translate(o.x, o.y - h - (o.tail === false ? 0 : 12 * Math.max(s, 0.5))); g.scale(k, k);
+  if (bare) { rr(g, -w / 2, 0, w, bh + 8, (bh + 8) / 2); g.fillStyle = 'rgba(14,10,28,.78)'; g.fill(); rr(g, -w / 2 + 4, 4, (w - 8) * hp, bh, bh / 2); g.fillStyle = hpC; g.fill(); g.restore(); return; }
+  rr(g, -w / 2, 0, w, h, Math.max(10, 16 * s)); g.fillStyle = 'rgba(16,12,32,.78)'; g.fill(); g.lineWidth = Math.max(1.5, 2.5 * s); g.strokeStyle = 'rgba(255,236,210,.42)'; g.stroke();
+  // a thin bright top edge, like glass catching the light
+  g.save(); g.beginPath(); rr(g, -w / 2, 0, w, h, Math.max(10, 16 * s)); g.clip(); g.fillStyle = 'rgba(255,255,255,.07)'; g.fillRect(-w / 2, 0, w, h * 0.42); g.restore();
+  if (o.tail !== false) { g.beginPath(); g.moveTo(-10 * Math.max(s, 0.5), h); g.lineTo(0, h + 12 * Math.max(s, 0.5)); g.lineTo(10 * Math.max(s, 0.5), h); g.closePath(); g.fillStyle = 'rgba(16,12,32,.78)'; g.fill(); }
+  let y = pad;
+  const lv = o.level != null ? `LV ${o.level}` : null, cs = Math.max(mini ? 26 : 24, (mini ? 26 : 22) * Math.max(s, 0.8));
+  if (!mini) { text(g, o.name || 'YOU', -w / 2 + pad, y + rowH / 2, { size: fs, font: f, weight: w8, color: ui.cream || '#fff2e2', align: 'left', spacing: 2 }); }
+  if (lv) { const cw = measure(g, lv, cs, FONTS.ui, 900) + cs * 0.9, cx = mini ? 0 : w / 2 - pad - cw / 2, cy = mini ? y + cs * 0.6 : y + rowH / 2; rr(g, cx - cw / 2, cy - cs * 0.68, cw, cs * 1.36, cs * 0.68); g.fillStyle = ui.gold; g.fill(); text(g, lv, cx, cy + cs * 0.05, { size: cs, font: FONTS.ui, weight: 900, color: '#2a1a10' }); }
+  y += mini ? cs * 1.5 : rowH + 6 * s;
+  const bar = (yy, v, c, lab, off = 0) => { const lx = -w / 2 + pad + off, lw = w - pad * 2 - off; let bx = lx, bw = lw; if (lab) { const ls = Math.max(24, 22 * s); text(g, lab, lx, yy + bh / 2 + 1, { size: ls, font: FONTS.ui, weight: 900, color: alpha('#fff2e2', 0.8), align: 'left', spacing: 1 }); const lw2 = Math.max(measure(g, lab, ls, FONTS.ui, 900), ls * 2.4) + 10; bx += lw2; bw -= lw2; }
+    rr(g, bx, yy, bw, bh, bh / 2); g.fillStyle = 'rgba(255,255,255,.12)'; g.fill(); if (v > 0.002) { rr(g, bx, yy, Math.max(bh, bw * clamp(v)), bh, bh / 2); const gr = g.createLinearGradient(bx, 0, bx + bw, 0); gr.addColorStop(0, shade(c, -0.15)); gr.addColorStop(1, shade(c, 0.25)); g.fillStyle = gr; g.fill(); } };
+  if (!mini) drawIcon(g, 'heart', -w / 2 + pad + bh * 0.6, y + bh / 2, bh * 0.85);
+  bar(y, hp, hpC, null, mini ? 0 : bh * 1.5); y += bh + 6 * s;
+  if (!mini) bars.forEach(b => { bar(y + (rh - bh) / 2, clamp(b.value ?? 0.5), b.color || ui.gold, b.label); y += rh; });
+  g.restore();
+}
+// counter(g, { kind: 'pill'|'score'|'bar', label, value, left, right, max, corner: 'tr'|'tl'|'br'|'bl'|'tc', x, y, bump, a, icon })
+// A corner tracker of the story's variable: "DAY 15", "YOU 15 – 4 THEM", a "39/50" progress bar. The player draws the shots.json
+// "counters" track across cuts; call it yourself for one shot. bump 0..1 makes it swell for a beat when the value changes.
+export function counter(g, o = {}) {
+  const ui = S().ui, f = LF(), w8 = f === FONTS.serif ? 700 : 900, size = Math.max(o.size ?? 40 * TS(), 34), kind = o.kind || 'pill', a = o.a ?? 1; if (a <= 0) return;
+  const top = (o.top ?? 0) + V(40, 110), corner = o.corner || 'tr', mx = V(70, 60);
+  let str = '', w = 0; const h = size * 1.5;
+  if (kind === 'score') { const L = String(o.left ?? 'YOU'), R = String(o.right ?? 'THEM'), v = String(o.value ?? '0 - 0').split(/\s*[-–:]\s*/); str = `${v[0] ?? 0}  –  ${v[1] ?? 0}`; w = measure(g, L, size * 0.62, FONTS.ui, 900) + measure(g, R, size * 0.62, FONTS.ui, 900) + measure(g, str, size, f, w8) + size * 3.4; }
+  else if (kind === 'bar') { w = Math.max(360, measure(g, String(o.label || ''), size * 0.55, FONTS.ui, 900) + 200); }
+  else { str = [o.label, o.value].filter(x => x != null && x !== '').join(' '); w = measure(g, str, size, f, w8) + size * 1.2 + (o.icon ? size : 0); }
+  const hh = kind === 'bar' ? size * 1.9 : h;
+  const x = o.x ?? (corner.includes('l') ? mx + w / 2 : corner === 'tc' ? E.W / 2 : E.W - mx - w / 2), y = o.y ?? (corner.startsWith('b') ? E.H - top - hh / 2 : top + hh / 2);
+  const sc = 1 + 0.16 * Math.sin(Math.PI * clamp(o.bump ?? 0));
+  g.save(); g.globalAlpha *= a; g.translate(x, y); g.scale(sc, sc);
+  rr(g, -w / 2, -hh / 2, w, hh, Math.min(hh / 2, size * 0.5)); g.fillStyle = 'rgba(16,12,32,.8)'; g.fill(); g.lineWidth = 2.5; g.strokeStyle = 'rgba(255,236,210,.42)'; g.stroke();
+  if (kind === 'score') { const L = String(o.left ?? 'YOU'), R = String(o.right ?? 'THEM'); text(g, L, -w / 2 + size * 0.6, 2, { size: size * 0.62, font: FONTS.ui, weight: 900, color: alpha(ui.cream || '#fff2e2', 0.85), align: 'left', spacing: 2 }); text(g, R, w / 2 - size * 0.6, 2, { size: size * 0.62, font: FONTS.ui, weight: 900, color: alpha(ui.cream || '#fff2e2', 0.85), align: 'right', spacing: 2 }); text(g, str, 0, size * 0.04, { size, font: f, weight: w8, color: ui.gold }); }
+  else if (kind === 'bar') { const v = clamp(+o.value || 0), lab = String(o.label || ''), ls = Math.max(26, size * 0.55); text(g, lab, -w / 2 + size * 0.5, -hh / 2 + ls * 0.95, { size: ls, font: FONTS.ui, weight: 900, color: alpha(ui.cream || '#fff2e2', 0.85), align: 'left', spacing: 2 });
+    const num = o.max ? `${Math.round(v * o.max)}/${o.max}` : `${Math.round(v * 100)}%`; text(g, num, w / 2 - size * 0.5, -hh / 2 + ls * 0.95, { size: ls * 1.05, font: FONTS.ui, weight: 900, color: ui.gold, align: 'right' });
+    const bx = -w / 2 + size * 0.5, bw = w - size, by = hh / 2 - size * 0.62, bh = size * 0.32; rr(g, bx, by, bw, bh, bh / 2); g.fillStyle = 'rgba(255,255,255,.12)'; g.fill(); if (v > 0) { rr(g, bx, by, Math.max(bh, bw * v), bh, bh / 2); g.fillStyle = o.color || ui.good || '#5fd39a'; g.fill(); } }
+  else { let tx = 0; if (o.icon) { drawIcon(g, o.icon, -w / 2 + size * 0.85, 0, size * 0.42); tx = size * 0.45; } text(g, str, tx, size * 0.04, { size, font: f, weight: w8, color: o.color || ui.gold, spacing: f === FONTS.serif ? 2 : 1 }); }
+  g.restore();
 }

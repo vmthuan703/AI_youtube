@@ -72,6 +72,14 @@ simple characters, real staging, real light.
   night close-ups. The scorecard flags videos with too many frames too dark to read.
 - **Text a phone can read:** speech bubbles at least 38 px, labels 30–36 px, pills and tags 36 px (logical, 1080 high); the UI
   enforces these floors. `config.textScale` (e.g. 1.1) scales every label for a mostly-mobile audience.
+- **Go outside.** The references spend whole sequences on beaches, islands, snowy slopes, farms, under the sea and in space, and those bright
+  scenes are a big part of why they feel varied (13–61% of their frames are high-key; the channel's own videos were 6–12%). When the script
+  allows, give every video at least one daylight or outdoor sequence from the nature sets (`T.W.beach`, `island`, `snow`, `farm`, `underwater`,
+  `space` + `planet`) and pick its mood (`beach`, `sunrise`, `snow`, `arctic`, `underwater`). The same rules hold: 4–8 signature props, the hero
+  still the loudest colour, faces lit.
+- **Fill the world the script names.** Animals are toy shapes with the cast's eyes (`T.W.cow`, `dog`, `cat`, `bird`, `crab`, `bee`…), never realistic; a "whole stadium"
+  is thousands of instanced people (`T.W.stadium`), "everyone in school" can be a formation; the world reacts on screens in the world (`newsWall`, `feedDraw` on a phone,
+  a `scoreboard3d`, a `billboard`) rather than as text cards. Cuts, breaks and crashes show the physics: hot cut faces (`slice`), sparks, debris, smoke, splashes.
 - **Atmosphere in most shots:** `FX3.dust` indoors, `FX3.rain` for storms, `FX3.bokeh` behind close-ups, fog (stage
   fog), `FX3.frozen` droplets for time-stop.
 
@@ -82,6 +90,9 @@ simple characters, real staging, real light.
   (`T.lamp`, `T.spot`, lamps inside `T.W` props) where the set shows a source. Fake extra sources with `T.glow`.
 - The story drives the light: tension → darker, cooler, harder contrast (`look: "danger"`, `noir` moments);
   wonder/triumph → warm, more bloom; time-stop → `look: "freeze"`; memories → `look: "flashback"`.
+- **Story lights:** when something in the story glows (a campfire, an energy blade, a torch, a phone in a dark bedroom), it is the key light of
+  the shot: dim the stage (`ambient` 0.25–0.4, `keyIntensity` 0.2–0.4) and let `FX3.fire`/`blade`/`torch`/`glowLight` light the faces and walls, moving
+  with the prop. One prop light per glowing thing, still ≤ 5 lights per shot.
 - The final grade (lift/gamma/gain, saturation, vignette, grain) comes from the style and applies to every frame.
 
 ## Camera (never static)
@@ -112,6 +123,8 @@ heads almost touching** for comedy. Recipes in engine-api.md.
 10. **Data card / UI** (as needed): any number the narrator says appears on screen (2D overlay, `wordTime()`).
 11. **Title card**: big glowing title over a cinematic wide, **silent: the narrator does not read it**, between about 0:30 and 1:15, after the cold open.
 12b. **Macro insert** (5–10%): under a second, an object or body part filling the frame, cut on the word.
+12c. **First person** (2–5%): through the hero's eyes (`T.pov` + `T.povArms`): his lime sleeves and ball hands holding the thing that matters (a gift,
+    a wheel, a phone, a cube), the other character reacting in front. One beat, not a sequence.
 12. **End screen**: the question, a comment bubble, a subscribe pill, the cast lined up in 3D.
 
 Continuity: same outfits, same screen direction within a scene (hero on the left facing right in conversations), same
@@ -135,6 +148,11 @@ for the one moment in a sequence that should hang in the air: the dive, the slip
 - **Fill the stage frame:** the figure stands at least a third of the frame height, the main picture spans at least 40% of the width,
   1–2 labels at once, and something builds or moves for the whole shot (the stage itself drifts light and dust). Labels that won't carry
   into the next shot leave before the cut (`end: 'shot'`); numbers count up as they appear (`count: true`). The scorecard lists near-empty frames.
+- **Game rules as a HUD.** When the power works like a game (stats, levels, scores, days survived), show it as one HUD layer in the channel's
+  colours: glass panels over heads (`userData.hud`), and one corner counter for the story's variable across cuts (shots.json `counters`: DAY 15,
+  39/50, YOU 15 – 4 THEM). One layer at a time; the hero's panel is the biggest; never invent a second HUD style mid-video.
+- **Pictures, not words, on the stage:** a number gets an icon (`D.icon`, `D.iconRow`), a comparison gets two panels (`D.versus`), "everyone on
+  Earth" cuts to the planet. A label alone on the stage is a missed picture.
 - **Speech bubbles:** every line of a named character shows in a white bubble over their head while spoken (automatic, `speaker` on the character).
 - Captions (`captions: true`, default for 9:16): word-by-word, current word highlighted.
 

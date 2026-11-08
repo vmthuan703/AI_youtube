@@ -3,7 +3,7 @@
 // 3D shots render with Three.js (engine/kit3d.js) into a WebGL canvas, then 2D overlays, grade, captions and bars are composited.
 import { E, V, setStyle, getShot, clamp, ease, prog, alpha, text, FONTS } from './core.js';
 import { STYLES } from './styles.js';
-import { captions, speech } from './ui2d.js';
+import { captions, speech, hud as drawHud, counter } from './ui2d.js';
 import { prepareGag, drawGag } from './gag.js';
 
 const q = new URLSearchParams(location.search);
@@ -29,7 +29,7 @@ async function boot() {
   const short = RES[cfg.resolution || '1080p'] || 1080, long = Math.round((short * 16) / 9 / 2) * 2;
   const scale = +(q.get('scale') || 1) * +(q.get('ss') || 1);   // ss = supersampling factor (render.mjs downsizes with lanczos)
   const outW = Math.round(((vertical ? short : long) * scale) / 2) * 2, outH = Math.round(((vertical ? long : short) * scale) / 2) * 2;
-  Object.assign(E, { vertical, W: vertical ? 1080 : 1920, H: vertical ? 1920 : 1080, fps: +(q.get('fps') || cfg.fps || 24), cfg, words: words.words || words, lines: Array.isArray(lines) ? lines : [], shots: story.shots, outW, outH });
+  Object.assign(E, { vertical, W: vertical ? 1080 : 1920, H: vertical ? 1920 : 1080, fps: +(q.get('fps') || cfg.fps || 24), cfg, words: words.words || words, lines: Array.isArray(lines) ? lines : [], shots: story.shots, story, outW, outH });
   E.PX = outW / E.W; E.quality = q.get('quality') || cfg.quality || 'high';
   setStyle(q.get('style') || cfg.style || 'pearl', q.get('palette') || cfg.palette || null);
   await loadFonts();
@@ -146,6 +146,27 @@ function drawBubble(g, shot, lt, st, stg, def, info) {
   if (shot.bubble) ({ x = x, y = y, tx = tx, ty = ty } = shot.bubble);
   g.save(); speech(g, { str, x, y, tx, ty, t: t - start, start: 0 }); g.restore();
 }
+// Game HUD over heads: any character with userData.hud = { name, level, hp, bars, start, end, lift, ref } gets a glass panel above the head,
+// sized by distance (small far away: bar only). Numbers may be a value, a function of shot time, or keys [[t, v], …]. shots.json "hud": false hides them.
+const valAt = (v, t) => (typeof v === 'function' ? v(t) : Array.isArray(v) && Array.isArray(v[0]) ? keyVal(v, t) : v);
+function keyVal(K, t) { if (t <= K[0][0]) return K[0][1]; for (let i = 1; i < K.length; i++) if (t < K[i][0]) { const [t0, a] = K[i - 1], [t1, b] = K[i]; return typeof a === 'number' && typeof b === 'number' ? a + (b - a) * ease.inOut(clamp((t - t0) / (t1 - t0))) : a; } return K[K.length - 1][1]; }
+function drawHuds(g, shot, lt, st, stg) {
+  if (shot.hud === false || !stg?.scene || !three) return;
+  const list = st.__hudChars || (st.__hudChars = (() => { const L = []; stg.scene.traverse(o => { if (o.name === 'character' && o.headWorld) L.push(o); }); return L; })());
+  const on = list.filter(c => c.userData.hud && c.visible).map(c => ({ c, h: c.userData.hud, tag: three.headTag(c, stg.camera, c.userData.hud) })).filter(x => x.tag.on).sort((a, b) => a.tag.s - b.tag.s);
+  for (const { h, tag } of on) drawHud(g, { ...h, x: tag.x, y: tag.y, s: tag.s * (h.size ?? 1), hp: valAt(h.hp ?? 1, lt), level: valAt(h.level, lt), name: valAt(h.name, lt), bars: (h.bars || []).map(b => ({ ...b, value: valAt(b.value, lt) })), t: lt, start: h.start ?? 0, end: h.end ?? null });
+}
+// shots.json "counters": [{ "from": 12, "to": 95, "kind": "pill"|"score"|"bar", "label": "DAY", "keys": [[12, "1"], [40, "15"]], "corner": "tr", "max": 50, "icon": "star" }]
+// A tracker of the story's variable that stays on screen across cuts (under the grade, like the subscribe gag). It fades in and out at
+// from/to, swells for a beat on every change, and numbers count between keys. A shot can hide it with "counters": false.
+function drawCounters(g, t, shot) {
+  const C = E.story?.counters; if (!C || shot.counters === false) return;
+  for (const c of C) { if (t < c.from || t > c.to) continue; const a = clamp(Math.min((t - c.from) / 0.3, (c.to - t) / 0.3)); const K = c.keys || [[c.from, c.value]];
+    let i = 0; while (i + 1 < K.length && t >= K[i + 1][0]) i++; const since = t - K[i][0], prev = i > 0 ? K[i - 1][1] : null; let v = K[i][1];
+    if (typeof v === 'number' && typeof prev === 'number' && c.kind === 'bar') v = prev + (v - prev) * ease.out(clamp(since / 0.6));
+    else if (c.count !== false && prev != null && /^\d+$/.test(String(v)) && /^\d+$/.test(String(prev))) v = String(Math.round(+prev + (+v - +prev) * ease.out(clamp(since / 0.5))));
+    counter(g, { ...c, value: v, a, bump: i > 0 ? clamp(since / 0.35) : 0, top: barVal(shot) }); }
+}
 // shots.json "ramp": [[0, 1], [0.8, 0.25], [2.2, 0.25], [2.6, 1]] — speed keys (shot-local seconds → playback speed, linear
 // between keys): the shot's animation slows down or speeds up while the voice runs on. Returns the animation time.
 function rampT(shot, lt) {
@@ -179,6 +200,7 @@ function drawShot(buf, shot, lt, opts = {}) {
         ax.globalAlpha = 1; g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(accA, 0, 0, buf.width, buf.height); g.restore();
       }
       if (def.overlay && !opts.noOverlay) { g.save(); def.overlay(g, lt, info, st); g.restore(); }
+      if (!opts.noOverlay) { g.save(); drawHuds(g, shot, lt, st, stg); g.restore(); }
       if (!opts.noOverlay) drawBubble(g, shot, lt, st, stg, def, info);
     } else {
       const bd = shot.backdrop || def.backdrop; if (bd) drawBackdrop(g, bd, info.p);
@@ -216,6 +238,7 @@ window.renderFrame = function (f) {
   } else mg.drawImage(bufA, 0, 0);
   mg.globalAlpha = 1; mg.filter = 'none'; mg.setTransform(1, 0, 0, 1, 0, 0);
   drawGag(mg, t);   // the subscribe gag runs across cuts, under the grade so it sits in the picture
+  mg.save(); mg.setTransform(E.PX, 0, 0, E.PX, 0, 0); drawCounters(mg, t, shot); mg.restore(); mg.setTransform(1, 0, 0, 1, 0, 0);
   if (q.has('prof')) mg.getImageData(0, 0, 1, 1);
   const T1 = performance.now(); applyGrade(W, H, GL.lut); PROF.grade = performance.now() - T1; PROF.before = T1 - T0;
   if (grade.tint) { mg.globalCompositeOperation = grade.tint[1]; mg.fillStyle = alpha(grade.tint[0], grade.tint[2]); mg.fillRect(0, 0, W, H); mg.globalCompositeOperation = 'source-over'; }

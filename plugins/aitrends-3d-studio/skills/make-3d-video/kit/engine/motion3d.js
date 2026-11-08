@@ -141,3 +141,25 @@ export function rackFocus(st, t, keys, dur = 0.45) {
   const cur = pt(keys[i][1]); if (i === 0) { st.focusOn(cur); return; }
   st.focusOn(pt(keys[i - 1][1]).lerp(cur, ease.inOut(prog(t, keys[i][0], keys[i][0] + dur))));
 }
+
+// ---------------------------------------------------------------- first-person view (0.2.7)
+// pov(camera, ch, t, { look, ahead, drop, fov, walk, bob, roll }) — see through a character's eyes: their head and hair are hidden,
+// the camera sits at their eyes, and their own sleeves and ball hands come into frame when the arms reach forward (use T.povArms).
+// The hero's lime puffer in the bottom of frame tells the viewer whose eyes these are. look: a world point; default straight ahead
+// and a little down. walk: true adds a step bob (bob = cadence in Hz, default 1.8) and a slight sway.
+export function pov(camera, ch, t, o = {}) {
+  const P = ch.parts || {}; [P.head, P.hair, P.neck].forEach(x => { if (x) x.visible = false; });
+  ch.updateMatrixWorld(true); const head = ch.headWorld(), yaw = ch.rotation.y, fx = Math.sin(yaw), fz = Math.cos(yaw), sc = ch.scale?.y || 1;
+  const bob = o.walk ? Math.abs(Math.sin(t * Math.PI * (o.bob ?? 1.8))) * 0.035 * sc : 0, sway = o.walk ? Math.sin(t * Math.PI * (o.bob ?? 1.8) / 2) * 0.02 : 0;
+  camera.position.set(head.x + fx * 0.12 * sc - fz * sway, head.y - 0.04 * sc + bob, head.z + fz * 0.12 * sc + fx * sway);
+  const L = o.look || [head.x + fx * (o.ahead ?? 3), head.y - (o.drop ?? 0.9) * sc, head.z + fz * (o.ahead ?? 3)];
+  camera.up.set(0, 1, 0); camera.lookAt(...L); if (o.roll || o.walk) camera.rotateZ((o.roll ?? 0) + (o.walk ? sway * 0.4 : 0));
+  const fov = o.fov ?? 64; if (camera.fov !== fov) { camera.fov = fov; camera.updateProjectionMatrix(); }
+  if (camera.near > 0.03) { camera.near = 0.03; camera.updateProjectionMatrix(); }
+}
+// povArms({ reach, height, spread, hands, base }) → a pose with both arms held out in front (holding a gift, a steering wheel, a phone,
+// a cube). reach = metres in front of the chest, height = hand height (character space), spread = distance between the hands.
+export function povArms(o = {}) {
+  const r = o.reach ?? 0.5, h = o.height ?? 1.12, sp = o.spread ?? 0.36, base = typeof o.base === 'string' ? POSES3[o.base] : (o.base || POSES3.stand);
+  return { ...base, armL: { to: [sp / 2, h, r] }, armR: { to: [-sp / 2, h, r] }, handL: o.hands || 'open', handR: o.hands || 'open', head: [0, 0, 0] };
+}

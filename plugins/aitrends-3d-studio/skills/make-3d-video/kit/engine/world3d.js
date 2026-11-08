@@ -174,7 +174,7 @@ export function bedsideCabinet(o = {}) { const c = o.color || '#c8c2b8'; const g
 // rise/riseFrom/y0 lift rows for bleachers (y += (riseFrom - z) * rise). The crowd moves by itself once added with st.add:
 // people bob and sway out of step, and `cheer` (0..1, or a function of t) raises arms in waves. o.still: true freezes it.
 export function crowd(o = {}) {
-  const { n = 40, area = [-10, 10, -6, -2], seed = 5, s = 1, rise = 0, riseFrom = 0, y0 = 0 } = o; const r = rng(seed); const g = group();
+  const { area = [-10, 10, -6, -2], seed = 5, s = 1, rise = 0, riseFrom = 0, y0 = 0 } = o, n = o.positions ? o.positions.length : (o.n ?? 40); const r = rng(seed); const g = group();
   const st = S(), skinC = st.skin === 'ink' ? st.ink : (st.paleSkin || '#e8e0f2');
   const colors = o.colors || ['#7a3a34', '#2c3e6e', '#3f6a58', '#8d4a6b', '#5f6a2e', '#2f6f6a', '#6a4a36', '#4a4a62', '#9a7a3a'];
   const hairs = o.hairColors || ['#2a2024', '#4a3226', '#1e1a20', '#6a4a30', '#34262c', '#8a4426'];
@@ -183,7 +183,7 @@ export function crowd(o = {}) {
   const hairG = new THREE.SphereGeometry(0.262, 14, 8, 0, Math.PI * 2, 0, Math.PI * 0.42), armG = new THREE.CapsuleGeometry(0.045, 0.3, 3, 6); armG.translate(0, -0.17, 0);
   const bodies = new THREE.InstancedMesh(bodyG, hoodM, n), heads = new THREE.InstancedMesh(headG, skinM, n), hairsM = new THREE.InstancedMesh(hairG, hairM, n), legs = new THREE.InstancedMesh(legG, skinM, n * 2), arms = new THREE.InstancedMesh(armG, hoodM, n * 2);
   const P = [], col = new THREE.Color();
-  for (let i = 0; i < n; i++) { const x = lerp(area[0], area[1], r()), z = lerp(area[2], area[3], r()), k = s * (0.85 + r() * 0.25), yaw = (r() - 0.5) * 1.2 + (o.yaw || 0);
+  for (let i = 0; i < n; i++) { const pp = o.positions?.[i], x = pp ? pp[0] : lerp(area[0], area[1], r()), z = pp ? pp[1] : lerp(area[2], area[3], r()), k = s * (0.85 + r() * 0.25) * (o.same ? 0 : 1) + (o.same ? s : 0), yaw = (o.same ? 0 : (r() - 0.5) * (o.turn ?? 1.2)) + (o.yaw || 0);
     P.push({ x, z, k, yaw, y: y0 + Math.max(0, riseFrom - z) * rise, ph: r() * 6.28, sp: 0.7 + r() * 0.8, fan: r(), bald: r() < 0.12 });
     const cc = colors[(r() * colors.length) | 0]; bodies.setColorAt(i, col.set(cc)); for (const a of [0, 1]) arms.setColorAt(i * 2 + a, col.set(cc)); hairsM.setColorAt(i, col.set(hairs[(r() * hairs.length) | 0])); }
   const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), qa = new THREE.Quaternion(), sc = new THREE.Vector3(), p = new THREE.Vector3(), e = new THREE.Euler();
@@ -472,3 +472,9 @@ export function store(st, o = {}) {
   st.add(counter({ w: 2.4, color: '#f4f0ea', base: '#3a78e0' }).translateZ(5).translateX(-2.5));
   return {};
 }
+// outdoor nature sets and props (beach, island, snow, farm, underwater, palm, pine, rock, bush, mountain, water, foam, fishSchool, seaweed, aurora, sun)
+export * from './nature3d.js';
+// toy animals, sports venues and big crowds, screens in the world (0.2.7)
+export * from './animals3d.js';
+export * from './sports3d.js';
+export * from './screens3d.js';

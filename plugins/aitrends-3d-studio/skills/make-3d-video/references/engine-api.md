@@ -5,12 +5,14 @@
 aitrends-3d-studio/
   render.mjs  player.html  package.json
   channel/  brand.json cast.js        (the channel's choices and hero; updates never overwrite this folder)
-  engine/   core.js styles.js kit3d.js rig3d.js motion3d.js costume3d.js world3d.js fx3d.js player.js gag.js   (+ ui2d.js diagrams2d.js fx2d.js rig2d.js for 2D overlays/cards)
+  engine/   core.js styles.js kit3d.js rig3d.js motion3d.js costume3d.js world3d.js nature3d.js animals3d.js sports3d.js screens3d.js fx3d.js player.js gag.js   (+ ui2d.js diagrams2d.js icons2d.js fx2d.js rig2d.js for 2D overlays/cards)
   tools/    doctor.py verify_kit.py tts_chatterbox.py tts.py script_check.py new_project.py parse_script.py transcribe.py beats.py qc_metrics.py tidy_project.py common.py
   audio/    dsp.py sfx.py music.py mix.py
   examples/speed-demo/   (reference project: a finished 32 s video — cast, sets, shots, story, timeline)
   examples/look-demo/    (one shot per reference-video situation: explainer stage + UI, diner, gym, game show, casino)
   examples/diagram-gallery/ (every picture in diagrams2d.js and a diagram on a blurred scene)
+  examples/worlds-demo/  (0.2.7: beach, sunrise wading, island, snow, aurora, farm, underwater, campfire, blade, torch, phone light, game HUD + counters, POV, icons, versus, planet;
+                          wave2.js: slice, debris, pool splash, farm animals, beach critters, stadium, boxing ring, track + results board, clone army, news wall, billboard, phone feed)
   projects/<slug>/
      config.json   input/ (voiceover, script, music)   timeline/ (words, sentences, beats, lines)
      story/shots.json  story/bible.md   scenes/cast.js  scenes/sets/*.js  scenes/shots/*.js
@@ -58,6 +60,12 @@ paths (`'/engine/core.js'`) and project files relatively (`'../cast.js'`, `'../s
   bubbles and lip-sync keep real time. Keep it to 1–3 moments a video.
 - `backdrop` (2D shots): a still of another shot, without its overlays, blurred and dimmed behind this shot's drawing. Built once per worker, so it costs almost nothing.
 - `bubbles: false` turns the automatic speech bubble off for one shot; `bubble` places it by hand.
+- `hud: false` hides the game HUD over heads in one shot; `counters: false` hides the corner counters in one shot.
+- Top-level `counters` (next to `shots`): trackers of the story's variable that stay on screen across cuts, drawn under the grade like the subscribe gag:
+  `[{ "from": 12, "to": 95, "kind": "pill", "label": "DAY", "keys": [[12, "1"], [40, "15"]], "corner": "tr", "icon": "calendar" },
+  { "from": 200, "to": 260, "kind": "bar", "label": "BALLS CUT", "max": 50, "keys": [[200, 0.1], [240, 0.78]], "corner": "tl" },
+  { "from": 300, "to": 330, "kind": "score", "left": "YOU", "right": "THEM", "keys": [[300, "3 - 4"], [318, "15 - 4"]], "corner": "tc" }]`.
+  It fades in and out at from/to, swells for a beat on every change, and whole numbers count up between keys (`count: false` to jump). Corners `tr tl br bl tc`, kept clear of the bars.
 
 ## Shot modules
 ```js
@@ -120,7 +128,9 @@ T.dolly(cam, t, [[0, { pos: [0.2, 0.45, 9], look: [0, 1.35, 3] }], [3, { pos: [0
 ## Stage, materials, lights — `T` (engine/kit3d.js)
 - `T.stage({ mood, fov, fog:[near,far]|false, fogColor, sky:[top..bottom]|colour, keyPos, keyColor, keyIntensity, ambient,
   fill, fillPos, rim, rimStrength, bloom, bloomThreshold, exposure, dof:{focus, aperture, maxblur}, shadowSize, shadows, faceLight })`
-  Night and storm moods add a soft light from the camera that lifts faces off the dark set (`faceLight` 0.55; 0 turns it off,
+  Moods: `day golden dusk night storm interiorWarm interiorCool void` and, for the nature sets, `beach` (bright tropical day, turquoise sea), `sunrise`
+  (dawn sea and sky), `snow` (high-key white day), `arctic` (snow at night under an aurora) and `underwater` (teal, use fog [4, 30]). Outdoor sets want a long fog: `fog: [30, 150]`.
+  Night, storm and arctic moods add a soft light from the camera that lifts faces off the dark set (`faceLight` 0.55; 0 turns it off,
   any mood can set it) and a stronger rim. `st.add(obj)` animates objects that carry `obj.tick(t)` (crowds, heart monitors, clocks);
   the player calls `st.tick(t)` every frame, so shots no longer need to.
   → `st = { scene, camera, composer, sun, hemi, fill, M, add(...objs), onTick(fn), tick(t), focus(d), focusOn(obj|[x,y,z]),
@@ -151,6 +161,10 @@ T.dolly(cam, t, [[0, { pos: [0.2, 0.45, 9], look: [0, 1.35, 3] }], [3, { pos: [0
   `T.punch(camera, t, at, {amp, dur})` (impact bump and dying shake), `T.dutch(camera, deg)` (tilted horizon for tension),
   `T.handheld(camera, t, amount, seed)` (the player already adds `config.handheld`), `T.rackFocus(st, t, [[0, mia], [1.6, leo]], 0.45)`
   (focus moves from one subject to the next; needs `dof`).
+- **First person** (0.2.7): `T.pov(camera, ch, t, { look, ahead, drop, fov: 64, walk, bob, roll })` puts the camera at the character's eyes and hides
+  their head and hair; pose the arms forward with `T.povArms({ reach: 0.5, height: 1.12, spread: 0.36, hands, base })` so the hero's own lime sleeves and
+  ball hands come into frame (holding a gift, a wheel, a phone). `walk: true` adds a step bob. Hold props at about y 1.1, 0.5 m in front.
+- `T.headTag(ch, camera, { lift, ref })` → `{ x, y, s, on }`: where a tag over a head goes on screen and how big (s = 1 at `ref` 4.5 m).
 - Utils: `T.THREE`, `T.v3`, `T.worldPos(obj)`, `T.rng(seed)`, `T.key`, `T.smoothKey` (key() as one smooth curve), `T.ease` (adds
   `ease.back(x, a)`: anticipation + overshoot), `T.clamp`, `T.lerp`, `T.noise`,
   `T.optimize(st, keep)` (called automatically).
@@ -272,6 +286,31 @@ Sets build into the stage and return anchors:
   `money({n})`, `ball`, `crowd({n, area:[x0,x1,z0,z1], colors, hairColors, s, yaw, rise, riseFrom, y0, cheer, still})` (instanced mini people in the
 style's skin with hair, arms and muted tops; `rise` lifts rows for bleachers: y = y0 + (riseFrom − z) × rise). Added with `st.add`, they bob, sway
 and raise their arms in waves; `cheer` 0–1 (or a function of t) sets how many cheer, `still: true` freezes them).
+- **Nature** (engine/nature3d.js, 0.2.7; every set returns `heightAt(x, z)`: stand people with `ch.place(x, set.heightAt(x, z), z)`):
+  `T.W.beach(st, { seed, shoreZ: -2, bay, palms, framePalms, rocks, bushes, sun, sunPos })` → dry sand toward the camera, the sea beyond (a bay, so the sides
+  curve away), lapping foam, two palms that frame a shot from z ≈ 8 looking out to sea; with mood `sunrise`/`golden`/`dusk` a low sun and a glittering
+  path on the water. Wading: place a character at `heightAt` below 0 and the water shows the legs. `T.W.island(st, { r: 9, cx, cz, palms })` → a round
+  island in open sea (aerial and stranded shots). `T.W.snow(st, { slope: 0.12, pines, mountains, falling, aurora, tracks, stars })` → a snowy slope rising
+  away from camera, snow-capped pines, peaks, falling snow; `aurora: true` for arctic nights. `T.W.farm(st, { barn: [x, z], silo, fence, fields, hay })` →
+  red barn, silo, white fences, crop rows, hay bales. `T.W.underwater(st, { depth: 9, rays, fish, weeds, coral, bubbles, surface })` → sea floor at y 0,
+  god rays, swaying seaweed, caustic light, a fish school. `T.W.space(st)` + `T.W.planet(st, { r, pos, spin, tilt, sea, land, clouds, atmosphere })` →
+  a toy Earth in deep space (mood `void`). Props: `palm({ h, lean, dir })`, `pine({ s, snow })`, `rock({ s })`, `bush({ s })`, `mountain({ h, r })`,
+  `campfire(st, { pos, size })`, `fishSchool(st, { n, center, radius })`, `seaweed(st, { pos, h })`, `aurora(st)`, `sun(st, { pos })`, `water(st, {...})`,
+  `foam(st, { path | ring })`, `terrain(w, d, seg, h(x, z), colour(x, z, y))`. Everything that moves animates itself.
+- **Animals** (engine/animals3d.js): `T.W.cow()`, `sheep`, `pig`, `dog`, `cat`, `bird`, `crab`, `bee`, `fish` (or `T.W.animal(kind, { color, seed })`) — toy shapes with the
+  cast's glossy dot eyes, standing on y 0, facing +z. Call `a.update(t, { walk | run: 0..1, look, nod, wag, fly, snap, raise, blink })` every frame and move them yourself
+  (`a.position.x = …`); legs swing, tails wag, wings flap, eyes blink. Sizes match a 1.75 m person (cow 1.5 m, dog 0.75 m, cat 0.55 m).
+- **Sports and big crowds** (engine/sports3d.js): `T.W.stadium(st, { kind: 'football'|'soccer', n: 5000, cheer, lights })` → a 100 × 64 m pitch at the origin, stands
+  on four sides full of instanced people, floodlight towers. `T.W.boxingRing(st, { crowd: 700 })` → raised ring (canvas at y = `top` 1.1), ropes, corner pads, a hard
+  spotlight, stepped seats all round. `T.W.track(st, { lanes, length, crowd })` → straight track along x, `laneZ(i)`, start and finish lines, bleachers.
+  `T.W.pool(st, { lanes, length, depth })` → tiled pool, lane ropes, blocks, ladders; the surface is y 0 and see-through, a swimmer stands at y ≈ −0.95.
+  `T.W.stand({ len, rows, n })` → one block of stepped seats with people (rotate/move it). `T.W.formation(st, { cols, rows, gap, pos, colors, hairColors, same })` →
+  people in a grid (an army of clones: `colors: [HERO.color], hairColors: [HERO.hairColor], same: true`). `T.W.crowd({ positions: [[x, z], …] })` places a crowd exactly.
+- **Screens and signs** (engine/screens3d.js): `T.W.newsWall(st, { cols, rows, w, items: [{ tag, text }], pos, yaw })` → a wall of TVs running news with a host, a tag,
+  a headline and a ticker. `T.W.scoreboard3d({ title, rows: [[rank, name, value, highlight, colour]], timer, w, h })` → a results board on legs (rows pop in).
+  `T.W.billboard({ title, sub, icon, color })` → a lit roadside billboard on posts. Draw functions for any screen (`T.screen`, `T.W.tv/phone/laptop({ draw })`):
+  `T.W.newsDraw({ tag, text, ticker })`, `T.W.feedDraw({ title, user, views: [from, to], t0, dur, live })` (a post whose view count climbs), `T.W.boardDraw({...})`.
+  Animate a phone screen with `phone.screen.update(t)`.
 - Project sets: write `scenes/sets/<name>.js` exporting `function build(T, st, o)` that composes these, so every shot in
   a location uses the same geometry. Invent new props from boxes/cylinders/rounded boxes when the script needs them.
 
@@ -282,10 +321,30 @@ Build in `init`, then `fx.update(t)` in `draw` (or `st.onTick(fx.update)` once +
 `shockwave(st,{pos, t0, r1, c})`, `bokeh(st,{area, colors})`, `frozen(st,{area})` (droplets hanging in time-stop),
 `burst(st,{pos, t0, confetti})`, `aura(st, target, {c})`, `trail(st,{c, width})` → `.update(t, tt => [x,y,z])`.
 
+**Light from props** (0.2.7): the thing that glows in the story lights the faces near it, and the light moves with it. One real light each.
+- `T.FX3.fire(st, { pos, size, colors, intensity: 9, dist, smoke, embers, shadow })` → licking flames, embers, smoke, a flickering warm light (animates itself).
+  `T.W.campfire(st, { pos, size })` puts it on logs in a ring of stones.
+- `T.FX3.blade({ color, len: 1, width, intensity: 8, dist: 5 })` → an energy blade on a hilt; `hero.hold(b, 'R', { rot: [Math.PI, 0, 0] })` holds it upright
+  out of the fist; `b.update(t, { on: 0..1, hum })` ignites/retracts it.
+- `T.FX3.torch({ color, angle, dist, intensity: 40, beam, shadow })` → a flashlight with a real spotlight and a soft beam along its +y; held with `rot: [0, 0, 0]`
+  it points where the forearm points (`armR` raised 80° = straight ahead). `f.update(t, { on })`.
+- `T.FX3.glowLight(obj, { color, intensity, dist, at, flicker, halo })` → a light on any object: a phone screen in the dark (`at: [0, 0, -0.15]` lights the face),
+  a lantern, an orb. Night shots that use it: lower `ambient`/`keyIntensity` on the stage so the prop is the key light.
+**Things that break, burn and splash** (0.2.7): `T.FX3.slice(st, obj, { t0, normal, gap, tilt, drop, capColor, glow })` → cuts a prop in two along a plane: the halves
+slide apart at t0, the cut faces glow white-hot then cool to `capColor` (the inside). `T.FX3.sparks(st, { pos, t0, dur, dir, spread, rate })`, `T.FX3.smoke(st, { pos, t0,
+dur, rate, size, grow, rise, color, opacity })`, `T.FX3.debris(st, { pos, t0, n, size, colors, floorY })` (chunks fly, tumble and settle), `T.FX3.splash(st, { pos, t0,
+size })` (droplets and rings on a water surface). All tick themselves and are pure functions of t.
+Held props follow the hand: the object's +y runs out of the fist along the forearm, so `rot: [Math.PI, 0, 0]` turns it back up.
+
 ## Diagrams (engine/diagrams2d.js) — `import * as D from '/engine/diagrams2d.js'`
 Flat animated pictures for explainers, in `overlay()` or a 2D `draw()`. All take logical `x, y`, a size, `t` and `start` (pop-in); `examples/diagram-gallery` shows every call.
 - Base: `D.stage2d(g, {floor, live})` (the purple stage in 2D; it is alive by itself: a warm light pool drifts across the back and dust
   motes float up, `live: false` freezes it; `D.stageLife(g, t)` adds the same life to any 2D shot), `D.flatFigure(g, {x, y, h, color, hairColor, hair: anime|spiky|short|bob|none, seams, pose: stand|point|cheer|shrug, expr: neutral|deadpan|happy|shock})` (a cast member as a 2D figure, for diagrams on a blurred scene), `D.label(g, str, x, y, {size, color})`.
+- **Pictograms** (0.2.7, engine/icons2d.js): `D.icon(g, { kind, x, y, r, label, t, start, badge, glow, cross, check, pulse })` → one of 47 flat icons on a round
+  glass badge, `cross`/`check` stamp a red ✗ / green ✓ at a time; `D.iconRow(g, { items: [{ kind, label }], x, y, r, gap, t, start, stagger })`; `D.ICON_KINDS`:
+  brain bone eye clock calendar sun moon drop fire bolt leaf tree fish cow house city car plane phone money coin pill virus atom globe skull trophy lock key
+  book music bulb shield warning snow wave person people crown gift target dna flag hourglass chart heart kidneys lungs muscle. Every pill, tag and HUD
+  takes the same names as `icon`. `D.versus(g, { left: { title, value, icon | figure, note }, right: {...}, winner: 'right', t, start })` → "NORMAL PERSON" vs "YOU".
 - Things: `crossSection` (a house cut open, pipes, `cut` 0–1 snaps them), `scale`, `calendarCard`, `growthBars`, `stopwatch`, `radar`, `seismo`, `mapPins`, `usMap`, `globe`, `organ` (`kind`: brain, lungs, kidneys, heart; `pulse`), `thermometer`, `jar`.
 - Screens: `phoneChat` (messages arrive), `phoneStat` (one big number), `videoFrame` (view counter or LIVE badge around the scene, `views`, `live`, `viewers`).
 - Lists and meters: `checklist`, `stamp` (slams down), `scoreboard` (`head` + `value`, or `left` + `right`), `progressRing`, `meterBar`, `chips` (items, the first `lit` stay bright from `litAt`), `arrow` (`bend`, `dashed`, draws itself), `compare` (two panels).
@@ -303,6 +362,10 @@ into the next shot). `count: true` on `pill`/`statCard` counts the first number 
   `meter`, `blueprint`, `bubble`, `captions`; `FX.speedLines`, `FX.rings`, `FX.sparkle`, `FX.lensStreak`.
 - Helpers from core.js: `text(g, str, x, y, {size, font, weight, color, glow, spacing})`, `V(h, v)`, `FONTS` (Fredoka,
   Nunito, Playfair Display 700/900).
+- **Game HUD** (0.2.7): set `ch.userData.hud = { name: 'BRICK', level: 17, hp: 0.9, bars: [{ label: 'STR', value: 0.8, color }], start, end, lift, ref, size }` in
+  `init` and the player draws a dark-glass panel over that head every frame (name, gold level chip, green life bar that turns red under 30%).
+  Far away it shrinks to the level chip and bar, then to a bare bar, so text never drops under the readable floor. `hp`, `level`, `name` and bar values
+  can be numbers, `t => …` or keys `[[0, 0.9], [2.4, 0.2]]` (shot time). `UI.hud(g, {...})` draws one yourself; `UI.counter(g, {...})` one corner tracker.
 - Pin a label to a 3D point: `const [x, y] = T.toScreen(s.hero.headWorld().add(new T.THREE.Vector3(0, 0.45, 0)),
   s.st.camera)` in `draw`, store it on `s`, then use it in `overlay` (e.g. a heart pill above a head).
 

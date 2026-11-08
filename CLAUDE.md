@@ -22,6 +22,9 @@
   `prompts/thumbnail_style.md` (đã bỏ phong cách "TINY." cũ). Dựng 4 phương án
   theo 4 bố cục A–D trong file đó rồi gửi ảnh để chọn.
 
+## Viết script
+- Trước khi viết hoặc sửa script, đọc `prompts/QUY_TAC_VIET_SCRIPT_KENH.md` đầu tiên.
+
 ## Chọn nhánh
 - Khi chưa rõ việc thuộc nhánh nào: hỏi người dùng mô tả việc, chọn nhánh,
   nêu lý do và chờ người dùng xác nhận trước khi thực hiện.

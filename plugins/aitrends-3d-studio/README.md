@@ -37,7 +37,12 @@ Có 5 điểm dừng để bạn duyệt: soát kịch bản, nghe thử giọng
 | HUD kiểu game | `userData.hud` trên nhân vật: bảng kính tên, cấp, thanh máu, chỉ số, tự thu nhỏ theo khoảng cách · `counters` trong shots.json: bộ đếm ở góc chạy xuyên các cảnh (DAY 15, 39/50, YOU 15 – 4 THEM) |
 | Góc nhìn thứ nhất | `T.pov` + `T.povArms`: nhìn qua mắt hero, thấy tay áo phao chanh và bàn tay tròn đang cầm đồ |
 | Sơ đồ | 47 icon (`D.icon`, `D.iconRow`, mọi pill/tag/HUD dùng chung tên) · `D.versus` (NGƯỜI THƯỜNG vs BẠN) |
-| Ví dụ | `examples/worlds-demo`: mỗi tính năng mới một shot |
+| Vật thể vỡ, cháy, bắn nước | `FX3.slice` (cắt đôi, mặt cắt đỏ rực rồi nguội), `sparks` (tia lửa), `smoke` (khói), `debris` (mảnh vỡ văng rồi nằm yên), `splash` (bắn nước, vòng sóng) |
+| Thú đồ chơi | `T.W.cow`, `sheep`, `pig`, `dog`, `cat`, `bird`, `crab`, `bee`, `fish`: mắt chấm như nhân vật, đi, vẫy đuôi, vỗ cánh, chớp mắt |
+| Thể thao và đám đông lớn | `T.W.stadium` (5.000 khán giả), `boxingRing`, `track`, `pool` (người đứng trong nước), `formation` (đội quân bản sao), `crowd({ positions })` |
+| Màn hình trong cảnh | `T.W.newsWall` (tường TV tin tức), `scoreboard3d` (bảng kết quả), `billboard` (biển quảng cáo), `feedDraw` (điện thoại đếm lượt xem), `newsDraw`, `boardDraw` |
+| Kiểm tra | Bảng điểm thêm "tỉ lệ khung sáng" (mục tiêu 13–65%) và "số bối cảnh" (từ `set` trong shots.json) |
+| Ví dụ | `examples/worlds-demo`: mỗi tính năng mới một shot (đợt 2 trong `wave2.js`) |
 
 ## Có gì mới ở 0.2.5 (chuyển động)
 | Nhóm | Thay đổi |

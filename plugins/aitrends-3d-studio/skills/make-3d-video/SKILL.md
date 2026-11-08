@@ -124,7 +124,8 @@ camera accents on the words that earn them (`crashZoom`, `punch`, `smash` cut, `
 contact; colours from `st.M`/`S()` and the cast; every number the narrator says on screen (`wordTime()`); **no empty stage: every
 explainer has a moving picture from `engine/diagrams2d.js`, and most sit on the blurred scene (`backdrop`), not the bare purple stage**;
 text between y = 90 and y = 990 so the bars don't cut it; **at least one bright or outdoor sequence when the story allows** (nature sets);
-**glowing props light the faces** (`FX3.fire/blade/torch/glowLight`, dim stage); game-like powers get one HUD layer (`userData.hud`, `counters`);
+**glowing props light the faces** (`FX3.fire/blade/torch/glowLight`, dim stage); game-like powers get one HUD layer (`userData.hud`, `counters`); animals are toys (`T.W.cow` …), big crowds are instanced (`stadium`, `formation`), the world reacts on
+screens in the world (`newsWall`, `feedDraw`, `scoreboard3d`, `billboard`), and breaks show physics (`slice`, `sparks`, `debris`, `smoke`, `splash`);
 **props read as the real thing** (a receipt has printed lines, a torn edge and paper size, never a plain grey slab); **no missing or
 sunk limbs** (seated legs visible in front of the seat, not swallowed by it); **hands rest on a table top, never pass through it**;
 **every prop the script names is visible** (headphones in a contrasting colour, at least one close-up); `V()` for aspect-dependent values; `draw()` a pure function of `t`; ≤ 5 real lights per

@@ -119,3 +119,8 @@ Final file QC: `python tools/qc_metrics.py --project projects/<slug>`, `ffprobe 
   model folder and set `KOKORO_MODEL_DIR`.
 - **The video is longer/shorter than the audio** → `story.duration` must equal the last shot's `end`.
 - **Windows paths** → quote paths with spaces; use `python` (or `py -3`) instead of `python3`.
+
+## Variety (0.2.7)
+- The scorecard counts **bright frames** (median brightness above 0.40; the references have 13–65%) and **distinct locations** (the `set` of each shot in shots.json).
+  Too few bright frames: add a daylight or outdoor sequence (nature sets, moods `beach`, `snow`, `day`). Fill `set` on every shot so the count is right.
+- Animals, screens and crowds read at phone size: a news headline at least 1/12 of the TV height, HUD text never under the floor, crowds not a grey blur (raise `cheer` or light them).

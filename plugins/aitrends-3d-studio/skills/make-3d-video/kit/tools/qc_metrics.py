@@ -14,6 +14,8 @@ TARGETS = {
     "luma": (0.19, 0.40, "median brightness 0-1", "Too dark: raise ambient, use the pearl style or a brighter palette."),
     "dark": (0.03, 0.22, "share of near-black pixels", "Lift the shadows: pearl style, more ambient, lighter walls."),
     "sat": (0.35, 0.47, "mean saturation 0-1", "Too intense: pearl style; keep only the hero outfit loud."),
+    "bright": (0.13, 0.65, "share of bright frames (median > 0.40)", "Add a daylight or outdoor sequence: nature sets (beach, island, snow, farm, underwater), moods beach/snow/day."),
+    "places": (4.0, 60.0, "distinct locations (shots.json set)", "Fill each shot's set in shots.json; the references move through many places: add a location or vary the sets."),
     "murky": (0.0, 0.12, "share of frames too dark to read (median < 0.13)", "Night scenes: keep the stage faceLight on, add a practical lamp near the faces, lighter walls."),
     "empty": (0.0, 0.02, "share of frames with almost nothing in them", "Fill the purple stage: a bigger figure (a third of the height), a bigger diagram, a backdrop; see style-bible Explainers."),
     "still": (0.0, 0.10, "share of half-seconds where nothing moves", "Every shot moves: a camera drift, idle3 on people, a diagram that builds."),
@@ -50,7 +52,7 @@ def picture(path):
     # detail: share of pixels on an edge; under 4.5 % is a near-empty picture (a bare stage with one small label)
     gx, gy = np.abs(np.diff(y, axis=2))[:, :-1, :], np.abs(np.diff(y, axis=1))[:, :, :-1]
     edge = ((gx + gy) > 0.05).reshape(len(y), -1).mean(axis=1)
-    return {"bars": float(bars), "luma": float(np.median(y)), "dark": float((y < 0.08).mean()), "sat": float(sat.mean()), "murky": float((np.median(y.reshape(len(y), -1), axis=1) < 0.13).mean()),
+    return {"bars": float(bars), "luma": float(np.median(y)), "dark": float((y < 0.08).mean()), "sat": float(sat.mean()), "murky": float((np.median(y.reshape(len(y), -1), axis=1) < 0.13).mean()), "bright": float((np.median(y.reshape(len(y), -1), axis=1) > 0.40).mean()),
             "empty": float((edge < 0.045).mean()), "empty_at": [i * 2 for i in np.nonzero(edge < 0.045)[0].tolist()]}
 
 
@@ -112,13 +114,18 @@ def main():
         w = w.get("words", w) if isinstance(w, dict) else w
         if w:
             M["wpm"] = len(w) / max(w[-1]["end"] - w[0]["start"], 1) * 60
+    if a.project and os.path.exists(os.path.join(a.project, "story", "shots.json")):
+        sh = json.load(open(os.path.join(a.project, "story", "shots.json"), encoding="utf-8")).get("shots", [])
+        sets = {str(x.get("set")).strip().lower() for x in sh if x.get("set")}
+        if sets:
+            M["places"] = float(len(sets))
     rows, bad = ["| Measure | This video | Target | Result |", "|---|---|---|---|"], 0
     for k, (lo, hi, unit, fix) in TARGETS.items():
         if M.get(k) is None:
             continue
         ok = lo <= M[k] <= hi
         bad += not ok
-        fmt = (lambda x: f"{x:.2f}") if k not in ("cuts", "wpm", "loud") else (lambda x: f"{x:.1f}")
+        fmt = (lambda x: f"{x:.2f}") if k not in ("cuts", "wpm", "loud", "places") else (lambda x: f"{x:.1f}")
         rows.append(f"| {unit} | {fmt(M[k])} | {fmt(lo)} to {fmt(hi)} | {'OK' if ok else 'CHECK: ' + fix} |")
     md = f"# Scorecard: {os.path.basename(v)} ({dur:.0f} s)\n\n" + "\n".join(rows) + f"\n\n{len(rows) - 2 - bad} in range, {bad} to check. Targets describe one winning channel's template, not a rule.\n"
     if M.get("empty_at"):

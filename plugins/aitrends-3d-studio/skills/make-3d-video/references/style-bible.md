@@ -77,6 +77,9 @@ simple characters, real staging, real light.
   allows, give every video at least one daylight or outdoor sequence from the nature sets (`T.W.beach`, `island`, `snow`, `farm`, `underwater`,
   `space` + `planet`) and pick its mood (`beach`, `sunrise`, `snow`, `arctic`, `underwater`). The same rules hold: 4–8 signature props, the hero
   still the loudest colour, faces lit.
+- **Fill the world the script names.** Animals are toy shapes with the cast's eyes (`T.W.cow`, `dog`, `cat`, `bird`, `crab`, `bee`…), never realistic; a "whole stadium"
+  is thousands of instanced people (`T.W.stadium`), "everyone in school" can be a formation; the world reacts on screens in the world (`newsWall`, `feedDraw` on a phone,
+  a `scoreboard3d`, a `billboard`) rather than as text cards. Cuts, breaks and crashes show the physics: hot cut faces (`slice`), sparks, debris, smoke, splashes.
 - **Atmosphere in most shots:** `FX3.dust` indoors, `FX3.rain` for storms, `FX3.bokeh` behind close-ups, fog (stage
   fog), `FX3.frozen` droplets for time-stop.
 

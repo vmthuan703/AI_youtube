@@ -5,13 +5,14 @@
 aitrends-3d-studio/
   render.mjs  player.html  package.json
   channel/  brand.json cast.js        (the channel's choices and hero; updates never overwrite this folder)
-  engine/   core.js styles.js kit3d.js rig3d.js motion3d.js costume3d.js world3d.js nature3d.js fx3d.js player.js gag.js   (+ ui2d.js diagrams2d.js icons2d.js fx2d.js rig2d.js for 2D overlays/cards)
+  engine/   core.js styles.js kit3d.js rig3d.js motion3d.js costume3d.js world3d.js nature3d.js animals3d.js sports3d.js screens3d.js fx3d.js player.js gag.js   (+ ui2d.js diagrams2d.js icons2d.js fx2d.js rig2d.js for 2D overlays/cards)
   tools/    doctor.py verify_kit.py tts_chatterbox.py tts.py script_check.py new_project.py parse_script.py transcribe.py beats.py qc_metrics.py tidy_project.py common.py
   audio/    dsp.py sfx.py music.py mix.py
   examples/speed-demo/   (reference project: a finished 32 s video — cast, sets, shots, story, timeline)
   examples/look-demo/    (one shot per reference-video situation: explainer stage + UI, diner, gym, game show, casino)
   examples/diagram-gallery/ (every picture in diagrams2d.js and a diagram on a blurred scene)
-  examples/worlds-demo/  (0.2.7: beach, sunrise wading, island, snow, aurora, farm, underwater, campfire, blade, torch, phone light, game HUD + counters, POV, icons, versus, planet)
+  examples/worlds-demo/  (0.2.7: beach, sunrise wading, island, snow, aurora, farm, underwater, campfire, blade, torch, phone light, game HUD + counters, POV, icons, versus, planet;
+                          wave2.js: slice, debris, pool splash, farm animals, beach critters, stadium, boxing ring, track + results board, clone army, news wall, billboard, phone feed)
   projects/<slug>/
      config.json   input/ (voiceover, script, music)   timeline/ (words, sentences, beats, lines)
      story/shots.json  story/bible.md   scenes/cast.js  scenes/sets/*.js  scenes/shots/*.js
@@ -296,6 +297,20 @@ and raise their arms in waves; `cheer` 0–1 (or a function of t) sets how many 
   a toy Earth in deep space (mood `void`). Props: `palm({ h, lean, dir })`, `pine({ s, snow })`, `rock({ s })`, `bush({ s })`, `mountain({ h, r })`,
   `campfire(st, { pos, size })`, `fishSchool(st, { n, center, radius })`, `seaweed(st, { pos, h })`, `aurora(st)`, `sun(st, { pos })`, `water(st, {...})`,
   `foam(st, { path | ring })`, `terrain(w, d, seg, h(x, z), colour(x, z, y))`. Everything that moves animates itself.
+- **Animals** (engine/animals3d.js): `T.W.cow()`, `sheep`, `pig`, `dog`, `cat`, `bird`, `crab`, `bee`, `fish` (or `T.W.animal(kind, { color, seed })`) — toy shapes with the
+  cast's glossy dot eyes, standing on y 0, facing +z. Call `a.update(t, { walk | run: 0..1, look, nod, wag, fly, snap, raise, blink })` every frame and move them yourself
+  (`a.position.x = …`); legs swing, tails wag, wings flap, eyes blink. Sizes match a 1.75 m person (cow 1.5 m, dog 0.75 m, cat 0.55 m).
+- **Sports and big crowds** (engine/sports3d.js): `T.W.stadium(st, { kind: 'football'|'soccer', n: 5000, cheer, lights })` → a 100 × 64 m pitch at the origin, stands
+  on four sides full of instanced people, floodlight towers. `T.W.boxingRing(st, { crowd: 700 })` → raised ring (canvas at y = `top` 1.1), ropes, corner pads, a hard
+  spotlight, stepped seats all round. `T.W.track(st, { lanes, length, crowd })` → straight track along x, `laneZ(i)`, start and finish lines, bleachers.
+  `T.W.pool(st, { lanes, length, depth })` → tiled pool, lane ropes, blocks, ladders; the surface is y 0 and see-through, a swimmer stands at y ≈ −0.95.
+  `T.W.stand({ len, rows, n })` → one block of stepped seats with people (rotate/move it). `T.W.formation(st, { cols, rows, gap, pos, colors, hairColors, same })` →
+  people in a grid (an army of clones: `colors: [HERO.color], hairColors: [HERO.hairColor], same: true`). `T.W.crowd({ positions: [[x, z], …] })` places a crowd exactly.
+- **Screens and signs** (engine/screens3d.js): `T.W.newsWall(st, { cols, rows, w, items: [{ tag, text }], pos, yaw })` → a wall of TVs running news with a host, a tag,
+  a headline and a ticker. `T.W.scoreboard3d({ title, rows: [[rank, name, value, highlight, colour]], timer, w, h })` → a results board on legs (rows pop in).
+  `T.W.billboard({ title, sub, icon, color })` → a lit roadside billboard on posts. Draw functions for any screen (`T.screen`, `T.W.tv/phone/laptop({ draw })`):
+  `T.W.newsDraw({ tag, text, ticker })`, `T.W.feedDraw({ title, user, views: [from, to], t0, dur, live })` (a post whose view count climbs), `T.W.boardDraw({...})`.
+  Animate a phone screen with `phone.screen.update(t)`.
 - Project sets: write `scenes/sets/<name>.js` exporting `function build(T, st, o)` that composes these, so every shot in
   a location uses the same geometry. Invent new props from boxes/cylinders/rounded boxes when the script needs them.
 
@@ -315,6 +330,10 @@ Build in `init`, then `fx.update(t)` in `draw` (or `st.onTick(fx.update)` once +
   it points where the forearm points (`armR` raised 80° = straight ahead). `f.update(t, { on })`.
 - `T.FX3.glowLight(obj, { color, intensity, dist, at, flicker, halo })` → a light on any object: a phone screen in the dark (`at: [0, 0, -0.15]` lights the face),
   a lantern, an orb. Night shots that use it: lower `ambient`/`keyIntensity` on the stage so the prop is the key light.
+**Things that break, burn and splash** (0.2.7): `T.FX3.slice(st, obj, { t0, normal, gap, tilt, drop, capColor, glow })` → cuts a prop in two along a plane: the halves
+slide apart at t0, the cut faces glow white-hot then cool to `capColor` (the inside). `T.FX3.sparks(st, { pos, t0, dur, dir, spread, rate })`, `T.FX3.smoke(st, { pos, t0,
+dur, rate, size, grow, rise, color, opacity })`, `T.FX3.debris(st, { pos, t0, n, size, colors, floorY })` (chunks fly, tumble and settle), `T.FX3.splash(st, { pos, t0,
+size })` (droplets and rings on a water surface). All tick themselves and are pure functions of t.
 Held props follow the hand: the object's +y runs out of the fist along the forearm, so `rot: [Math.PI, 0, 0]` turns it back up.
 
 ## Diagrams (engine/diagrams2d.js) — `import * as D from '/engine/diagrams2d.js'`

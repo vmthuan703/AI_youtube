@@ -11,11 +11,7 @@
 - Dùng bảng khi so sánh nhiều phương án, số liệu hoặc thuộc tính.
 
 ## Hỏi trước khi chỉnh sửa
-- Khi người dùng yêu cầu chỉnh sửa, thêm hoặc thay đổi nội dung, KHÔNG tự tạo
-  hoặc xuất bản bản xem trước (preview, artifact, ảnh, bản nháp đầy đủ).
-- Thay vào đó, nêu ngắn gọn sẽ đổi gì và hỏi người dùng có muốn xem bản xem
-  trước không.
-- Chỉ thực hiện khi người dùng đồng ý rõ ràng. Mục đích: tiết kiệm token.
+- Hỏi trước khi xuất bản bản xem trước (theo quy tắc chung trong CLAUDE.md của người dùng).
 
 ## Thumbnail
 - Khi được yêu cầu thiết kế thumbnail, dùng quy tắc học từ dữ liệu đối thủ trong
@@ -35,8 +31,7 @@
 - Thay đổi trong `CLAUDE.md` thì commit riêng, không gộp với file khác.
 - Mở GitHub (tạo PR, xem PR, repo) bằng Chrome của người dùng (Claude in Chrome),
   vì đã đăng nhập sẵn. Không dùng trình duyệt tích hợp, không chờ `gh`.
-- Ngoại lệ: tác vụ theo lịch "Báo cáo đối thủ 3 ngày" được tự commit và push
-  vào `research/reports`, và vào `main` nhưng chỉ đổi `ke-hoach/` và khối `KE_HOACH_MOI_NHAT` đầu `README.md`.
+- Ngoại lệ: tác vụ "Báo cáo đối thủ 3 ngày" tự push `research/reports`, và `main` chỉ đổi `ke-hoach/` và khối `KE_HOACH_MOI_NHAT` trong `README.md`.
 
 ## Bảo trì file này
 - Mỗi khi thêm nội dung vào `CLAUDE.md`, nếu file dài quá 50 dòng thì đề nghị
@@ -45,8 +40,5 @@
   thành quy tắc trong `CLAUDE.md` (rồi tự commit và push như ngoại lệ ở trên).
 
 ## Dọn dẹp sau mỗi lần thay đổi
-- Sau mỗi lần `git push` lên GitHub, hoặc sau khi sửa trực tiếp file trên máy,
-  đề xuất danh sách có thể xóa: file, nhánh (cục bộ và remote), thư mục, mục
-  trong file (ví dụ `README.md`, `ke-hoach/`), kèm lý do từng mục.
-- Chỉ đề xuất, không xóa. Chỉ xóa đúng những mục người dùng đã đồng ý.
-- Không tính "người dùng im lặng" là đồng ý; mỗi lần đề xuất hỏi lại một lần.
+- Sau mỗi lần push hoặc sửa file trên máy, đề xuất danh sách có thể xóa (file, nhánh, thư mục, mục trong file) kèm lý do.
+- Chỉ đề xuất, không xóa; chỉ xóa đúng mục người dùng đồng ý. Im lặng không phải đồng ý.

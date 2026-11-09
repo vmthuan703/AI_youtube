@@ -14,34 +14,34 @@
 <!-- DAILY:START -->
 ## Báo cáo hôm nay
 
-_Cập nhật tự động 2026-11-08. Số liệu từ YouTube Data API, đối chiếu bằng tay trước khi quyết định._
+_Cập nhật tự động 2026-11-10. Số liệu từ YouTube Data API, đối chiếu bằng tay trước khi quyết định._
 
-### Tóm tắt thu thập 2026-11-08
+### Tóm tắt thu thập 2026-11-10
 
 - Quota đã dùng: 2174 / ngân sách 6000 đơn vị
-- Kênh theo dõi: 60 · video đã chụp: 1399
+- Kênh theo dõi: 59 · video đã chụp: 1436
 
 #### What-If Fiction × Mỹ
 
 - Truy vấn đã chạy: 20 · bỏ qua: 0 · lỗi: 0
 - Kênh mới thêm vào theo dõi: không
-- Kênh bỏ khỏi theo dõi vì lệch ngách: không
-- Bảng chấm nhanh (chỉ dữ liệu hôm nay): **CẦN THEO DÕI** · tuổi trung vị top 5: 19.4 tháng · video ≥ 100k: 272
+- Kênh bỏ khỏi theo dõi vì lệch ngách: Nearside (48% khớp)
+- Bảng chấm nhanh (chỉ dữ liệu hôm nay): **CẦN THEO DÕI** · tuổi trung vị top 5: 57.5 tháng · video ≥ 100k: 290
 
 | Kênh mới thắng | Tuổi (ngày) | Sub | Video to nhất |
 |---|---|---|---|
-| Minute Zero | 28 | 22.400 | 2.321.374 |
-|  Jeremy Bearimy | 28 | 46.200 | 1.715.109 |
-| ConChaser | 15 | 19.300 | 1.590.112 |
-| Araragi | 120 | 23.600 | 1.435.194 |
-| OminiAM | 33 | 6.780 | 1.185.836 |
-| Manifesting | 27 | 5.270 | 964.640 |
-| Earth Tipping | 39 | 1.510 | 962.421 |
-| IFOLOGY | 29 | 54.900 | 950.875 |
-| The Hypothetical Room | 6 | 5.000 | 881.575 |
-| What If Animations | 36 | 6.090 | 877.902 |
+| Minute Zero | 30 | 22.600 | 2.336.259 |
+|  Jeremy Bearimy | 29 | 48.700 | 1.802.896 |
+| ConChaser | 16 | 20.500 | 1.676.369 |
+| Araragi | 121 | 23.800 | 1.450.899 |
+| OminiAM | 34 | 6.940 | 1.199.961 |
+| The Hypothetical Room | 7 | 5.750 | 1.030.117 |
+| Manifesting | 28 | 5.410 | 969.157 |
+| Earth Tipping | 41 | 1.510 | 965.491 |
+| IFOLOGY | 30 | 55.600 | 963.722 |
+| What If Animations | 38 | 6.090 | 878.243 |
 
-Xem thêm: [dữ liệu ngày 2026-11-08](https://github.com/vmthuan703/AI_youtube/blob/research/reports/data/2026-11-08/TOM_TAT.md)
+Xem thêm: [dữ liệu ngày 2026-11-10](https://github.com/vmthuan703/AI_youtube/blob/research/reports/data/2026-11-10/TOM_TAT.md)
 
 <!-- DAILY:END -->
 

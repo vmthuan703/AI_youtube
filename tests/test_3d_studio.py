@@ -55,3 +55,20 @@ def test_new_project_and_parse_script_keep_quality_and_speakers(tmp_path):
     assert r.returncode == 0, r.stderr
     got = json.load(open(ws / "projects" / "t" / "timeline" / "words.json"))["words"]
     assert [w.get("speaker") for w in got] == ["NARRATOR", "JAKE"]
+
+
+def test_script_check_flags_late_rule_and_long_intro(tmp_path):
+    late = ("NARRATOR: You grab the box and it shrinks. " + "Words fill the page. " * 10 +
+            "Your name is Leo. You're fifteen. " + "Six days from now something happens to you and your friend. " * 3 +
+            "Here's the rule. Touch it and it shrinks.\n")
+    early = "NARRATOR: You grab the box and it shrinks. Here's the rule. Touch it. Your name is Leo. You're fifteen. Soon it ends.\n"
+    out = {}
+    for name, body in (("late", late), ("early", early)):
+        f = tmp_path / (name + ".txt")
+        f.write_text(body, encoding="utf-8")
+        r = run(["tools/script_check.py", "--script", str(f), "--json"], KIT)
+        assert r.returncode == 0, r.stderr
+        data, _ = json.JSONDecoder().raw_decode(r.stdout)
+        out[name] = {x["check"]: x["state"] for x in data}
+    assert out["early"]["Rule stated early"] == "PASS" and out["early"]["Name, age and flash-forward are short"] == "PASS"
+    assert out["late"]["Name, age and flash-forward are short"] == "LOOK"

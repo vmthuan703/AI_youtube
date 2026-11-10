@@ -43,6 +43,7 @@ def num(word):
     return None
 
 
+RULE_LINE = r"\bhere'?s (the rule|how (it|this) works)\b|\bhere is (the rule|how (it|this) works)\b"
 MYSTERY = re.compile(r"\b(stranger|unknown|don't know|someone|somebody|a letter|a knock|a number|a woman|a man|a new|phone number|black car|wanna|want it back|been watching)\b", re.I)
 
 
@@ -96,6 +97,20 @@ def check(lines, title, wpm):
     add("Flash-forward", "PASS" if fm else "MISS", f"\"{fm.group(0)}\"" if fm else "none in the first 70 s", "" if fm else "Between about 0:20 and 1:05 tell what this will turn into: the big win and the danger.")
     pm = PIVOT.search(upto(90))
     add("Back to right now", "PASS" if pm else "MISS", f"\"{pm.group(0)}\"" if pm else "none in the first 90 s", "" if pm else "One line that drops back to the small present moment after the flash-forward.")
+    # opening rules from the 2026-11-11 retention review (prompts/QUY_TAC_VIET_SCRIPT_KENH.md, section 1b)
+    def word_at(pattern):
+        m_ = re.search(pattern, text, re.I)
+        return len(text[: m_.start()].split()) if m_ else None
+    rule_at = word_at(RULE_LINE)
+    add("Rule stated early", "PASS" if rule_at is not None and rule_at <= 70 else ("LOOK" if rule_at is not None else "MISS"),
+        f"starts at word {rule_at} (about {rule_at / wpm * 60:.0f} s)" if rule_at is not None else "no \"Here's the rule\" line found",
+        "" if rule_at is not None and rule_at <= 70 else "State the rule before word 70 (about 26 s). Retention fell to 45% at 0:30 when it came after word 105.")
+    intro = next((t for t in narr if HERO_NAME.search(t)), "")
+    im = HERO_NAME.search(intro)
+    intro_words = len(intro[im.start():].split()) if im else None
+    if intro_words is not None:
+        add("Name, age and flash-forward are short", "PASS" if intro_words <= 25 else "LOOK", f"{intro_words} words from \"Your name is\" to the end of that line",
+            "" if intro_words <= 25 else "Keep the name, age and \"N days from now\" part to 25 words or fewer, next to the rule, not between the demo and the rule.")
     sm = STAKES.search(upto(120))
     add("Cost is hinted early", "PASS" if sm else "LOOK", f"\"{sm.group(0)}\"" if sm else "no clear hint in the first 2 min", "" if sm else "A short line that promises the power has a price.")
     # middle
@@ -179,6 +194,7 @@ The Memory 100x v2 script scored 6.5/10 on logic because of these, so read the w
 7. **Safety.** Is no dangerous real-world advice given, such as "walk toward the water" in a rescue? Rescuers should lead.
 8. **Science.** Are terms used correctly (HSAM is memory of one's own life; working memory is limited attention, not physical slots)? Are names and figures checked? Is there no science explainer in the middle of the climax?
 9. **Cast.** Is the hero a boy (he/him, a boy's name) and the best friend a girl? Does every prop the script names (headphones, a receipt) have a shot where it can be seen?
+10. **First consequence.** Does the first result of the power (not the demo) show before word 120, about 45 s? A regex cannot find it, so point to the sentence.
 """
 
 

@@ -1,6 +1,6 @@
 {
   "snapshot_date": "2026-11-10",
-  "started_at": "2026-11-09T18:47:15.265240+00:00",
+  "started_at": "2026-11-10T16:24:56.132691+00:00",
   "quota_budget": 6000,
   "markets": {
     "whatif-us": {
@@ -30,27 +30,27 @@
       ],
       "queries_skipped": [],
       "errors": [],
-      "discovery_rows": 962,
+      "discovery_rows": 961,
       "seeded": [],
-      "added": [],
+      "added": [
+        "Questionverse"
+      ],
       "not_added_registry_full": [
-        "Matal",
-        "Questionverse",
+        "Nearside",
         "AniFacade",
-        "IfLoop",
+        "Puck Pukish",
         "Stick Knows",
         "Stick Saga",
-        "Iftales",
-        "Ifable"
+        "Any Minute Now",
+        "Ifable",
+        "Iftales"
       ]
     }
   },
-  "pruned_off_niche": [
-    "Nearside (48% khớp)"
-  ],
-  "tracked_channels": 59,
-  "tracked_videos": 1436,
+  "pruned_off_niche": [],
+  "tracked_channels": 60,
+  "tracked_videos": 1465,
   "tracking_skipped": [],
-  "quota_used": 2174,
-  "finished_at": "2026-11-09T18:47:56.493680+00:00"
+  "quota_used": 2176,
+  "finished_at": "2026-11-10T16:25:28.295790+00:00"
 }

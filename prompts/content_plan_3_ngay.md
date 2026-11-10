@@ -23,6 +23,14 @@ kênh đối thủ**. Mẫu đã duyệt: `ke-hoach/2026-11-05.md`. Viết đún
 - Các kế hoạch cũ trong `ke-hoach/` trên `main`: không lặp góc đã dùng.
 - `prompts/T4_script_prompt.md`: khung prompt viết script.
 
+## Bước kiểm tra YouTube (bắt buộc, trước khi chốt tiêu đề)
+
+- Kiểm trùng trên snapshot là chưa đủ: nhiều kênh nhỏ chép khung trong 1–2 tuần. Với mỗi tiêu đề dự kiến, tìm trực tiếp trên YouTube
+  (bộ lọc "Video") bằng tiêu đề đầy đủ, rồi bằng 1–2 từ khóa ngắn của ý.
+- Chỉ đề xuất khi **không có video dài What If nào cùng ý**, dù ít view. Shorts, video nhạc, video hướng dẫn thì không tính.
+- Nếu đã có thì bỏ ý đó, nghĩ ý khác và tìm lại. Ghi vào kế hoạch: câu đã tìm, video gần nhất (kênh, view), và các ý bị loại.
+- Tìm lại một lần nữa ngay trước khi dựng và đăng.
+
 ## Quy tắc
 
 - Mọi đề xuất phải có bằng chứng: link video đối thủ, view, × trung vị, số kênh. Không có số thì ghi "chưa đo". Không bịa số.

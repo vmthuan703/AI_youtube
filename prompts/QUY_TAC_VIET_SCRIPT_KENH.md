@@ -25,6 +25,21 @@
 
 **Độ dài:** trung vị ~1.760 từ (khoảng 11 phút ở 165 từ/phút). Giữ trong khoảng **1.700–1.900 từ**. Video dài gấp đôi (8QUGyGRY9zs, 3.500+ từ) không nên làm chuẩn, cần kiểm tra lại caption trước khi tham khảo.
 
+## 1b. Quy tắc mở đầu 30 giây (từ 2026-11-11, đang thử nghiệm)
+
+Nguồn: biểu đồ giữ chân YouTube Studio ngày 10–11/11 của 6 video kênh IfAhead, xem [reports/2026-11-10_studio_tep_khan_gia.md](../reports/2026-11-10_studio_tep_khan_gia.md) mục 2b, 2c. Mẫu nhỏ (10–100 lượt xem mỗi video), nên đây là giả thuyết, đo lại bằng 9 video 11–13/11.
+
+Vấn đề: Shrink, Body Healed, Date You, Memory v2 đều theo khung biểu diễn năng lực (từ 0–40), rồi "Your name is… N days from now…" (từ 41–85), rồi mới đến luật (từ 107–122, khoảng giây 41). Shrink còn 45% người xem ở giây 30 và chỉ giữ 9,5% thời lượng.
+
+Quy tắc (áp dụng cho mọi script mới):
+1. **5 giây đầu cho thấy đúng điều tiêu đề hứa**, bằng một cảnh cụ thể. Không dẫn nhập, không giới thiệu nhân vật trước.
+2. **Luật xuất hiện trước từ thứ 70** (khoảng giây 26). Lời thoại nhân vật phụ ở phần mở đầu tối đa 1 câu.
+3. **Đoạn "tên, tuổi, N ngày nữa sẽ…" tối đa 25 từ** (hiện khoảng 45 từ), đặt ngay trước hoặc sau luật, không chen giữa phần biểu diễn và luật.
+4. **Hệ quả đầu tiên của năng lực xuất hiện trước giây 45** (từ khoảng 120).
+5. **Đo sau 48 giờ**: tỉ lệ còn xem ở giây 30, % thời lượng trung bình, lượt hiển thị. Mốc giữ chân tối thiểu 15% (dựa trên Date You 16,7%) là mốc làm việc, chưa phải chuẩn của YouTube.
+
+Thử nghiệm: video ngày 11/11 và 12/11 áp dụng quy tắc 2 và 3; video ngày 13/11 giữ khung cũ để so sánh. Đánh giá khoảng 25/11. Nếu khung cũ giữ chân không kém hơn, bỏ quy tắc 2 và 3.
+
 ## 2. Cách xây "power" (ý tưởng chính)
 
 - **1 power = 1 quy tắc rõ ràng + 1 cái giá.** Quy tắc nói ngay từ đầu. Cái giá thường xuất hiện trong phần "cost".
@@ -72,6 +87,7 @@ Câu hỏi sau "So, would you" là câu hỏi đạo đức hoặc lựa chọn 
 ## 7. Checklist trước khi giao script
 
 - [ ] Hook 30 giây đầu: cảnh cụ thể, ngôi "you", không mở bằng "What if".
+- [ ] Mở đầu theo mục 1b: 5 giây đầu đúng tiêu đề, luật trước từ 70, đoạn "tên/tuổi/N ngày nữa" ≤ 25 từ, hệ quả đầu tiên trước từ 120. Ghi số từ thực tế vào ghi chú script.
 - [ ] Power có một quy tắc rõ và một cái giá.
 - [ ] Mỗi power có ít nhất 1 con số/nghiên cứu thật, giải thích ngắn.
 - [ ] Có ít nhất 2 đoạn leo thang ("But where it gets crazy…").

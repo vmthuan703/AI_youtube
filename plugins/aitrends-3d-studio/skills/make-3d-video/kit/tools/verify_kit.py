@@ -76,7 +76,7 @@ EXPECTED = {
     "tools/new_project.py": "cb5dd45c811db41a",
     "tools/parse_script.py": "f33853d2823efde2",
     "tools/qc_metrics.py": "d16f19aec9f17772",
-    "tools/script_check.py": "212244ce5bf3e6d3",
+    "tools/script_check.py": "d5a9105d621aa789",
     "tools/tidy_project.py": "37a1c24f85e1446d",
     "tools/transcribe.py": "ecd48d05a6655d13",
     "tools/tts.py": "bae62a46f9d68395",

@@ -15,7 +15,7 @@ Length: 1,500–1,650 words is the channel plan; references run 1,730–1,800.
 
 The check also flags these: **Hero name fits the hero** (a girl's name for the boy hero), **Weekdays run in order**, **Day count adds up**
 (a "thirty days to ..." deadline that ends after the story's last day) and **Punchlines land when heard** (a 1–4 word answer such as
-"You say YouTube."). Under the table it lists the **Story logic** questions. Answer each one in writing before the voice.
+"You say YouTube."). It also checks the opening rules from the 2026-11-11 retention review: **Rule stated early** (the "Here's the rule" line before word 70, about 26 s) and **Name, age and flash-forward are short** (25 words or fewer from "Your name is"). Story-logic question 10 asks for the first consequence of the power before word 120. These are a trial: the channel compares the 11/11-12/11 videos with the 13/11 ones. Under the table it lists the **Story logic** questions. Answer each one in writing before the voice.
 
 ## Writing a script (when the user asks you to write or rewrite one)
 These rules come from the Memory 100x v2 review (logic 6.5/10) and the user's notes on the finished video. Follow them from the first draft:

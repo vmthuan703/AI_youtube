@@ -72,7 +72,7 @@ export function bookcase(o = {}) {
 export function bankerLamp(o = {}) {
   const g = group(cyl(0.08, 0.09, 0.02, mat('#c8a050', { metal: 0.8, rough: 0.3 }), 0, 0.01, 0, 16), cyl(0.01, 0.01, 0.3, mat('#c8a050', { metal: 0.8 }), 0, 0.16, 0, 6));
   const sh = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.12, 0.09, 20, 1, true, 0, PI), mat('#1f6a3a', { clearcoat: 0.8, rough: 0.2, side: THREE.DoubleSide })); sh.rotation.z = R2; sh.rotation.y = R2; sh.position.set(0, 0.32, 0); g.add(sh);
-  g.add(at(glow('#ffe0a0', 0.5, 0.6), 0, 0.28, 0)); if (o.light !== false) { const L = lamp('#ffe0a8', o.intensity ?? 1.4, 2.4, { bulb: false, decay: 1.6 }); L.position.set(0, 0.25, 0.05); g.add(L); }
+  g.add(at(glow('#ffe0a0', 0.22, 0.45), 0, 0.27, 0.03)); if (o.light !== false) { const L = lamp('#ffe0a8', o.intensity ?? 1.4, 2.4, { bulb: false, decay: 1.6 }); L.position.set(0, 0.25, 0.05); g.add(L); }
   return g;
 }
 // labBench({ len, sinks, taps }) — black resin top on white cabinets, gas taps, a sink at one end. Top at 0.92.

@@ -36,7 +36,7 @@
    "start": 12,
    "end": 15,
    "line": "",
-   "camera": "backRow"
+   "camera": "medium"
   },
   {
    "id": "detention",
@@ -135,7 +135,7 @@
    "start": 54,
    "end": 57,
    "line": "",
-   "camera": "lowHero"
+   "camera": "medium"
   },
   {
    "id": "rainLot",

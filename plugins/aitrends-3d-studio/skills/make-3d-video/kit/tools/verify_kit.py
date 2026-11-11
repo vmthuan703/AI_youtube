@@ -28,7 +28,7 @@ EXPECTED = {
     "engine/nature3d.js": "a058ae18ad5745ab",
     "engine/player.js": "f67d7ce200280aaa",
     "engine/rig2d.js": "ec2a665e0aa8ffed",
-    "engine/rig3d.js": "6a5a7e61fc66f0c2",
+    "engine/rig3d.js": "7837000c33b4c25c",
     "engine/school3d.js": "356ff750cbab5e58",
     "engine/screens3d.js": "250bbf664fff717b",
     "engine/sports3d.js": "982dcacc06b10a13",
@@ -95,12 +95,12 @@ EXPECTED = {
     "examples/v1-more/scenes/shots/more.js": "f143bb99aae234c5",
     "examples/v1-more/story/shots.json": "075d42130f80ad46",
     "examples/v1-more/timeline/words.json": "4ffba71caf98eb3f",
-    "engine/school10.js": "46dbae153ae88d85",
+    "engine/school10.js": "8d927716e1ea8a9a",
     "engine/season10.js": "34f97174ca2066f3",
     "examples/v101-school/config.json": "cb2e770362c512ec",
     "examples/v101-school/scenes/cast.js": "19cc3da1956f35d8",
-    "examples/v101-school/scenes/shots/school.js": "97b61d3d9e63cf44",
-    "examples/v101-school/story/shots.json": "343c8590957cee28",
+    "examples/v101-school/scenes/shots/school.js": "a7b8bf93def43530",
+    "examples/v101-school/story/shots.json": "1e08f0c7581d427c",
 }
 bad = 0
 for rel, want in EXPECTED.items():

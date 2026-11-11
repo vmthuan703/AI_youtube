@@ -91,8 +91,8 @@ export const POSES3 = {
   handsOnBelt: P({ spine: [-3, 0, 0], armL: { to: [0.2, 0.6, 0.06] }, armR: { to: [-0.2, 0.6, 0.06] }, handL: 'fist', handR: 'fist' }),
   holdMic: P({ armL: [62, 12, 118, 0], handL: 'fist' }),
   // 1.0.1 US high school: class, lockers, cafeteria, sports, weather. Seated ones match T.W.classroom / library chairs (hips 0.42).
-  raiseHand: P({ spine: [-2, 0, 4], head: [-4, 0, 0], armL: [172, 18, 8, 0], handL: 'open' }),
-  sitRaiseHand: P({ y: -0.2, spine: [6, 0, 6], head: [-4, 0, 0], legL: [88, 6, 88, 0], legR: [88, 6, 88, 0], armL: [170, 15, 10, 0], armR: [72, -12, 20, 0], handL: 'open', handR: 'open' }),
+  raiseHand: P({ spine: [-2, 0, 6], head: [-4, 0, -4], armL: [162, 42, 0, 0], handL: 'open' }),   // big heads: the hand goes out beside the head, not over it
+  sitRaiseHand: P({ y: -0.2, spine: [6, 0, 6], head: [-4, 0, 0], legL: [88, 6, 88, 0], legR: [88, 6, 88, 0], armL: [160, 44, 0, 0], armR: [72, -12, 20, 0], handL: 'open', handR: 'open' }),
   sleepDesk: P({ y: -0.2, spine: [52, 0, 0], head: [26, 18, 8], legL: [88, 6, 88, 0], legR: [88, 6, 88, 0], armL: [86, -42, 122, 0], armR: [86, -42, 122, 0], handL: 'relaxed', handR: 'relaxed' }),
   passNote: P({ y: -0.2, spine: [12, -14, 0], head: [6, 22, 0], legL: [88, 6, 88, 0], legR: [88, 6, 88, 0], armL: [72, -12, 20, 0], armR: [72, 82, 8, 0], handL: 'open', handR: 'open' }),
   copyPeek: P({ y: -0.2, spine: [16, 10, 0], head: [10, 38, 4], legL: [88, 6, 88, 0], legR: [88, 6, 88, 0], armL: [72, -12, 20, 0], armR: [72, -12, 20, 0], handL: 'open', handR: 'open' }),
@@ -664,7 +664,7 @@ export function character(outfit = {}, opts = {}) {
   root.faceTo = (x, z) => { root.rotation.y = Math.atan2(x - root.position.x, z - root.position.z); return root; };
   root.headWorld = () => head.getWorldPosition(new THREE.Vector3());
   // 1.0.1: put something on the head (T.W.gradCap(), a crown, a party hat): sits on top, tilted back a little; o.pos / o.rot override
-  root.wear = (obj, o = {}) => { head.add(obj); obj.position.set(...(o.pos || [0, BODY.headR * 0.9, -0.02])); obj.rotation.set(...(o.rot || [-0.18, 0, 0])); return obj; };
+  root.wear = (obj, o = {}) => { head.add(obj); obj.position.set(...(o.pos || [0, BODY.headR * 1.12, -0.03])); obj.rotation.set(...(o.rot || [-0.18, 0, 0])); return obj; };
   root.handWorld = (side = 'L') => hands[side].g.getWorldPosition(new THREE.Vector3());
   root.chestWorld = () => chest.localToWorld(new THREE.Vector3(0, 0.3, 0));
   root.parts = { body, pelvis, chest, head, neck, hands, feet, skull, faceMesh, torso, skirt, hair: hairG, contact };

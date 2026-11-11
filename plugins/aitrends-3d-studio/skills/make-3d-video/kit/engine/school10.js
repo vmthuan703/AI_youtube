@@ -198,7 +198,7 @@ export function library(st, o = {}) {
   for (const sx of [-1, 1]) for (let i = 0; i < 2; i++) put(st, bookcase({ len: 3, h: 2.4, seed: 7 + i + (sx > 0 ? 3 : 0) }), sx * (w / 2 - 0.26), -d / 2 + 2.2 + i * 3.2, sx > 0 ? -R2 : R2, 0, false);
   const aisles = []; for (let i = 0; i < 3; i++) { const x = -w / 2 + 2.5 + i * 2.2; put(st, bookcase({ len: 2.6, h: 2.0, d: 0.5, seed: 20 + i, double: true }), x, -d / 2 + 2.4, R2); aisles.push(x + 1.1); }
   const seats = [], tz = [-0.2, 2.4]; for (let ti = 0; ti < tz.length; ti++) { const z = tz[ti]; put(st, table({ w: 3.4, d: 1.1, h: 0.76, color: '#7a4a2a' }), 2.2, z);
-    for (let i = 0; i < 2; i++) { put(st, bankerLamp({ light: ti === 0 && i === 0 ? true : o.lamps !== false }), 1.6 + i * 1.2, z - 0.25, PI, 0.785, false); put(st, book({ color: ['#8a2a2a', '#2a4a7a', '#c89a3a'][i + ti] }), 1.6 + i * 1.6, z + 0.3, 0.3, 0.785, false); }
+    for (let i = 0; i < 2; i++) { put(st, bankerLamp({ light: ti === 0 && i === 0 ? true : o.lamps !== false }), 0.72 + i * 2.96, z - 0.3, PI, 0.785, false); put(st, book({ color: ['#8a2a2a', '#2a4a7a', '#c89a3a'][i + ti] }), 1.6 + i * 1.6, z + 0.3, 0.3, 0.785, false); }
     for (const side of [-1, 1]) for (let i = 0; i < 3; i++) { const x = 1.0 + i * 1.2, zz = z + side * 0.72; put(st, chair({ color: '#5a3a24' }), x, zz, side > 0 ? PI : 0); seats.push([x, zz, side > 0 ? PI : 0]); } }
   // computers along the right wall, the librarian's desk by the door
   for (let i = 0; i < 3; i++) { const z = d / 2 - 3.6 + i * 1.1; put(st, table({ w: 1.0, d: 0.6, color: '#d8d4cc' }), w / 2 - 0.5, z, -R2); st.add(at(screen(0.45, 0.3, (g, W, H) => { g.fillStyle = '#1a3a6a'; g.fillRect(0, 0, W, H); g.fillStyle = '#d8e8ff'; g.fillRect(16, 16, W - 32, 22); g.fillRect(16, 50, W * 0.6, 10); g.fillRect(16, 70, W * 0.5, 10); }), w / 2 - 0.5, 1.02, z, -R2)); }
@@ -252,19 +252,19 @@ export function auditorium(st, o = {}) {
   st.add(at(new THREE.Mesh(fold(w - 2, 1.0), vel), 0, h - 0.6, -d / 2 + sD - 0.5), box(w, 1.4, 0.4, mat('#2a1a20', { rough: 0.8 }), 0, h - 0.7, -d / 2 + sD - 0.3));
   for (const sx of [-1, 1]) st.add(box(1.0, h, 0.4, mat('#4a2a2a', { rough: 0.7 }), sx * (w / 2 - 0.5), h / 2, -d / 2 + sD - 0.3));
   st.add(box(w - 2, 0.02, sD - 0.8, mat('#121014'), 0, h - 0.01, -d / 2 + (sD - 0.8) / 2));
-  const pod = put(st, group(box(0.6, 1.1, 0.45, mat('#5a3a24', { clearcoat: 0.6, rough: 0.3 }), 0, 0.55, 0), box(0.7, 0.04, 0.5, mat('#3a2418', { clearcoat: 0.6 }), 0, 1.12, 0), at(cyl(0.006, 0.006, 0.3, mat('#2a2a30'), 0, 0, 0, 6), 0, 1.25, 0.1).rotateX(-0.4), at(plane(0.4, 0.4, sign(o.crest || 'E', 0.4, 0.4, '#f2b632', '#3a1a2a', 300)), 0, 0.65, 0.23)), 2.5, -d / 2 + sD - 1.6, 0, sY, false);
+  const pod = put(st, group(box(0.6, 1.1, 0.45, mat('#5a3a24', { clearcoat: 0.6, rough: 0.3 }), 0, 0.55, 0), box(0.7, 0.04, 0.5, mat('#3a2418', { clearcoat: 0.6 }), 0, 1.12, 0), at(cyl(0.006, 0.006, 0.3, mat('#2a2a30'), 0, 0, 0, 6), 0, 1.25, 0.1).rotateX(-0.4), at(plane(0.4, 0.4, sign(o.crest || 'E', 0.4, 0.4, '#f2b632', '#3a1a2a', 300)), 0, 0.65, 0.23)), 2.5, -d / 2 + sD - 1.6, 0, sY, false);   // podium at z -d/2+sD-1.6; the speaker stands 0.5 behind it
   // raked seats: rows rising toward +z
   const seats = [], rows = o.rows || 9, perRow = o.perRow || 12, z0 = -d / 2 + sD + 2.2, red = mat('#8a1a24', { rough: 0.6, sheen: 0.6, sheenColor: '#ff8a8a' });
   for (let ri = 0; ri < rows; ri++) { const y = ri * 0.22, z = z0 + ri * 0.95; if (y > 0) st.add(box(w, y, 0.95, mat('#3a2228', { rough: 0.9 }), 0, y / 2, z + 0.1));
-    for (let i = 0; i < perRow; i++) { const x = (i - (perRow - 1) / 2) * 0.62 + (i >= perRow / 2 ? 0.9 : -0.9); const s = group(box(0.5, 0.08, 0.45, red, 0, SEAT, 0), box(0.5, 0.55, 0.08, red, 0, SEAT + 0.3, -0.22), box(0.04, 0.4, 0.4, mat('#1a1a20'), 0.27, 0.3, 0)); s.position.set(x, y, z); s.rotation.y = PI; st.add(s); seats.push([x, z - 0.05, PI, y]); } }
+    for (let i = 0; i < perRow; i++) { const x = (i - (perRow - 1) / 2) * 0.62 + (i >= perRow / 2 ? 0.9 : -0.9); const s = group(box(0.5, 0.08, 0.45, red, 0, SEAT - 0.04, 0), box(0.5, 0.55, 0.08, red, 0, SEAT + 0.3, -0.22), box(0.04, 0.4, 0.4, mat('#1a1a20'), 0.27, 0.3, 0)); s.position.set(x, y, z); s.rotation.y = PI; st.add(s); seats.push([x, z + 0.02, PI, y]); } }
   // spotlights from the booth at the back + stage wash, house lights dim
-  const spots = []; for (const sx of o.spotsX || [-0.5, 1.5]) { const S1 = spot('#fff4e0', o.spotPower ?? 160, { pos: [sx * 2, h - 0.6, d / 2 - 1], target: [sx * 1.4, sY, -d / 2 + sD - 2], angle: 0.11, penumbra: 0.35, dist: 40 }); st.add(S1); spots.push(S1);
+  const spots = []; for (const sx of o.spotsX || [-0.5, 1.5]) { const S1 = spot('#fff4e0', o.spotPower ?? 160, { pos: [sx * 2, h - 0.6, d / 2 - 1], target: [sx < 0 ? -0.7 : 2.5, sY, -d / 2 + sD - 2.1], angle: 0.11, penumbra: 0.35, dist: 40 }); st.add(S1); spots.push(S1);
     const cn = lightCone(0.6, 20, '#fff4e0', 0.035); cn.position.set(sx * 2, h - 0.6, d / 2 - 1); cn.lookAt(sx * 1.4, sY, -d / 2 + sD - 2); cn.rotateX(-R2); st.add(cn); }
   for (let x = -6; x <= 6; x += 3) { st.add(at(glow('#ffd8a0', 0.6, 0.8), x, h - 0.4, -d / 2 + sD + 0.3)); }
   lights(st, [[0, h - 1, -d / 2 + 3], [0, h - 1, 4]], '#ffd8b0', o.lamp ?? 3, 16);
   for (const sx of [-1, 1]) for (let z = 0; z < d / 2; z += 4) st.add(at(glow('#ffc890', 0.35, 0.9), sx * (w / 2 - 0.05), 3, z));
   st.add(at(plane(1.0, 0.3, glowSign('EXIT', 1.0, 0.3, '#c8202a', '#ffffff', 110, 1.4)), w / 2 - 0.02, 3, d / 2 - 2, -R2));
-  return { seat: (row = 0, i = 0) => seats[clamp(row, 0, rows - 1) * perRow + clamp(i, 0, perRow - 1)], seats, stage: (x = 0) => [x, -d / 2 + sD - 2.2, 0], stageY: sY, podium: [2.5, -d / 2 + sD - 2.1, 0], spots, w, d };
+  return { seat: (row = 0, i = 0) => seats[clamp(row, 0, rows - 1) * perRow + clamp(i, 0, perRow - 1)], seats, stage: (x = 0) => [x, -d / 2 + sD - 2.2, 0], stageY: sY, podium: [2.5, -d / 2 + sD - 2.1, 0, sY], spots, w, d };
 }
 
 // ================================================================ FOOTBALL FIELD — field along x, home bleachers at z = +, scoreboard at -x end
@@ -298,7 +298,7 @@ export function lockerRoom(st, o = {}) {
   shell(st, w, d, h, { wall: o.wall || '#d8d4c8', wallTex: tiles('#d8d4c8', 10, [w / 1.5, h / 1.5], 'rgba(0,0,0,.1)'), floor: '#8a8c90', floorTex: tiles('#8a8c90', 12, [w / 1.2, d / 1.2], 'rgba(0,0,0,.2)'), floorRough: 0.25 });
   const lk = []; const lockerAt = (x, z, yaw) => { const m = mat(c, { rough: 0.45, metal: 0.4, clearcoat: 0.3 }); const g = group(box(0.42, 1.9, 0.45, m, 0, 0.95, 0)); for (let k = 0; k < 4; k++) g.add(box(0.26, 0.015, 0.01, mat(shade(c, -0.4)), 0, 1.65 + k * 0.04, 0.226)); g.add(box(0.03, 0.1, 0.03, mat('#c8ccd4', { metal: 0.8 }), 0.14, 1.0, 0.235)); put(st, g, x, z, yaw, 0, false); lk.push([x + Math.sin(yaw) * 0.7, z + Math.cos(yaw) * 0.7, yaw + PI]); };
   for (let x = -w / 2 + 2.6; x < w / 2 - 0.3; x += 0.44) { lockerAt(x, -d / 2 + 0.25, 0); lockerAt(x, d / 2 - 0.25, PI); }
-  const benches = []; for (let i = 0; i < 2; i++) { const x = -0.5 + i * 3.4; put(st, group(box(2.8, 0.06, 0.36, mat('#a8783a', { clearcoat: 0.5, rough: 0.35 }), 0, SEAT, 0), box(0.08, SEAT, 0.08, mat('#5a5e68', { metal: 0.6 }), -1.1, SEAT / 2, 0), box(0.08, SEAT, 0.08, mat('#5a5e68', { metal: 0.6 }), 1.1, SEAT / 2, 0)), x, 0); benches.push([x - 0.7, 0, 0], [x + 0.7, 0, PI]); }
+  const benches = []; for (let i = 0; i < 2; i++) { const x = -0.5 + i * 3.4; put(st, group(box(2.8, 0.06, 0.36, mat('#a8783a', { clearcoat: 0.5, rough: 0.35 }), 0, SEAT - 0.03, 0), box(0.08, SEAT, 0.08, mat('#5a5e68', { metal: 0.6 }), -1.1, SEAT / 2, 0), box(0.08, SEAT, 0.08, mat('#5a5e68', { metal: 0.6 }), 1.1, SEAT / 2, 0)), x, 0); benches.push([x - 0.7, 0.04, 0], [x + 0.7, -0.04, PI]); }
   // shower bay at -x: tiles, heads, a short wall
   st.add(box(0.12, 2.0, d - 2, mat('#e8e4dc', { map: tiles('#e8e4dc', 6, [3, 1.2]), rough: 0.3 }), -w / 2 + 2.3, 1.0, 0));
   for (let z = -d / 2 + 1.4; z < d / 2 - 1; z += 1.4) st.add(cyl(0.02, 0.02, 0.3, mat('#c8ccd4', { metal: 0.9 }), -w / 2 + 0.25, 2.1, z, 6), at(cyl(0.07, 0.05, 0.05, mat('#c8ccd4', { metal: 0.9 }), 0, 0, 0, 12), -w / 2 + 0.35, 2.2, z).rotateZ(-0.7));
@@ -413,7 +413,7 @@ export function studentLot(st, o = {}) {
   st.add(at(plane(10, 1.2, sign(o.school || 'LINCOLN HIGH SCHOOL', 10, 1.2, '#e8e2d0', '#2a3a6a', 70)), 0, 8, -16.95));
   st.add(box(70, 0.15, 3, mat('#b8b0a8', { rough: 0.8 }), 0, 0.075, -15.5));
   for (let i = 0; i < (o.buses ?? 3); i++) put(st, schoolBus({}), -14 + i * 10.5, -12.2, 0, 0, true);
-  for (const x of [-20, 0, 20]) { if (o.gap && x > o.gap[0] && x < o.gap[1]) continue; const lp = streetLamp({}); put(st, lp, x, 0.6, 0, 0, false); }
+  for (const x of [-20, 0, 20]) { if (o.gap && x > o.gap[0] && x < o.gap[1]) continue; const lp = streetLamp({}); put(st, lp, x, -6.2, 0, 0, false); }
   for (let i = 0; i < 6; i++) put(st, tree({ s: 1.2 + r() * 0.3, color: '#3a6a3a' }), -30 + i * 12, -14.5);
   if (!night) skyDome(st, { clouds: 14 }); else st.add(lamp('#ffd8a0', 6, 30, { bulb: false })).position.set(0, 6, 0);
   if (o.wet) mirror(st, { w: 60, d: 30, z: 2, strength: 0.4, blur: 1.2 });
@@ -449,7 +449,7 @@ export function dinerUS(st, o = {}) {
   const red = mat('#c8182a', { keepSat: true, clearcoat: 0.9, rough: 0.25 }), chrome = mat('#d8dce4', { metal: 0.95, rough: 0.12 }), mint = mat('#7ad8c8', { keepSat: true, clearcoat: 0.6, rough: 0.3 });
   const booths = []; for (let i = 0; i < 4; i++) { const x = -w / 2 + 1.6 + i * 2.6, z = -d / 2 + 1.0;
     put(st, group(rbox(1.0, 0.04, 0.7, 0.02, mint, 0, 0.76, 0), cyl(0.05, 0.12, 0.74, chrome, 0, 0.37, 0, 12)), x, z);
-    for (const sx of [-1, 1]) { put(st, group(rbox(0.5, 0.18, 0.9, 0.06, red, 0, SEAT, 0), rbox(0.15, 0.7, 0.9, 0.06, red, sx * 0.22, SEAT + 0.4, 0)), x + sx * 0.85, z); booths.push([x + sx * 0.75, z, sx > 0 ? -R2 : R2]); }
+    for (const sx of [-1, 1]) { put(st, group(rbox(0.5, 0.16, 0.9, 0.06, red, 0, SEAT - 0.1, 0), box(0.46, SEAT - 0.18, 0.86, mat('#8a1020'), 0, (SEAT - 0.18) / 2, 0), rbox(0.15, 0.7, 0.9, 0.06, red, sx * 0.22, SEAT + 0.3, 0)), x + sx * 0.85, z); booths.push([x + sx * 0.8, z, sx > 0 ? -R2 : R2]); }
     put(st, milkshake({ color: ['#f2a0b8', '#8a5a3a', '#f4ecd8'][i % 3] }), x - 0.15, z, 0, 0.78, false);
     const wv = windowPane(2.2, 1.2, night, '#d8dce4'); wv.position.set(x, 1.8, -d / 2 + 0.02); st.add(wv); }
   const stools = []; put(st, group(box(w - 3, 1.0, 0.6, mat('#e8203a', { keepSat: true, clearcoat: 0.6 }), 0, 0.5, 0), box(w - 2.9, 0.05, 0.75, mat('#f4f0e8', { clearcoat: 0.8, rough: 0.2 }), 0, 1.02, -0.05), box(w - 3, 0.04, 0.02, chrome, 0, 0.2, 0.31)), 0.8, d / 2 - 1.4);

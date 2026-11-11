@@ -281,7 +281,7 @@ export function turn3(ch, t, o = {}) {
 
 // ================================================================ 1.0.1 school motion: throws, lockers, tossed things
 // throw3(t, { t0, wind, dur }) — wind-up → release → follow-through (football, snowball, a paper ball). The object leaves the hand at t0.
-export function throw3(t, o = {}) { const t0 = o.t0 ?? 0.6, wind = o.wind ?? 0.45; return posesAt3(t, [[0, o.idle || 'stand'], [t0 - wind, 'throwWind'], [t0, 'throwRelease'], [t0 + 0.5, o.end || 'stand']], 0.16); }
+export function throw3(t, o = {}) { const t0 = o.t0 ?? 0.6, wind = o.wind ?? 0.45; return posesAt3(t, [[0, o.idle || 'stand'], [t0 - wind, 'throwWind'], [t0, 'throwRelease'], [t0 + 0.6, o.end || 'stand']], 0.24); }
 // toss(obj, t, { from, to, h, t0, dur, spin, hide }) — an object flying on an arc (snowball, football, a cap, a note). Before t0 it sits at
 // `from` (or is hidden: hide true); after landing it stays at `to`. spin: [x, y, z] turns per second. Returns progress 0..1.
 export function toss(obj, t, o = {}) { const t0 = o.t0 ?? 0, dur = o.dur ?? 0.8, k = clamp((t - t0) / dur), f = o.from || [0, 1, 0], to = o.to || f, h = o.h ?? 1;

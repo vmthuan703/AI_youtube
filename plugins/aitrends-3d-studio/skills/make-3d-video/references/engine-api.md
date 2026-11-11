@@ -259,8 +259,9 @@ Poses: `stand relaxed confident handsInPockets talk explain point pointUp pointA
 facepalm think crossArms crossArmsAngry crossArmsLean armsBehindHead shrug scared shocked sad phone phoneEar holdFront reach ready fight punch kick crouch kneel kneelBoth kneelSad kneelPlead sitBed sitBedSad sitBedPhone sitFloor hugKnees liftSquat liftOverhead pushHeavy
 sit sitBack sitDesk lie jump fall superLand flexL hunch hunchCane handsOnHips handsOnBelt holdMic`; 1.0.1 school: `raiseHand sitRaiseHand sleepDesk passNote
 copyPeek sitSlouch writeBoard holdBooks holdTray oneStrap dialLocker slamLocker holdUmbrella shareUmbrella throwWind throwRelease carryBall pomHigh pomLow
-capToss duckCover sitBleacher sitBooth` (seated ones at chair height 0.42; sitBooth / sitBleacher rest the hands on a table / the knees). `ch.wear(obj)` puts a
-grad cap, crown or party hat on the head. A pose object:
+capToss duckCover sitBleacher sitBooth atPodium` (seated ones at chair height 0.42; sitBooth / sitBleacher rest the hands on a table / the knees). `ch.wear(obj)` puts a
+grad cap, crown or party hat on the head. Blends between an angle limb and an IK limb (`{ to }`) are smooth since 1.0.1; keep pose
+changes at 0.35 s or more (posesAt3 blend) and walk at 1.2–1.5 m/s (walkTo distance / time) or the feet slide. A pose object:
 `{ y, hips:[pitch,yaw,roll], spine:[…], head:[…], armL:[raise, az, bend, twist] | {to:[x,y,z], pole}, armR, legL:[lift, side,
 knee, twist] | {to}, legR, handL:'fist'|'open'|'point'|'relaxed', handR }` in degrees. Pitch + leans/nods forward, yaw +
 turns to the character's left, arm raise 0 = hanging, 90 = horizontal, 180 = up; az 0 = forward, 90 = sideways. `{to}`

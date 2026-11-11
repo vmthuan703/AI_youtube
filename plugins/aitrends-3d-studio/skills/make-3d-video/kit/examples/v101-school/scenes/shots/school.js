@@ -13,31 +13,31 @@ const arms = (T, pose, from) => { const p = T.POSES3[from]; return { ...pose, ar
 registerShot('suburb', {
   init(T) { const st = T.stage({ ...T.W.schoolTime('morning'), fov: 36, fog: [30, 140] }); const u = T.W.suburbStop(st, { autumn: true, busX: 30 }); T.W.fallDay(st, { area: [-8, 10, 0, 6, -3, 2], y: 0.14, piles: 0 });
     const hero = st.add(T.character(HERO)), sam = st.add(T.character(SAM).place(5.6, 0.14, 0.3, -R2 + 0.3)); return { st, u, hero, sam }; },
-  draw(s, t, info, T) { s.u.bus.position.x = 30 - 24 * T.ease.out(clamp(t / 2.3));
-    const w = T.walkTo(s.hero, t, { from: [-1.5, 0.35], to: [4.4, 0.35], t0: 0, t1: 2.4, y: 0.14 }); s.hero.pose({ ...w, armR: T.POSES3.oneStrap.armR, handR: 'fist' }).face({ expr: 'smile', t, blink: true });
+  draw(s, t, info, T) { s.u.bus.position.x = 30 - 24 * T.ease.out(clamp(t / 2.8));
+    const w = T.walkTo(s.hero, t, { from: [0.6, 0.35], to: [4.4, 0.35], t0: 0, t1: 2.9, y: 0.14 }); s.hero.pose({ ...w, armR: T.POSES3.oneStrap.armR, handR: 'fist' }).face({ expr: 'smile', t, blink: true });
     s.sam.pose(T.idle3('wave', t, { seed: 2 })).face({ expr: 'happy', t, blink: true }); cam(s, t, info, T, { a: s.hero, b: s.sam, dist: 0.7 }); },
 });
 registerShot('locker', {
   init(T) { const st = T.stage({ mood: 'interiorWarm', fov: 30, fog: [10, 40] }); const h = T.W.lockerHall(st, {}); const L = h.locker(14, 1);
     const hero = st.add(T.character(HERO).place(L.front[0], 0, L.front[1], L.yaw + PI)); const bell = T.W.bell(st, { pos: [-2.25, 2.5, L.z + 1.5], yaw: R2, t0: 1.2 });
     const kids = [STUDENTS[0], STUDENTS[2], STUDENTS[4]].map(o => st.add(T.character(o))); return { st, h, L, hero, kids, peek: [1.7, 1.4, L.z + 1.7] }; },
-  draw(s, t, info, T) { T.lockerDoor(s.L.door, t, { t0: 0.2, slam: 1.55 });
-    s.hero.pose(T.posesAt3(t, [[0, 'dialLocker'], [0.5, 'reach'], [1.4, 'slamLocker'], [1.9, 'stand']], 0.14)).face({ expr: [[0, 'neutral'], [1.5, 'determined']], t, blink: true });
-    s.kids.forEach((k, i) => k.pose(T.walkTo(k, t, { from: [-0.9 + i * 0.6, s.L.z - 7 + i], to: [-0.9 + i * 0.6, s.L.z + 6 + i], t0: 1.2 + i * 0.15, t1: 4.2, run: i === 1 })).face({ expr: 'neutral', t, blink: true }));
+  draw(s, t, info, T) { T.lockerDoor(s.L.door, t, { t0: 0.3, dur: 0.7, slam: 2.0 });
+    s.hero.pose(T.posesAt3(t, [[0, 'dialLocker'], [0.7, 'reach'], [1.8, 'slamLocker'], [2.5, 'stand']], 0.38)).face({ expr: [[0, 'neutral'], [1.5, 'determined']], t, blink: true });
+    s.kids.forEach((k, i) => k.pose(T.walkTo(k, t, { from: [-0.9 + i * 0.6, s.L.z - 3.5 + i * 0.6], to: [-0.9 + i * 0.6, s.L.z + 3.5 + i * 0.6], t0: 1.0 + i * 0.2, t1: 6.2 + i * 0.2 })).face({ expr: 'neutral', t, blink: true }));
     cam(s, t, info, T, { a: s.hero, at: s.peek }); },
 });
 registerShot('chem', {
   init(T) { const st = T.stage({ mood: 'interiorCool', fov: 34, fog: [12, 40] }); const c = T.W.chemLab(st, {}); const p = c.station(1);
     const hero = st.add(T.character(HERO).place(p[0], 0, p[1], p[2])), maya = st.add(T.character(MAYA).place(c.station(0)[0], 0, c.station(0)[1], PI + 0.3)), tch = st.add(T.character(TEACHER_M).place(...[c.teacher[0], 0, c.teacher[1]], 0.4));
     return { st, c, hero, maya, tch }; },
-  draw(s, t, info, T) { s.hero.pose(T.posesAt3(t, [[0, 'holdFront'], [1.3, 'shocked']], 0.12)).face({ expr: [[0, 'thinking'], [1.3, 'shocked']], t, blink: true }); s.maya.pose(T.idle3('think', t, { seed: 3 })).face({ expr: 'smile', t, blink: true, look: [0.6, 0] });
+  draw(s, t, info, T) { s.hero.pose(T.posesAt3(t, [[0, 'holdFront'], [1.3, 'shocked']], 0.38)).face({ expr: [[0, 'thinking'], [1.3, 'shocked']], t, blink: true }); s.maya.pose(T.idle3('think', t, { seed: 3 })).face({ expr: 'smile', t, blink: true, look: [0.6, 0] });
     s.tch.pose(T.idle3('explain', t, { seed: 5 })).face({ expr: 'neutral', t, blink: true }); s.c.flask.scale.setScalar(1 + 0.08 * Math.sin(t * 9)); cam(s, t, info, T, { a: s.hero, side: -1 }); },
 });
 registerShot('library', {
   init(T) { const st = T.stage({ mood: 'interiorWarm', fov: 34, fog: [12, 40], dof: { focus: 2.5, aperture: 0.0016, maxblur: 0.008 } }); const l = T.W.library(st, {});
     const hero = st.add(sitAt(T, HERO, l.seat(0, 1, 0))), sam = st.add(sitAt(T, SAM, l.seat(0, 1, 1))), lib = st.add(T.character(TEACHER_F).place(l.librarian[0], 0, l.librarian[1], l.librarian[2]));
     st.add(T.W.book({ color: '#c8443a' })).position.set(l.seat(0, 1, 1)[0], 0.785, l.seat(0, 1, 1)[1] - 0.45); return { st, l, hero, sam, lib }; },
-  draw(s, t, info, T) { s.hero.pose(T.posesAt3(t, [[0, 'sitBooth'], [0.9, 'passNote']], 0.2)).face({ expr: 'smirk', t, blink: true, look: [-0.6, 0] }); s.sam.pose(T.idle3('sitBooth', t, { seed: 4 })).face({ expr: [[0, 'neutral'], [1.4, 'smile']], t, blink: true, look: [0, -0.4] });
+  draw(s, t, info, T) { s.hero.pose(T.posesAt3(t, [[0, 'sitBooth'], [0.9, 'passNote']], 0.38)).face({ expr: 'smirk', t, blink: true, look: [-0.6, 0] }); s.sam.pose(T.idle3('sitBooth', t, { seed: 4 })).face({ expr: [[0, 'neutral'], [1.4, 'smile']], t, blink: true, look: [0, -0.4] });
     s.lib.pose(T.idle3('crossArms', t)).face({ expr: 'neutral', t, blink: true }); cam(s, t, info, T, { a: s.hero, b: s.sam }); s.st.focusOn?.(s.hero.headWorld()); },
 });
 registerShot('rainClass', {
@@ -45,7 +45,7 @@ registerShot('rainClass', {
     for (let i = 0; i < 3; i++) T.W.windowRain(st, { pos: [-c.w / 2 + 0.06, 1.85, -c.d / 2 + 1.8 + i * 2.6], w: 1.8, h: 1.7, yaw: R2 }); T.W.lightning(st, { times: [1.6] });
     const hero = st.add(sitAt(T, HERO, c.seat(2, 1))), a = st.add(sitAt(T, STUDENTS[1], c.seat(2, 2))), b = st.add(sitAt(T, STUDENTS[3], c.seat(1, 1))), d = st.add(sitAt(T, CLASSMATE, c.seat(1, 2))), tch = st.add(T.character(TEACHER_F).place(c.teacher[0], 0, c.teacher[1] + 0.3, 0));
     return { st, c, hero, a, b, d, tch }; },
-  draw(s, t, info, T) { s.hero.pose(T.posesAt3(t, [[0, 'sitStudy'], [0.6, 'sitRaiseHand']], 0.18)).face({ expr: 'determined', t, blink: true }); s.a.pose(T.idle3('sleepDesk', t, { seed: 2 })).face({ expr: 'sleepy', t });
+  draw(s, t, info, T) { s.hero.pose(T.posesAt3(t, [[0, 'sitStudy'], [0.6, 'sitRaiseHand']], 0.38)).face({ expr: 'determined', t, blink: true }); s.a.pose(T.idle3('sleepDesk', t, { seed: 2 })).face({ expr: 'sleepy', t });
     s.b.pose(T.idle3('copyPeek', t, { seed: 3 })).face({ expr: 'smirk', t, blink: true }); s.d.pose(T.idle3('sitStudy', t, { seed: 5 })).face({ expr: 'neutral', t, blink: true }); s.tch.pose(T.idle3('point', t)).face({ expr: 'smile', t, blink: true });
     cam(s, t, info, T, { a: s.hero }); },
 });
@@ -61,15 +61,15 @@ registerShot('blackout', {
     T.W.lightning(st, { times: [0.4, 1.9] }); T.W.powerCut(st, { t0: 0.8 }); T.W.alarmLight(st, { pos: [c.w / 2 - 0.4, 2.9, -c.d / 2 + 0.6], t0: 1.0 });
     const hero = st.add(sitAt(T, HERO, c.seat(1, 1))), k1 = st.add(T.character(STUDENTS[0]).place(c.seat(0, 1)[0] + 0.95, 0, c.seat(0, 1)[1] - 0.2, PI)), k2 = st.add(T.character(STUDENTS[5] || STUDENTS[2]).place(c.seat(1, 2)[0] + 0.95, 0, c.seat(1, 2)[1] - 0.2, PI));
     return { st, c, hero, k1, k2 }; },
-  draw(s, t, info, T) { s.hero.pose(T.posesAt3(t, [[0, 'sitStudy'], [0.9, 'scared']], 0.12)).face({ expr: [[0, 'neutral'], [0.9, 'scared']], t, blink: true });
-    for (const k of [s.k1, s.k2]) k.pose(T.posesAt3(t, [[0, 'scared'], [1.1, 'duckCover']], 0.25)).face({ expr: 'scared', t, blink: true }); cam(s, t, info, T, { a: s.hero }); },
+  draw(s, t, info, T) { s.hero.pose(T.posesAt3(t, [[0, 'sitStudy'], [0.9, 'scared']], 0.38)).face({ expr: [[0, 'neutral'], [0.9, 'scared']], t, blink: true });
+    for (const k of [s.k1, s.k2]) k.pose(T.posesAt3(t, [[0, 'scared'], [1.1, 'duckCover']], 0.38)).face({ expr: 'scared', t, blink: true }); cam(s, t, info, T, { a: s.hero }); },
 });
 registerShot('cafeteria', {
   init(T) { const st = T.stage({ mood: 'day', fov: 40, fog: [16, 60] }); const c = T.W.cafeteria(st, {});
     const hero = st.add(T.character(HERO)); const tr = T.W.tray({}); tr.position.set(0, 0.88, 0.42); hero.add(tr);
     const eaters = [[0, -1, 0], [0, -1, 1], [0, 1, 4], [1, 1, 0], [2, -1, 3], [2, -1, 4]].map(([a, b, i], k) => st.add(sitAt(T, STUDENTS[k % STUDENTS.length], c.seat(a, b, i))));
     return { st, c, hero, eaters }; },
-  draw(s, t, info, T) { const w = T.walkTo(s.hero, t, { from: [-1, 5.0], to: [-1, 1.7], t0: 0, t1: 2.4 }); s.hero.pose(arms(T, w, 'holdTray')).face({ expr: 'neutral', t, blink: true, look: [-0.4, 0] });
+  draw(s, t, info, T) { const w = T.walkTo(s.hero, t, { from: [-1, 5.2], to: [-1, 1.6], t0: 0, t1: 2.9 }); s.hero.pose(arms(T, w, 'holdTray')).face({ expr: 'neutral', t, blink: true, look: [-0.4, 0] });
     s.eaters.forEach((e, i) => e.pose(T.idle3(i % 2 ? 'sitBooth' : 'talk', t, { seed: i })).face({ expr: i % 3 ? 'smile' : 'neutral', t, blink: true })); cam(s, t, info, T, { a: s.hero }); },
 });
 registerShot('football', {
@@ -78,40 +78,40 @@ registerShot('football', {
     T.W.breath(st, qb, { every: 1.4 }); return { st, f, qb, wr, ball }; },
   draw(s, t, info, T) { s.qb.pose(T.throw3(t, { t0: 1.0, idle: 'carryBall' })).face({ expr: 'determined', t, blink: true });
     if (t < 1.0) { s.ball.position.set(-2.15, 0.98, 13.15); s.ball.rotation.set(0, 0, 0.3); } else T.toss(s.ball, t, { from: [-2.2, 1.9, 13.1], to: [-1.4, 1.25, 21.1], h: 2.2, t0: 1.0, dur: 1.0, spin: [3, 0, 0] });
-    s.wr.pose(T.posesAt3(t, [[0, 'ready'], [1.6, 'holdFront']], 0.15)).face({ expr: 'joy', t, blink: true }); cam(s, t, info, T, { a: s.qb, side: -1, yaw: Math.PI, dist: 1.1 }); },
+    s.wr.pose(T.posesAt3(t, [[0, 'ready'], [1.6, 'holdFront']], 0.38)).face({ expr: 'joy', t, blink: true }); cam(s, t, info, T, { a: s.qb, side: -1, yaw: Math.PI, dist: 1.1 }); },
 });
 registerShot('principal', {
   init(T) { const st = T.stage({ mood: 'interiorWarm', fov: 34, fog: [10, 30] }); const p = T.W.principalOffice(st, {});
     const hero = st.add(sitAt(T, HERO, p.guest(1))), pr = st.add(T.character(PRINCIPAL).place(p.principal[0], 0, p.principal[1] + 0.15, 0)); return { st, p, hero, pr }; },
-  draw(s, t, info, T) { s.hero.pose(T.idle3('sit', t)).face({ expr: 'worried', t, blink: true }); s.pr.pose(T.posesAt3(t, [[0, 'crossArmsAngry'], [1.2, 'pointAtViewer']], 0.2)).face({ expr: 'angry', t, blink: true });
+  draw(s, t, info, T) { s.hero.pose(T.idle3('sit', t)).face({ expr: 'worried', t, blink: true }); s.pr.pose(T.posesAt3(t, [[0, 'crossArmsAngry'], [1.2, 'pointAtViewer']], 0.38)).face({ expr: 'angry', t, blink: true });
     cam(s, t, info, T, { a: s.hero, b: s.pr, dist: 0.5 }); },
 });
 registerShot('nurse', {
   init(T) { const st = T.stage({ mood: 'interiorCool', fov: 32, fog: [8, 30] }); const n = T.W.nurseOffice(st, {});
     const hero = st.add(sitAt(T, HERO, n.bed)), nu = st.add(T.character(NURSE).place(n.bed[0] + 0.9, 0, n.bed[1] - 1.1, -0.6)); return { st, n, hero, nu }; },
-  draw(s, t, info, T) { s.hero.pose(T.body3('sit', t, 'shiver', 0.6)).face({ expr: 'nervous', t, blink: true }); s.nu.pose(T.idle3('think', t)).face({ expr: 'worried', t, blink: true }); cam(s, t, info, T, { a: s.hero, side: -1 }); },
+  draw(s, t, info, T) { s.hero.pose(T.body3('sit', t, 'shiver', 0.6)).face({ expr: 'nervous', t, blink: true }); s.nu.pose(T.idle3('think', t)).face({ expr: 'worried', t, blink: true }); cam(s, t, info, T, { a: s.hero, side: -1, yaw: 0.3 }); },
 });
 registerShot('restroom', {
   init(T) { const st = T.stage({ mood: 'interiorCool', fov: 34, fog: [8, 30] }); const w = T.W.restroom(st, {}); const sk = w.sink(1);
     const hero = st.add(T.character(HERO).place(sk[0], 0, sk[1], sk[2])); return { st, w, hero }; },
-  draw(s, t, info, T) { s.hero.pose(T.posesAt3(t, [[0, 'sad'], [1.3, 'handsOnHips']], 0.25)).face({ expr: [[0, 'sad'], [1.3, 'determined']], t, blink: true }); cam(s, t, info, T, { a: s.hero, yaw: PI * 0.78, side: -1, dist: 0.85 }); },
+  draw(s, t, info, T) { s.hero.pose(T.posesAt3(t, [[0, 'sad'], [1.3, 'handsOnHips']], 0.38)).face({ expr: [[0, 'sad'], [1.3, 'determined']], t, blink: true }); cam(s, t, info, T, { a: s.hero, yaw: PI * 0.78, side: -1, dist: 0.85 }); },
 });
 registerShot('band', {
   init(T) { const st = T.stage({ mood: 'interiorWarm', fov: 38, fog: [12, 40] }); const b = T.W.bandRoom(st, {});
     const kids = [[0, 1], [0, 3], [1, 2], [1, 4], [2, 3], [2, 6]].map(([r, i], k) => st.add(sitAt(T, k === 2 ? HERO : STUDENTS[k % STUDENTS.length], b.seat(r, i))));
     const tch = st.add(T.character(TEACHER_M).place(b.podium[0], b.podium[3], b.podium[1], 0)); return { st, b, kids, tch }; },
-  draw(s, t, info, T) { s.kids.forEach((k, i) => k.pose(T.idle3(i === 2 ? 'holdMic' : 'sit', t, { seed: i })).face({ expr: i === 2 ? 'joy' : 'neutral', t, blink: true }));
-    s.tch.pose(T.posesAt3(t, [[0, 'pointUp'], [0.6, 'cheer'], [1.2, 'pointUp'], [1.8, 'cheer']], 0.3)).face({ expr: 'smile', t, blink: true }); cam(s, t, info, T, { a: s.kids[2], height: 1.3 }); },
+  draw(s, t, info, T) { s.kids.forEach((k, i) => k.pose(T.idle3('sit', t, { seed: i })).face({ expr: i === 2 ? 'joy' : 'neutral', t, blink: true }));
+    s.tch.pose(T.posesAt3(t, [[0, 'pointUp'], [0.6, 'cheer'], [1.2, 'pointUp'], [1.8, 'cheer']], 0.38)).face({ expr: 'smile', t, blink: true }); cam(s, t, info, T, { a: s.kids[2], height: 1.3 }); },
 });
 registerShot('stage', {
   init(T) { const st = T.stage({ mood: 'night', fov: 40, fog: [20, 60] }); const a = T.W.auditorium(st, {});
-    const hero = st.add(T.character(HERO).place(a.podium[0] - 0.05, a.stageY, a.podium[1] + 0.55, 0)); [[0, 3], [0, 8], [1, 5], [2, 2]].forEach(([r, i], k) => st.add(sitAt(T, STUDENTS[k], a.seat(r, i))).pose(T.POSES3.sit));
+    const hero = st.add(T.character(HERO).place(a.podium[0], a.stageY, a.podium[1], 0)); [[0, 3], [0, 8], [1, 5], [2, 2]].forEach(([r, i], k) => st.add(sitAt(T, STUDENTS[k], a.seat(r, i))).pose(T.POSES3.sit));
     return { st, a, hero }; },
-  draw(s, t, info, T) { s.hero.pose(T.posesAt3(t, [[0, 'explain'], [1.3, 'pointUp']], 0.25)).face({ expr: 'determined', t, blink: true }); cam(s, t, info, T, { a: s.hero }); },
+  draw(s, t, info, T) { s.hero.pose(T.posesAt3(t, [[0, 'atPodium'], [1.6, 'raiseHand']], 0.45)).face({ expr: 'determined', t, blink: true }); cam(s, t, info, T, { a: s.hero, yaw: -0.65, side: -1 }); },
 });
 registerShot('lockerRoom', {
   init(T) { const st = T.stage({ mood: 'interiorCool', fov: 34, fog: [10, 30] }); const r = T.W.lockerRoom(st, {}); const b = r.bench(0);
-    const hero = st.add(T.character(HERO).place(b[0], 0, b[1] + 0.12, b[2])), rv = st.add(T.character({ ...RIVAL, ...T.W.LETTERMAN, patch: 'E' }).place(b[0] + 1.3, 0, b[1] + 1.4, PI + 0.5)), co = st.add(T.character(COACH).place(b[0] - 1.6, 0, b[1] + 1.8, PI - 0.4));
+    const hero = st.add(T.character(HERO).place(b[0], 0, b[1], b[2])), rv = st.add(T.character({ ...RIVAL, ...T.W.LETTERMAN, patch: 'E' }).place(b[0] + 1.3, 0, b[1] + 1.4, PI + 0.5)), co = st.add(T.character(COACH).place(b[0] - 1.6, 0, b[1] + 1.8, PI - 0.4));
     return { st, r, hero, rv, co }; },
   draw(s, t, info, T) { s.hero.pose(T.idle3('sit', t)).face({ expr: 'neutral', t, blink: true, look: [0.4, 0.2] }); s.rv.pose(T.idle3('crossArmsLean', t)).face({ expr: 'smirk', t, blink: true }); s.co.pose(T.idle3('handsOnHips', t, { seed: 3 })).face({ expr: 'angry', t, blink: true });
     cam(s, t, info, T, { a: s.hero, side: -1 }); },
@@ -121,7 +121,7 @@ registerShot('snowLot', {
     const hero = st.add(T.character({ ...HERO, scarf: '#c8343a' }).place(1.5, 0, 0.6, -R2)), sam = st.add(T.character({ ...SAM, scarf: '#ffffff' }).place(-2.5, 0, 0.6, R2)), ball = st.add(T.sphere(0.07, T.mat('#f8f8ff', { rough: 0.8 })));
     T.W.breath(st, hero, { every: 1.5 }); T.W.breath(st, sam, { every: 1.7, offset: 0.6 }); return { st, l, hero, sam, ball }; },
   draw(s, t, info, T) { s.sam.pose(T.throw3(t, { t0: 1.0 })).face({ expr: 'smirk', t, blink: true }); if (t < 1.0) s.ball.position.set(-2.55, 1.55, 0.55); else T.toss(s.ball, t, { from: [-2.4, 1.7, 0.5], to: [1.45, 1.35, 0.6], h: 0.5, t0: 1.0, dur: 0.45 });
-    s.ball.visible = t < 1.47; s.hero.pose(T.posesAt3(t, [[0, 'handsInPockets'], [1.45, 'shocked']], 0.1)).face({ expr: [[0, 'neutral'], [1.45, 'shocked']], t, blink: true }); cam(s, t, info, T, { a: s.hero, b: s.sam, side: -1 }); },
+    s.ball.visible = t < 1.47; s.hero.pose(T.posesAt3(t, [[0, 'handsInPockets'], [1.45, 'shocked']], 0.38)).face({ expr: [[0, 'neutral'], [1.45, 'shocked']], t, blink: true }); cam(s, t, info, T, { a: s.hero, b: s.sam, side: -1 }); },
 });
 registerShot('prom', {
   init(T) { const st = T.stage({ mood: 'night', fov: 34, fog: [16, 60] }); const h = T.W.promHall(st, {}); T.W.confetti(st, { area: [-3, 3, 0, 4.5, -2, 2], t0: 1.2, n: 500 });
@@ -140,14 +140,14 @@ registerShot('graduation', {
     const gown = (o) => ({ ...o, top: 'dress', color: '#1a1a2a', skirt: null, skirtLen: 1.25 });
     const grads = [HERO, SAM, STUDENTS[0], STUDENTS[1], STUDENTS[3], CLASSMATE].map((o, i) => { const c = st.add(T.character(gown(o)).place(-2.5 + i * 1.0, 0, -5.5 - (i % 2) * 0.8, 0)); c.userData.cap = c.wear(T.W.gradCap({})); return c; });
     return { st, grads }; },
-  draw(s, t, info, T) { s.grads.forEach((c, i) => { c.pose(T.posesAt3(t, [[0, 'stand'], [0.75 + i * 0.03, 'capToss'], [1.6, 'cheer']], 0.15)).face({ expr: 'joy', t, blink: true }); c.userData.cap.visible = t < 0.98; });
+  draw(s, t, info, T) { s.grads.forEach((c, i) => { c.pose(T.posesAt3(t, [[0, 'stand'], [0.75 + i * 0.03, 'capToss'], [1.6, 'cheer']], 0.38)).face({ expr: 'joy', t, blink: true }); c.userData.cap.visible = t < 0.98; });
     cam(s, t, info, T, { a: s.grads[0], side: 0.5 }); },
 });
 registerShot('rainLot', {
   init(T) { const st = T.stage({ mood: 'storm', fov: 34, fog: [20, 90] }); const l = T.W.studentLot(st, { wet: true, buses: 3 }); const rn = T.FX3.rain(st, { n: 1600, area: [-10, 10, 0, 9, -6, 6] }); if (rn?.update) st.onTick(rn.update);
     T.W.puddles(st, { area: [-8, 8, -1.5, 2.5], n: 7, y: 0.002 });
     const hero = st.add(T.character(HERO)), sam = st.add(T.character(SAM)); const u = T.W.umbrella({ color: '#c8343a' }); u.position.set(0.25, 1.42, 0.1); hero.add(u); return { st, l, hero, sam }; },
-  draw(s, t, info, T) { const wh = T.walkTo(s.hero, t, { from: [-3, 0.9], to: [1.8, 0.9], t0: 0, t1: 3.2 }), ws = T.walkTo(s.sam, t, { from: [-3, 0.35], to: [1.8, 0.35], t0: 0, t1: 3.2 });
+  draw(s, t, info, T) { const wh = T.walkTo(s.hero, t, { from: [-2.4, 0.9], to: [1.6, 0.9], t0: 0, t1: 3.2 }), ws = T.walkTo(s.sam, t, { from: [-2.4, 0.35], to: [1.6, 0.35], t0: 0, t1: 3.2 });
     s.hero.pose({ ...wh, armL: T.POSES3.shareUmbrella.armL, handL: 'fist' }).face({ expr: 'smile', t, blink: true, look: [-0.5, 0] }); s.sam.pose({ ...ws, armR: T.POSES3.holdBooks.armR, handR: 'open' }).face({ expr: 'happy', t, blink: true, look: [0.5, 0.1] });
-    cam(s, t, info, T, { a: s.hero, b: s.sam, side: -1 }); },
+    cam(s, t, info, T, { a: s.hero, b: s.sam, yaw: 0.25, dist: 1.25 }); },
 });

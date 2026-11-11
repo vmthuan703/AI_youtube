@@ -113,6 +113,7 @@ export const POSES3 = {
   capToss: P({ y: 0.04, spine: [-12, 0, 0], head: [-22, 0, 0], armL: [172, 26, 4, 0], armR: [172, 26, 4, 0], handL: 'open', handR: 'open', legL: [6, 6, 6, 0], legR: [-4, 6, 6, 0] }),
   duckCover: P({ y: -0.4, spine: [62, 0, 0], head: [24, 0, 0], legL: [96, 10, 128, 0], legR: [96, 10, 128, 0], armL: [150, 68, 128, 10], armR: [150, 68, 128, 10], handL: 'open', handR: 'open' }),
   sitBleacher: P({ y: -0.2, spine: [8, 0, 0], legL: [80, 10, 80, 0], legR: [80, 10, 80, 0], armL: { to: [0.16, 0.5, 0.36] }, armR: { to: [-0.16, 0.5, 0.36] }, handL: 'fist', handR: 'fist' }),
+  atPodium: P({ spine: [6, 0, 0], head: [-4, 0, 0], armL: { to: [0.2, 1.1, 0.3], pole: [0.6, 0.7, -0.3] }, armR: { to: [-0.2, 1.1, 0.3], pole: [-0.6, 0.7, -0.3] }, handL: 'open', handR: 'open' }),   // hands on a lectern 0.25 m ahead (T.W.auditorium podium)
   sitBooth: P({ y: -0.2, spine: [6, 0, 0], legL: [88, 6, 88, 0], legR: [88, 6, 88, 0], armL: { to: [0.16, 0.78, 0.4] }, armR: { to: [-0.16, 0.78, 0.4] }, handL: 'open', handR: 'open' }),
 };
 
@@ -201,6 +202,7 @@ export function blendPose3(a, b, k) {
     const va = a[kk] ?? b[kk], vb = b[kk] ?? a[kk];
     if (typeof va === 'number' || (Array.isArray(va) && Array.isArray(vb))) o[kk] = mixVal(va, vb, k);
     else if (va && vb && va.to && vb.to) o[kk] = { ...vb, to: mixVal(va.to, vb.to, k), pole: va.pole && vb.pole ? mixVal(va.pole, vb.pole, k) : vb.pole };
+    else if (/^(arm|leg)[LR]$/.test(kk) && va && vb) o[kk] = k <= 0 ? va : k >= 1 ? vb : { mix: [va, vb], k };   // 1.0.1: angle <-> IK limbs blend smoothly
     else o[kk] = k < 0.5 ? va : vb;
   }
   return o;
@@ -546,6 +548,17 @@ export function character(outfit = {}, opts = {}) {
       else { g.rotation.z = 0.14 * Math.sin(ph + 0.6) * sp - 0.25 * yr; g.rotation.x = -0.22 * sp * (0.6 + 0.4 * bob) + 0.25 * vy; }
     }
   };
+  // 1.0.1: limb points for any spec. armPts / legPts → [joint, end] in body space; limbMix blends two specs (nested mixes too)
+  // by lerping the joint and end points and restoring the bone lengths, so a pose blend never jumps between solvers.
+  const armPts = (a, sh, s) => { if (a.mix) return limbMix(a, sh, s, armPts, B.upperArm, B.foreArm);
+    if (Array.isArray(a)) { const [d, dd] = fkArm(a, s); const bq = body.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(chest.getWorldQuaternion(new THREE.Quaternion())); d.applyQuaternion(bq); dd.applyQuaternion(bq); const el = sh.clone().addScaledVector(d, B.upperArm); return [el, el.clone().addScaledVector(dd, B.foreArm)]; }
+    const T = new THREE.Vector3(...a.to), el = ik(sh, T, B.upperArm, B.foreArm, a.pole ? new THREE.Vector3(...a.pole) : sh.clone().add(new THREE.Vector3(s * 0.4, -0.3, -0.5))); return [el, el.clone().add(T.clone().sub(el).setLength(B.foreArm))]; };
+  const legPts = (lg, hp, s) => { if (lg.mix) return limbMix(lg, hp, s, legPts, B.thigh, B.shin);
+    if (Array.isArray(lg)) { const [d, dd] = fkLeg(lg, s); const bq = body.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(pelvis.getWorldQuaternion(new THREE.Quaternion())); d.applyQuaternion(bq); dd.applyQuaternion(bq); const kn = hp.clone().addScaledVector(d, B.thigh); return [kn, kn.clone().addScaledVector(dd, B.shin)]; }
+    const T = new THREE.Vector3(...lg.to), kn = ik(hp, T, B.thigh, B.shin, lg.pole ? new THREE.Vector3(...lg.pole) : hp.clone().add(new THREE.Vector3(s * 0.05, 0, 1))); return [kn, kn.clone().add(T.clone().sub(kn).setLength(B.shin))]; };
+  const limbMix = (m, base, s, pts, l1, l2) => { const [j0, e0] = pts(m.mix[0], base, s), [j1, e1] = pts(m.mix[1], base, s), k = m.k;
+    const e = e0.clone().lerp(e1, k), jGuess = j0.clone().lerp(j1, k), j = ik(base, e, l1, l2, jGuess.clone().multiplyScalar(2).sub(base.clone().add(e).multiplyScalar(0.5)));
+    return [j, j.clone().add(e.clone().sub(j).setLength(l2))]; };
   root.pose = (p) => {
     p = typeof p === 'string' ? POSES3[p] : p;
     // follow-through: hair lags the head and the body stretches a little when it rises or drops fast (poses from posesAt3 carry _prev)
@@ -563,7 +576,8 @@ export function character(outfit = {}, opts = {}) {
     for (const [side, s] of [['L', 1], ['R', -1]]) {
       const sh = toBody(chest, new THREE.Vector3(s * (chunky ? B.shoulderX + 0.02 : B.shoulderX), B.shoulderY, 0));
       const a = p['arm' + side] || [6, 12, 12, 0]; let el, wr, d2;
-      if (Array.isArray(a)) { const [d, dd] = fkArm(a, s); const bq = body.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(chest.getWorldQuaternion(new THREE.Quaternion())); d.applyQuaternion(bq); dd.applyQuaternion(bq); el = sh.clone().addScaledVector(d, B.upperArm); wr = el.clone().addScaledVector(dd, B.foreArm); d2 = dd; }
+      if (a && a.mix) { [el, wr] = limbMix(a, sh, s, armPts, B.upperArm, B.foreArm); d2 = wr.clone().sub(el).normalize(); }
+      else if (Array.isArray(a)) { const [d, dd] = fkArm(a, s); const bq = body.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(chest.getWorldQuaternion(new THREE.Quaternion())); d.applyQuaternion(bq); dd.applyQuaternion(bq); el = sh.clone().addScaledVector(d, B.upperArm); wr = el.clone().addScaledVector(dd, B.foreArm); d2 = dd; }
       else { const T = new THREE.Vector3(...a.to); el = ik(sh, T, B.upperArm, B.foreArm, a.pole ? new THREE.Vector3(...a.pole) : sh.clone().add(new THREE.Vector3(s * 0.4, -0.3, -0.5))); wr = el.clone().add(T.clone().sub(el).setLength(B.foreArm)); d2 = wr.clone().sub(el).normalize(); }
       place(L['up' + side], sh, el, L['up' + side].r); place(L['lo' + side], el, wr, L['lo' + side].r);
       if (sleeveRings[side].length) { const [a, b, c, d] = sleeveRings[side], setRing = (m, A, Bp, k) => { m.position.lerpVectors(A, Bp, k); tmp.copy(Bp).sub(A).normalize(); m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), tmp); }; setRing(a, sh, el, 0.38); setRing(b, sh, el, 0.76); setRing(c, el, wr, 0.3); setRing(d, el, wr, 0.66); }
@@ -571,7 +585,8 @@ export function character(outfit = {}, opts = {}) {
       if (shoulderBall.length) shoulderBall[side === 'L' ? 0 : 1].position.copy(sh);
       setHand(hands[side], p['hand' + side] || 'relaxed', el, wr);
       const hp = toBody(pelvis, new THREE.Vector3(s * B.hipX, 0, 0)); const lg = p['leg' + side] || [0, 3, 2, 0]; let kn, an, ld2;
-      if (Array.isArray(lg)) { const [d, dd] = fkLeg(lg, s); const bq = body.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(pelvis.getWorldQuaternion(new THREE.Quaternion())); d.applyQuaternion(bq); dd.applyQuaternion(bq); kn = hp.clone().addScaledVector(d, B.thigh); an = kn.clone().addScaledVector(dd, B.shin); ld2 = dd; }
+      if (lg && lg.mix) { [kn, an] = limbMix(lg, hp, s, legPts, B.thigh, B.shin); ld2 = an.clone().sub(kn).normalize(); }
+      else if (Array.isArray(lg)) { const [d, dd] = fkLeg(lg, s); const bq = body.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(pelvis.getWorldQuaternion(new THREE.Quaternion())); d.applyQuaternion(bq); dd.applyQuaternion(bq); kn = hp.clone().addScaledVector(d, B.thigh); an = kn.clone().addScaledVector(dd, B.shin); ld2 = dd; }
       else { const T = new THREE.Vector3(...lg.to); kn = ik(hp, T, B.thigh, B.shin, lg.pole ? new THREE.Vector3(...lg.pole) : hp.clone().add(new THREE.Vector3(s * 0.05, 0, 1))); an = kn.clone().add(T.clone().sub(kn).setLength(B.shin)); ld2 = an.clone().sub(kn).normalize(); }
       place(L['th' + side], hp, kn, L['th' + side].r); place(L['sh' + side], kn, an, L['sh' + side].r);
       const yaw = (p.hips?.[1] || 0) + (Array.isArray(lg) ? s * (lg[3] || 0) : 0) + s * 6;

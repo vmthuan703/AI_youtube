@@ -18,16 +18,17 @@ import { dust } from './fx3d.js';
 // Lies just above the floor and blends over it: strong at grazing angles, faint looking straight down, so floors read as
 // polished rather than as glass. o: { w, d, x, z, y, strength 0..1, blur 0..3, res 0.25..1, tint }.
 const MIRROR_SHADER = {
-  uniforms: { color: { value: null }, tDiffuse: { value: null }, textureMatrix: { value: null }, strength: { value: 0.35 }, blur: { value: 1.2 }, texel: { value: new THREE.Vector2(1 / 512, 1 / 512) } },
-  vertexShader: `uniform mat4 textureMatrix; varying vec4 vUv; varying vec3 vW;
-    void main() { vUv = textureMatrix * vec4(position, 1.0); vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`,
-  fragmentShader: `uniform vec3 color; uniform sampler2D tDiffuse; uniform float strength, blur; uniform vec2 texel; varying vec4 vUv; varying vec3 vW;
+  uniforms: { color: { value: null }, tDiffuse: { value: null }, textureMatrix: { value: null }, strength: { value: 0.35 }, blur: { value: 1.2 }, texel: { value: new THREE.Vector2(1 / 512, 1 / 512) }, mask: { value: null }, useMask: { value: 0 } },
+  vertexShader: `uniform mat4 textureMatrix; varying vec4 vUv; varying vec3 vW; varying vec2 vM;
+    void main() { vM = uv; vUv = textureMatrix * vec4(position, 1.0); vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`,
+  fragmentShader: `uniform vec3 color; uniform sampler2D tDiffuse; uniform float strength, blur; uniform vec2 texel; uniform sampler2D mask; uniform float useMask; varying vec4 vUv; varying vec3 vW; varying vec2 vM;
     void main() {
       vec2 uv = vUv.xy / vUv.w; vec3 acc = vec3(0.0); float wsum = 0.0;
       for (int i = -2; i <= 2; i++) for (int j = -2; j <= 2; j++) { float w = exp(-float(i * i + j * j) / 4.0); acc += texture2D(tDiffuse, uv + vec2(float(i), float(j)) * texel * blur * 1.5).rgb * w; wsum += w; }
       vec3 refl = acc / wsum * color;
       vec3 V = normalize(cameraPosition - vW); float fr = 0.25 + 0.75 * pow(1.0 - clamp(V.y, 0.0, 1.0), 3.0);
       float a = clamp(strength * fr, 0.0, 0.95);
+      if (useMask > 0.5) { float mk = texture2D(mask, vM).a; if (mk < 0.02) discard; a *= mk; }
       gl_FragColor = vec4(refl, a);
       #include <tonemapping_fragment>
       #include <colorspace_fragment>
@@ -39,7 +40,7 @@ export function mirror(st, o = {}) {
   const tw = Math.round(E.W * (E.PX || 1) * res), th = Math.round(E.H * (E.PX || 1) * res);
   const m = new Reflector(new THREE.PlaneGeometry(w, d), { textureWidth: tw, textureHeight: th, clipBias: 0.003, color: color(o.tint || '#ffffff'), shader: MIRROR_SHADER, multisample: 0 });
   m.material.transparent = true; m.material.depthWrite = false; m.material.uniforms.strength.value = o.strength ?? 0.35; m.material.uniforms.blur.value = o.blur ?? 1.2;
-  m.material.uniforms.texel.value.set(1 / tw, 1 / th);
+  m.material.uniforms.texel.value.set(1 / tw, 1 / th); if (o.mask) { m.material.uniforms.mask.value = o.mask; m.material.uniforms.useMask.value = 1; }   // o.mask: alpha texture (puddles)
   m.rotation.x = -Math.PI / 2; m.position.set(o.x || 0, (o.y || 0) + 0.004, o.z || 0); m.renderOrder = 2; m.name = 'mirror'; m.userData.dynamic = true;
   st.add(m); return m;
 }

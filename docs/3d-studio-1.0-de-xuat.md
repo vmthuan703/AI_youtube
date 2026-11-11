@@ -20,7 +20,7 @@ Ngày 2026-11-11. Nhánh `feature/3d-1.0.0`. Demo: `plugins/aitrends-3d-studio/s
 | Bối cảnh | Người qua đường (lấy từ roster) | `T.W.passersby` |
 | Công cụ | So sánh trước/sau cùng khung hình | `render.mjs --legacy` |
 
-## Đề xuất cho các bản sau (chưa làm)
+## Đề xuất P1–P8: đã làm trong 1.0.0 (ngày 2026-11-11, theo yêu cầu bổ sung)
 
 | # | Đề xuất | Lợi ích | Công sức |
 |---|---|---|---|

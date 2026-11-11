@@ -225,7 +225,7 @@ const fy = (deg) => ((deg * D2R - FACE.thStart) / FACE.thSpan) * FACE.H;
 const pxDeg = FACE.W / (FACE.phiSpan / D2R);   // pixels per degree (x)
 // pal: { line (mouth/brow strokes), sclera (eye white, 'big' eyes only), pupil, inner (mouth inside), teeth, tongue }
 function drawFace(g, f) {
-  const { eye, mouth, talk = 0, blink = false, look = [0, 0], style = 'dot', pal } = f;
+  const { eye, mouth, talk = 0, blink = false, look = [0, 0], style = 'dot', pal, vis = null } = f;
   const dot = style === 'dot';
   g.clearRect(0, 0, FACE.W, FACE.H); g.lineCap = 'round'; g.lineJoin = 'round';
   const ex = dot ? 25 : 23, ey = dot ? 93 : 86, ew = dot ? 5.0 : 17, eh = dot ? 7.5 : 21;   // degrees
@@ -275,7 +275,10 @@ function drawFace(g, f) {
   const m = mouth, mw = (m.w || 0.5) * 58 * k * pxDeg / 2, mx = fx(0) + (m.type === 'smirk' ? 3 * pxDeg : 0), my = fy(dot ? 111 : 119); const U = (pxDeg / 2.6) * (dot ? 0.62 : 1);
   const op = clamp((m.open || 0) + talk * 0.75, 0, 1.2), cu = m.curve || 0;
   const line = pal.line; g.fillStyle = line; g.strokeStyle = line; g.lineWidth = (dot ? 7 : 9) * U;
-  if (talk > 0.05 && ['flat', 'smile', 'smirk', 'frown'].includes(m.type)) { drawOpen(g, mx, my, mw * 0.8, op * 26 * U, cu, pal); return; }
+  if (talk > 0.05 && ['flat', 'smile', 'smirk', 'frown'].includes(m.type)) {
+    if (vis?.closed) { g.lineWidth = (dot ? 9 : 11) * U; g.beginPath(); g.moveTo(mx - mw * 0.7, my); g.quadraticCurveTo(mx, my + 4 * U, mx + mw * 0.7, my); g.stroke(); return; }   // m/b/p: lips pressed
+    if (vis?.teeth) { const hh = 12 * U; drawOpen(g, mx, my, mw * 0.75, hh, 0, pal); g.fillStyle = pal.teeth; g.fillRect(mx - mw * 0.5, my - hh * 0.25, mw, hh * 0.55); return; }   // f/v: top teeth on the lip
+    const wide = vis?.wide || 0; drawOpen(g, mx, my, mw * 0.8 * (1 + 0.35 * wide), op * 26 * U * (1 - 0.3 * wide), cu + 0.15 * wide, pal); return; }
   switch (m.type) {
     case 'flat': g.beginPath(); g.moveTo(mx - mw, my - cu * 10 * U); g.quadraticCurveTo(mx, my + cu * 30 * U, mx + mw, my - cu * 10 * U); g.stroke(); break;
     case 'frown': g.beginPath(); g.moveTo(mx - mw, my + 10 * U); g.quadraticCurveTo(mx, my + (-22 + cu * 20) * U, mx + mw, my + 10 * U); g.stroke(); break;
@@ -337,6 +340,7 @@ export function character(outfit = {}, opts = {}) {
   // outline hull: a back-face copy pushed out by olW (scaled for spheres/lathes, or an explicit radius for segments)
   const hull = (m, k = 1.06) => { if (!olM) return null; const h = new THREE.Mesh(m.geometry, olM); h.castShadow = false; h.receiveShadow = false; h.scale.setScalar(k); m.add(h); return h; };
   // frames
+  const dangles = [];   // 1.0: parts that swing with motion (hoodie strings, the bag); see secondary() in pose()
   const pelvis = new THREE.Group(); body.add(pelvis);
   const chest = new THREE.Group(); pelvis.add(chest);
   const neck = new THREE.Group(); neck.position.set(0, B.chestH, 0); chest.add(neck);
@@ -371,7 +375,8 @@ export function character(outfit = {}, opts = {}) {
     const pocket = add(new THREE.Mesh(new THREE.CylinderGeometry(0.197, 0.205, 0.13, 28, 1, true, -0.75, 1.5), clothM(shade(topC, -0.1), { side: THREE.DoubleSide, rim: 0.4 })), chest); pocket.scale.set(1.03, 1, 0.72); pocket.position.set(0, -0.01, 0);
     const band = add(new THREE.Mesh(new THREE.TorusGeometry(0.193, 0.02, 8, 32), trimM), chest); band.rotation.x = Math.PI / 2; band.scale.set(1, 0.7, 1); band.position.y = -0.155;
     const strM = MAT(outfit.strings || '#f2f2f2', { rim: 0.2 });
-    for (const sx of [-0.045, 0.045]) { const s = add(new THREE.Mesh(new THREE.CylinderGeometry(0.009, 0.009, 0.2, 6), strM), chest); s.position.set(sx, 0.39, 0.145); s.rotation.x = 0.08; const tip = add(new THREE.Mesh(new THREE.CapsuleGeometry(0.012, 0.025, 4, 6), strM), chest); tip.position.set(sx, 0.28, 0.153); }
+    for (const sx of [-0.045, 0.045]) { const piv = new THREE.Group(); piv.position.set(sx, 0.49, 0.137); piv.rotation.x = 0.08; chest.add(piv); dangles.push(['string', piv, sx]);   // 1.0: strings hang from a pivot and swing
+      const s = add(new THREE.Mesh(new THREE.CylinderGeometry(0.009, 0.009, 0.2, 6), strM), piv); s.position.set(0, -0.1, 0); const tip = add(new THREE.Mesh(new THREE.CapsuleGeometry(0.012, 0.025, 4, 6), strM), piv); tip.position.set(0, -0.21, 0.006); }
   }
   if (top === 'puffer') {
     // quilted down jacket: horizontal seams, high collar, zip. The seams follow the boxy torso section.
@@ -391,7 +396,7 @@ export function character(outfit = {}, opts = {}) {
   if (outfit.stripe) { const b = add(new THREE.Mesh(new THREE.CylinderGeometry(torsoR, torsoR, 0.07, 36, 1, true), clothM(outfit.stripe, { rim: 0.3, side: THREE.DoubleSide })), chest); b.scale.z = 0.71; b.position.y = 0.2; }
   if (outfit.scarf) { const sm = clothM(outfit.scarf, { rim: 0.35 }); const ring = add(new THREE.Mesh(new THREE.TorusGeometry(0.098, 0.04, 12, 28), sm), chest); ring.rotation.x = Math.PI / 2; ring.position.y = 0.5; ring.scale.set(1.08, 0.92, 0.85); hull(ring, 1 + olW / 0.1); const tail = add(new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.24, 0.03), sm), chest); tail.position.set(-0.07, 0.34, chunky ? 0.158 : 0.135); tail.rotation.x = 0.07; }
   if (outfit.collar) { const cm = clothM(outfit.collar, { rim: 0.3 }); for (const sx of [-1, 1]) { const w = add(new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.03, 0.075), cm), chest); w.position.set(sx * 0.062, 0.485, 0.082); w.rotation.set(0.55, sx * -0.55, sx * -0.42); } }
-  if (outfit.bag) { const bm = clothM(outfit.bag, { rim: 0.3 }); const pivot = new THREE.Group(); pivot.position.y = 0.19; pivot.rotation.z = -0.72; chest.add(pivot); const strap = add(new THREE.Mesh(new THREE.TorusGeometry(torsoR / Math.cos(0.72) + 0.005, 0.0105, 8, 48), bm), pivot); strap.rotation.x = Math.PI / 2; strap.scale.set(1, 0.56, 1); const pouch = add(new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.115, 0.055), bm), chest); pouch.position.set(0.16, -0.02, chunky ? 0.125 : 0.105); hull(pouch, 1.08); }
+  if (outfit.bag) { const bm = clothM(outfit.bag, { rim: 0.3 }); const pivot = new THREE.Group(); pivot.position.y = 0.19; pivot.rotation.z = -0.72; chest.add(pivot); const strap = add(new THREE.Mesh(new THREE.TorusGeometry(torsoR / Math.cos(0.72) + 0.005, 0.0105, 8, 48), bm), pivot); strap.rotation.x = Math.PI / 2; strap.scale.set(1, 0.56, 1); const bp = new THREE.Group(); bp.position.set(0.16, 0.04, chunky ? 0.125 : 0.105); chest.add(bp); dangles.push(['bag', bp, 0]); const pouch = add(new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.115, 0.055), bm), bp); pouch.position.set(0, -0.06, 0.004); hull(pouch, 1.08); }
   let skirt = null;
   if (outfit.skirt && top !== 'dress') { const len = 0.26; skirt = add(new THREE.Mesh(new THREE.CylinderGeometry(0.178, 0.3, len, 28, 1, true), MAT(outfit.skirt, { rough: 0.85, rim: 0.4, side: THREE.DoubleSide })), pelvis); skirt.scale.z = 0.74; skirt.position.y = -len / 2 - 0.045; hull(skirt, 1 + olW / 0.25); }
   if (top === 'dress' || coat) { const len = top === 'dress' ? 0.42 : 0.55; skirt = add(new THREE.Mesh(new THREE.CylinderGeometry(0.17, top === 'dress' ? 0.3 : 0.22, len, 28, 1, true), MAT(top === 'dress' ? topC : coatC, { rough: 0.85, rim: 0.4, side: THREE.DoubleSide })), pelvis); skirt.scale.z = 0.75; skirt.position.y = -len / 2 + 0.02; hull(skirt, 1 + olW / 0.25); }
@@ -505,6 +510,18 @@ export function character(outfit = {}, opts = {}) {
     const sb = clothBase.skirt; if (sb) { const L = sb.len * sb.sy, sy = sb.sy * (1 - (sb.len > 0.35 ? 0.72 : 0.55) * k), top = sb.y + L / 2;
       skirt.scale.set(sb.sx * (1 - 0.18 * k), sy, sb.sz * (1 + 0.3 * k)); skirt.position.y = lerp(top - (sb.len * sy) / 2, 0.006 + (sb.len * sy) / 2, k); skirt.position.z = sb.z + 0.08 * k; skirt.rotation.x = -0.18 * k; }
   };
+  // 1.0 secondary motion: motion helpers (walkTo, climb, jump3, turn3) leave root.userData.mo = { v, phase, vy, yawRate } for this
+  // frame; the hair bounces and sweeps back, hoodie strings and the bag swing a beat behind the steps. Pure function of time.
+  const secondary = (p) => {
+    const mo = root.userData.mo || {}; root.userData.mo = null;
+    const sp = clamp((mo.v || 0) / 2.6), ph = mo.phase || 0, bob = Math.sin(2 * ph - 0.9), vy = clamp((mo.vy || 0) / 3, -1, 1), yr = clamp((mo.yawRate || 0) / 6, -1, 1);
+    const q = p._prev, dSp = q ? clamp(((p.spine?.[0] || 0) - (q.spine?.[0] || 0)) / 20, -1, 1) : 0;
+    hairG.rotation.x += (-0.09 * sp + 0.035 * bob * sp + 0.1 * vy) ; hairG.rotation.z += 0.03 * Math.sin(ph) * sp - 0.08 * yr; hairG.position.y = 0.006 * bob * sp;
+    for (const [kind, g, sx] of dangles) {
+      if (kind === 'string') { g.rotation.x = 0.08 - 0.55 * sp - 0.22 * bob * sp + 0.35 * vy - 0.4 * dSp; g.rotation.z = 0.18 * Math.sin(ph + sx * 20) * sp - 0.3 * yr; }
+      else { g.rotation.z = 0.14 * Math.sin(ph + 0.6) * sp - 0.25 * yr; g.rotation.x = -0.22 * sp * (0.6 + 0.4 * bob) + 0.25 * vy; }
+    }
+  };
   root.pose = (p) => {
     p = typeof p === 'string' ? POSES3[p] : p;
     // follow-through: hair lags the head and the body stretches a little when it rises or drops fast (poses from posesAt3 carry _prev)
@@ -512,6 +529,7 @@ export function character(outfit = {}, opts = {}) {
     if (q) { const dp = (p.head?.[0] || 0) + (p.spine?.[0] || 0) - (q.head?.[0] || 0) - (q.spine?.[0] || 0), dyw = (p.head?.[1] || 0) + (p.spine?.[1] || 0) - (q.head?.[1] || 0) - (q.spine?.[1] || 0);
       hairG.rotation.set(clamp(-dp * 0.35, -9, 9) * D2R, clamp(-dyw * 0.3, -9, 9) * D2R, 0); sy = 1 + clamp(((p.y || 0) - (q.y || 0)) * 0.9, -0.06, 0.06); }
     else hairG.rotation.set(0, 0, 0);
+    secondary(p);
     body.scale.set(scale / Math.sqrt(sy), scale * sy, scale / Math.sqrt(sy));
     if (contact) { const lying = Math.abs((p.hips || [0])[0]) > 45, up = Math.max(0, p.y || 0); contact.visible = !lying; const k = clamp(1 - up * 1.6, 0.35, 1); contact.scale.set(k, k, 1); contact.material.opacity = (S().contact ?? 0.42) * k * (contact.userData.fade ?? 1); }
     seated(p);
@@ -546,17 +564,17 @@ export function character(outfit = {}, opts = {}) {
     const ex = keys ? exprAt(o.t ?? 0, keys, o.exprBlend ?? 0.16) : typeof o.expr === 'object' ? o.expr : EXPRESSIONS[o.expr || 'neutral'] || EXPRESSIONS.neutral;
     let bl = typeof o.blink === 'number' ? o.blink : o.blink && o.blink !== true ? 1 : 0;
     if (o.blink === true && o.t != null) bl = blinkAt(o.t, seed, keys ? keys.slice(1).map(k => k[0]) : []);
-    let talk = o.talk || 0, round = 0;
+    let talk = o.talk || 0, round = 0, vis = null;
     if (o.speaker && o.gt != null) talk = talkShape(o.speaker, o.gt);
-    if (typeof talk === 'object') { round = talk.round || 0; talk = talk.open || 0; }
-    talk = Math.round(clamp(talk) * 4) / 4;
+    if (typeof talk === 'object') { round = talk.round || 0; vis = { wide: Math.round((talk.wide || 0) * 2) / 2, teeth: talk.teeth > 0.5 ? 1 : 0, closed: talk.closed > 0.5 ? 1 : 0 }; talk = talk.open || 0; }
+    talk = Math.round(clamp(talk) * 8) / 8;   // 1.0: 8 steps (was 4) so the mouth moves smoothly
     let look = o.look; if (!look) look = o.t != null && o.saccade !== false && !ex.eye.closed ? saccade(o.t, seed, typeof o.saccade === 'number' ? o.saccade : 1) : [0, 0];
     look = look.map(v => Math.round(v * 12) / 12);
     let eye = ex.eye, mouth = ex.mouth; const blink = bl >= 0.7;
     if (!blink && bl > 0.05 && !eye.closed) eye = { ...eye, open: (eye.open ?? 0.82) * Math.round((1 - bl) * 4) / 4 };
     if (talk > 0.05 && round > 0.5 && ['flat', 'smile', 'smirk', 'frown'].includes(mouth.type)) mouth = { ...mouth, type: 'o', w: Math.max(0.22, (mouth.w || 0.5) * 0.6), open: 0 };
-    const k = JSON.stringify([eye, mouth, talk, blink, look, eyeStyle, pal]);
-    if (k !== faceKey) { faceKey = k; faceMat.map = faceTexture(k, (g) => drawFace(g, { eye, mouth, talk, blink, look, style: eyeStyle, pal })); faceMat.needsUpdate = true; }
+    const k = JSON.stringify([eye, mouth, talk, blink, look, eyeStyle, pal, vis]);
+    if (k !== faceKey) { faceKey = k; faceMat.map = faceTexture(k, (g) => drawFace(g, { eye, mouth, talk, blink, look, style: eyeStyle, pal, vis })); faceMat.needsUpdate = true; }
     return root;
   };
   // lookAt3(point, k = 1): turn the head toward a world point; k < 1 blends from the pose's own head angle (smooth turns)

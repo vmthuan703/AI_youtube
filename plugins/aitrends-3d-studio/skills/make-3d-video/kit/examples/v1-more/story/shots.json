@@ -1,0 +1,79 @@
+{
+ "title": "v1-more",
+ "duration": 31.0,
+ "shots": [
+  {
+   "id": "market",
+   "start": 0,
+   "end": 3,
+   "line": "",
+   "camera": "full"
+  },
+  {
+   "id": "hospital",
+   "start": 3,
+   "end": 6,
+   "line": "",
+   "camera": "pushIn"
+  },
+  {
+   "id": "rooftop",
+   "start": 6,
+   "end": 9.2,
+   "line": "",
+   "camera": "lowHero"
+  },
+  {
+   "id": "train",
+   "start": 9.2,
+   "end": 12.4,
+   "line": "",
+   "camera": "full",
+   "mblur": "action"
+  },
+  {
+   "id": "snow",
+   "start": 12.4,
+   "end": 15.4,
+   "line": "",
+   "camera": "closeup"
+  },
+  {
+   "id": "puddles",
+   "start": 15.4,
+   "end": 18.4,
+   "line": "",
+   "camera": "wide",
+   "mblur": "action"
+  },
+  {
+   "id": "leaves",
+   "start": 18.4,
+   "end": 21.4,
+   "line": "",
+   "camera": "twoShot"
+  },
+  {
+   "id": "punch",
+   "start": 21.4,
+   "end": 24.0,
+   "line": "",
+   "camera": "dutch",
+   "mblur": "action"
+  },
+  {
+   "id": "lipsync",
+   "start": 24.0,
+   "end": 27.5,
+   "line": "",
+   "camera": "closeup"
+  },
+  {
+   "id": "headlights",
+   "start": 27.5,
+   "end": 31.0,
+   "line": "",
+   "camera": "full"
+  }
+ ]
+}

@@ -189,14 +189,15 @@ function drawShot(buf, shot, lt, opts = {}) {
   try {
     if (def.kind === '3d') {
       const st = state3D(shot, def, info); const stg = st.stage || st.st || st; stg.activate?.();
-      const nb = Math.max(1, Math.round(shot.mblur ?? def.mblur ?? 1));
+      // mblur: sub-frames (2–4) over a 180° shutter; 'action' (1.0) = 5 sub-frames over a 300° shutter for runs, punches and falls
+      const mbv = shot.mblur ?? def.mblur ?? 1, nb = mbv === 'action' ? 5 : Math.max(1, Math.round(+mbv || 1)), shutter = mbv === 'action' ? 0.83 : 0.5;
       // a light hand-held drift on every 3D shot (config.handheld, shots.json/shot "handheld"), added only for the render
       const hh = shot.handheld ?? def.handheld ?? E.cfg.handheld ?? 0.35, cam = stg.camera, hseed = 1 + Math.round(shot.start * 7) % 97;
       const render = (gt) => { let sv = null; if (hh && cam && three.handheld) { sv = [cam.position.clone(), cam.quaternion.clone()]; three.handheld(cam, gt, hh, hseed); cam.updateMatrixWorld(); } stg.render(); if (sv) { cam.position.copy(sv[0]); cam.quaternion.copy(sv[1]); cam.updateMatrixWorld(); } };
       if (nb <= 1) { const a = performance.now(); const at = rampT(shot, lt); def.draw(st, at, info, three); stg.tick?.(at); const b = performance.now(); render(shot.start + lt); g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(glCanvas, 0, 0, buf.width, buf.height); g.restore(); PROF.anim = b - a; PROF.gl = performance.now() - b; PROF.calls = stg.calls; PROF.tris = stg.tris; }
       else {   // motion blur: average nb sub-frames across a 180° shutter
         const ax = accA.getContext('2d'); ax.globalAlpha = 1;
-        for (let k = 0; k < nb; k++) { const st_ = Math.max(0, lt - (0.5 / E.fps) * (1 - k / (nb - 1))), at = rampT(shot, st_); def.draw(st, at, { ...info, globalT: shot.start + st_ }, three); stg.tick?.(at); render(shot.start + st_); ax.globalAlpha = 1 / (k + 1); ax.drawImage(glCanvas, 0, 0, accA.width, accA.height); }
+        for (let k = 0; k < nb; k++) { const st_ = Math.max(0, lt - (shutter / E.fps) * (1 - k / (nb - 1))), at = rampT(shot, st_); def.draw(st, at, { ...info, globalT: shot.start + st_ }, three); stg.tick?.(at); render(shot.start + st_); ax.globalAlpha = 1 / (k + 1); ax.drawImage(glCanvas, 0, 0, accA.width, accA.height); }
         ax.globalAlpha = 1; g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(accA, 0, 0, buf.width, buf.height); g.restore();
       }
       if (def.overlay && !opts.noOverlay) { g.save(); def.overlay(g, lt, info, st); g.restore(); }

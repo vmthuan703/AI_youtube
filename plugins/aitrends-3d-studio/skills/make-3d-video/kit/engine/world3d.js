@@ -481,4 +481,6 @@ export * from './screens3d.js';
 // ready-made school sets: bus stop, inside the bus, locker hall, school front, cafeteria, PE yard, outdoor court (0.2.8)
 export * from './school3d.js';
 export * from './look10.js';     // 1.0: mirror floors, sky dome, light shafts, AO strips, string lights
-export * from './places10.js';   // 1.0: stairwell, classroom, city bus stop, shop street, residential, street food, café, passers-by
+export * from './places10.js';
+export * from './weather10.js';
+export * from './places10b.js';  // 1.0: supermarket, hospital hallway, rooftop, train station   // 1.0: lightning, cloud shadows, headlights, flicker, snow cover, puddles, leaves   // 1.0: stairwell, classroom, city bus stop, shop street, residential, street food, café, passers-by

@@ -40,6 +40,7 @@ export function walkTo(ch, t, o = {}) {
   // cadence from distance: nominal stride per cycle (walk 1.45 m, run 2.85 m, sprint 4.7 m) adapted to the speed asked for
   const cad = o.sprint ? 1.9 : o.run ? 1.4 : 0.92, nominal = (o.sprint ? 4.7 : o.run ? 2.85 : 1.45) * sc;
   const stride = clamp(vmax / cad, nominal * 0.6, nominal * 1.5), phase = (s / stride) * Math.PI * 2;
+  ch.userData.mo = { ...(ch.userData.mo || {}), v, phase };   // 1.0: drives hair / strings / bag swing in pose()
   const gait = walkPose3(phase, { run: o.run, sprint: o.sprint, lean: (o.lean ?? 1) * clamp(v / Math.max(vmax, 1e-3)) });
   const idle = getPose(o.idle || 'stand'), end = getPose(o.end || o.idle || 'stand');
   const k = clamp((v / Math.max(vmax, 1e-3)) * 1.6);
@@ -240,7 +241,7 @@ export function jump3(ch, t, o = {}) {
   const crouch = getPose('crouch'), stand = getPose(o.idle || 'stand'), inAir = getPose('jump'), end = getPose(o.end || o.idle || 'stand');
   if (t < t0 - pre) { ch.position.set(...from); squash(ch, 1); return stand; }
   if (t < t0) { const k = ease.inOut(prog(t, t0 - pre, t0)); ch.position.set(...from); squash(ch, 1 - 0.1 * k); return blendPose3(stand, crouch, k * 0.8); }
-  if (t < t0 + air) { const k = (t - t0) / air; ch.position.set(lerp(from[0], to[0], k), lerp(from[1], to[1], k) + 4 * h * k * (1 - k), lerp(from[2], to[2], k));
+  if (t < t0 + air) { const k = (t - t0) / air; ch.userData.mo = { vy: (4 * h * (1 - 2 * k)) / air }; ch.position.set(lerp(from[0], to[0], k), lerp(from[1], to[1], k) + 4 * h * k * (1 - k), lerp(from[2], to[2], k));
     squash(ch, 1 + 0.16 * Math.max(0, 1 - k * 4) + 0.08 * Math.max(0, k * 4 - 3)); const tuck = Math.sin(Math.PI * k); return blendPose3(blendPose3(crouch, inAir, ease.out(clamp(k * 5))), crouch, tuck * 0.35); }
   const u = (t - t0 - air) / rec; ch.position.set(...to);
   if (u < 1) { squash(ch, 1 - 0.18 * Math.exp(-u * 5) * Math.cos(u * 9)); return blendPose3(crouch, end, ease.out(clamp(u * 1.2))); }
@@ -271,6 +272,7 @@ export function turn3(ch, t, o = {}) {
   const t0 = o.t0 ?? 0, dur = o.dur ?? 0.55, k = prog(t, t0, t0 + dur), e = ease.inOut(k), base = getPose(o.pose || 'stand');
   ch.rotation.y = angLerp(o.from ?? 0, o.to ?? 0, e);
   if (k <= 0 || k >= 1) return base;
+  { let dd = ((o.to - o.from + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI; ch.userData.mo = { yawRate: dd / dur * Math.sin(Math.PI * k) * 1.5 }; }
   let d = ((o.to - o.from + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
   const lead = (1 - e) * d * 0.45 / D2R * Math.min(1, k * 4), stepL = Math.max(0, Math.sin(Math.PI * k * 2)) * 16, stepR = Math.max(0, -Math.sin(Math.PI * k * 2)) * 16;
   const leg = (l, s) => Array.isArray(l) ? [l[0] + s, l[1], l[2] + s * 1.6, l[3]] : l;

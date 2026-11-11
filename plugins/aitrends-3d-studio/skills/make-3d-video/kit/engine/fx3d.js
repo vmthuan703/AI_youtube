@@ -236,3 +236,28 @@ export function splash(st, o = {}) {
     rings.forEach((m, i) => { const k = clamp((tt - i * 0.18) / 1.6); m.visible = k > 0 && k < 1; m.scale.setScalar(0.2 + k * 1.8 * size * (1 + i * 0.3)); m.material.opacity = 0.7 * (1 - k); }); };
   update(0); st.onTick(update); return { obj: g, update };
 }
+
+// ---------------------------------------------------------------- 1.0 smear arcs: the cartoon "smear frame" of a fast swing
+// swoosh(st, { pos: [x,y,z] centre of the swing, from, to (angles, radians, in the plane), axis: [x,y,z] plane normal, r, w (band width),
+//   t0, dur, color, opacity }) → { obj, update(t) } (ticks itself). A crescent band sweeps from `from` to `to` and fades: punches,
+// kicks, a bat swing, a fall (draw it along the body's path). Pair it with shot "mblur": "action".
+export function swoosh(st, o = {}) {
+  const r = o.r ?? 0.55, w = o.w ?? 0.16, t0 = o.t0 ?? 0, dur = o.dur ?? 0.18, a0 = o.from ?? -1.2, a1 = o.to ?? 0.4, seg = 40;
+  const geo = new THREE.BufferGeometry(), pos = new Float32Array((seg + 1) * 2 * 3), uv = new Float32Array((seg + 1) * 2 * 2), idx = [];
+  for (let i = 0; i < seg; i++) { const a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.setAttribute('uv', new THREE.BufferAttribute(uv, 2)); geo.setIndex(idx);
+  const tex = cachedSwoosh(); const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: tex, color: color(o.color || '#ffffff'), transparent: true, opacity: o.opacity ?? 0.75, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, toneMapped: false, fog: false }));
+  m.frustumCulled = false; m.renderOrder = 5; m.userData.dynamic = true; m.position.set(...(o.pos || [0, 1, 0]));
+  m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), new THREE.Vector3(...(o.axis || [0, 0, 1])).normalize()); if (o.roll) m.rotateZ(o.roll); st.add(m);
+  const update = (t) => { const k = (t - t0) / dur; if (k < 0 || k > 1.6) { m.visible = false; return; } m.visible = true;
+    const head = a0 + (a1 - a0) * Math.min(1, k), tail = a0 + (a1 - a0) * Math.max(0, Math.min(1, k - 0.55)) * (k > 1 ? 1 + (k - 1) * 1.6 : 1), fade = k > 1 ? 1 - (k - 1) / 0.6 : 1;
+    for (let i = 0; i <= seg; i++) { const u = i / seg, a = tail + (head - tail) * u, ww = w * Math.sin(Math.PI * Math.min(1, u * 1.15)) * fade;
+      pos.set([Math.cos(a) * (r + ww / 2), Math.sin(a) * (r + ww / 2), 0, Math.cos(a) * (r - ww / 2), Math.sin(a) * (r - ww / 2), 0], i * 6); uv.set([u, 1, u, 0], i * 4); }
+    geo.attributes.position.needsUpdate = true; geo.attributes.uv.needsUpdate = true; m.material.opacity = (o.opacity ?? 0.75) * Math.max(0, fade); };
+  update(0); st.onTick(update); return { obj: m, update };
+}
+let _swooshTex = null;
+function cachedSwoosh() { if (_swooshTex) return _swooshTex; const c = document.createElement('canvas'); c.width = 256; c.height = 32; const g = c.getContext('2d');
+  const gr = g.createLinearGradient(0, 0, 256, 0); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(0.75, 'rgba(255,255,255,.55)'); gr.addColorStop(1, 'rgba(255,255,255,1)'); g.fillStyle = gr; g.fillRect(0, 0, 256, 32);
+  const v = g.createLinearGradient(0, 0, 0, 32); v.addColorStop(0, 'rgba(0,0,0,1)'); v.addColorStop(0.5, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,1)'); g.globalCompositeOperation = 'destination-out'; g.fillStyle = v; g.globalAlpha = 0.6; g.fillRect(0, 0, 256, 32);
+  _swooshTex = new THREE.CanvasTexture(c); _swooshTex.colorSpace = THREE.SRGBColorSpace; return _swooshTex; }

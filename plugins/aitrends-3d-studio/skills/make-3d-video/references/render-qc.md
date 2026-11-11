@@ -124,3 +124,8 @@ Final file QC: `python tools/qc_metrics.py --project projects/<slug>`, `ffprobe 
 - The scorecard counts **bright frames** (median brightness above 0.40; the references have 13–65%) and **distinct locations** (the `set` of each shot in shots.json).
   Too few bright frames: add a daylight or outdoor sequence (nature sets, moods `beach`, `snow`, `day`). Fill `set` on every shot so the count is right.
 - Animals, screens and crowds read at phone size: a news headline at least 1/12 of the TV height, HUD text never under the floor, crowds not a grey blur (raise `cheer` or light them).
+
+
+## Gloss (1.0)
+The scorecard row `gloss` is the share of pixels that are small near-white highlights (glossy skin, hair, wet floors), lit windows and skies excluded.
+0.2.x videos measured ~0.005, the 1.0 demo ~0.015; under 0.008 reads flat: keep the 1.0 defaults (style gloss/env), add a mirror floor or wet street, a light shaft, a practical near the faces.

@@ -74,17 +74,23 @@ export function talkAmount(globalT, from = -1, to = 1e9) {
 // The mouth follows the letters of the word being spoken: a/e/i open wide, o/u/w round, m/b/p close, f/v nearly close.
 export function talkFor(speaker, globalT) { return talkShape(speaker, globalT).open; }
 const SPK = (w) => String(w.speaker || 'NARRATOR').toUpperCase();
-const VIS = (c) => ('aeiy'.includes(c) ? [0.95, 0] : 'ouw'.includes(c) ? [0.65, 1] : 'mbp'.includes(c) ? [0.02, 0] : 'fv'.includes(c) ? [0.2, 0] : 'lnrdt'.includes(c) ? [0.45, 0] : [0.55, 0]);
-// talkShape('MIA', info.globalT) -> { open 0..1, round 0..1 } (face() takes it as talk, or pass face({ speaker, gt }))
+// 1.0 visemes: each sound shapes the mouth — open (height), round (o/u/w), wide (e/i/ee), teeth (f/v: top teeth on the lip),
+// closed (m/b/p: lips pressed). Words are split into sounds with the common English digraphs first.
+const VISEME = { a: [0.95, 0, 0.2, 0, 0], e: [0.55, 0, 0.9, 0, 0], i: [0.5, 0, 0.95, 0, 0], y: [0.45, 0, 0.8, 0, 0], o: [0.65, 1, 0, 0, 0], u: [0.5, 1, 0, 0, 0], w: [0.35, 1, 0, 0, 0],
+  m: [0.14, 0, 0, 0, 1], b: [0.14, 0, 0, 0, 1], p: [0.14, 0, 0, 0, 1], f: [0.18, 0, 0.3, 1, 0], v: [0.18, 0, 0.3, 1, 0], r: [0.4, 0.55, 0, 0, 0], sh: [0.35, 0.75, 0, 0, 0], ch: [0.35, 0.7, 0, 0, 0],
+  oo: [0.5, 1, 0, 0, 0], ee: [0.5, 0, 1, 0, 0], th: [0.3, 0, 0.5, 0, 0], s: [0.25, 0, 0.75, 0, 0], z: [0.25, 0, 0.75, 0, 0], t: [0.35, 0, 0.6, 0, 0], d: [0.38, 0, 0.5, 0, 0], n: [0.38, 0, 0.5, 0, 0], l: [0.42, 0, 0.4, 0, 0], _: [0.5, 0, 0.2, 0, 0] };
+const VIS = (c) => VISEME[c] || VISEME._;
+const sounds = (s) => { const out = []; for (let i = 0; i < s.length; i++) { const two = s.slice(i, i + 2); if (['sh', 'ch', 'th', 'oo', 'ee'].includes(two)) { out.push(two); i++; } else out.push(s[i]); } return out; };
+// talkShape('MIA', info.globalT) -> { open 0..1, round, wide, teeth, closed } (face() takes it as talk, or pass face({ speaker, gt }))
 export function talkShape(speaker, globalT) {
-  const w = E.words.find(w => globalT >= w.start - 0.03 && globalT <= w.end + 0.03);
-  if (!w || (speaker != null && SPK(w) !== String(speaker).toUpperCase())) return { open: 0, round: 0 };
+  const w = E.words.find(w => globalT >= w.start - 0.04 && globalT <= w.end + 0.03);
+  if (!w || (speaker != null && SPK(w) !== String(speaker).toUpperCase())) return { open: 0, round: 0, wide: 0, teeth: 0, closed: 0 };
   let s = String(w.word || '').toLowerCase().replace(/[^a-z]/g, '').replace(/(.)\1+/g, '$1'); if (s.length > 3) s = s.replace(/e$/, '');
   if (/\d/.test(w.word || '') || !s) s = 'aea';
-  const dur = Math.max(0.06, w.end - w.start), u = clamp((globalT - w.start) / dur) * s.length, i = Math.min(s.length - 1, Math.floor(u)), f = u - i;
-  const [o1, r1] = VIS(s[i]), [o2, r2] = VIS(s[Math.min(s.length - 1, i + 1)]), k = ease.inOut(prog(f, 0.55, 1));
-  const env = clamp(Math.min((globalT - w.start + 0.03) / 0.07, (w.end + 0.03 - globalT) / 0.08));
-  return { open: clamp(lerp(o1, o2, k) * env * (0.75 + 0.25 * Math.min(1, dur / 0.25))), round: lerp(r1, r2, k) };
+  const S2 = sounds(s), dur = Math.max(0.06, w.end - w.start), u = clamp((globalT - w.start + 0.03) / dur) * S2.length, i = Math.min(S2.length - 1, Math.floor(u)), f = u - i;
+  const A = VIS(S2[i]), B = VIS(S2[Math.min(S2.length - 1, i + 1)]), k = ease.inOut(prog(f, 0.5, 1)), mixv = (j) => lerp(A[j], B[j], k);
+  const env = clamp(Math.min((globalT - w.start + 0.04) / 0.07, (w.end + 0.03 - globalT) / 0.08));
+  return { open: clamp(mixv(0) * env * (0.75 + 0.25 * Math.min(1, dur / 0.25))), round: mixv(1), wide: mixv(2), teeth: mixv(3) * env, closed: mixv(4) * env };
 }
 // who is speaking around globalT: { speaker, since (s since their run of words began), prev (the speaker before), word }
 export function speakerAt(globalT, gap = 0.6) {

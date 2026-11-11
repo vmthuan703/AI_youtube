@@ -17,6 +17,7 @@ TARGETS = {
     "bright": (0.13, 0.65, "share of bright frames (median > 0.40)", "Add a daylight or outdoor sequence: nature sets (beach, island, snow, farm, underwater), moods beach/snow/day."),
     "places": (4.0, 60.0, "distinct locations (shots.json set)", "Fill each shot's set in shots.json; the references move through many places: add a location or vary the sets."),
     "murky": (0.0, 0.12, "share of frames too dark to read (median < 0.13)", "Night scenes: keep the stage faceLight on, add a practical lamp near the faces, lighter walls."),
+    "gloss": (0.008, 0.06, "share of pixels with a small bright highlight (glossy skin, hair, floors)", "Too flat: keep style gloss/env on (1.0 defaults), add a mirror floor or wet street, a light shaft, practical lights near faces; too high: lower mirror strength."),
     "empty": (0.0, 0.02, "share of frames with almost nothing in them", "Fill the purple stage: a bigger figure (a third of the height), a bigger diagram, a backdrop; see style-bible Explainers."),
     "still": (0.0, 0.10, "share of half-seconds where nothing moves", "Every shot moves: a camera drift, idle3 on people, a diagram that builds."),
     "cuts": (16.0, 22.0, "shots per minute", "Add or merge cuts on phrase boundaries."),
@@ -33,6 +34,20 @@ def frames(path, vf, w, h, extra=()):
     raw = subprocess.run(cmd, capture_output=True).stdout
     n = len(raw) // (w * h * 3)
     return np.frombuffer(raw[: n * w * h * 3], dtype=np.uint8).reshape(n, h, w, 3).astype(np.float32) / 255
+
+
+def gloss_share(F, y):
+    """per frame: share of pixels that are a specular highlight: bright, nearly white, 0.1 above the local 7x7 mean, in a
+    neighbourhood that is not itself bright (so lit windows and skies do not count). Measured at 320x180.
+    Calibration 2026-11-11: 0.2.x videos ~0.005, the 1.0 demo ~0.015."""
+    pad = np.pad(y, ((0, 0), (3, 3), (3, 3)), mode="edge")
+    c = pad.cumsum(1).cumsum(2)
+    c = np.pad(c, ((0, 0), (1, 0), (1, 0)))
+    loc = (c[:, 7:, 7:] - c[:, :-7, 7:] - c[:, 7:, :-7] + c[:, :-7, :-7]) / 49.0
+    mx, mn = F.max(axis=3), F.min(axis=3)
+    sat = (mx - mn) / (mx + 1e-4)
+    hi = (y > 0.6) & (sat < 0.3) & (y - loc > 0.1) & (loc < 0.55)
+    return hi.reshape(len(y), -1).mean(axis=1)
 
 
 def picture(path):
@@ -52,7 +67,11 @@ def picture(path):
     # detail: share of pixels on an edge; under 4.5 % is a near-empty picture (a bare stage with one small label)
     gx, gy = np.abs(np.diff(y, axis=2))[:, :-1, :], np.abs(np.diff(y, axis=1))[:, :, :-1]
     edge = ((gx + gy) > 0.05).reshape(len(y), -1).mean(axis=1)
-    return {"bars": float(bars), "luma": float(np.median(y)), "dark": float((y < 0.08).mean()), "sat": float(sat.mean()), "murky": float((np.median(y.reshape(len(y), -1), axis=1) < 0.13).mean()), "bright": float((np.median(y.reshape(len(y), -1), axis=1) > 0.40).mean()),
+    G = frames(path, "fps=1/2,scale=320:180", 320, 180)
+    if top >= 3:
+        G = G[:, top * 2:-top * 2]
+    gl = gloss_share(G, G @ np.array([0.2126, 0.7152, 0.0722], dtype=np.float32)) if len(G) else np.zeros(1)
+    return {"gloss": float(np.median(gl)), "bars": float(bars), "luma": float(np.median(y)), "dark": float((y < 0.08).mean()), "sat": float(sat.mean()), "murky": float((np.median(y.reshape(len(y), -1), axis=1) < 0.13).mean()), "bright": float((np.median(y.reshape(len(y), -1), axis=1) > 0.40).mean()),
             "empty": float((edge < 0.045).mean()), "empty_at": [i * 2 for i in np.nonzero(edge < 0.045)[0].tolist()]}
 
 
@@ -125,7 +144,7 @@ def main():
             continue
         ok = lo <= M[k] <= hi
         bad += not ok
-        fmt = (lambda x: f"{x:.2f}") if k not in ("cuts", "wpm", "loud", "places") else (lambda x: f"{x:.1f}")
+        fmt = (lambda x: f"{x:.3f}") if k == "gloss" else (lambda x: f"{x:.2f}") if k not in ("cuts", "wpm", "loud", "places") else (lambda x: f"{x:.1f}")
         rows.append(f"| {unit} | {fmt(M[k])} | {fmt(lo)} to {fmt(hi)} | {'OK' if ok else 'CHECK: ' + fix} |")
     md = f"# Scorecard: {os.path.basename(v)} ({dur:.0f} s)\n\n" + "\n".join(rows) + f"\n\n{len(rows) - 2 - bad} in range, {bad} to check. Targets describe one winning channel's template, not a rule.\n"
     if M.get("empty_at"):

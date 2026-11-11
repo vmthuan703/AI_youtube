@@ -7,6 +7,12 @@ khung hình 2:1, sơ đồ giải thích hoạt hình.
 Mọi khung hình đều dựng bằng code (Three.js) và render từng khung một. Không dùng AI tạo ảnh/video, nên nhân vật
 giữ nguyên dáng suốt video và chữ luôn nét. Giọng đọc mặc định dùng Chatterbox (MIT, chạy máy cá nhân), dự phòng Kokoro-82M (Apache-2.0).
 
+## Mới trong 1.0.0
+- **Đồ họa:** ánh sáng môi trường theo bầu trời của từng mood, da/tóc/giày bóng kiểu đồ chơi vinyl (clearcoat), áo có ánh vải (sheen), sàn bóng và đường ướt phản chiếu, bầu trời có mây, tia nắng có bụi bay, bóng tối góc tường.
+- **Bối cảnh dựng sẵn:** cầu thang trường, lớp học, trạm xe buýt, phố hàng quán, khu dân cư (nhà có bậc thềm), quán ăn vỉa hè, quán cà phê, người qua đường.
+- **Hoạt ảnh:** leo cầu thang, nhảy có co giãn (squash & stretch), ngồi xuống/đứng dậy, xoay người tại chỗ.
+- So sánh trước/sau: `node render.mjs --project P --stills 3,12 --legacy`.
+
 ## Lệnh
 | Lệnh | Việc làm |
 |---|---|

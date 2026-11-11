@@ -109,7 +109,7 @@ Tweaks: add a custom entry to `STYLES` or `PALETTES` in `engine/styles.js` and r
 
 ## Stage 6: Build every shot
 Read `references/engine-api.md` and the example scenes in `examples/speed-demo/scenes/` (a full 32 s video),
-`examples/look-demo/scenes/` (sets and UI), `examples/diagram-gallery/scenes/` (every diagram, a blurred-scene backdrop) and
+`examples/v1-demo/scenes/` (1.0 everyday places: stairwell, classroom, city bus stop, shop street, residential, street food, café; gloss and motion), `examples/look-demo/scenes/` (sets and UI), `examples/diagram-gallery/scenes/` (every diagram, a blurred-scene backdrop) and
 `examples/worlds-demo/scenes/` (nature sets, light from props, game HUD and counters, first person, icons, planet) once.
 Work in batches of 8–12:
 1. Write `scenes/sets/<location>.js` (reusable builders on top of `T.W.*`) and `scenes/shots/NN_<name>.js` with

@@ -170,6 +170,11 @@ T.dolly(cam, t, [[0, { pos: [0.2, 0.45, 9], look: [0, 1.35, 3] }], [3, { pos: [0
   `ease.back(x, a)`: anticipation + overshoot), `T.clamp`, `T.lerp`, `T.noise`,
   `T.optimize(st, keep)` (called automatically).
 
+**1.0 motion** (engine/motion3d.js): `T.climb(ch, t, { path, t0, t1, run })` walks a 3D path (stairs, stoops) with higher knees and a lean on slopes;
+`T.jump3(ch, t, { t0, from, to, h, air, end })` crouch → stretch → arc → squash on landing → springy recovery (sets position and scale);
+`T.sitDown(t, { t0, dur, from, to, up })` stand ↔ sit with the hips back and the chest forward; `T.turn3(ch, t, { t0, from, to, dur, pose })` turn on the spot,
+head first, two small steps; `T.squash(ch, k)` volume-keeping squash/stretch from the feet.
+
 ## Characters — `T.character(outfit, {pose, expr, seed})` (engine/rig3d.js)
 Outfit (put them in `scenes/cast.js`, one per recurring character, never change them mid-video). The channel hero lives in `/channel/cast.js`; add the script's name for them:
 ```js
@@ -329,6 +334,24 @@ and raise their arms in waves; `cheer` 0–1 (or a function of t) sets how many 
   `T.W.schoolFront(st, { name, bus })` → facade with the name, steps, flag, path, sidewalk and bus (as busStop). `T.W.cafeteria(st, { tables })` → long tables (top 0.76),
   benches at z ± 0.72, `seat(table, side, i)`. `T.W.court(st)` → outdoor basketball court, hoops at x ±11.5 (rim 3.05), fence, benches; `T.W.hoop()` alone.
   `T.W.schoolYard(st)` → PE field 40 × 24 with a running lane, goals at x ±18, coach bench `coach`, school behind. Indoor basketball / dodgeball: `T.W.gym`.
+- **Everyday places, ready-made** (engine/places10.js, 1.0). Reach for these before writing a project set; they already use the 1.0 look.
+  `T.W.stairwell(st, { n, floorLabel })` → two flights + landing with a window and light shafts; `up` (whole climb), `upA`, `upB` are paths for `T.climb`,
+  `landing`, `H1` (landing height). `T.W.classroom(st, { board: [lines], boardDraw, rows, cols, clock })` → desks facing the board at z = −d/2;
+  `seat(row, col)` → [x, z, yaw] for pose 'sitDesk'; `teacher`, `board`. `T.W.cityBusStop(st, { busX, shelterX, wet, ad, route })` → shelter with a lit ad,
+  bench (`bench(i)` → [x, z, yaw], y 0.15), city bus (`bus`, `door`, `step`), sidewalk top `walk` 0.15. `T.W.shopStreet(st, { names, wet, tables, scooters })` →
+  shophouses with lit fronts, awnings, signs, balconies, string lights; `shops[i].door`, `table(i)`. `T.W.residential(st, { houses, cars, wet })` → brownstones;
+  `stoops[i] = { base, top, door, up }`. `T.W.streetFood(st, { name, menu, tables, wet })` → food stall with steam and bulbs; `vendor`, `seat(i)`, `counter`.
+  `T.W.cafe(st, { rain, menu, tables })` → counter, espresso machine, pendants, big window; `seat(i)`, `barista`, `counter`.
+  Props: `T.W.stairs({ n, rise, run, w, rails })` (`.path(x)` → climb path once placed), `cityBus`, `awning`, `stool`, `lowTable`, `pendantLamp`, `scooter`,
+  `menuBoard`, `aFrame`, `acUnit`, `planter`. Extras: `T.W.passersby(st, { cast: [roster outfits], lane: [x0, x1, z], n })` walk the sidewalk on their own.
+  These sets animate through `st.onTick` (dust in light shafts, steam, rain on glass, passers-by, the sky dome): **call `st.tick(t)` first in draw()**.
+- **1.0 look helpers** (engine/look10.js; all switch off with `render.mjs --legacy` for before/after): `T.W.mirror(st, { w, d, x, z, y, strength, blur })`
+  polished/wet floors (fresnel, blurred; ~0.15 indoors, 0.4–0.5 wet streets); `T.W.skyDome(st, { clouds, sun, seed })` painted sky with clouds and a sun glow;
+  `T.W.shafts(st, { pos, dir, len, w, h, n, gap, along, opacity, motes })` light beams with dust; `T.W.aoStrip(st, { from, to, yaw, up, out })` soft
+  darkening where a wall meets the floor; `T.W.stringLights({ from, to, n, sag, lights, colors })`.
+  Materials: `T.mat(c, { clearcoat, clearcoatRough, sheen, sheenRough, sheenColor })` switches to the physical material. Characters get a clearcoat on
+  skin, hair and shoes and a sheen on cloth automatically (`style.gloss` 0..1.5, 0 = the matte 0.2 look). `T.stage` lights every standard material with
+  the mood's own sky/ground/sun (`env` 0..1, default 0.42; `style.env`). `st.fitShadow([x,y,z], size)` tightens the sun's shadow box around the action.
 - Project sets: write `scenes/sets/<name>.js` exporting `function build(T, st, o)` that composes these, so every shot in
   a location uses the same geometry. Invent new props from boxes/cylinders/rounded boxes when the script needs them.
 

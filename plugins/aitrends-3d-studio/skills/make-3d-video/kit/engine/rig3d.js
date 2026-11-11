@@ -319,10 +319,11 @@ export function character(outfit = {}, opts = {}) {
   const contact = outfit.contact === false || opts.ghost ? null : new THREE.Mesh(new THREE.PlaneGeometry(0.78 * scale, 0.62 * scale), new THREE.MeshBasicMaterial({ map: contactTex(), color: 0x000000, transparent: true, opacity: S().contact ?? 0.42, depthWrite: false, fog: true }));
   if (contact) { contact.rotation.x = -Math.PI / 2; contact.position.y = 0.006; contact.renderOrder = 1; contact.castShadow = contact.receiveShadow = false; contact.name = 'contact'; root.add(contact); }
   const ghost = opts.ghost ? new THREE.MeshBasicMaterial({ color: new THREE.Color(opts.ghost.color || '#9fd0ff'), transparent: true, opacity: opts.ghost.opacity ?? 0.35, blending: THREE.AdditiveBlending, depthWrite: false, fog: false }) : null;
-  const MAT = (c, o = {}) => ghost || mat(c, { rim: 1, rough: 0.6, ...o });
+  // 1.0 gloss: cloth gets a soft sheen, skin a vinyl-toy clearcoat (style.gloss 0..1.5 scales both; 0 = the matte 0.2 look)
+  const G = st.gloss ?? 1, MAT = (c, o = {}) => ghost || mat(c, { rim: 1, rough: 0.6, ...(G > 0 && !(o.metal > 0.3) && !o.clearcoat ? { sheen: 0.7 * G, sheenRough: 0.5 } : {}), ...o });
   // pale skin glows faintly (as in the references: heads never go muddy, even back-lit); style.skinGlow 0..0.3
   const glowK = dark ? 0 : (st.skinGlow ?? 0.16);
-  const skinM = MAT(skin, dark ? { rough: 0.55, rim: 1.0 } : { rough: 0.58, rim: 0.85, limit: st.skinLimit ?? 0.95, emissive: new THREE.Color(skin).multiplyScalar(glowK) });
+  const skinM = MAT(skin, dark ? { rough: 0.55, rim: 1.0 } : { rough: 0.58, rim: 0.85, limit: st.skinLimit ?? 0.95, emissive: new THREE.Color(skin).multiplyScalar(glowK), ...(G > 0 ? { clearcoat: 0.55 * G, clearcoatRough: 0.32, sheen: 0 } : {}) });
   const olM = olC && !ghost ? new THREE.MeshBasicMaterial({ color: new THREE.Color(olC), side: THREE.BackSide, fog: true }) : null;
   const B = BODY;
   const unitCyl = new THREE.CylinderGeometry(1, 1, 1, 18, 1, true), unitSph = new THREE.SphereGeometry(1, 22, 16);
@@ -445,7 +446,7 @@ export function character(outfit = {}, opts = {}) {
   for (const side of ['L', 'R']) {
     const f = new THREE.Group(); add(f);
     if (shoeC) {
-      const shoeM = MAT(shoeC, { rough: 0.6, rim: 0.5 }), soleM = MAT(outfit.shoeSole || '#f4f4f4', { rough: 0.7, rim: 0.2 });
+      const shoeM = MAT(shoeC, { rough: 0.6, rim: 0.5, ...(G > 0 ? { clearcoat: 0.6 * G, clearcoatRough: 0.2, sheen: 0 } : {}) }), soleM = MAT(outfit.shoeSole || '#f4f4f4', { rough: 0.7, rim: 0.2 });
       const up = add(new THREE.Mesh(unitSph, shoeM), f); up.scale.set(0.06, 0.056, 0.125); up.position.set(0, 0.035, 0.045); hull(up, 1.12);
       const sole = add(new THREE.Mesh(roundedSole(), soleM), f); sole.position.set(0, -0.005, 0.045);
     } else { const ft = add(new THREE.Mesh(unitSph, skinM), f); ft.scale.set(0.05, 0.04, 0.09); ft.position.set(0, 0.03, 0.04); hull(ft, 1.18); }

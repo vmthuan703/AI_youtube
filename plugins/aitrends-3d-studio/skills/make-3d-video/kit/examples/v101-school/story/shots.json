@@ -1,0 +1,148 @@
+{
+ "title": "v101-school",
+ "duration": 50.0,
+ "shots": [
+  {
+   "id": "suburb",
+   "start": 0,
+   "end": 2.5,
+   "line": "",
+   "camera": "wide"
+  },
+  {
+   "id": "locker",
+   "start": 2.5,
+   "end": 5.0,
+   "line": "",
+   "camera": "lockerPeek",
+   "mblur": "action"
+  },
+  {
+   "id": "chem",
+   "start": 5.0,
+   "end": 7.5,
+   "line": "",
+   "camera": "medium"
+  },
+  {
+   "id": "library",
+   "start": 7.5,
+   "end": 10.0,
+   "line": "",
+   "camera": "twoShot"
+  },
+  {
+   "id": "rainClass",
+   "start": 10.0,
+   "end": 12.5,
+   "line": "",
+   "camera": "backRow"
+  },
+  {
+   "id": "detention",
+   "start": 12.5,
+   "end": 15.0,
+   "line": "",
+   "camera": "doorWindow"
+  },
+  {
+   "id": "blackout",
+   "start": 15.0,
+   "end": 17.5,
+   "line": "",
+   "camera": "teacherView"
+  },
+  {
+   "id": "cafeteria",
+   "start": 17.5,
+   "end": 20.0,
+   "line": "",
+   "camera": "cafeteriaWide"
+  },
+  {
+   "id": "football",
+   "start": 20.0,
+   "end": 22.5,
+   "line": "",
+   "camera": "full",
+   "mblur": "action"
+  },
+  {
+   "id": "principal",
+   "start": 22.5,
+   "end": 25.0,
+   "line": "",
+   "camera": "twoShot"
+  },
+  {
+   "id": "nurse",
+   "start": 25.0,
+   "end": 27.5,
+   "line": "",
+   "camera": "closeup"
+  },
+  {
+   "id": "restroom",
+   "start": 27.5,
+   "end": 30.0,
+   "line": "",
+   "camera": "medium"
+  },
+  {
+   "id": "band",
+   "start": 30.0,
+   "end": 32.5,
+   "line": "",
+   "camera": "high"
+  },
+  {
+   "id": "stage",
+   "start": 32.5,
+   "end": 35.0,
+   "line": "",
+   "camera": "lowHero"
+  },
+  {
+   "id": "lockerRoom",
+   "start": 35.0,
+   "end": 37.5,
+   "line": "",
+   "camera": "medium"
+  },
+  {
+   "id": "snowLot",
+   "start": 37.5,
+   "end": 40.0,
+   "line": "",
+   "camera": "twoShot"
+  },
+  {
+   "id": "prom",
+   "start": 40.0,
+   "end": 42.5,
+   "line": "",
+   "camera": "twoShot"
+  },
+  {
+   "id": "diner",
+   "start": 42.5,
+   "end": 45.0,
+   "line": "",
+   "camera": "twoShot"
+  },
+  {
+   "id": "graduation",
+   "start": 45.0,
+   "end": 47.5,
+   "line": "",
+   "camera": "lowHero"
+  },
+  {
+   "id": "rainLot",
+   "start": 47.5,
+   "end": 50.0,
+   "line": "",
+   "camera": "twoShot"
+  }
+ ]
+}

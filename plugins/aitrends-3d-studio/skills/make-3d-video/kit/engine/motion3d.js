@@ -8,7 +8,7 @@
 //   T.dolly(cam, t, keys); T.crashZoom(cam, t, { at: 1.2, to: 18 }); T.handheld(cam, t, 0.6);
 import * as THREE from 'three';
 import { E, clamp, lerp, ease, prog, noise, hash01, speakerAt } from './core.js';
-import { POSES3, walkPose3, blendPose3, breathe3 } from './rig3d.js';
+import { POSES3, walkPose3, blendPose3, breathe3, posesAt3 } from './rig3d.js';
 
 const D2R = Math.PI / 180;
 const getPose = (p) => (typeof p === 'string' ? POSES3[p] || POSES3.stand : p);
@@ -278,3 +278,17 @@ export function turn3(ch, t, o = {}) {
   const leg = (l, s) => Array.isArray(l) ? [l[0] + s, l[1], l[2] + s * 1.6, l[3]] : l;
   return { ...base, head: [base.head[0], base.head[1] + clamp(lead, -40, 40), base.head[2]], legL: leg(base.legL, stepL), legR: leg(base.legR, stepR), y: (base.y || 0) + 0.02 * Math.sin(Math.PI * k * 2) ** 2 };
 }
+
+// ================================================================ 1.0.1 school motion: throws, lockers, tossed things
+// throw3(t, { t0, wind, dur }) — wind-up → release → follow-through (football, snowball, a paper ball). The object leaves the hand at t0.
+export function throw3(t, o = {}) { const t0 = o.t0 ?? 0.6, wind = o.wind ?? 0.45; return posesAt3(t, [[0, o.idle || 'stand'], [t0 - wind, 'throwWind'], [t0, 'throwRelease'], [t0 + 0.5, o.end || 'stand']], 0.16); }
+// toss(obj, t, { from, to, h, t0, dur, spin, hide }) — an object flying on an arc (snowball, football, a cap, a note). Before t0 it sits at
+// `from` (or is hidden: hide true); after landing it stays at `to`. spin: [x, y, z] turns per second. Returns progress 0..1.
+export function toss(obj, t, o = {}) { const t0 = o.t0 ?? 0, dur = o.dur ?? 0.8, k = clamp((t - t0) / dur), f = o.from || [0, 1, 0], to = o.to || f, h = o.h ?? 1;
+  obj.visible = !(o.hide && t < t0); obj.position.set(lerp(f[0], to[0], k), lerp(f[1], to[1], k) + 4 * h * k * (1 - k), lerp(f[2], to[2], k));
+  const sp = o.spin || [0, 0, 0], u = Math.max(0, Math.min(t, t0 + dur) - t0); obj.rotation.set(sp[0] * u * Math.PI * 2, sp[1] * u * Math.PI * 2, sp[2] * u * Math.PI * 2); return k; }
+// lockerDoor(door, t, { t0, open, dur, slam }) — swing a T.W.lockerHall locker door (its pivot): opens to `open` rad (default 1.9);
+// slam: a time when it is slammed shut with a rattle. Returns the angle.
+export function lockerDoor(door, t, o = {}) { const t0 = o.t0 ?? 0, op = o.open ?? 1.9, dur = o.dur ?? 0.5; let a = op * ease.out(clamp((t - t0) / dur));
+  if (o.slam != null && t >= o.slam) { const u = t - o.slam; a = u < 0.12 ? op * (1 - u / 0.12) ** 2 : 0.08 * Math.exp(-(u - 0.12) * 9) * Math.abs(Math.sin((u - 0.12) * 40)); }
+  door.rotation.y = -a * (o.dir ?? 1); return a; }

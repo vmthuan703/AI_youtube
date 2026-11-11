@@ -90,6 +90,30 @@ export const POSES3 = {
   handsOnHips: P({ spine: [-4, 0, 0], armL: { to: [0.23, 0.64, 0.0], pole: [0.6, 0.9, -0.3] }, armR: { to: [-0.23, 0.64, 0.0], pole: [-0.6, 0.9, -0.3] }, handL: 'fist', handR: 'fist', legL: [0, 8, 0, 0], legR: [0, 8, 0, 0] }),
   handsOnBelt: P({ spine: [-3, 0, 0], armL: { to: [0.2, 0.6, 0.06] }, armR: { to: [-0.2, 0.6, 0.06] }, handL: 'fist', handR: 'fist' }),
   holdMic: P({ armL: [62, 12, 118, 0], handL: 'fist' }),
+  // 1.0.1 US high school: class, lockers, cafeteria, sports, weather. Seated ones match T.W.classroom / library chairs (hips 0.42).
+  raiseHand: P({ spine: [-2, 0, 4], head: [-4, 0, 0], armL: [172, 18, 8, 0], handL: 'open' }),
+  sitRaiseHand: P({ y: -0.2, spine: [6, 0, 6], head: [-4, 0, 0], legL: [88, 6, 88, 0], legR: [88, 6, 88, 0], armL: [170, 15, 10, 0], armR: [72, -12, 20, 0], handL: 'open', handR: 'open' }),
+  sleepDesk: P({ y: -0.2, spine: [52, 0, 0], head: [26, 18, 8], legL: [88, 6, 88, 0], legR: [88, 6, 88, 0], armL: [86, -42, 122, 0], armR: [86, -42, 122, 0], handL: 'relaxed', handR: 'relaxed' }),
+  passNote: P({ y: -0.2, spine: [12, -14, 0], head: [6, 22, 0], legL: [88, 6, 88, 0], legR: [88, 6, 88, 0], armL: [72, -12, 20, 0], armR: [72, 82, 8, 0], handL: 'open', handR: 'open' }),
+  copyPeek: P({ y: -0.2, spine: [16, 10, 0], head: [10, 38, 4], legL: [88, 6, 88, 0], legR: [88, 6, 88, 0], armL: [72, -12, 20, 0], armR: [72, -12, 20, 0], handL: 'open', handR: 'open' }),
+  sitSlouch: P({ y: -0.25, spine: [-20, 0, 0], head: [-4, 0, 8], legL: [68, 12, 34, 0], legR: [72, 8, 40, 0], armL: [10, 30, 10, 0], armR: [12, 26, 12, 0] }),
+  writeBoard: P({ spine: [-2, 14, 0], head: [-8, 10, 0], armL: [118, 8, 46, 0], armR: [8, 12, 14, 0], handL: 'fist' }),
+  holdBooks: P({ head: [4, 0, 0], armL: { to: [0.08, 1.02, 0.2], pole: [0.6, 0.7, -0.2] }, armR: { to: [-0.08, 0.94, 0.22], pole: [-0.6, 0.7, -0.2] }, handL: 'open', handR: 'open' }),
+  holdTray: P({ head: [8, 0, 0], armL: { to: [0.17, 0.86, 0.38], pole: [0.6, 0.6, -0.3] }, armR: { to: [-0.17, 0.86, 0.38], pole: [-0.6, 0.6, -0.3] }, handL: 'open', handR: 'open' }),
+  oneStrap: P({ spine: [-2, 0, 0], armR: { to: [-0.11, 1.12, 0.12], pole: [-0.6, 0.8, -0.2] }, handR: 'fist', armL: [8, 16, 14, 0] }),
+  dialLocker: P({ spine: [6, 0, 0], head: [14, 0, 0], armL: { to: [0.04, 1.2, 0.42] }, armR: [12, 14, 20, 0], handL: 'point' }),
+  slamLocker: P({ spine: [4, 24, 0], head: [-4, -12, 0], armL: [84, 52, 6, 0], armR: [16, 20, 30, 0], handL: 'open', legL: [12, 8, 8, 0], legR: [-8, 8, 6, 0] }),
+  holdUmbrella: P({ armR: { to: [-0.04, 1.22, 0.24], pole: [-0.6, 0.8, -0.2] }, handR: 'fist', armL: [8, 14, 14, 0] }),
+  shareUmbrella: P({ head: [-6, 0, 0], armL: { to: [0.06, 1.5, 0.16], pole: [0.6, 1.0, -0.2] }, handL: 'fist', armR: [8, 14, 14, 0] }),
+  throwWind: P({ spine: [-8, -28, 0], head: [0, 26, 0], armR: [150, 62, 96, 0], armL: [70, 10, 20, 0], handR: 'fist', handL: 'open', legL: [22, 8, 10, 0], legR: [-14, 8, 12, 0] }),
+  throwRelease: P({ spine: [14, 22, 0], head: [-4, -16, 0], armR: [96, -12, 6, 0], armL: [40, 40, 40, 0], handR: 'open', legL: [28, 8, 16, 0], legR: [-24, 8, 10, 0] }),
+  carryBall: P({ spine: [6, 0, 0], armR: { to: [-0.15, 0.96, 0.13], pole: [-0.6, 0.5, -0.3] }, handR: 'fist', armL: [24, 20, 40, 0] }),
+  pomHigh: P({ spine: [-6, 0, 0], head: [-10, 0, 0], armL: [158, 48, 4, 0], armR: [158, 48, 4, 0], handL: 'fist', handR: 'fist', legL: [0, 12, 0, 0], legR: [0, 12, 0, 0] }),
+  pomLow: P({ spine: [2, 0, 0], armL: [42, 66, 4, 0], armR: [42, 66, 4, 0], handL: 'fist', handR: 'fist', legL: [0, 12, 0, 0], legR: [0, 12, 0, 0] }),
+  capToss: P({ y: 0.04, spine: [-12, 0, 0], head: [-22, 0, 0], armL: [172, 26, 4, 0], armR: [172, 26, 4, 0], handL: 'open', handR: 'open', legL: [6, 6, 6, 0], legR: [-4, 6, 6, 0] }),
+  duckCover: P({ y: -0.4, spine: [62, 0, 0], head: [24, 0, 0], legL: [96, 10, 128, 0], legR: [96, 10, 128, 0], armL: [150, 68, 128, 10], armR: [150, 68, 128, 10], handL: 'open', handR: 'open' }),
+  sitBleacher: P({ y: -0.2, spine: [8, 0, 0], legL: [80, 10, 80, 0], legR: [80, 10, 80, 0], armL: { to: [0.16, 0.5, 0.36] }, armR: { to: [-0.16, 0.5, 0.36] }, handL: 'fist', handR: 'fist' }),
+  sitBooth: P({ y: -0.2, spine: [6, 0, 0], legL: [88, 6, 88, 0], legR: [88, 6, 88, 0], armL: { to: [0.16, 0.78, 0.4] }, armR: { to: [-0.16, 0.78, 0.4] }, handL: 'open', handR: 'open' }),
 };
 
 // ---------------------------------------------------------------- cycles
@@ -590,6 +614,8 @@ export function character(outfit = {}, opts = {}) {
   root.place = (x = 0, y = 0, z = 0, yaw = 0) => { root.position.set(x, y, z); root.rotation.y = yaw; return root; };
   root.faceTo = (x, z) => { root.rotation.y = Math.atan2(x - root.position.x, z - root.position.z); return root; };
   root.headWorld = () => head.getWorldPosition(new THREE.Vector3());
+  // 1.0.1: put something on the head (T.W.gradCap(), a crown, a party hat): sits on top, tilted back a little; o.pos / o.rot override
+  root.wear = (obj, o = {}) => { head.add(obj); obj.position.set(...(o.pos || [0, BODY.headR * 0.9, -0.02])); obj.rotation.set(...(o.rot || [-0.18, 0, 0])); return obj; };
   root.handWorld = (side = 'L') => hands[side].g.getWorldPosition(new THREE.Vector3());
   root.chestWorld = () => chest.localToWorld(new THREE.Vector3(0, 0.3, 0));
   root.parts = { body, pelvis, chest, head, neck, hands, feet, skull, faceMesh, torso, skirt, hair: hairG, contact };

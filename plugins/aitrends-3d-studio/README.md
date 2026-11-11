@@ -7,6 +7,13 @@ khung hình 2:1, sơ đồ giải thích hoạt hình.
 Mọi khung hình đều dựng bằng code (Three.js) và render từng khung một. Không dùng AI tạo ảnh/video, nên nhân vật
 giữ nguyên dáng suốt video và chữ luôn nét. Giọng đọc mặc định dùng Chatterbox (MIT, chạy máy cá nhân), dự phòng Kokoro-82M (Apache-2.0).
 
+## Mới trong 1.0.1 — trường trung học Mỹ
+- **Bối cảnh:** thư viện, phòng thí nghiệm hóa, hội trường có sân khấu, sân bóng bầu dục đêm thứ Sáu (khán đài, bảng điểm, cột gôn), phòng thay đồ, phòng ban nhạc, phòng hiệu trưởng, phòng phạt, phòng y tá, nhà vệ sinh (gương phản chiếu thật), bãi đỗ xe học sinh, đêm dạ hội, quán diner thập niên 50, trạm xe buýt vàng ở khu ngoại ô.
+- **Thời tiết và mùa:** lá phong mùa thu, ngày tuyết (tuyết phủ, tuyết rơi, hơi thở thành khói), mưa chảy trên kính cửa sổ lớp, kính mờ hơi nước, mất điện giữa giông, đèn báo động xoay (diễn tập lốc xoáy), mũ tốt nghiệp tung lên, pháo giấy, sương dưới đèn sân, giấy bay theo gió; chọn giờ trong ngày bằng `T.W.schoolTime('afterSchool')`.
+- **Hoạt ảnh học sinh:** giơ tay, gục ngủ trên bàn, chuyền giấy, liếc bài, ngồi uể oải, viết bảng, ôm sách, bê khay, đeo balo một vai, mở khóa số và đóng sập tủ đồ, che ô / che chung ô, ném bóng / ném tuyết, cổ vũ, tung mũ, chui gầm bàn; đội mũ lên đầu bằng `ch.wear()`.
+- **Góc máy trường học:** `hallwayWalk`, `lockerPeek`, `bleachers`, `cafeteriaWide`, `backRow`, `teacherView`, `doorWindow`.
+- Ví dụ: `examples/v101-school` (20 cảnh, 50 giây).
+
 ## Mới trong 1.0.0
 - **Đồ họa:** ánh sáng môi trường theo bầu trời của từng mood, da/tóc/giày bóng kiểu đồ chơi vinyl (clearcoat), áo có ánh vải (sheen), sàn bóng và đường ướt phản chiếu, bầu trời có mây, tia nắng có bụi bay, bóng tối góc tường.
 - **Bối cảnh dựng sẵn:** cầu thang trường, lớp học, trạm xe buýt, phố hàng quán, khu dân cư (nhà có bậc thềm), quán ăn vỉa hè, quán cà phê, người qua đường.

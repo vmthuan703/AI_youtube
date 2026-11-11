@@ -70,7 +70,7 @@ export function schoolFront(st, o = {}) {
   st.add(box(4, 0.03, 9, mat('#b8aca4'), 0, 0.015, -7));   // the path from the sidewalk to the door
   const pole = group(cyl(0.06, 0.06, 9, mat('#c8c8d0', { metal: 0.8 }), 0, 4.5, 0), at(plane(1.8, 1.1, mat('#2c4a8a', { keepSat: true, side: THREE.DoubleSide })), 0.92, 8.3, 0));
   st.add(at(pole, -6, 0, -9));
-  if (o.bus === false) st.remove(r.bus);
+  if (o.bus === false) r.bus?.parent?.remove(r.bus);   // 1.0.1 fix: the stage has no remove()
   return { ...r, entrance: [0, 0, -11.6], path: [0, 0, -7] };
 }
 

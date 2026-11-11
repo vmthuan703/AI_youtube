@@ -14,7 +14,7 @@ const GREY = '#8e8a94';
 
 // friends and family
 export const BESTIE = { top: 'tshirt', color: '#2f6f6a', stripe: '#d8ccb4', skirt: '#533a78', hair: 'sidePony', hairColor: '#8a4426', lashes: true };   // the hero's best friend (a girl)
-export const BRO = { top: 'hoodie', color: '#7a3a34', color2: '#622e28', bag: '#a8843c', strings: '#e8dcc8', hair: 'curls', hairColor: '#4a2f24' };   // speaks with a girl's voice (brand.json voice.roles BRO = af_nova); the look stays
+export const BRO = { top: 'dress', color: '#f29ab4', collar: '#fff4f6', bow: '#ffffff', hair: 'long', hairColor: '#17131a', lashes: true, blush: true, bag: '#f4ead8', shoes: '#f2ece4', pop: 0.15 };   // 1.0 (2026-11-11): the hero's girl friend: long black hair, pink dress, a little self-lit so she stands out among the extras; voice af_nova (brand.json voice.roles BRO)
 export const RIVAL = { top: 'jacket', color: '#2c3e6e', sleeves: '#b0a68c', shirt: '#243158', hair: 'quiff', hairColor: '#2b2d3c' };
 export const CLASSMATE = { top: 'tshirt', color: '#8d4a6b', collar: '#e0d4c8', skirt: '#3e3048', hair: 'fringe', hairColor: '#34262c', bow: '#b89c5c', lashes: true };
 export const MOM = { top: 'dress', color: '#3f6a58', scarf: '#9c7a3a', hair: 'bob', hairColor: '#4a3226', lashes: true, shoes: '#3a2a26', scale: 1.06 };
@@ -27,7 +27,7 @@ export const GRANDMA = { top: 'jacket', color: '#6a4a5e', shirt: '#d8ccb8', butt
 // so a video never needs an outfit written from scratch (tools/cast_check.py flags any that is).
 export const CLASSMATE_2 = { ...CLASSMATE, color: '#2c3e6e', collar: '#c8b8a0', hair: 'bob', hairColor: '#24181a', bow: null, scarf: '#9c7a3a' };   // navy tee, bob, gold scarf
 export const CLASSMATE_3 = { ...CLASSMATE, color: '#5f6a2e', hair: 'bun', hairColor: '#2a1e1a', bow: null, face: 'glasses' };                     // olive tee, bun, glasses
-export const BRO_2 = { ...BRO, color: '#3f6a58', color2: '#2f5244', hair: 'short', hairColor: '#3a2a20', bag: null };                               // forest hoodie, short hair
+export const BRO_2 = { top: 'hoodie', color: '#3f6a58', color2: '#2f5244', strings: '#e8dcc8', hair: 'short', hairColor: '#3a2a20' };                               // forest hoodie, short hair
 export const RIVAL_2 = { ...RIVAL, color: '#2f6f6a', shirt: '#24504c', hair: 'sidePart', hairColor: '#2a2420' };                                    // teal jacket, side part
 export const STUDENTS = [   // background students (crowds of named-less kids), in this order: pick by index, never invent new ones
   BRO_2,

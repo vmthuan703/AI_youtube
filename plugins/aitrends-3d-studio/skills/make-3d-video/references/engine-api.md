@@ -201,7 +201,7 @@ null (bare stick legs) · `shoes` colour | null (round feet), `shoeSole` · `glo
 ponytail | pigtails | bun (soft hairlines, `engine/hair3d.js`), `hairColor`, `hairShade` (anime only: the shadow between locks), `bow` (colour) · `skirt` (colour, any top) · one-detail accents, each a colour: `sleeves`, `stripe`, `scarf`, `collar`, `bag` · `blush`
 (true | colour) · `lashes: true` · `face` glasses | sunglasses · `kid: true` (74% size) · `scale` · `outline` (colour | false) · `pose` (the resting pose when none is given).
 
-**Role roster** (`/channel/cast.js`, all in muted colours next to the hero): friends and family `BESTIE` (the hero's best friend, a girl), `BRO`, `RIVAL`, `CLASSMATE`,
+**Role roster** (`/channel/cast.js`, all in muted colours next to the hero): friends and family `BESTIE` (the hero's best friend, a girl), `BRO` (1.0: girl friend, long black hair, pink dress, slightly self-lit), `RIVAL`, `CLASSMATE`,
 `MOM`, `DAD`, `GRANDPA`, `GRANDMA`, `LITTLE_SIB`; school `TEACHER_F`, `TEACHER_M`, `TEACHER_VN` (áo dài), `PRINCIPAL`, `COACH`; hospital and emergency `DOCTOR`, `NURSE`,
 `PARAMEDIC`, `POLICE`, `FIREFIGHTER`; town `GUARD`, `CHEF`, `CASHIER`, `SCIENTIST`, `WORKER`, `REPORTER`, `SHADY`. `ROLES` maps script words to a role
 ("nurse" → `NURSE`). Old names still work (`FRIEND` = `BRO`, `GIRL` = `CLASSMATE`, `GIRL2` = `BESTIE`, `STRANGER` = `SHADY`, `PARENT`, `TEACHER`).

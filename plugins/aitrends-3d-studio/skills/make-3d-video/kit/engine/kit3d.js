@@ -27,6 +27,8 @@ export function getRenderer(canvas) {
 }
 export const renderer = () => R;
 const QS = new URLSearchParams(typeof location !== 'undefined' ? location.search : '');   // debug toggles: ?nodof&nobloom&noshadow&noenv&lambert&msaa=0
+// ?legacy renders with the 0.2.x look (no mood environment light, clearcoat, sheen, mirrors, sky domes): for before/after comparisons
+export const LEGACY = QS.has('legacy');
 const C = (c) => (c instanceof THREE.Color ? c : new THREE.Color(c));
 export const color = C;
 
@@ -71,11 +73,14 @@ function toonRamp(steps, hard) {
 // The style decides toon (ramp of grey levels) or soft PBR; shiny metal stays PBR so cars and glass still reflect.
 export function mat(c, o = {}) {
   const st = S(); const toon = o.toon === false ? null : (o.toon || st.toon || null);
-  const { rim: rk = 0, limit = 0, rough = 0.85, metal = 0, flat = false, ...rest } = o; delete rest.toon;
+  const { rim: rk = 0, limit = 0, rough = 0.85, metal = 0, flat = false, clearcoat = 0, clearcoatRough = 0.3, sheen = 0, sheenRough = 0.55, sheenColor = null, ...rest } = o; delete rest.toon;
   // style.setSat < 1 calms the sets (materials without a rim: walls, floors, furniture, props); characters keep their colours
   const setSat = rk > 0 || limit > 0 || o.keepSat ? 1 : (st.setSat ?? 1); delete rest.keepSat;
   if (setSat !== 1) { const cc = C(c).clone(), hsl = {}; cc.getHSL(hsl); cc.setHSL(hsl.h, hsl.s * setSat, hsl.l); c = cc; }
   const m = QS.has('lambert') ? new THREE.MeshLambertMaterial({ color: C(c), flatShading: flat, ...rest }) : toon && !(metal > 0.45 && rough < 0.4) ? new THREE.MeshToonMaterial({ color: C(c), gradientMap: toonRamp(toon, st.toonHard), ...rest })
+    // 1.0: clearcoat (vinyl-toy skin, glossy hair, shoes) and sheen (soft fabric highlight) use the physical material; ?legacy turns them off
+    : (clearcoat > 0 || sheen > 0) && !LEGACY ? new THREE.MeshPhysicalMaterial({ color: C(c), roughness: rough, metalness: metal, flatShading: flat, clearcoat, clearcoatRoughness: clearcoatRough,
+        sheen, sheenRoughness: sheenRough, sheenColor: sheenColor ? C(sheenColor) : C(c).clone().lerp(new THREE.Color('#ffffff'), 0.55), ...rest })
     : new THREE.MeshStandardMaterial({ color: C(c), roughness: rough, metalness: metal, flatShading: flat, ...rest });
   if (rk > 0 || limit > 0) addRim(m, rk, limit);
   if (m.isMeshStandardMaterial && (metal > 0.3 || rough < 0.3) && R && !QS.has('noenv')) { m.envMap = envMap(); m.envMapIntensity = o.env ?? 0.6; }
@@ -115,9 +120,13 @@ export function stage(o = {}) {
   if (o.fog !== false) scene.fog = new THREE.Fog(C(o.fogColor || M.fog || M.dark), ...(o.fog || [14, 70]));
   // soft reflections for shiny things (cars, glass, metal); toon materials ignore it
   // reflections only on shiny materials (see mat()): a global environment map costs ~40% more on CPU renderers
+  // 1.0: soft image-based light from this mood's own sky, ground and sun, so every standard material gets gentle reflections
+  // and glossy highlights that match the set (o.env / style.env = strength, 0 = off). Toon materials ignore it.
+  const envK = LEGACY || QS.has('noenv') || !R ? 0 : (o.env ?? st.env ?? 0.42);
+  if (envK > 0) { scene.environment = moodEnv(sky, M, o.keyPos || [-6, 10, 6], o.keyColor || M.key); scene.environmentIntensity = envK; }
   const camera = new THREE.PerspectiveCamera(o.fov || V(35, 50), E.W / E.H, 0.05, 600);
   camera.position.set(0, 1.6, 6); camera.lookAt(0, 1.2, 0);
-  const hemi = new THREE.HemisphereLight(C(o.ambientSky || M.ambient), C(M.dark), (o.ambient ?? 1.0) * (L.ambient ?? 1)); scene.add(hemi);
+  const hemi = new THREE.HemisphereLight(C(o.ambientSky || M.ambient), C(M.dark), (o.ambient ?? 1.0) * (L.ambient ?? 1) * (1 - 0.35 * envK)); scene.add(hemi);
   const sun = new THREE.DirectionalLight(C(o.keyColor || M.key), (o.keyIntensity ?? 2.0) * (L.key ?? 1));
   sun.position.set(...(o.keyPos || [-6, 10, 6]));
   if (o.shadows !== false) {
@@ -155,6 +164,9 @@ export function stage(o = {}) {
     // the depth pass measures along the view axis, so focus uses view depth: off-centre subjects stay sharp
     focusOn: (p) => { if (!bokeh) return; const v = Array.isArray(p) ? new THREE.Vector3(...p) : p.isVector3 ? p.clone() : p.getWorldPosition(new THREE.Vector3()); camera.updateMatrixWorld(); bokeh.uniforms.focus.value = Math.max(0.05, -v.applyMatrix4(camera.matrixWorldInverse).z); },
     exposure: (x) => { R.toneMappingExposure = x; },
+    // fitShadow([x,y,z], size): aim the sun's shadow box at the action and shrink it, so shadows under feet and props are crisp
+    fitShadow: (c, size = 6) => { const d = sun.position.clone().sub(sun.target.position).normalize(); sun.target.position.set(...c); sun.position.copy(sun.target.position).addScaledVector(d, 30);
+      Object.assign(sun.shadow.camera, { left: -size, right: size, top: size, bottom: -size, near: 1, far: 80 }); sun.shadow.camera.updateProjectionMatrix(); sun.target.updateMatrixWorld(); },
     render: () => { if (faceLight) { camera.updateMatrixWorld(); faceLight.position.copy(camera.position); faceLight.target.position.copy(camera.position).add(camera.getWorldDirection(new THREE.Vector3()).multiplyScalar(6)); faceLight.target.updateMatrixWorld(); }
       R.toneMappingExposure = (o.exposure ?? 1) * (L.exposure ?? 1); camera.aspect = E.W / E.H; camera.updateProjectionMatrix(); R.info.autoReset = false; R.info.reset(); composer.render(); api.calls = R.info.render.calls; api.tris = R.info.render.triangles; },
     dispose: () => { scene.traverse(x => { x.geometry?.dispose(); [].concat(x.material || []).forEach(m => { m.map?.dispose?.(); m.dispose(); }); }); composer.passes.forEach(p => p.dispose?.()); composer.dispose?.(); },   // free bloom/DOF targets too (long videos visit hundreds of shots per worker)
@@ -162,6 +174,21 @@ export function stage(o = {}) {
   return api;
 }
 
+// the mood's environment: a sky gradient dome, a darker ground, and a soft bright sun where the key light comes from
+const _moodEnv = new Map();
+function moodEnv(sky, M, keyPos, keyColor) {
+  const cols = Array.isArray(sky) ? sky : [sky, sky]; const k = cols.join() + M.dark + M.floor + keyPos.join() + keyColor; if (_moodEnv.has(k)) return _moodEnv.get(k);
+  const es = new THREE.Scene(); const top = C(cols[0]), hor = C(cols[cols.length - 1]), mid = C(cols[Math.floor((cols.length - 1) / 2)]), gnd = C(M.floor || M.dark).clone().lerp(C(M.dark), 0.4);
+  const dome = new THREE.Mesh(new THREE.SphereGeometry(50, 48, 24), new THREE.ShaderMaterial({ side: THREE.BackSide, depthWrite: false,
+    uniforms: { top: { value: top }, mid: { value: mid }, hor: { value: hor }, gnd: { value: gnd } },
+    vertexShader: 'varying vec3 vP; void main(){ vP = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
+    fragmentShader: 'uniform vec3 top, mid, hor, gnd; varying vec3 vP; void main(){ float y = vP.y; vec3 c = y > 0.0 ? mix(hor, mix(mid, top, smoothstep(0.25, 0.9, y)), smoothstep(0.0, 0.35, y)) : mix(hor * 0.7, gnd, smoothstep(0.0, -0.25, y)); gl_FragColor = vec4(c, 1.0); }' }));
+  es.add(dome);
+  const sunM = new THREE.MeshBasicMaterial({ color: C(keyColor).clone().multiplyScalar(6) }); const sunB = new THREE.Mesh(new THREE.SphereGeometry(5, 16, 8), sunM);
+  sunB.position.copy(new THREE.Vector3(...keyPos).normalize().multiplyScalar(40)); es.add(sunB);
+  const pm = new THREE.PMREMGenerator(R); const tex = pm.fromScene(es, 0.03).texture; pm.dispose(); dome.geometry.dispose(); dome.material.dispose(); sunB.geometry.dispose(); sunM.dispose();
+  _moodEnv.set(k, tex); return tex;
+}
 let _env = null;
 function envMap() { if (_env) return _env; const pm = new THREE.PMREMGenerator(R); _env = pm.fromScene(new RoomEnvironment(), 0.04).texture; pm.dispose(); return _env; }
 
@@ -293,7 +320,8 @@ export function optimize(st, keep = []) {
 
 // re-export the rest of the 3D toolkit so shots only need `T`
 export { character, POSES3, posesAt3, exprAt, walkPose3, breathe3, blendPose3, EXPRESSIONS, BODY } from './rig3d.js';
-export { walkTo, idle3, speak3, lookAtSpeaker, handheld, chase, crashZoom, punch, dutch, rackFocus, pov, povArms, armWrestle, reachPose, body3 } from "./motion3d.js";
+export { walkTo, idle3, speak3, lookAtSpeaker, handheld, chase, crashZoom, punch, dutch, rackFocus, pov, povArms, armWrestle, reachPose, body3, squash, climb, jump3, sitDown, turn3 } from "./motion3d.js";
+export { camShot, CAMS } from './camera10.js';   // 1.0 named camera framings
 export * as W from './world3d.js';
 export * as FX3 from './fx3d.js';
 export { rng, key, smoothKey, ease, clamp, lerp, noise };

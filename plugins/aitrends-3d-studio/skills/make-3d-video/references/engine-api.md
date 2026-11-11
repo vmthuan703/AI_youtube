@@ -170,6 +170,20 @@ T.dolly(cam, t, [[0, { pos: [0.2, 0.45, 9], look: [0, 1.35, 3] }], [3, { pos: [0
   `ease.back(x, a)`: anticipation + overshoot), `T.clamp`, `T.lerp`, `T.noise`,
   `T.optimize(st, keep)` (called automatically).
 
+**1.0 motion** (engine/motion3d.js): `T.climb(ch, t, { path, t0, t1, run })` walks a 3D path (stairs, stoops) with higher knees and a lean on slopes;
+`T.jump3(ch, t, { t0, from, to, h, air, end })` crouch → stretch → arc → squash on landing → springy recovery (sets position and scale);
+`T.sitDown(ch, t, { seat: [x, z, yaw], y, t0, dur, to, up, back })` stand ↔ sit: start at `T.sitDown.front(seat)` (0.32 m in front; 0.2 at desks), the legs fold first, the chest leans forward and the hips travel back onto the seat (`up: true` = stand up, ending at the front point); seated clothes adapt by themselves (jacket hems gather onto the seat, skirts and dresses spread over it instead of passing through); `T.turn3(ch, t, { t0, from, to, dur, pose })` turn on the spot,
+head first, two small steps; `T.squash(ch, k)` volume-keeping squash/stretch from the feet.
+
+**1.0 named cameras** (engine/camera10.js): `T.camShot(st.camera, t, info.shot.camera, { a, b, side, yaw, dist, dur: info.dur })` with shots.json
+`"camera"`: `wide` · `full` · `medium` · `closeup` · `xcu` · `ots` (over a's shoulder onto b) · `twoShot` · `lowHero` · `high` · `dutch` · `pushIn` ·
+`pullBack` · `orbit` · `track` · `reveal` · `insert` (o.at). Each framing works from the subject's own facing and drifts a little over the shot.
+**Motion blur**: shots.json `"mblur": "action"` (5 sub-frames, 300° shutter) for runs, punches, falls, a train going by; `T.FX3.swoosh(st, { pos, axis, from,
+to, r, w, t0, dur })` draws the cartoon smear arc of a punch or kick (tilt `axis` toward the camera so the band is not edge-on).
+**Secondary motion** is automatic: walkTo / climb / jump3 / turn3 make the hair bounce and sweep, hoodie strings and the bag swing a beat behind the steps.
+**Lip-sync**: `face({ speaker, gt })` reads timeline/words.json and shapes the mouth per sound: open a, wide e/i/ee, round o/u/w/oo, pressed m/b/p, top teeth on
+the lip for f/v, 8 levels of opening.
+
 ## Characters — `T.character(outfit, {pose, expr, seed})` (engine/rig3d.js)
 Outfit (put them in `scenes/cast.js`, one per recurring character, never change them mid-video). The channel hero lives in `/channel/cast.js`; add the script's name for them:
 ```js
@@ -187,7 +201,7 @@ null (bare stick legs) · `shoes` colour | null (round feet), `shoeSole` · `glo
 ponytail | pigtails | bun (soft hairlines, `engine/hair3d.js`), `hairColor`, `hairShade` (anime only: the shadow between locks), `bow` (colour) · `skirt` (colour, any top) · one-detail accents, each a colour: `sleeves`, `stripe`, `scarf`, `collar`, `bag` · `blush`
 (true | colour) · `lashes: true` · `face` glasses | sunglasses · `kid: true` (74% size) · `scale` · `outline` (colour | false) · `pose` (the resting pose when none is given).
 
-**Role roster** (`/channel/cast.js`, all in muted colours next to the hero): friends and family `BESTIE` (the hero's best friend, a girl), `BRO`, `RIVAL`, `CLASSMATE`,
+**Role roster** (`/channel/cast.js`, all in muted colours next to the hero): friends and family `BESTIE` (the hero's best friend, a girl), `BRO` (1.0: girl friend, long black hair, pink dress, slightly self-lit), `RIVAL`, `CLASSMATE`,
 `MOM`, `DAD`, `GRANDPA`, `GRANDMA`, `LITTLE_SIB`; school `TEACHER_F`, `TEACHER_M`, `TEACHER_VN` (áo dài), `PRINCIPAL`, `COACH`; hospital and emergency `DOCTOR`, `NURSE`,
 `PARAMEDIC`, `POLICE`, `FIREFIGHTER`; town `GUARD`, `CHEF`, `CASHIER`, `SCIENTIST`, `WORKER`, `REPORTER`, `SHADY`. `ROLES` maps script words to a role
 ("nurse" → `NURSE`). Old names still work (`FRIEND` = `BRO`, `GIRL` = `CLASSMATE`, `GIRL2` = `BESTIE`, `STRANGER` = `SHADY`, `PARENT`, `TEACHER`).
@@ -329,6 +343,34 @@ and raise their arms in waves; `cheer` 0–1 (or a function of t) sets how many 
   `T.W.schoolFront(st, { name, bus })` → facade with the name, steps, flag, path, sidewalk and bus (as busStop). `T.W.cafeteria(st, { tables })` → long tables (top 0.76),
   benches at z ± 0.72, `seat(table, side, i)`. `T.W.court(st)` → outdoor basketball court, hoops at x ±11.5 (rim 3.05), fence, benches; `T.W.hoop()` alone.
   `T.W.schoolYard(st)` → PE field 40 × 24 with a running lane, goals at x ±18, coach bench `coach`, school behind. Indoor basketball / dodgeball: `T.W.gym`.
+- **Everyday places, ready-made** (engine/places10.js, 1.0). Reach for these before writing a project set; they already use the 1.0 look.
+  `T.W.stairwell(st, { n, floorLabel })` → two flights + landing with a window and light shafts; `up` (whole climb), `upA`, `upB` are paths for `T.climb`,
+  `landing`, `H1` (landing height). `T.W.classroom(st, { board: [lines], boardDraw, rows, cols, clock })` → desks facing the board at z = −d/2;
+  `seat(row, col)` → [x, z, yaw] for pose 'sitStudy' (desks 0.645 high: forearms rest on the top; 'sitDesk' is for 0.76 office desks); `teacher`, `board`. `T.W.cityBusStop(st, { busX, shelterX, wet, ad, route })` → shelter with a lit ad,
+  bench (`bench(i)` → [x, z, yaw], y 0.15), city bus (`bus`, `door`, `step`), sidewalk top `walk` 0.15. `T.W.shopStreet(st, { names, wet, tables, scooters })` →
+  shophouses with lit fronts, awnings, signs, balconies, string lights; `shops[i].door`, `table(i)`. `T.W.residential(st, { houses, cars, wet })` → brownstones;
+  `stoops[i] = { base, top, door, up }`. `T.W.streetFood(st, { name, menu, tables, wet })` → food stall with steam and bulbs; `vendor`, `seat(i)`, `counter`.
+  `T.W.cafe(st, { rain, menu, tables })` → counter, espresso machine, pendants, big window; `seat(i)`, `barista`, `counter`.
+  Props: `T.W.stairs({ n, rise, run, w, rails })` (`.path(x)` → climb path once placed), `cityBus`, `awning`, `stool`, `lowTable`, `pendantLamp`, `scooter`,
+  `menuBoard`, `aFrame`, `acUnit`, `planter`. Extras: `T.W.passersby(st, { cast: [roster outfits], lane: [x0, x1, z], n })` walk the sidewalk on their own.
+  These sets animate through `st.onTick` (dust in light shafts, steam, rain on glass, passers-by, the sky dome); the player ticks them after draw().
+- **More places** (engine/places10b.js, 1.0): `T.W.supermarket(st, { aisles, names, checkouts, name })` → shelves along z; `aisle(i)` → x of aisle i,
+  `checkout(i)` → [x, z], `cashier(i)` → [x, z, yaw]. `T.W.hospitalHall(st, { sign, room })` → corridor along z; `door(i, side)` → { x, z, yaw, n },
+  `station`, `panels` / `lights` (flicker them). `T.W.rooftop(st, { lights })` → roof at y 0 with parapet, water tank, vents, stair hut, city below; `edge`,
+  `ledge(i)`, `door`. `T.W.trainStation(st, { board, name, line, trainX })` → platform along x (top y 0), `train` (move `.position.x`; arriving: ease out),
+  `edgeZ`, `doorZ`, `bench(i)`. Props: `shelfUnit`, `cart`, `gurney`, `wheelchair`, `waterTank`, `trainCar`.
+- **Dramatic light and weather** (engine/weather10.js, 1.0, all tick themselves): `T.W.lightning(st, { times })` double-strobe flashes;
+  `T.W.cloudShadows(st, { at: [x, z] })` cloud shadows sliding over the ground, the sun dims when one passes; `T.W.headlights(st, { from, to, aim, t0, dur,
+  power, angle, shadow })` a sweeping car beam (indoors: start at the window, `shadow: false`); `T.W.flicker(t, { rate, depth })` multiplier for a failing
+  tube (`L.intensity = base * flicker`). `T.W.snowCover(st, { amount, groundY })` after the set: snow caps on every upward surface + patchy ground;
+  `T.W.puddles(st, { area: [x0, x1, z0, z1], n, y })` mirror puddles in one reflection pass; `T.W.leaves(st, { area: [x0, x1, y0, y1, z0, z1], n, ground })`.
+- **1.0 look helpers** (engine/look10.js; all switch off with `render.mjs --legacy` for before/after): `T.W.mirror(st, { w, d, x, z, y, strength, blur })`
+  polished/wet floors (fresnel, blurred; ~0.15 indoors, 0.4–0.5 wet streets); `T.W.skyDome(st, { clouds, sun, seed })` painted sky with clouds and a sun glow;
+  `T.W.shafts(st, { pos, dir, len, w, h, n, gap, along, opacity, motes })` light beams with dust; `T.W.aoStrip(st, { from, to, yaw, up, out })` soft
+  darkening where a wall meets the floor; `T.W.stringLights({ from, to, n, sag, lights, colors })`.
+  Materials: `T.mat(c, { clearcoat, clearcoatRough, sheen, sheenRough, sheenColor })` switches to the physical material. Characters get a clearcoat on
+  skin, hair and shoes and a sheen on cloth automatically (`style.gloss` 0..1.5, 0 = the matte 0.2 look). `T.stage` lights every standard material with
+  the mood's own sky/ground/sun (`env` 0..1, default 0.42; `style.env`). `st.fitShadow([x,y,z], size)` tightens the sun's shadow box around the action.
 - Project sets: write `scenes/sets/<name>.js` exporting `function build(T, st, o)` that composes these, so every shot in
   a location uses the same geometry. Invent new props from boxes/cylinders/rounded boxes when the script needs them.
 

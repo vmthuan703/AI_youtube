@@ -22,7 +22,7 @@ Kokoro voice, because the channel wants an emotional young narrator. `tools/tts.
 
 ## 2. Voices
 - **Narrator:** `am_puck+1.5` (lively young male, pitch raised 1.5 semitones so he sounds younger) at exaggeration **1.0**, cfg 0.3. These are the channel's choices in `channel/brand.json` and the script's defaults (approved 2026-11-08; 0.75 was too flat). `am_michael` was tried and found not emotional enough.
-- **Roster voices** (`channel/brand.json` → `voice.roles`): the hero `am_liam+3` (sounds about 15, the audience's age), the curly-haired BRO speaks with a girl's voice `af_nova` (the look stays), BESTIE `af_sky`, RIVAL `am_onyx`, MOM `af_sarah`, COACH `am_fenrir`, SHADY `am_echo`. Give each speaker the voice of the roster role that plays them unless the script's `.voices` says otherwise.
+- **Roster voices** (`channel/brand.json` → `voice.roles`): the hero `am_liam+3` (sounds about 15, the audience's age), BRO (1.0: a girl with long black hair in a pink dress) speaks with a girl's voice `af_nova` (the look stays), BESTIE `af_sky`, RIVAL `am_onyx`, MOM `af_sarah`, COACH `am_fenrir`, SHADY `am_echo`. Give each speaker the voice of the roster role that plays them unless the script's `.voices` says otherwise.
 - **Younger / older voices:** append semitones to any voice name: `am_liam+3`, `af_sky+1`, `am_onyx-2`. The clone clip is pitch-shifted once and cached as `refs/<name>.wav`. +1..+3 sounds younger without chipmunk; more than +4 is a cartoon.
 - Character pool (a different voice per character, never the narrator's): women `af_sarah` (mother/adult), `af_bella`
   (teen, emotional), `af_sky` (young), `af_nova` (professional), `af_aoede`, `af_kore`; men `am_liam` (young), `am_onyx` (deep, coach), `am_eric`, `am_echo`,

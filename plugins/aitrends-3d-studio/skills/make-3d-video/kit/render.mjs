@@ -5,6 +5,7 @@
 //   node render.mjs --project P --stills 3.5,12,40                    stills at times -> build/stills
 //   node render.mjs --project P --styles cinematic,ink,toon,golden,neon,noir --at 3.5,12,40   style comparison grid
 //   node render.mjs --project P --bench                               time this machine (GPU or CPU) and estimate the full render
+// --legacy renders with the 0.2.x look (before/after comparisons).
 // Options: --workers N  --scale K  --fps N  --style ID  --quality draft|standard|high|max  --debug  --format png|jpeg  --crf N  --preset X
 //          --gl auto|gpu|swiftshader  --angle d3d11|gl|vulkan|metal  --encoder auto|x264|nvenc  --out FILE  --chrome PATH
 // Quality (config.json "quality", default high): draft = no anti-aliasing, fast encode; standard = FXAA, CRF 18;
@@ -73,7 +74,7 @@ const SS = PREVIEW || args.sheet || args.stills || args.styles ? 1 : +(args.ss |
 const FORMAT = (args.format || (PREVIEW ? 'jpeg' : Q.format)) === 'jpeg' ? 'jpeg' : 'png';
 
 async function openPlayer(browser, style) {
-  const qs = new URLSearchParams(); if (args.scale) qs.set('scale', args.scale); qs.set('quality', PREVIEW && !args.quality ? 'standard' : QN); if (SS > 1) qs.set('ss', SS); if (args.fps) qs.set('fps', args.fps); if (args.palette) qs.set('palette', args.palette); if (style || args.style) qs.set('style', style || args.style); if (args.debug) qs.set('debug', '1'); if (args.bench) qs.set('prof', '1');
+  const qs = new URLSearchParams(); if (args.scale) qs.set('scale', args.scale); qs.set('quality', PREVIEW && !args.quality ? 'standard' : QN); if (SS > 1) qs.set('ss', SS); if (args.fps) qs.set('fps', args.fps); if (args.palette) qs.set('palette', args.palette); if (args.legacy) qs.set('legacy', '1'); if (style || args.style) qs.set('style', style || args.style); if (args.debug) qs.set('debug', '1'); if (args.bench) qs.set('prof', '1');
   const page = await browser.newPage({ viewport: { width: 640, height: 360 } });
   page.on('pageerror', e => console.log('[pageerror]', e.message));
   page.on('console', m => { const t = m.text(); if (/ERROR|missing/i.test(t)) console.log('[page]', t); });

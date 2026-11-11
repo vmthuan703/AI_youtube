@@ -113,14 +113,14 @@ export function buildHair(kind, c) {
 
   if (ANIME[kind]) {
     const V = ANIME[kind], main = new THREE.Color(color), hi = main.clone().lerp(new THREE.Color('#ffffff'), 0.85), low = shade ? new THREE.Color(shade) : main.clone().multiplyScalar(0.58).lerp(new THREE.Color('#5a64b0'), 0.3), tones = [hi, main, low], tag = `${kind}/${color}/${shade || ''}/${hr}`;
-    const m = MAT('#ffffff', { rough: 0.55, rim: 0.45, limit: 0.985, emissive: main.clone().multiplyScalar(0.16), side: THREE.DoubleSide }); if (m !== ghost) { m.vertexColors = true; m.needsUpdate = true; }
+    const m = MAT('#ffffff', { rough: 0.55, rim: 0.45, limit: 0.985, clearcoat: 0.35, clearcoatRough: 0.4, sheen: 0, emissive: main.clone().multiplyScalar(0.16), side: THREE.DoubleSide }); if (m !== ghost) { m.vertexColors = true; m.needsUpdate = true; }
     under(cached(tag + '/line', () => animeVolume(hr, V, tones, { grow: 1.7, top: 1.11, edge: 1.012, bulge: 0.04 })));
     put(cached(tag + '/vol', () => animeVolume(hr, V, tones)), m, tag + '/vol');
     put(cached(tag + '/chunks', () => animeChunks(hr, V.chunks, tones)), m, tag + '/chunks');
     return;
   }
   const S = softKind(kind, hr, dark); if (!S) return;
-  const cc = new THREE.Color(color), hairLum = 0.2126 * cc.r + 0.7152 * cc.g + 0.0722 * cc.b, hairRim = 0.14 + 0.5 * Math.min(1, hairLum * 2.2); const m = MAT(color, { rough: 0.78, rim: hairRim, side: THREE.DoubleSide }), tag = `${kind}/${hr}`;
+  const cc = new THREE.Color(color), hairLum = 0.2126 * cc.r + 0.7152 * cc.g + 0.0722 * cc.b, hairRim = 0.14 + 0.5 * Math.min(1, hairLum * 2.2); const m = MAT(color, { rough: 0.78, rim: hairRim, side: THREE.DoubleSide, clearcoat: 0.35, clearcoatRough: 0.4, sheen: 0 }), tag = `${kind}/${hr}`;
   if (S.shell) {
     under(cached(tag + '/line', () => softShell(hr * S.r * 0.992, (a) => S.shell(a) + 1.6, S.lift ? (az, v) => S.lift(az, Math.min(1, (v * (S.shell(az) + 1.6)) / S.shell(az))) : undefined)));
     if (S.fade) { const hi = new THREE.Color(color), lo = hi.clone().multiplyScalar(0.5), fm = MAT('#ffffff', { rough: 0.78, rim: hairRim, side: THREE.DoubleSide }); if (fm !== ghost) { fm.vertexColors = true; fm.needsUpdate = true; } const key = `${tag}/${color}/fade`; put(cached(key, () => softShell(hr * S.r, S.shell, S.lift, (pol) => hi.clone().lerp(lo, smooth(50, 70, pol)))), fm, key); }

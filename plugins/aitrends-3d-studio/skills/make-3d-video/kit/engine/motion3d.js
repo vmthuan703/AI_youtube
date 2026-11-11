@@ -40,6 +40,7 @@ export function walkTo(ch, t, o = {}) {
   // cadence from distance: nominal stride per cycle (walk 1.45 m, run 2.85 m, sprint 4.7 m) adapted to the speed asked for
   const cad = o.sprint ? 1.9 : o.run ? 1.4 : 0.92, nominal = (o.sprint ? 4.7 : o.run ? 2.85 : 1.45) * sc;
   const stride = clamp(vmax / cad, nominal * 0.6, nominal * 1.5), phase = (s / stride) * Math.PI * 2;
+  ch.userData.mo = { ...(ch.userData.mo || {}), v, phase };   // 1.0: drives hair / strings / bag swing in pose()
   const gait = walkPose3(phase, { run: o.run, sprint: o.sprint, lean: (o.lean ?? 1) * clamp(v / Math.max(vmax, 1e-3)) });
   const idle = getPose(o.idle || 'stand'), end = getPose(o.end || o.idle || 'stand');
   const k = clamp((v / Math.max(vmax, 1e-3)) * 1.6);
@@ -208,4 +209,72 @@ export function body3(pose, t, kind, amount = 1, o = {}) {
   else if (kind === 'strain') { add('spine', [0, 0, 1.5 * a * s(t * 31)]); add('head', [2 * a * s(t * 27), 0, 3 * a * s(t * 23)]); }
   else if (kind === 'fidget') { const w = noise(t * 0.8, 3); add('hips', [0, 0, 6 * a * w]); add('spine', [0, 0, -5 * a * w]); add('head', [0, 10 * a * noise(t * 0.6, 9), 0]); }
   return p;
+}
+
+// ================================================================ 1.0 motion: stairs, jumps with squash & stretch, sitting down, turning on the spot
+// squash(ch, k) — volume-keeping squash (k < 1) or stretch (k > 1) from the feet. 1 = normal.
+export function squash(ch, k = 1) { const sx = 1 / Math.sqrt(Math.max(0.3, k)); ch.scale.set(sx, k, sx); return ch; }
+
+// climb(ch, t, { path: [[x,y,z], …], t0, t1, run, end, idle }) — walkTo along a 3D path (stairs from T.W.stairwell().up,
+// T.W.residential().stoops[i].up, T.W.stairs().path()): the height follows the path, and on sloped stretches the knees lift
+// higher and the body leans into the climb (down: leans back a little).
+export function climb(ch, t, o = {}) {
+  const P = o.path || [], segs = [];
+  for (let i = 0; i + 1 < P.length; i++) segs.push([P[i], P[i + 1]]);
+  const yAt = (x, z) => { let best = 1e9, y = P[0]?.[1] ?? 0, slope = 0;
+    for (const [a, b] of segs) { const dx = b[0] - a[0], dz = b[2] - a[2], L2 = dx * dx + dz * dz || 1e-6, k = clamp(((x - a[0]) * dx + (z - a[2]) * dz) / L2), px = a[0] + dx * k, pz = a[2] + dz * k, dd = (x - px) ** 2 + (z - pz) ** 2;
+      if (dd < best - 1e-6) { best = dd; y = lerp(a[1], b[1], k); slope = (b[1] - a[1]) / Math.sqrt(L2); } }
+    return [y, slope]; };
+  const pose = walkTo(ch, t, { ...o, path: P.map(p => [p[0], p[2]]), y: (x, z) => yAt(x, z)[0] });
+  const [, slope] = yAt(ch.position.x, ch.position.z), up = clamp(slope / 0.6, -1, 1);
+  if (Math.abs(up) < 0.05 || !Array.isArray(pose.legL) || !Array.isArray(pose.legR)) return pose;
+  const lift = (l) => [l[0] + Math.max(0, l[0]) * 0.9 * Math.abs(up) + 8 * Math.abs(up), l[1], l[2] + (up > 0 ? 34 : 18) * Math.abs(up) * clamp(0.3 + Math.max(0, l[0]) / 20), l[3]];
+  return { ...pose, legL: lift(pose.legL), legR: lift(pose.legR), spine: [pose.spine[0] + (up > 0 ? 9 : -4) * Math.abs(up), pose.spine[1], pose.spine[2]], head: [pose.head[0] + (up > 0 ? 4 : 8) * Math.abs(up), pose.head[1], pose.head[2]] };
+}
+
+// jump3(ch, t, { t0, from: [x,y,z], to: [x,y,z], h, air, land, end }) — a cartoon jump: crouch to load (0.22 s before t0),
+// stretch on take-off, an arc of height h for `air` seconds with the legs tucked at the top, a squash on landing, a springy
+// recovery. Sets position, facing (toward `to`), and squash/stretch; returns the pose.
+export function jump3(ch, t, o = {}) {
+  const t0 = o.t0 ?? 0.5, air = o.air ?? 0.6, from = o.from || [ch.position.x, ch.position.y, ch.position.z], to = o.to || from, h = o.h ?? 0.8, pre = 0.22, rec = 0.45;
+  const yaw = Math.hypot(to[0] - from[0], to[2] - from[2]) > 0.05 ? Math.atan2(to[0] - from[0], to[2] - from[2]) : (o.yaw ?? ch.rotation.y); ch.rotation.y = yaw;
+  const crouch = getPose('crouch'), stand = getPose(o.idle || 'stand'), inAir = getPose('jump'), end = getPose(o.end || o.idle || 'stand');
+  if (t < t0 - pre) { ch.position.set(...from); squash(ch, 1); return stand; }
+  if (t < t0) { const k = ease.inOut(prog(t, t0 - pre, t0)); ch.position.set(...from); squash(ch, 1 - 0.1 * k); return blendPose3(stand, crouch, k * 0.8); }
+  if (t < t0 + air) { const k = (t - t0) / air; ch.userData.mo = { vy: (4 * h * (1 - 2 * k)) / air }; ch.position.set(lerp(from[0], to[0], k), lerp(from[1], to[1], k) + 4 * h * k * (1 - k), lerp(from[2], to[2], k));
+    squash(ch, 1 + 0.16 * Math.max(0, 1 - k * 4) + 0.08 * Math.max(0, k * 4 - 3)); const tuck = Math.sin(Math.PI * k); return blendPose3(blendPose3(crouch, inAir, ease.out(clamp(k * 5))), crouch, tuck * 0.35); }
+  const u = (t - t0 - air) / rec; ch.position.set(...to);
+  if (u < 1) { squash(ch, 1 - 0.18 * Math.exp(-u * 5) * Math.cos(u * 9)); return blendPose3(crouch, end, ease.out(clamp(u * 1.2))); }
+  squash(ch, 1); return end;
+}
+
+// sitDown(ch, t, { seat: [x, z, yaw], y, t0, dur, from, to, up, back }) — stand → sit the way people do: knees bend and the chest
+// leans forward while the hips travel back from in front of the seat (`back` m, default 0.32) onto it, then the body settles
+// upright with a small give. The feet stay planted. up: true plays it in reverse (standing up ends at sitDown.front(seat)).
+// The old form sitDown(t, o) still returns just the pose (place the character yourself).
+export function sitDown(ch, t, o) {
+  if (typeof ch === 'number') { o = t || {}; t = ch; ch = null; }
+  o = o || {}; const t0 = o.t0 ?? 0, dur = o.dur ?? 0.9, a = getPose(o.from || 'stand'), b = getPose(o.to || 'sit');
+  let u = prog(t, t0, t0 + dur); if (o.up) u = 1 - u;
+  // the legs lead (thighs fold early), the hips drop later: two eased curves from one clock
+  const kLeg = ease.inOut(clamp(u * 1.25)), kHip = ease.inOut(clamp((u - 0.12) / 0.88)), lean = Math.sin(Math.PI * clamp(u * 1.1)) * (o.lean ?? 26);
+  const p = blendPose3(a, b, kLeg), settle = o.up ? 0 : Math.sin(Math.PI * clamp((u - 0.85) / 0.15)) * 0.012;
+  const out = { ...p, y: lerp(a.y || 0, b.y || 0, kHip) - settle, spine: [p.spine[0] + lean, p.spine[1], p.spine[2]], head: [p.head[0] - lean * 0.55, p.head[1], p.head[2]],
+    armL: Array.isArray(p.armL) ? [p.armL[0] + lean * 0.8, p.armL[1], p.armL[2] + lean, p.armL[3]] : p.armL, armR: Array.isArray(p.armR) ? [p.armR[0] + lean * 0.8, p.armR[1], p.armR[2] + lean, p.armR[3]] : p.armR };
+  if (ch && o.seat) { const [x, z, yaw] = o.seat, back = (o.back ?? 0.32) * (1 - kHip); ch.position.set(x + Math.sin(yaw) * back, o.y ?? 0, z + Math.cos(yaw) * back); ch.rotation.y = yaw; }
+  return out;
+}
+// where to stand before sitting down (and where standing up ends): [x, z] in front of the seat
+sitDown.front = (seat, back = 0.32) => [seat[0] + Math.sin(seat[2]) * back, seat[1] + Math.cos(seat[2]) * back];
+
+// turn3(ch, t, { t0, from, to, dur, pose }) — turn on the spot: the head leads, the body follows, and the feet step twice.
+export function turn3(ch, t, o = {}) {
+  const t0 = o.t0 ?? 0, dur = o.dur ?? 0.55, k = prog(t, t0, t0 + dur), e = ease.inOut(k), base = getPose(o.pose || 'stand');
+  ch.rotation.y = angLerp(o.from ?? 0, o.to ?? 0, e);
+  if (k <= 0 || k >= 1) return base;
+  { let dd = ((o.to - o.from + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI; ch.userData.mo = { yawRate: dd / dur * Math.sin(Math.PI * k) * 1.5 }; }
+  let d = ((o.to - o.from + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
+  const lead = (1 - e) * d * 0.45 / D2R * Math.min(1, k * 4), stepL = Math.max(0, Math.sin(Math.PI * k * 2)) * 16, stepR = Math.max(0, -Math.sin(Math.PI * k * 2)) * 16;
+  const leg = (l, s) => Array.isArray(l) ? [l[0] + s, l[1], l[2] + s * 1.6, l[3]] : l;
+  return { ...base, head: [base.head[0], base.head[1] + clamp(lead, -40, 40), base.head[2]], legL: leg(base.legL, stepL), legR: leg(base.legR, stepR), y: (base.y || 0) + 0.02 * Math.sin(Math.PI * k * 2) ** 2 };
 }

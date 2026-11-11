@@ -100,6 +100,7 @@ export const POSES3 = {
   writeBoard: P({ spine: [-2, 14, 0], head: [-8, 10, 0], armL: [118, 8, 46, 0], armR: [8, 12, 14, 0], handL: 'fist' }),
   holdBooks: P({ head: [4, 0, 0], armL: { to: [0.08, 1.02, 0.2], pole: [0.6, 0.7, -0.2] }, armR: { to: [-0.08, 0.94, 0.22], pole: [-0.6, 0.7, -0.2] }, handL: 'open', handR: 'open' }),
   holdTray: P({ head: [8, 0, 0], armL: { to: [0.17, 0.86, 0.38], pole: [0.6, 0.6, -0.3] }, armR: { to: [-0.17, 0.86, 0.38], pole: [-0.6, 0.6, -0.3] }, handL: 'open', handR: 'open' }),
+  // oneStrap: only with a backpack on (outfit bag); without one the folded arm reads as broken
   oneStrap: P({ spine: [-2, 0, 0], armR: { to: [-0.11, 1.12, 0.12], pole: [-0.6, 0.8, -0.2] }, handR: 'fist', armL: [8, 16, 14, 0] }),
   dialLocker: P({ spine: [6, 0, 0], head: [14, 0, 0], armL: { to: [0.04, 1.2, 0.42] }, armR: [12, 14, 20, 0], handL: 'point' }),
   slamLocker: P({ spine: [4, 24, 0], head: [-4, -12, 0], armL: [84, 52, 6, 0], armR: [16, 20, 30, 0], handL: 'open', legL: [12, 8, 8, 0], legR: [-8, 8, 6, 0] }),

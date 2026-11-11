@@ -14,7 +14,7 @@ registerShot('suburb', {
   init(T) { const st = T.stage({ ...T.W.schoolTime('morning'), fov: 36, fog: [30, 140] }); const u = T.W.suburbStop(st, { autumn: true, busX: 30 }); T.W.fallDay(st, { area: [-8, 10, 0, 6, -3, 2], y: 0.14, piles: 0 });
     const hero = st.add(T.character(HERO)), sam = st.add(T.character(SAM).place(5.6, 0.14, 0.3, -R2 + 0.3)); return { st, u, hero, sam }; },
   draw(s, t, info, T) { s.u.bus.position.x = 30 - 24 * T.ease.out(clamp(t / 2.8));
-    const w = T.walkTo(s.hero, t, { from: [0.6, 0.35], to: [4.4, 0.35], t0: 0, t1: 2.9, y: 0.14 }); s.hero.pose({ ...w, armR: T.POSES3.oneStrap.armR, handR: 'fist' }).face({ expr: 'smile', t, blink: true });
+    const w = T.walkTo(s.hero, t, { from: [0.8, 0.35], to: [3.9, 0.35], t0: 0, t1: 2.3, y: 0.14 }); s.hero.pose(T.blendPose3(w, T.idle3('wave', t), T.ease.inOut(clamp((t - 2.15) / 0.45)))).face({ expr: 'smile', t, blink: true });
     s.sam.pose(T.idle3('wave', t, { seed: 2 })).face({ expr: 'happy', t, blink: true }); cam(s, t, info, T, { a: s.hero, b: s.sam, dist: 0.7 }); },
 });
 registerShot('locker', {

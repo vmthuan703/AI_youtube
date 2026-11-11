@@ -28,7 +28,7 @@ EXPECTED = {
     "engine/nature3d.js": "a058ae18ad5745ab",
     "engine/player.js": "f67d7ce200280aaa",
     "engine/rig2d.js": "ec2a665e0aa8ffed",
-    "engine/rig3d.js": "2f904cda4a84c508",
+    "engine/rig3d.js": "2c7bdac9415511ee",
     "engine/school3d.js": "addd025ca351fa84",
     "engine/screens3d.js": "250bbf664fff717b",
     "engine/sports3d.js": "982dcacc06b10a13",
@@ -99,7 +99,7 @@ EXPECTED = {
     "engine/season10.js": "a40b2e3a45d74b6d",
     "examples/v101-school/config.json": "cb2e770362c512ec",
     "examples/v101-school/scenes/cast.js": "19cc3da1956f35d8",
-    "examples/v101-school/scenes/shots/school.js": "803dfad5be8b324b",
+    "examples/v101-school/scenes/shots/school.js": "983ca5018f0f8997",
     "examples/v101-school/story/shots.json": "c720f90fcb8eccc6",
 }
 bad = 0

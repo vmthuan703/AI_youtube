@@ -247,14 +247,24 @@ export function jump3(ch, t, o = {}) {
   squash(ch, 1); return end;
 }
 
-// sitDown(t, { t0, dur, from, to, up }) — stand → sit with the hips going back and the chest leaning forward on the way down
-// (and the reverse with up: true). Place the character at the seat; the pose drops the hips.
-export function sitDown(t, o = {}) {
-  const t0 = o.t0 ?? 0, dur = o.dur ?? 0.8, a = getPose(o.from || 'stand'), b = getPose(o.to || 'sit');
-  let k = ease.inOut(prog(t, t0, t0 + dur)); if (o.up) k = 1 - k;
-  const p = blendPose3(a, b, k), lean = Math.sin(Math.PI * k) * (o.lean ?? 24);
-  return { ...p, spine: [p.spine[0] + lean, p.spine[1], p.spine[2]], head: [p.head[0] - lean * 0.6, p.head[1], p.head[2]] };
+// sitDown(ch, t, { seat: [x, z, yaw], y, t0, dur, from, to, up, back }) — stand → sit the way people do: knees bend and the chest
+// leans forward while the hips travel back from in front of the seat (`back` m, default 0.32) onto it, then the body settles
+// upright with a small give. The feet stay planted. up: true plays it in reverse (standing up ends at sitDown.front(seat)).
+// The old form sitDown(t, o) still returns just the pose (place the character yourself).
+export function sitDown(ch, t, o) {
+  if (typeof ch === 'number') { o = t || {}; t = ch; ch = null; }
+  o = o || {}; const t0 = o.t0 ?? 0, dur = o.dur ?? 0.9, a = getPose(o.from || 'stand'), b = getPose(o.to || 'sit');
+  let u = prog(t, t0, t0 + dur); if (o.up) u = 1 - u;
+  // the legs lead (thighs fold early), the hips drop later: two eased curves from one clock
+  const kLeg = ease.inOut(clamp(u * 1.25)), kHip = ease.inOut(clamp((u - 0.12) / 0.88)), lean = Math.sin(Math.PI * clamp(u * 1.1)) * (o.lean ?? 26);
+  const p = blendPose3(a, b, kLeg), settle = o.up ? 0 : Math.sin(Math.PI * clamp((u - 0.85) / 0.15)) * 0.012;
+  const out = { ...p, y: lerp(a.y || 0, b.y || 0, kHip) - settle, spine: [p.spine[0] + lean, p.spine[1], p.spine[2]], head: [p.head[0] - lean * 0.55, p.head[1], p.head[2]],
+    armL: Array.isArray(p.armL) ? [p.armL[0] + lean * 0.8, p.armL[1], p.armL[2] + lean, p.armL[3]] : p.armL, armR: Array.isArray(p.armR) ? [p.armR[0] + lean * 0.8, p.armR[1], p.armR[2] + lean, p.armR[3]] : p.armR };
+  if (ch && o.seat) { const [x, z, yaw] = o.seat, back = (o.back ?? 0.32) * (1 - kHip); ch.position.set(x + Math.sin(yaw) * back, o.y ?? 0, z + Math.cos(yaw) * back); ch.rotation.y = yaw; }
+  return out;
 }
+// where to stand before sitting down (and where standing up ends): [x, z] in front of the seat
+sitDown.front = (seat, back = 0.32) => [seat[0] + Math.sin(seat[2]) * back, seat[1] + Math.cos(seat[2]) * back];
 
 // turn3(ch, t, { t0, from, to, dur, pose }) — turn on the spot: the head leads, the body follows, and the feet step twice.
 export function turn3(ch, t, o = {}) {

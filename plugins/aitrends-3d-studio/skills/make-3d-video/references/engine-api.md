@@ -172,7 +172,7 @@ T.dolly(cam, t, [[0, { pos: [0.2, 0.45, 9], look: [0, 1.35, 3] }], [3, { pos: [0
 
 **1.0 motion** (engine/motion3d.js): `T.climb(ch, t, { path, t0, t1, run })` walks a 3D path (stairs, stoops) with higher knees and a lean on slopes;
 `T.jump3(ch, t, { t0, from, to, h, air, end })` crouch → stretch → arc → squash on landing → springy recovery (sets position and scale);
-`T.sitDown(t, { t0, dur, from, to, up })` stand ↔ sit with the hips back and the chest forward; `T.turn3(ch, t, { t0, from, to, dur, pose })` turn on the spot,
+`T.sitDown(ch, t, { seat: [x, z, yaw], y, t0, dur, to, up, back })` stand ↔ sit: start at `T.sitDown.front(seat)` (0.32 m in front; 0.2 at desks), the legs fold first, the chest leans forward and the hips travel back onto the seat (`up: true` = stand up, ending at the front point); seated clothes adapt by themselves (jacket hems gather onto the seat, skirts and dresses spread over it instead of passing through); `T.turn3(ch, t, { t0, from, to, dur, pose })` turn on the spot,
 head first, two small steps; `T.squash(ch, k)` volume-keeping squash/stretch from the feet.
 
 ## Characters — `T.character(outfit, {pose, expr, seed})` (engine/rig3d.js)

@@ -351,6 +351,12 @@ export function character(outfit = {}, opts = {}) {
     : chunky ? [[0.001, -0.17], [0.19, -0.17], [0.205, -0.13], [0.2, 0.05], [0.205, 0.28], [0.205, 0.38], [0.18, 0.45], [0.11, 0.5], [0.06, 0.52], [0.001, 0.52]]
     : [[0.001, -0.07], [0.16, -0.07], [0.172, -0.03], [0.165, 0.12], [0.172, 0.28], [0.178, 0.37], [0.15, 0.44], [0.09, 0.49], [0.055, 0.51], [0.001, 0.51]];
   const torsoGeo = new THREE.LatheGeometry(prof.map(([r, y]) => new THREE.Vector2(r, y)), 32); torsoGeo.scale(1, 1, top === 'none' ? 1 : 0.7);
+  // 1.0: a "seated" morph of the torso: the hem below the hips gathers up to the hip line and bunches out a little, so a
+  // jacket or hoodie rests on the seat instead of passing through it (driven by the sit amount in pose()).
+  { const pos = torsoGeo.attributes.position, sitP = new Float32Array(pos.array.length), lowY = prof[0][1];
+    for (let i = 0; i < pos.count; i++) { const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i), k = y < 0 && lowY < 0 ? clamp(y / lowY) : 0;
+      sitP[i * 3] = x * (1 + 0.1 * k); sitP[i * 3 + 1] = y < 0 ? y * 0.1 : y; sitP[i * 3 + 2] = z * (1 + 0.18 * k) + (z > 0 ? 0.02 * k : 0); }
+    torsoGeo.morphAttributes.position = [new THREE.Float32BufferAttribute(sitP, 3)]; }
   const torso = add(new THREE.Mesh(torsoGeo, topM), chest); hull(torso, 1 + olW / 0.2);
   if (top === 'hoodie') {
     // hood bunched behind the neck + front collar ring
@@ -480,6 +486,19 @@ export function character(outfit = {}, opts = {}) {
     const fwd = yawFwd.clone(); const hinge = new THREE.Vector3().crossVectors(d2, fwd); const natural = new THREE.Vector3().crossVectors(hinge.lengthSq() > 1e-6 ? hinge.normalize() : new THREE.Vector3(1, 0, 0), d2).normalize().negate();
     const dir = natural.lerp(fwd, flat).normalize(); const m = new THREE.Matrix4(); const x = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), dir).normalize(); const y = new THREE.Vector3().crossVectors(dir, x).normalize(); m.makeBasis(x, y, dir); F.quaternion.setFromRotationMatrix(m);
   };
+  // 1.0: clothes on a seat. sitK (0..1) from the thigh lift and the dropped hips: the torso hem gathers up (morph), trims and
+  // bands below the hips follow it, and a skirt or dress spreads over the seat at hip level instead of hanging through it.
+  let clothBase = null;
+  const seated = (p) => {
+    const lift = ((Array.isArray(p.legL) ? p.legL[0] : 0) + (Array.isArray(p.legR) ? p.legR[0] : 0)) / 2;
+    const k = clamp((lift - 40) / 40) * clamp(-(p.y || 0) / 0.12);
+    if (!clothBase) { clothBase = { kids: [], skirt: skirt ? { y: skirt.position.y, z: skirt.position.z, sy: skirt.scale.y, sz: skirt.scale.z, sx: skirt.scale.x, len: skirt.geometry.parameters?.height || 0.3 } : null };
+      for (const c of chest.children) if (c !== torso && c !== neck && c.position.y < -0.02) clothBase.kids.push([c, c.position.y]); }
+    if (torso.morphTargetInfluences) { torso.morphTargetInfluences[0] = k; for (const h of torso.children) if (h.morphTargetInfluences) h.morphTargetInfluences[0] = k; }
+    for (const [c, y0] of clothBase.kids) c.position.y = y0 * (1 - 0.9 * k);
+    const sb = clothBase.skirt; if (sb) { const L = sb.len * sb.sy, sy = sb.sy * (1 - (sb.len > 0.35 ? 0.72 : 0.55) * k), top = sb.y + L / 2;
+      skirt.scale.set(sb.sx * (1 - 0.18 * k), sy, sb.sz * (1 + 0.3 * k)); skirt.position.y = lerp(top - (sb.len * sy) / 2, 0.006 + (sb.len * sy) / 2, k); skirt.position.z = sb.z + 0.08 * k; skirt.rotation.x = -0.18 * k; }
+  };
   root.pose = (p) => {
     p = typeof p === 'string' ? POSES3[p] : p;
     // follow-through: hair lags the head and the body stretches a little when it rises or drops fast (poses from posesAt3 carry _prev)
@@ -489,6 +508,7 @@ export function character(outfit = {}, opts = {}) {
     else hairG.rotation.set(0, 0, 0);
     body.scale.set(scale / Math.sqrt(sy), scale * sy, scale / Math.sqrt(sy));
     if (contact) { const lying = Math.abs((p.hips || [0])[0]) > 45, up = Math.max(0, p.y || 0); contact.visible = !lying; const k = clamp(1 - up * 1.6, 0.35, 1); contact.scale.set(k, k, 1); contact.material.opacity = (S().contact ?? 0.42) * k * (contact.userData.fade ?? 1); }
+    seated(p);
     pelvis.position.set(0, B.hipY + (p.y || 0), 0); pelvis.rotation.copy(eul(p.hips || [0, 0, 0]));
     chest.rotation.copy(eul(p.spine || [0, 0, 0])); head.rotation.copy(eul(p.head || [0, 0, 0]));
     body.updateMatrixWorld(true);

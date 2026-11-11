@@ -18,15 +18,15 @@ registerShot('stairs', {   // climbing the school stairs into the morning light
 });
 registerShot('classroom', {   // the hero sits down while the teacher writes; light shafts from the windows
   init(T) { const st = T.stage({ mood: 'day', fov: 38, fog: [12, 40] }); const c = T.W.classroom(st, { board: ['WHAT IF YOU NEVER', 'NEEDED SLEEP?'] });
-    const kids = []; [[0, 0], [0, 2], [1, 1], [1, 3], [2, 0], [0, 3]].forEach(([r, k], i) => { const [x, z, yaw] = c.seat(r, k); kids.push(st.add(T.character(STUDENTS[i % STUDENTS.length], { pose: 'sitDesk' }).place(x, 0, z, yaw))); });
+    const kids = []; [[0, 0], [0, 2], [1, 1], [1, 3], [2, 0], [0, 3]].forEach(([r, k], i) => { const [x, z, yaw] = c.seat(r, k); kids.push(st.add(T.character(STUDENTS[i % STUDENTS.length], { pose: 'sitStudy' }).place(x, 0, z, yaw))); });
     const [hx, hz, hy] = c.seat(1, 2); const hero = st.add(T.character(HERO)); const teacher = st.add(T.character(TEACHER_F).place(...[c.teacher[0] - 1.2, 0, c.teacher[1]], 0.3));
     return { st, c, kids, hero, hx, hz, hy, teacher }; },
   draw(s, t, info, T) { s.st.tick(t);
     const seat = [s.hx, s.hz, s.hy], f = T.sitDown.front(seat, 0.2);
     if (t < 1.0) s.hero.pose(T.walkTo(s.hero, t, { from: [s.hx + 1.0, s.hz - 0.05], to: f, t0: 0.05, t1: 0.95, yaw1: s.hy }));
-    else s.hero.pose(T.sitDown(s.hero, t, { seat, t0: 1.0, dur: 0.95, to: 'sitDesk', back: 0.2 }));
+    else s.hero.pose(T.sitDown(s.hero, t, { seat, t0: 1.0, dur: 0.95, to: 'sitStudy', back: 0.2 }));
     s.hero.face({ expr: [[0, 'neutral'], [1.8, 'smug']], t, blink: true });
-    s.kids.forEach((ch, i) => ch.pose(T.idle3('sitDesk', t, { seed: i + 2 })).face({ expr: 'neutral', t, blink: true, look: [0, 0.2] }));
+    s.kids.forEach((ch, i) => ch.pose(T.idle3('sitStudy', t, { seed: i + 2 })).face({ expr: 'neutral', t, blink: true, look: [0, 0.2] }));
     s.teacher.pose(T.idle3({ ...T.POSES3.stand, armL: [110, 10, 40, 0], handL: 'point' }, t)).face({ expr: 'neutral', t, blink: true });
     T.dolly(s.st.camera, t, [[0, { pos: [3.6, 1.9, 3.6], look: [0.6, 0.9, -0.4] }], [3.5, { pos: [3.1, 1.75, 2.9], look: [0.6, 0.9, -0.6] }]]);
   },

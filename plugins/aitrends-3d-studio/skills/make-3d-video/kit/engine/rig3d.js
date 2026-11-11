@@ -62,6 +62,8 @@ export const POSES3 = {
   sit: P({ y: -0.2, spine: [4, 0, 0], legL: [88, 6, 88, 0], legR: [88, 6, 88, 0], armL: [30, 10, 50, 0], armR: [30, 10, 50, 0] }),
   sitBack: P({ y: -0.22, spine: [-14, 0, 0], legL: [80, 10, 70, 0], legR: [92, 4, 95, 0], armL: [20, 40, 20, 0], armR: [20, 40, 20, 0] }),
   sitDesk: P({ y: -0.2, spine: [16, 0, 0], head: [8, 0, 0], legL: [88, 6, 88, 0], legR: [88, 6, 88, 0], armL: [50, -5, 80, 0], armR: [50, -5, 80, 0], handL: 'open', handR: 'open' }),
+  // 1.0: at a school desk (T.W.classroom, top 0.645): forearms lie flat on the desk top, elbows on it, hands together
+  sitStudy: P({ y: -0.2, spine: [14, 0, 0], head: [6, 0, 0], legL: [88, 6, 88, 0], legR: [88, 6, 88, 0], armL: [72, -12, 20, 0], armR: [72, -12, 20, 0], handL: 'open', handR: 'open' }),
   // 0.2.8: kneeling, sitting on a bed / the floor, folded arms, lifting. sitBed puts the hips at 0.58 (T.W.bed top); sitFloor and hugKnees at the floor.
   kneelBoth: P({ y: -0.33, spine: [4, 0, 0], legL: [0, 5, 98, 0], legR: [0, 5, 98, 0], armL: [14, 14, 24, 0], armR: [14, 14, 24, 0] }),
   kneelSad: P({ y: -0.36, spine: [28, 0, 0], head: [24, 0, 0], legL: [-4, 5, 110, 0], legR: [-4, 5, 110, 0], armL: { to: [0.16, 0.36, 0.22] }, armR: { to: [-0.16, 0.36, 0.22] }, handL: 'open', handR: 'open' }),
@@ -95,9 +97,13 @@ export const POSES3 = {
 // with phase = t * 2π * cadence (walk 0.9 Hz, run 1.4 Hz, sprint 1.9 Hz). Includes the vertical bob (pose.y).
 export function walkPose3(ph, o = {}) {
   const run = o.sprint ? 1.35 : o.run ? 1 : 0, s = Math.sin(ph), c = Math.cos(ph), s2 = Math.abs(Math.sin(ph));
-  if (!run) return P({ y: -0.02 + 0.025 * Math.abs(c), spine: [3, 4 * s, 0], head: [-2, -3 * s, 0], hips: [0, -5 * s, 0],
-    armL: [6 + 22 * Math.max(0, -s) , 10 - 20 * s, 18 + 12 * Math.max(0, -s), 0], armR: [6 + 22 * Math.max(0, s), 10 + 20 * s, 18 + 12 * Math.max(0, s), 0],
-    legL: [24 * s, 3, 6 + 40 * clamp(-Math.sin(ph - 1.2)), 0], legR: [-24 * s, 3, 6 + 40 * clamp(Math.sin(ph - 1.2)), 0] });
+  // 1.0 walk: a looser gait. The swinging knee folds up to ~65°, the landing knee gives a little (loading), the stance leg
+  // pushes off behind, the pelvis turns and rolls, the chest counter-turns, the head stays steady, the arms swing from the shoulder.
+  if (!run) { const sw = (x) => Math.pow(clamp(x), 1.35), load = (x) => Math.pow(clamp(x), 6);
+    const knee = (q) => 7 + 58 * sw(-Math.sin(q - 1.15)) + 12 * load(Math.cos(q - 2.05)), thigh = (q) => 3 + 27 * Math.sin(q) - 6 * load(-Math.sin(q + 0.5));
+    return P({ y: -0.028 + 0.034 * Math.abs(c) ** 1.5, spine: [4, 7 * s, -1.5 * c], head: [-3, -5 * s, 1.2 * c], hips: [0, -7 * s, 2.5 * c],
+      armL: [8 + 28 * Math.max(0, -s), 10 - 26 * s, 20 + 22 * Math.max(0, -s), 0], armR: [8 + 28 * Math.max(0, s), 10 + 26 * s, 20 + 22 * Math.max(0, s), 0],
+      legL: [thigh(ph), 3, knee(ph), 0], legR: [thigh(ph + Math.PI), 3, knee(ph + Math.PI), 0] }); }
   const lean = (o.sprint ? 32 : 18) * (o.lean ?? 1);
   return P({ y: -0.05 * run + 0.07 * s2 * run, hips: [0, -8 * s, 0], spine: [lean, 8 * s, 0], head: [-lean * 0.75, -8 * s, 0],
     armL: [10 + 60 * Math.max(0, -s) * run - 20 * Math.max(0, s), 18, 95, 0], armR: [10 + 60 * Math.max(0, s) * run - 20 * Math.max(0, -s), 18, 95, 0], handL: 'fist', handR: 'fist',

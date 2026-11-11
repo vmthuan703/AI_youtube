@@ -337,7 +337,7 @@ and raise their arms in waves; `cheer` 0–1 (or a function of t) sets how many 
 - **Everyday places, ready-made** (engine/places10.js, 1.0). Reach for these before writing a project set; they already use the 1.0 look.
   `T.W.stairwell(st, { n, floorLabel })` → two flights + landing with a window and light shafts; `up` (whole climb), `upA`, `upB` are paths for `T.climb`,
   `landing`, `H1` (landing height). `T.W.classroom(st, { board: [lines], boardDraw, rows, cols, clock })` → desks facing the board at z = −d/2;
-  `seat(row, col)` → [x, z, yaw] for pose 'sitDesk'; `teacher`, `board`. `T.W.cityBusStop(st, { busX, shelterX, wet, ad, route })` → shelter with a lit ad,
+  `seat(row, col)` → [x, z, yaw] for pose 'sitStudy' (desks 0.645 high: forearms rest on the top; 'sitDesk' is for 0.76 office desks); `teacher`, `board`. `T.W.cityBusStop(st, { busX, shelterX, wet, ad, route })` → shelter with a lit ad,
   bench (`bench(i)` → [x, z, yaw], y 0.15), city bus (`bus`, `door`, `step`), sidewalk top `walk` 0.15. `T.W.shopStreet(st, { names, wet, tables, scooters })` →
   shophouses with lit fronts, awnings, signs, balconies, string lights; `shops[i].door`, `table(i)`. `T.W.residential(st, { houses, cars, wet })` → brownstones;
   `stoops[i] = { base, top, door, up }`. `T.W.streetFood(st, { name, menu, tables, wet })` → food stall with steam and bulbs; `vendor`, `seat(i)`, `counter`.

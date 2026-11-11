@@ -164,7 +164,7 @@ export function stairwell(st, o = {}) {
 
 // ================================================================ CLASSROOM, interior with daylight from tall windows on the left
 // Board on the back wall (z = -d/2), 4 columns × 3 rows of desks facing it; a teacher's desk front-left of the board.
-// c.seat(row, col) → [x, z, yaw] for T.character(..., { pose: 'sitDesk' }) (row 0 = front). c.teacher → [x, z, yaw] standing at the board.
+// c.seat(row, col) → [x, z, yaw] for T.character(..., { pose: 'sitStudy' }) (row 0 = front; desks are 0.645 high so forearms rest on them). c.teacher → [x, z, yaw] standing at the board.
 export function classroom(st, o = {}) {
   const M = st.M, w = o.w || 10, d = o.d || 9.5, h = o.h || 3.3, night = isNight(st), rows = o.rows || 3, cols = o.cols || 4;
   const wallC = o.wall || mix(M.wall, '#e4d8c4', 0.5);
@@ -190,8 +190,8 @@ export function classroom(st, o = {}) {
   const r = rng(o.seed || 3), seats = [], dx = 1.9, dz = 1.7, x0 = -((cols - 1) * dx) / 2 + 0.3, zF = -d / 2 + 3.1;
   const bagCols = ['#c8443a', '#2f6fe0', '#3a8a5a', '#e8b030', '#7a4ab0'];
   for (let ri = 0; ri < rows; ri++) for (let ci = 0; ci < cols; ci++) { const x = x0 + ci * dx, z = zF + ri * dz;
-    const dk = put(st, table({ w: 0.95, d: 0.55, h: 0.72, color: '#c8a070' }), x, z); put(st, chair({ color: '#3a4a7a' }), x, z + 0.5, PI);
-    if (r() < 0.7) put(st, book({ color: bagCols[(r() * 5) | 0] }), x - 0.2 + r() * 0.3, z, r(), 0.745, false);
+    const dk = put(st, table({ w: 0.95, d: 0.55, h: 0.62, color: '#c8a070' }), x, z); put(st, chair({ color: '#3a4a7a' }), x, z + 0.5, PI);
+    if (r() < 0.7) put(st, book({ color: bagCols[(r() * 5) | 0] }), x - 0.32 + r() * 0.12, z - 0.1, r() * 0.6, 0.645, false);
     if (r() < 0.5) put(st, group(rbox(0.3, 0.4, 0.16, 0.06, mat(bagCols[(r() * 5) | 0], { rough: 0.8 }), 0, 0.2, 0)), x + 0.32, z + 0.5, PI, 0.05, false);
     seats.push([x, z + 0.5, PI]); }
   put(st, desk({ color: '#5a3a2a', w: 1.5 }), -bw / 2 - 0.4, -d / 2 + 1.5, 0); put(st, chair({ color: '#2a2430' }), -bw / 2 - 0.4, -d / 2 + 0.9, 0);

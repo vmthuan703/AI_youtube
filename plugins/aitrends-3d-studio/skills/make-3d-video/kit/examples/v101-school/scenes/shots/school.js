@@ -19,12 +19,20 @@ registerShot('suburb', {
 });
 registerShot('locker', {
   init(T) { const st = T.stage({ mood: 'interiorWarm', fov: 30, fog: [10, 40] }); const h = T.W.lockerHall(st, {}); const L = h.locker(14, 1);
-    const hero = st.add(T.character(HERO).place(L.front[0], 0, L.front[1], L.yaw + PI)); const bell = T.W.bell(st, { pos: [-2.25, 2.5, L.z + 1.5], yaw: R2, t0: 1.2 });
-    const kids = [STUDENTS[0], STUDENTS[2], STUDENTS[4]].map(o => st.add(T.character(o))); return { st, h, L, hero, kids, peek: [1.7, 1.4, L.z + 1.7] }; },
-  draw(s, t, info, T) { T.lockerDoor(s.L.door, t, { t0: 0.3, dur: 0.7, slam: 2.0 });
-    s.hero.pose(T.posesAt3(t, [[0, 'dialLocker'], [0.7, 'reach'], [1.8, 'slamLocker'], [2.5, 'stand']], 0.38)).face({ expr: [[0, 'neutral'], [1.5, 'determined']], t, blink: true });
+    const hero = st.add(T.character(HERO).place(L.front[0] - 0.12, 0, L.z + 0.4, L.yaw + PI + 0.35)); const bell = T.W.bell(st, { pos: [-2.25, 2.5, L.z + 1.5], yaw: R2, t0: 1.2 });
+    const handle = new T.THREE.Object3D(); handle.position.set(0.42, 0.05, 0.05); L.door.add(handle);
+    const kids = [STUDENTS[0], STUDENTS[2], STUDENTS[4]].map(o => st.add(T.character(o))); return { st, h, L, hero, kids, handle, peek: [1.7, 1.4, L.z + 1.7] }; },
+  draw(s, t, info, T) {
+    // the door: opened by the hand at 0.55 s, swung shut at 2.0 s (rattle); the right hand stays on the handle while it moves the door
+    const ang = T.lockerDoor(s.L.door, t, { t0: 0.55, dur: 0.75, open: 1.55, slam: 2.0 }); s.L.door.updateMatrixWorld(true);
+    const sm = (a, b) => { const k = T.clamp((t - a) / (b - a)); return k * k * (3 - 2 * k); };
+    const onHandle = sm(0.2, 0.55) * (1 - sm(1.05, 1.4)) + sm(1.6, 1.85) * (1 - sm(2.15, 2.5));
+    const body = T.flow3(t, [[0, 'stand'], [0.5, { ...T.POSES3.stand, spine: [6, 8, 0], head: [8, 6, 0] }], [1.3, { ...T.POSES3.stand, spine: [10, -6, 0], head: [12, -10, 0] }],
+      [1.85, { ...T.POSES3.stand, spine: [4, 16, 0], head: [-2, -6, 0], legL: [10, 8, 6, 0], legR: [-6, 8, 8, 0] }], [2.2, { ...T.POSES3.stand, spine: [-2, 4, 0], head: [-6, 0, 0] }], [3, 'relaxed']]);
+    const rest = [-0.2, 0.72, 0.08], grip = T.reachTo(s.hero, s.handle.getWorldPosition(new T.THREE.Vector3())), to = rest.map((v, i) => v + (grip[i] - v) * onHandle);
+    s.hero.pose({ ...body, armR: { to, pole: [-0.7, 0.6, -0.4] }, handR: onHandle > 0.5 ? 'fist' : 'relaxed' }).face({ expr: [[0, 'neutral'], [1.9, 'determined']], t, blink: true });
     s.kids.forEach((k, i) => k.pose(T.walkTo(k, t, { from: [-0.9 + i * 0.6, s.L.z - 3.5 + i * 0.6], to: [-0.9 + i * 0.6, s.L.z + 3.5 + i * 0.6], t0: 1.0 + i * 0.2, t1: 6.2 + i * 0.2 })).face({ expr: 'neutral', t, blink: true }));
-    cam(s, t, info, T, { a: s.hero, at: s.peek }); },
+    const c = s.st.camera, z = s.L.z; c.position.set(0.95 - t * 0.03, 1.42, z - 2.5 + t * 0.06); c.lookAt(1.3, 1.2, z + 0.4); if (c.fov !== 34) { c.fov = 34; c.updateProjectionMatrix(); } },   // 3/4 from across the hall: the door, the hand and the face all read
 });
 registerShot('chem', {
   init(T) { const st = T.stage({ mood: 'interiorCool', fov: 34, fog: [12, 40] }); const c = T.W.chemLab(st, {}); const p = c.station(1);
@@ -76,9 +84,12 @@ registerShot('football', {
   init(T) { const st = T.stage({ mood: 'night', fov: 32, fog: [60, 220] }); const f = T.W.footballField(st, {}); T.W.haze(st, { area: [-40, 40, 1, 14, -30, 30], n: 24, opacity: 0.025 });
     const qb = st.add(T.character({ ...HERO, ...T.W.LETTERMAN, patch: 'E' }).place(-2, 0, 13, 0)), wr = st.add(T.character(BRO_2).place(-1.4, 0, 21.5, PI)), ball = st.add(T.W.football());
     T.W.breath(st, qb, { every: 1.4 }); return { st, f, qb, wr, ball }; },
-  draw(s, t, info, T) { s.qb.pose(T.throw3(t, { t0: 1.0, idle: 'carryBall' })).face({ expr: 'determined', t, blink: true });
-    if (t < 1.0) { s.ball.position.set(-2.15, 0.98, 13.15); s.ball.rotation.set(0, 0, 0.3); } else T.toss(s.ball, t, { from: [-2.2, 1.9, 13.1], to: [-1.4, 1.25, 21.1], h: 2.2, t0: 1.0, dur: 1.0, spin: [3, 0, 0] });
-    s.wr.pose(T.posesAt3(t, [[0, 'ready'], [1.6, 'holdFront']], 0.38)).face({ expr: 'joy', t, blink: true }); cam(s, t, info, T, { a: s.qb, side: -1, yaw: Math.PI, dist: 1.1 }); },
+  draw(s, t, info, T) { const t0 = 1.25, o = { t0 }; const rel = T.throwHand(s.qb, t0, o).toArray();
+    if (t < t0) { s.ball.position.copy(T.throwHand(s.qb, t, o)); s.ball.rotation.set(-0.4, 0, 0); } else T.toss(s.ball, t, { from: rel, to: [-1.45, 1.3, 21.1], h: 1.6, t0, dur: 0.95, spin: [0, 0, 2.5] });
+    s.qb.pose(T.throw3(t, o)).face({ expr: [[0, 'determined'], [t0 + 0.3, 'joy']], t, blink: true });
+    const catchK = T.clamp((t - (t0 + 0.55)) / 0.4);
+    s.wr.pose(T.flow3(t, [[0, 'ready'], [t0 + 0.4, 'ready'], [t0 + 0.9, { ...T.POSES3.holdFront, armL: { to: [0.12, 1.25, 0.32] }, armR: { to: [-0.12, 1.25, 0.32] } }], [3, { ...T.POSES3.holdFront, armL: { to: [0.1, 1.0, 0.25] }, armR: { to: [-0.1, 1.0, 0.25] } }]])).face({ expr: catchK > 0.5 ? 'joy' : 'determined', t, blink: true });
+    cam(s, t, info, T, { a: s.qb, side: 0, yaw: -1.25, dist: 1.25 }); },
 });
 registerShot('principal', {
   init(T) { const st = T.stage({ mood: 'interiorWarm', fov: 34, fog: [10, 30] }); const p = T.W.principalOffice(st, {});
@@ -120,8 +131,11 @@ registerShot('snowLot', {
   init(T) { const st = T.stage({ mood: 'snow', fov: 34, fog: [20, 90] }); const l = T.W.studentLot(st, { buses: 2, gap: [-9, 7] }); T.W.snowDay(st, { area: [-8, 8, 0, 6, -4, 4] });
     const hero = st.add(T.character({ ...HERO, scarf: '#c8343a' }).place(1.5, 0, 0.6, -R2)), sam = st.add(T.character({ ...SAM, scarf: '#ffffff' }).place(-2.5, 0, 0.6, R2)), ball = st.add(T.sphere(0.07, T.mat('#f8f8ff', { rough: 0.8 })));
     T.W.breath(st, hero, { every: 1.5 }); T.W.breath(st, sam, { every: 1.7, offset: 0.6 }); return { st, l, hero, sam, ball }; },
-  draw(s, t, info, T) { s.sam.pose(T.throw3(t, { t0: 1.0 })).face({ expr: 'smirk', t, blink: true }); if (t < 1.0) s.ball.position.set(-2.55, 1.55, 0.55); else T.toss(s.ball, t, { from: [-2.4, 1.7, 0.5], to: [1.45, 1.35, 0.6], h: 0.5, t0: 1.0, dur: 0.45 });
-    s.ball.visible = t < 1.47; s.hero.pose(T.posesAt3(t, [[0, 'handsInPockets'], [1.45, 'shocked']], 0.38)).face({ expr: [[0, 'neutral'], [1.45, 'shocked']], t, blink: true }); cam(s, t, info, T, { a: s.hero, b: s.sam, side: -1 }); },
+  draw(s, t, info, T) { const t0 = 1.15, o = { t0, wind: 0.5 }, hit = t0 + 0.42; const rel = T.throwHand(s.sam, t0, o).toArray();
+    if (t < t0) s.ball.position.copy(T.throwHand(s.sam, t, o)); else T.toss(s.ball, t, { from: rel, to: [1.45, 1.45, 0.6], h: 0.35, t0, dur: hit - t0 });
+    s.ball.visible = t < hit; s.sam.pose(T.throw3(t, o)).face({ expr: [[0, 'smirk'], [hit, 'joy']], t, blink: true });
+    const flinch = { ...T.POSES3.shocked, spine: [-14, 10, 6], head: [-16, 18, 0] };
+    s.hero.pose(T.flow3(t, [[0, 'handsInPockets'], [hit, 'handsInPockets'], [hit + 0.18, flinch], [3, { ...T.POSES3.shocked, spine: [-4, 0, 0] }]])).face({ expr: [[0, 'neutral'], [hit, 'shocked']], t, blink: true }); cam(s, t, info, T, { a: s.hero, b: s.sam, side: -1 }); },
 });
 registerShot('prom', {
   init(T) { const st = T.stage({ mood: 'night', fov: 34, fog: [16, 60] }); const h = T.W.promHall(st, {}); T.W.confetti(st, { area: [-3, 3, 0, 4.5, -2, 2], t0: 1.2, n: 500 });

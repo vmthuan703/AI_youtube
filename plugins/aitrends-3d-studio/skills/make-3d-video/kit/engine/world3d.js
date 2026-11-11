@@ -339,7 +339,7 @@ export function room(st, o = {}) {
     for (let i = 0; i < 3; i++) put(box(0.9, 0.7, 0.35, mat(o.cabinet || '#6a4a5a')), -w * 0.35 + i * 1.0, backZ + 0.2, 0, 1.9);
   } else if (kind === 'hallway') {
     const lc = o.lockerColors || [o.lockerColor || '#2f6a72'], run = o.lockerRun || 8; let i = 0;
-    for (const sx of [-1, 1]) for (let z = backZ + 1; z < backZ + d - 1; z += 0.55, i++) put(locker({ color: lc[Math.floor(i / run) % lc.length] }), sx * (w / 2 - 0.3), z, sx > 0 ? -R2 : R2);
+    if (o.lockers !== false) for (const sx of [-1, 1]) for (let z = backZ + 1; z < backZ + d - 1; z += 0.55, i++) put(locker({ color: lc[Math.floor(i / run) % lc.length] }), sx * (w / 2 - 0.3), z, sx > 0 ? -R2 : R2);
   }
   if (o.strips || (kind === 'hallway' && o.strips !== false)) {   // fluorescent strips on the ceiling: glow-only, plus 2 real lights
     for (let z = backZ + 1.5; z < backZ + d; z += 3) { const s2 = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.04, 0.18), glowMat('#fff4e6', 1.6)); s2.position.set(0, h - 0.03, z); st.add(s2); }

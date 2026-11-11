@@ -85,7 +85,7 @@ export function powerCut(st, o = {}) {
 // rotating red beacon: a glowing dome + a spot that sweeps round the room
 export function alarmLight(st, o = {}) {
   const c = o.color || '#ff2a1a', p = o.pos || [0, 2.6, 0], t0 = o.t0 ?? 0;
-  const g = group(cyl(0.09, 0.1, 0.04, mat('#2a2a30'), 0, 0, 0, 16), sphere(0.08, glowMat(c, 1.8, { transparent: true, opacity: 0.9 }), 0, 0.05, 0, 14, 10)); g.position.set(...p); st.add(g);
+  const g = group(cyl(0.09, 0.1, 0.04, mat('#2a2a30'), 0, 0, 0, 16), sphere(0.08, glowMat(c, 1.8, { transparent: true, opacity: 0.9 }), 0, 0.05, 0, 14, 10)); g.position.set(...p); g.userData.dynamic = true; st.add(g);
   const halo = glow(c, 1.2, 0); halo.position.set(p[0], p[1] + 0.05, p[2]); st.add(halo);
   const S1 = new THREE.SpotLight(color(c), 0, 14, 0.45, 0.5, 1.2); S1.position.set(p[0], p[1] + 0.05, p[2]); st.add(S1, S1.target);
   const update = (t) => { const on = t >= t0, a = (t - t0) * (o.speed ?? 6); S1.intensity = on ? (o.power ?? 40) : 0; S1.target.position.set(p[0] + Math.cos(a) * 4, p[1] - 1.5, p[2] + Math.sin(a) * 4); S1.target.updateMatrixWorld();
@@ -98,7 +98,7 @@ export function capToss(st, o = {}) {
   const cm = mat(o.color || '#1a1a2a', { rough: 0.5 }), tm = mat(o.tassel || '#f2b632', { keepSat: true });
   for (let i = 0; i < n; i++) { const cap = group(box(0.32, 0.015, 0.32, cm, 0, 0, 0), cyl(0.11, 0.11, 0.07, cm, 0, -0.04, 0, 12), sphere(0.012, tm, 0, 0.012, 0, 6, 4), cyl(0.003, 0.003, 0.12, tm, 0.13, -0.05, 0.13, 4));
     caps.push({ cap, x: cx + (r() - 0.5) * (o.spread ?? 4), z: cz + (r() - 0.5) * (o.spread ?? 4) * 0.6, vx: (r() - 0.5) * 1.2, vz: (r() - 0.5) * 1.2, vy: 7 + r() * 3, d: r() * 0.25, spin: [r() * 9 - 4.5, r() * 12 - 6, r() * 9 - 4.5] }); g.add(cap); }
-  st.add(g); const y0 = o.y ?? 1.9;
+  g.userData.dynamic = true; st.add(g); const y0 = o.y ?? 1.9;
   const update = (t) => { for (const c of caps) { const k = Math.max(0, t - t0 - c.d); let y = y0 + c.vy * k - 4.9 * k * k; const land = y < 0.02; if (land) y = 0.02;
       c.cap.position.set(c.x + c.vx * Math.min(k, 3), y, c.z + c.vz * Math.min(k, 3)); c.cap.visible = t >= t0 + c.d || o.holding; if (!land) c.cap.rotation.set(c.spin[0] * k, c.spin[1] * k, c.spin[2] * k); else c.cap.rotation.set(0, c.spin[1], 0); } };
   update(0); st.onTick(update); return { obj: g, update };

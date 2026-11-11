@@ -164,6 +164,39 @@ function poseAt3(t, keys, blend, fn = ease.inOut) {
 }
 // exprAt(t, [[0,'deadpan'], [1.2,'shocked']], blend=0.16) — the expression at t, blended into each new one (eyes close down
 // and open up through a squint, the mouth eases). face({ expr: [[t, name], …], t }) calls this for you.
+// flow3(t, [[t0, pose], [t1, pose], …], { ease }) — 1.0.1: one continuous movement through key poses. posesAt3 holds each pose
+// and eases in and out of it, so the body stops at every key (robotic for throws, swings, reaches). flow3 runs a smooth spline
+// (cubic Hermite, Catmull-Rom tangents) through the keys: speed carries through each key and only the first and last ease.
+// Angle limbs spline their angles, IK limbs ({ to }) spline the hand/foot target; a limb that changes kind between two keys
+// blends over that stretch. Returns the pose with _prev (hair follow-through).
+export function flow3(t, keys, o = {}) {
+  const at = (tt) => {
+    const K = keys.map(([kt, p]) => [kt, typeof p === 'string' ? POSES3[p] || POSES3.stand : p]), n = K.length;
+    if (tt <= K[0][0]) return K[0][1]; if (tt >= K[n - 1][0]) return K[n - 1][1];
+    let i = 0; while (i + 2 < n && tt >= K[i + 1][0]) i++;
+    const [t0, A] = K[i], [t1, B] = K[i + 1], h = t1 - t0, u = (tt - t0) / h;
+    const h00 = 2 * u ** 3 - 3 * u ** 2 + 1, h10 = u ** 3 - 2 * u ** 2 + u, h01 = -2 * u ** 3 + 3 * u ** 2, h11 = u ** 3 - u ** 2;
+    const val = (P, k) => { const v = P[k]; return v === undefined ? undefined : v; };
+    const tan = (j, k, get) => { if (j <= 0 || j >= n - 1) return null; const a = get(K[j - 1][1], k), b = get(K[j + 1][1], k); if (a == null || b == null) return null; const dt = K[j + 1][0] - K[j - 1][0];
+      return Array.isArray(a) ? a.map((x, m) => (b[m] - x) / dt) : (b - a) / dt; };
+    const herm = (a, b, ma, mb) => Array.isArray(a) ? a.map((x, m) => h00 * x + h10 * h * (ma ? ma[m] : 0) + h01 * b[m] + h11 * h * (mb ? mb[m] : 0)) : h00 * a + h10 * h * (ma ?? 0) + h01 * b + h11 * h * (mb ?? 0);
+    const out = {};
+    for (const k of new Set([...Object.keys(A), ...Object.keys(B)])) {
+      if (k === '_prev') continue; const a = val(A, k) ?? val(B, k), b = val(B, k) ?? a;
+      const num = (x) => typeof x === 'number' || Array.isArray(x);
+      if (num(a) && num(b) && (typeof a === 'number') === (typeof b === 'number') && (!Array.isArray(a) || a.length === b.length)) {
+        const g = (P, kk) => { const v = P[kk]; return num(v) && (typeof v === typeof a) ? v : null; };
+        out[k] = herm(a, b, tan(i, k, g), tan(i + 1, k, g)); }
+      else if (a && b && a.to && b.to) {
+        const g = (P, kk) => (P[kk] && P[kk].to ? P[kk].to : null), gp = (P, kk) => (P[kk] && P[kk].pole ? P[kk].pole : null);
+        const to = herm(a.to, b.to, tan(i, k, g), tan(i + 1, k, g)), pole = a.pole && b.pole ? herm(a.pole, b.pole, tan(i, k, gp), tan(i + 1, k, gp)) : b.pole || a.pole;
+        out[k] = pole ? { to, pole } : { to }; }
+      else { const e = u * u * (3 - 2 * u); out[k] = blendPose3({ [k]: a }, { [k]: b }, e)[k]; }
+    }
+    return out;
+  };
+  return { ...at(t), _prev: at(t - 0.1) };
+}
 export function exprAt(t, keys, blend = 0.16) {
   const get = (e) => (typeof e === 'string' ? EXPRESSIONS[e] || EXPRESSIONS.neutral : e);
   let i = 0; while (i + 1 < keys.length && t >= keys[i + 1][0]) i++;

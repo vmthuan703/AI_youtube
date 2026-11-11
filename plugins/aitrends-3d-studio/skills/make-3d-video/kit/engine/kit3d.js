@@ -319,8 +319,8 @@ export function optimize(st, keep = []) {
 }
 
 // re-export the rest of the 3D toolkit so shots only need `T`
-export { character, POSES3, posesAt3, exprAt, walkPose3, breathe3, blendPose3, EXPRESSIONS, BODY } from './rig3d.js';
-export { walkTo, idle3, speak3, lookAtSpeaker, handheld, chase, crashZoom, punch, dutch, rackFocus, pov, povArms, armWrestle, reachPose, body3, squash, climb, jump3, sitDown, turn3, throw3, toss, lockerDoor } from "./motion3d.js";
+export { character, POSES3, posesAt3, flow3, exprAt, walkPose3, breathe3, blendPose3, EXPRESSIONS, BODY } from './rig3d.js';
+export { walkTo, idle3, speak3, lookAtSpeaker, handheld, chase, crashZoom, punch, dutch, rackFocus, pov, povArms, armWrestle, reachPose, body3, squash, climb, jump3, sitDown, turn3, throw3, throwHand, reachTo, toss, lockerDoor } from "./motion3d.js";
 export { camShot, CAMS } from './camera10.js';   // 1.0 named camera framings
 export * as W from './world3d.js';
 export * as FX3 from './fx3d.js';

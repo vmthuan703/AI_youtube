@@ -89,7 +89,7 @@ export function beaker(o = {}) {
   const gl = mat('#e8f4ff', { rough: 0.05, metal: 0.1, transparent: true, opacity: 0.3, clearcoat: 1 }), c = o.color || '#3ad08a';
   const liq = o.glow ? glowMat(c, 1.5, { transparent: true, opacity: 0.9 }) : mat(c, { keepSat: true, rough: 0.2, transparent: true, opacity: 0.85 });
   const g = o.flask ? group(sphere(0.07, gl, 0, 0.08, 0, 16, 12), cyl(0.02, 0.02, 0.12, gl, 0, 0.19, 0, 10), sphere(0.062, liq, 0, 0.07, 0, 14, 10)) : group(cyl(0.05, 0.05, 0.14, gl, 0, 0.07, 0, 16), cyl(0.046, 0.046, 0.08, liq, 0, 0.042, 0, 16));
-  if (o.glow) g.add(at(glow(c, 0.4, 0.7), 0, 0.1, 0)); return g;
+  if (o.glow) { g.add(at(glow(c, 0.4, 0.7), 0, 0.1, 0)); g.userData.dynamic = true; } return g;
 }
 // trophyCase({ w }) — glass-front cabinet with gold cups and plaques, lit inside
 export function trophyCase(o = {}) {
@@ -186,7 +186,7 @@ export function sinkUnit(o = {}) { const w = o.w || 0.9; return group(box(w, 0.0
 export const LETTERMAN = { top: 'jacket', color: '#2a3a8a', sleeves: '#f2ece0', patch: 'E', patchColor: '#f2b632', patchBg: '#2a3a8a', collar: '#f2b632' };
 // bell(st, { pos, yaw, t0, dur }) — the class bell on a wall: the dome shakes and blurs while it rings (pair with a bell SFX)
 export function bell(st, o = {}) { const g = group(cyl(0.05, 0.05, 0.06, mat('#3a3a42'), 0, 0, -0.03, 10), sphere(0.13, mat('#c8282a', { keepSat: true, clearcoat: 0.8, rough: 0.2, metal: 0.3 }), 0, 0, 0.04, 20, 12)); g.children[0].rotation.x = R2; g.children[1].scale.z = 0.5;
-  g.position.set(...(o.pos || [0, 2.6, 0])); g.rotation.y = o.yaw ?? 0; st.add(g); const t0 = o.t0 ?? 0, dur = o.dur ?? 2.5, d = g.children[1], p0 = d.position.clone();
+  g.position.set(...(o.pos || [0, 2.6, 0])); g.rotation.y = o.yaw ?? 0; g.userData.dynamic = true; st.add(g); const t0 = o.t0 ?? 0, dur = o.dur ?? 2.5, d = g.children[1], p0 = d.position.clone();
   const update = (t) => { const on = t >= t0 && t < t0 + dur; d.position.set(p0.x + (on ? Math.sin(t * 190) * 0.008 : 0), p0.y + (on ? Math.cos(t * 170) * 0.006 : 0), p0.z); }; update(0); st.onTick(update); return { obj: g, update, ringing: (t) => t >= t0 && t < t0 + dur }; }
 
 // ================================================================ LIBRARY — tables in the middle (along x), shelves at the back and sides
@@ -427,7 +427,7 @@ export function promHall(st, o = {}) {
   const arch = put(st, balloonArch({ colors: o.colors }), 0, 5.5, 0, 0, false);
   const r = rng(o.seed || 41); for (let i = 0; i < 26; i++) { const b = balloon({ color: ['#f2b632', '#ffffff', '#2a3a8a', '#e83a6a'][i % 4], string: 0.5 }); b.position.set((r() - 0.5) * 22, 5.2 + r() * 1.4, (r() - 0.5) * 12); st.add(b); }
   for (let i = 0; i < 5; i++) st.add(stringLights({ from: [-13, 6.2, -6 + i * 3], to: [13, 6.2, -6 + i * 3 + 0.5], n: 26, sag: 0.8, lights: i === 2 ? 2 : 0 }));
-  const ball = discoBall({ drop: 1.2 }); ball.position.set(0, 6.0, -1); st.add(ball);
+  const ball = discoBall({ drop: 1.2 }); ball.position.set(0, 6.0, -1); ball.userData.dynamic = true; st.add(ball);
   // moving coloured spots from the disco ball (additive decals on floor and walls)
   const dots = new THREE.InstancedMesh(new THREE.CircleGeometry(0.12, 12), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }), 160); dots.userData.dynamic = true; dots.frustumCulled = false;
   const pal = ['#ff4a9a', '#4ad0ff', '#ffe04a', '#ffffff', '#a04aff'].map(c => new THREE.Color(c)); const base = []; for (let i = 0; i < 160; i++) { base.push([r() * PI * 2, 0.25 + r() * 1.1]); dots.setColorAt(i, pal[i % 5]); }
@@ -476,7 +476,7 @@ export function suburbStop(st, o = {}) {
     for (let k = 0; k < 2; k++) put(st, tree({ s: 1.1 + r() * 0.4, color: o.autumn ? ['#d8702a', '#c8402a', '#e8a030'][(r() * 3) | 0] : '#3a7a3a' }), x - 3 + k * 6 + r(), -3.5 - r()); }
   for (let x = -24; x <= 24; x += 8) st.add(box(1.2, 0.02, 5, mat('#b8b0a4'), x, 0.015, -4));
   const stop = [6, 0.6, PI]; put(st, stopSign({}), 9.5, 0.7, -R2); put(st, streetLamp({}), -8, 0.8, 0, 0, false);
-  const bus = schoolBus({ door: o.door ?? 1 }); bus.position.set(o.busX ?? 2, 0, 3.4); st.add(bus); st.add(contactShadow(bus));
+  const bus = schoolBus({ door: o.door ?? 1 }); bus.position.set(o.busX ?? 2, 0, 3.4); bus.userData.dynamic = true; st.add(bus);   // moves: no baked contact shadow
   if (!night) skyDome(st, { clouds: 14 }); if (o.wet) mirror(st, { w: 120, d: 7, z: 4.5, strength: 0.45, blur: 1.2 });
   return { stop, bus, busDoor: [(o.busX ?? 2) + 3.9, 2.0, PI], porch: (i = 0) => porches[i % porches.length], walk: 0.14 };
 }

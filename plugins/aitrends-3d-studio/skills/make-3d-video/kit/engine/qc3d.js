@@ -1,6 +1,8 @@
 // engine/qc3d.js — 1.0.2 automatic motion QC, run inside the player by `node render.mjs --project P --qc` (and before every full
 // render). It probes sampled frames of every 3D shot and reports, with the shot and the time:
 //   clip      a hand, elbow, knee, foot, head or chest inside a solid prop (chair, desk, podium, door, car…) or inside another body
+//             1.0.4: or a limb SEGMENT (upper arm, forearm, thigh, shin) passing through a surface — a forearm through a thin tabletop
+//             has no joint inside the top, so joints alone missed it. Red when the surface belongs to something big (table, wall, car).
 //   occluded  the subject's face more than half hidden from the camera (a head, a hand, a prop in front of the lens)
 //   camera    the camera inside a wall, a car, a locker or a person
 //   slide     a planted foot skating over the floor
@@ -62,6 +64,20 @@ export function probe(stg, opts = {}) {
       if (deep && inside(p, meshes)) out.issues.push({ kind: 'clip', sev: name === 'head' || name === 'chest' ? 'red' : 'amber', msg: `${who}: ${name} inside a prop` });
       for (const o of people) { if (o === ch) continue; const c = capsules(o); if (segDist(p, c.a, c.b) < c.r * 0.8 || p.distanceTo(c.head) < c.hr * 0.85) out.issues.push({ kind: 'clip', sev: 'amber', msg: `${who}: ${name} inside ${o.userData.label || 'another character'}` }); }
     }
+    // 1.0.4: limb segments crossing a surface (joints on both sides of a tabletop, a wall, a car door)
+    for (const sd of ['L', 'R']) { const S = J[sd]; if (!S || !S.sh) continue;
+      for (const [nm, a, b] of [['upper arm', S.sh, S.el], ['forearm', S.el, S.wr], ['thigh', S.hp, S.kn], ['shin', S.kn, S.an]]) {
+        if (!a || !b) continue; const d = b.clone().sub(a), L = d.length(); if (L < 0.05) continue; RAY.set(a, d.normalize()); RAY.near = 0.03; RAY.far = L - 0.03;
+        const h = RAY.intersectObjects(meshes, false)[0]; if (!h || !h.face) continue;
+        // a real crossing: the two ends lie on opposite sides of the surface, each more than 2 cm away (lying along it is contact)
+        const n = h.face.normal.clone().applyMatrix3(NM.getNormalMatrix(h.object.matrixWorld)).normalize(), sa = a.clone().sub(h.point).dot(n), sb = b.clone().sub(h.point).dot(n);
+        const m = nm === 'thigh' || nm === 'shin' ? 0.05 : 0.02; if (!(sa * sb < 0 && Math.abs(sa) > m && Math.abs(sb) > m)) continue;   // a hip sunk a few cm into a seat is hidden
+        // depth: lifted by the limb's own thickness it must still cut the same object (a thigh 1 cm under a bench top does not)
+        const up = V().set(0, m + 0.02, 0), a2 = a.clone().add(up), b2 = b.clone().add(up); RAY.set(a2, b2.clone().sub(a2).normalize()); RAY.far = L - 0.03;
+        if (!RAY.intersectObjects([h.object], false).length) continue;
+        if (!h.object.geometry.boundingBox) h.object.geometry.computeBoundingBox(); const sz = h.object.geometry.boundingBox.getSize(V()).multiply(h.object.getWorldScale(V()));
+        const big = Math.max(sz.x, sz.y, sz.z) >= 0.5;
+        out.issues.push({ kind: 'clip', sev: big ? 'red' : 'amber', msg: `${who}: ${sd === 'L' ? 'left' : 'right'} ${nm} passes through a ${big ? 'surface (table, wall, car…)' : 'small prop'}` }); } }
     out.snap[ch.uuid] = { who, J };
   }
   out.snap.__cam = { pos: cam.position.clone(), q: cam.quaternion.clone() };

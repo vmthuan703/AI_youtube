@@ -10,6 +10,7 @@ giữ nguyên dáng suốt video và chữ luôn nét. Giọng đọc mặc đ�
 ## Mới trong 1.0.4
 - **Bảng điểm hình ảnh tự chạy** sau mỗi lần render bản cuối (độ sáng, độ rực, khung tối / trống / đứng yên, nhịp cảnh): in các mục cần xem ở cuối log, lưu `build/qc_scorecard.md` và đưa vào sổ bài học. Bỏ qua bằng `--no-scorecard`.
 - **Bối cảnh sức mạnh và tập luyện** (`engine/strength12.js`): phòng tập tạ có tường gương phản chiếu thật (`T.W.weightRoom`), phòng leo núi với tuyến bám màu (`T.W.climbingGym`, `c.hold(i, k)`), tháp đèn sân vận động gãy chân, đứt cáp, đổ nghiêng (`T.W.lightTower`), lốp máy kéo 200 kg, thanh tạ có đĩa, góc livestream có ring light và số người xem (`T.W.streamCorner`), dãy tủ sắt rời đổ được (`T.W.lockerRow`). Demo: `examples/v104-sets`.
+- **QC bắt tay/chân xuyên bàn:** kiểm tra cả đoạn chi (bắp tay, cẳng tay, đùi, cẳng chân), không chỉ các khớp. Cẳng tay cắm xuyên mặt bàn mỏng (cổ tay dưới bàn, khuỷu trên bàn) giờ là lỗi đỏ; tì sát mặt ghế vài cm không bị tính.
 
 ## Mới trong 1.0.3 — diễn xuất sống hơn, trang phục chuyển động, tháng 11 nước Mỹ
 - **Khẩu hình theo lời thoại** cho mọi kiểu miệng (cả khi cười, há miệng), lông mày nhướng ở từ nhấn mạnh, người nghe gật đầu (`T.listen3`). Chỉ cần `face({ gt })`.

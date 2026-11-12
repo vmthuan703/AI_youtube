@@ -101,7 +101,7 @@ EXPECTED = {
     "examples/v101-school/scenes/cast.js": "19cc3da1956f35d8",
     "examples/v101-school/scenes/shots/school.js": "a8f7cd6aefa97691",
     "examples/v101-school/story/shots.json": "1e08f0c7581d427c",
-    "engine/qc3d.js": "42ed3c62977ed4b2",
+    "engine/qc3d.js": "7c83f7d3ef92527c",
     "engine/act10.js": "0234887d92214b03",
     "examples/v102-motion/config.json": "3c4e76602ccb5c13",
     "examples/v102-motion/scenes/cast.js": "19cc3da1956f35d8",

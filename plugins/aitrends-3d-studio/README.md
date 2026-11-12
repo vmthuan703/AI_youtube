@@ -7,6 +7,14 @@ khung hình 2:1, sơ đồ giải thích hoạt hình.
 Mọi khung hình đều dựng bằng code (Three.js) và render từng khung một. Không dùng AI tạo ảnh/video, nên nhân vật
 giữ nguyên dáng suốt video và chữ luôn nét. Giọng đọc mặc định dùng Chatterbox (MIT, chạy máy cá nhân), dự phòng Kokoro-82M (Apache-2.0).
 
+## Mới trong 1.0.2 — chuyển động tự nhiên, bắt lỗi tự động
+- **Kiểm tra lỗi tự động** (`--qc`): tay chân xuyên đồ vật hoặc người khác, mặt bị che, máy quay nằm trong tường / xe / người hoặc nhảy giữa cảnh, chân trượt, khớp giật. Còn lỗi đỏ thì không cho render bản cuối.
+- **Máy quay thông minh:** tự né vật chắn để thấy rõ mặt, ưu tiên góc nhìn thấy mặt, giữ nguyên tắc 180° khi hai người nói chuyện.
+- **Thư viện động tác** (`T.act`): mở cửa, nhặt / bê / đặt đồ, ngồi lên mọi độ cao, chạy dừng gấp, vấp ngã, nhảy qua vật, leo lên ghế, ôm, đập tay, khoác vai, kéo tay chạy, đỡ người ngã.
+- **Nhân vật:** tay dài hơn 25% (giơ tay cao hơn đầu), khớp không gập ngược, tay cầm nắm (cán ô, bút, quả bóng), váy áo lay theo bước đi.
+- **Diễn xuất:** ánh mắt nhìn theo người / vật, giật mình quay lại khi có tiếng động, đám đông tự nói chuyện, cười, xem điện thoại.
+- **Xem nhanh bằng GIF** (`--gif`) cho từng cảnh. Ví dụ: `examples/v102-motion` (18 cảnh).
+
 ## Mới trong 1.0.1 — trường trung học Mỹ
 - **Bối cảnh:** thư viện, phòng thí nghiệm hóa, hội trường có sân khấu, sân bóng bầu dục đêm thứ Sáu (khán đài, bảng điểm, cột gôn), phòng thay đồ, phòng ban nhạc, phòng hiệu trưởng, phòng phạt, phòng y tá, nhà vệ sinh (gương phản chiếu thật), bãi đỗ xe học sinh, đêm dạ hội, quán diner thập niên 50, trạm xe buýt vàng ở khu ngoại ô.
 - **Thời tiết và mùa:** lá phong mùa thu, ngày tuyết (tuyết phủ, tuyết rơi, hơi thở thành khói), mưa chảy trên kính cửa sổ lớp, kính mờ hơi nước, mất điện giữa giông, đèn báo động xoay (diễn tập lốc xoáy), mũ tốt nghiệp tung lên, pháo giấy, sương dưới đèn sân, giấy bay theo gió; chọn giờ trong ngày bằng `T.W.schoolTime('afterSchool')`.

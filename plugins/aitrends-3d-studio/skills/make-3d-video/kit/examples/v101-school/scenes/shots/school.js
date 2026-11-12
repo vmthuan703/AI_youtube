@@ -158,7 +158,7 @@ registerShot('graduation', {
     const gown = (o) => ({ ...o, top: 'dress', color: '#1a1a2a', skirt: null, skirtLen: 1.25 });
     const grads = [HERO, SAM, STUDENTS[0], STUDENTS[1], STUDENTS[3], CLASSMATE].map((o, i) => { const c = st.add(T.character(gown(o)).place(-2.5 + i * 1.0, 0, -5.5 - (i % 2) * 0.8, 0)); c.userData.cap = c.wear(T.W.gradCap({})); return c; });
     return { st, grads }; },
-  draw(s, t, info, T) { s.grads.forEach((c, i) => { c.pose(T.posesAt3(t, [[0, 'stand'], [0.75 + i * 0.03, 'capToss'], [1.6, 'cheer']], 0.38)).face({ expr: 'joy', t, blink: true }); c.userData.cap.visible = t < 0.98; });
+  draw(s, t, info, T) { s.grads.forEach((c, i) => { c.pose(T.flow3(t, [[0, 'stand'], [0.45 + i * 0.03, 'stand'], [0.95 + i * 0.03, 'capToss'], [1.8, 'cheer']])).face({ expr: 'joy', t, blink: true }); c.userData.cap.visible = t < 0.98; });
     cam(s, t, info, T, { a: s.grads[0], side: 0.5, dist: 1.25 }); },
 });
 registerShot('rainLot', {

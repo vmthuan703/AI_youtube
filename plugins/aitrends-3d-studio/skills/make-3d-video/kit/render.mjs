@@ -6,6 +6,7 @@
 //   node render.mjs --project P --styles cinematic,ink,toon,golden,neon,noir --at 3.5,12,40   style comparison grid
 //   node render.mjs --project P --bench                               time this machine (GPU or CPU) and estimate the full render
 // --legacy renders with the 0.2.x look (before/after comparisons).
+//   node render.mjs --project P --gif [id,id]                         1.0.2 a small looping GIF per shot (build/gifs) to check motion
 //   node render.mjs --project P --qc [--every 0.5]                   1.0.2 motion QC: clipping, hidden faces, camera in walls, sliding feet, snapping joints
 // Options: --workers N  --scale K  --fps N  --style ID  --quality draft|standard|high|max  --debug  --format png|jpeg  --crf N  --preset X
 //          --gl auto|gpu|swiftshader  --angle d3d11|gl|vulkan|metal  --encoder auto|x264|nvenc  --out FILE  --chrome PATH
@@ -70,8 +71,9 @@ const QUALITY = {
   max: { crf: 10, preset: 'slower', ss: 1.5, format: 'png' },
 };
 const QN = QUALITY[args.quality] ? args.quality : QUALITY[CFG.quality] ? CFG.quality : 'high', Q = QUALITY[QN];
+if (args.gif && !args.scale) args.scale = '0.35';
 const PREVIEW = !!(args.from || args.to || (args.scale && +args.scale < 1));
-const SS = PREVIEW || args.sheet || args.stills || args.styles ? 1 : +(args.ss || Q.ss);
+const SS = PREVIEW || args.sheet || args.stills || args.styles || args.gif ? 1 : +(args.ss || Q.ss);
 const FORMAT = (args.format || (PREVIEW ? 'jpeg' : Q.format)) === 'jpeg' ? 'jpeg' : 'png';
 
 async function openPlayer(browser, style) {
@@ -180,6 +182,21 @@ async function renderStills() {
   else { const per = 24; for (let i = 0; i < all.length; i += per) await contactSheet(browser, all.slice(i, i + per), path.join(dir, `sheet_${String(i / per + 1).padStart(2, '0')}.png`), 4, 440); }
   await browser.close(); console.log(`Wrote ${all.length} stills + contact sheet(s) to ${dir}`);
 }
+// --gif [ids] (1.0.2): a looping GIF per shot (10 fps, small) to judge motion — stills hide jerks and sliding feet.
+// ids: comma-separated shot ids, default all. --gifFps N, --scale K (default 0.35). Output build/gifs/<id>.gif.
+async function renderGifs() {
+  const browser = await launch(); const page = await openPlayer(browser); const fps = FPS, gfps = +(args.gifFps || 10);
+  const list = (await page.evaluate('window.SHOT_LIST')).filter(s => args.gif === true || String(args.gif).split(',').includes(s.id));
+  const dir = path.join(BUILD, 'gifs'); fs.mkdirSync(dir, { recursive: true });
+  for (const sh of list) {
+    const tmp = path.join(dir, '_' + sh.id); fs.rmSync(tmp, { recursive: true, force: true }); fs.mkdirSync(tmp, { recursive: true }); let k = 0;
+    for (let t = sh.start; t < sh.end - 1e-6; t += 1 / gfps) { await page.evaluate(i => window.renderFrame(i), Math.round(t * fps)); fs.writeFileSync(path.join(tmp, `f${String(k++).padStart(4, '0')}.png`), await page.screenshot({ type: 'png' })); }
+    const out = path.join(dir, `${sh.id}.gif`);
+    const r = spawnSync('ffmpeg', ['-v', 'error', '-y', '-framerate', String(gfps), '-i', path.join(tmp, 'f%04d.png'), '-vf', 'split[a][b];[a]palettegen=max_colors=128[p];[b][p]paletteuse=dither=bayer:bayer_scale=4', '-loop', '0', out]);
+    if (r.status) console.log('  gif failed:', sh.id, String(r.stderr).slice(0, 200)); fs.rmSync(tmp, { recursive: true, force: true });
+  }
+  await browser.close(); console.log(`Wrote ${list.length} GIF(s) to ${dir}`);
+}
 // --bench: time one worker on frames spread across the video, then estimate the full render for this machine
 async function bench() {
   const browser = await launch(); const page = await openPlayer(browser); const total = await page.evaluate('window.TOTAL_FRAMES'); [OUTW, OUTH] = await page.evaluate('window.OUT');
@@ -201,6 +218,6 @@ async function bench() {
   console.log(`  one worker ≈ ${fpsW.toFixed(2)} frames/s; ${W} workers ≈ ${(fpsW * eff).toFixed(2)} frames/s (estimate)`);
   console.log(`  this video: ${total} frames ≈ ${fmtT(est)} to render (+ encode). Encoder: ${ENCODER}. CPU threads: ${cores}.`);
 }
-try { if (args.bench) await bench(); else if (args.qc) { const q = await runQC(); if (q.red) process.exitCode = 2; } else if (args.sheet || args.stills || args.styles) await renderStills(); else await renderVideo(); }
+try { if (args.bench) await bench(); else if (args.qc) { const q = await runQC(); if (q.red) process.exitCode = 2; } else if (args.gif) await renderGifs(); else if (args.sheet || args.stills || args.styles) await renderStills(); else await renderVideo(); }
 catch (e) { console.error('RENDER FAILED:', e.message); process.exitCode = 1; }
 finally { server.close(); }

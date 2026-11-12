@@ -324,4 +324,5 @@ export { walkTo, idle3, speak3, lookAtSpeaker, handheld, chase, crashZoom, punch
 export { camShot, CAMS } from './camera10.js';   // 1.0 named camera framings
 export * as W from './world3d.js';
 export * as FX3 from './fx3d.js';
+export * as act from './act10.js';   // 1.0.2: action library (door, carry, sitOn, runStop, trip, vault, climbOn, hug, highFive, armAround, pullRun, catchFall, gaze, react, busyCrowd)
 export { rng, key, smoothKey, ease, clamp, lerp, noise };

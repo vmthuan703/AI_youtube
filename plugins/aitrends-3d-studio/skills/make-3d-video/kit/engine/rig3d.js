@@ -12,7 +12,7 @@
 import * as THREE from 'three';
 import { buildHair } from './hair3d.js';
 import { S, clamp, lerp, mixVal, ease, prog, noise, shade, hash01, talkShape } from './core.js';
-import { mat } from './kit3d.js';
+import { mat, LEGACY } from './kit3d.js';
 import { dressUp } from './costume3d.js';
 
 const D2R = Math.PI / 180;
@@ -394,7 +394,8 @@ export function character(outfit = {}, opts = {}) {
   const glowK = dark ? 0 : (st.skinGlow ?? 0.16);
   const skinM = MAT(skin, dark ? { rough: 0.55, rim: 1.0 } : { rough: 0.58, rim: 0.85, limit: st.skinLimit ?? 0.95, emissive: new THREE.Color(skin).multiplyScalar(glowK), ...(G > 0 ? { clearcoat: 0.55 * G, clearcoatRough: 0.32, sheen: 0 } : {}) });
   const olM = olC && !ghost ? new THREE.MeshBasicMaterial({ color: new THREE.Color(olC), side: THREE.BackSide, fog: true }) : null;
-  const B = BODY;
+  const AK = outfit.arms ?? S().arms ?? (LEGACY ? 1 : 1.25);   // 1.0.2: arm length factor (1.25 = a raised hand clears the big head)
+  const B = AK === 1 ? BODY : { ...BODY, upperArm: BODY.upperArm * AK, foreArm: BODY.foreArm * AK };
   const unitCyl = new THREE.CylinderGeometry(1, 1, 1, 18, 1, true), unitSph = new THREE.SphereGeometry(1, 22, 16);
   const add = (m, parent = body) => { m.castShadow = !ghost; m.receiveShadow = !ghost; parent.add(m); return m; };
   // outline hull: a back-face copy pushed out by olW (scaled for spheres/lathes, or an explicit radius for segments)
@@ -540,13 +541,19 @@ export function character(outfit = {}, opts = {}) {
   };
   const eul = (a) => new THREE.Euler(a[0] * D2R, a[1] * D2R, a[2] * D2R, 'YXZ');
   const toBody = (frame, v) => { frame.updateWorldMatrix(true, false); const w = v.clone().applyMatrix4(frame.matrixWorld); return body.worldToLocal(w); };
-  const fkArm = (a, s) => { const [raise, az, bend, twist] = a; const Q = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, s * az * D2R, 0)).multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(-raise * D2R, 0, 0))).multiply(new THREE.Quaternion().setFromAxisAngle(up, -s * (twist || 0) * D2R)); const d = new THREE.Vector3(0, -1, 0).applyQuaternion(Q), b = new THREE.Vector3(0, 0, 1).applyQuaternion(Q); const d2 = d.clone().multiplyScalar(Math.cos(bend * D2R)).addScaledVector(b, Math.sin(bend * D2R)); return [d, d2, b]; };
-  const fkLeg = (a, s) => { const [lift, side, knee, twist] = a; const Q = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, 0, s * side * D2R)).multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(-lift * D2R, 0, 0))).multiply(new THREE.Quaternion().setFromAxisAngle(up, s * (twist || 0) * D2R)); const d = new THREE.Vector3(0, -1, 0).applyQuaternion(Q), b = new THREE.Vector3(0, 0, -1).applyQuaternion(Q); const d2 = d.clone().multiplyScalar(Math.cos(knee * D2R)).addScaledVector(b, Math.sin(knee * D2R)); return [d, d2, b]; };
+  const fkArm = (a, s) => { const [raise, az, bend0, twist] = a, bend = Math.max(0, Math.min(165, bend0)); /* 1.0.2: no reverse elbow */ const Q = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, s * az * D2R, 0)).multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(-raise * D2R, 0, 0))).multiply(new THREE.Quaternion().setFromAxisAngle(up, -s * (twist || 0) * D2R)); const d = new THREE.Vector3(0, -1, 0).applyQuaternion(Q), b = new THREE.Vector3(0, 0, 1).applyQuaternion(Q); const d2 = d.clone().multiplyScalar(Math.cos(bend * D2R)).addScaledVector(b, Math.sin(bend * D2R)); return [d, d2, b]; };
+  const fkLeg = (a, s) => { const [lift, side, knee0, twist] = a, knee = Math.max(0, Math.min(165, knee0)); /* 1.0.2: no reverse knee */ const Q = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, 0, s * side * D2R)).multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(-lift * D2R, 0, 0))).multiply(new THREE.Quaternion().setFromAxisAngle(up, s * (twist || 0) * D2R)); const d = new THREE.Vector3(0, -1, 0).applyQuaternion(Q), b = new THREE.Vector3(0, 0, -1).applyQuaternion(Q); const d2 = d.clone().multiplyScalar(Math.cos(knee * D2R)).addScaledVector(b, Math.sin(knee * D2R)); return [d, d2, b]; };
   const ik = (A, T, l1, l2, pole) => { const dv = T.clone().sub(A); let d = dv.length(); d = clamp(d, Math.abs(l1 - l2) + 1e-3, (l1 + l2) * 0.999); const u = dv.normalize(); const a = Math.acos(clamp((l1 * l1 + d * d - l2 * l2) / (2 * l1 * d), -1, 1)); const pv = pole.clone().sub(A); pv.addScaledVector(u, -pv.dot(u)); if (pv.lengthSq() < 1e-8) pv.set(0, 0, 1); pv.normalize(); return A.clone().addScaledVector(u, Math.cos(a) * l1).addScaledVector(pv, Math.sin(a) * l1); };
   const setHand = (H, mode, A, Bp) => {
     H.g.position.copy(Bp); tmp.copy(Bp).sub(A).normalize(); H.g.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), tmp);
     if (H.mode === mode) return; H.mode = mode;
     const open = mode === 'open', point = mode === 'point';
+    if (mode === 'grip' || mode === 'pinch' || mode === 'cup') {   // 1.0.2 grips
+      const g = mode === 'grip', pc = mode === 'pinch';
+      H.palm.scale.set(handR * (g ? 1.0 : 1.05), handR * (pc ? 1.0 : 1.1), handR * (g ? 1.0 : 0.8)); H.palm.position.set(0, -handR * 0.75, 0);
+      H.thumb.visible = true; H.thumb.position.set(handR * (g ? 0.55 : 0.7), -handR * (g ? 1.0 : 0.9), handR * (g ? 0.75 : 0.5)); H.thumb.rotation.set(g ? 0.9 : 0.4, 0, g ? 1.2 : 0.7);
+      H.fing.visible = true; H.fing.position.set(0, -handR * (pc ? 1.75 : 1.55), handR * (g ? 0.55 : 0.4)); H.fing.scale.set(pc ? 0.8 : 2.4, pc ? 0.85 : 0.55, g ? 0.9 : 0.75); return;
+    }
     H.palm.scale.set(handR, open ? handR * 1.25 : handR * 1.05, open ? handR * 0.55 : handR * 0.95); H.palm.position.set(0, -handR * 0.75, 0);
     H.thumb.position.set(handR * 0.75, -handR * 0.55, handR * 0.35); H.thumb.rotation.set(0, 0, open ? 0.9 : 0.4); H.thumb.visible = open || point;
     H.fing.visible = point || open; H.fing.position.set(0, -handR * 2.1, 0); H.fing.scale.set(1, point ? 1 : 0.9, open ? 0.6 : 1);
@@ -581,6 +588,7 @@ export function character(outfit = {}, opts = {}) {
       if (kind === 'string') { g.rotation.x = 0.08 - 0.55 * sp - 0.22 * bob * sp + 0.35 * vy - 0.4 * dSp; g.rotation.z = 0.18 * Math.sin(ph + sx * 20) * sp - 0.3 * yr; }
       else { g.rotation.z = 0.14 * Math.sin(ph + 0.6) * sp - 0.25 * yr; g.rotation.x = -0.22 * sp * (0.6 + 0.4 * bob) + 0.25 * vy; }
     }
+    if (skirt && !LEGACY) { const standing = (p.y || 0) > -0.1; skirt.rotation.x = standing ? -0.1 * sp + 0.05 * bob * sp + 0.12 * vy : 0; skirt.rotation.z = standing ? 0.06 * Math.sin(ph) * sp - 0.1 * yr : 0; }
   };
   // 1.0.1: limb points for any spec. armPts / legPts → [joint, end] in body space; limbMix blends two specs (nested mixes too)
   // by lerping the joint and end points and restoring the bone lengths, so a pose blend never jumps between solvers.

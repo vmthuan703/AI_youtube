@@ -63,6 +63,7 @@ export function probe(stg, opts = {}) {
     }
     out.snap[ch.uuid] = { who, J };
   }
+  out.snap.__cam = { pos: cam.position.clone(), q: cam.quaternion.clone() };
   // occlusion of faces on screen: 5 rays from the camera to points on the face
   const subj = opts.subject ? people.filter(p => p.userData.speaker === opts.subject || p.userData.label === opts.subject) : people;
   const others = []; scene.traverse(m => { if (m.isMesh && m.visible && !(m.material?.transparent) && m.name !== 'mirror') others.push(m); });
@@ -80,7 +81,9 @@ export function probe(stg, opts = {}) {
 // motion checks from snapshots at consecutive frames (a, b, c = f-1, f, f+1), dt = 1/fps
 export function motion(a, b, c, dt) {
   const issues = [];
-  for (const id of Object.keys(b)) {
+  if (a?.__cam && b?.__cam && c?.__cam) { const j = (x, y) => [x.pos.distanceTo(y.pos), x.q.angleTo(y.q) * 57.3]; const [d1, r1] = j(a.__cam, b.__cam), [d2, r2] = j(b.__cam, c.__cam);
+    if (Math.max(d1, d2) > 0.35 || Math.max(r1, r2) > 12) issues.push({ kind: 'camera', sev: 'red', msg: `camera jumps ${Math.max(d1, d2).toFixed(2)} m / ${Math.round(Math.max(r1, r2))}° in one frame` }); }
+  for (const id of Object.keys(b)) { if (id === '__cam') continue;
     const A = a?.[id]?.J, B = b[id].J, C = c?.[id]?.J, who = b[id].who; if (!A || !C) continue;
     for (const s of ['L', 'R']) {
       // slide: foot on the floor in all three frames but moving sideways

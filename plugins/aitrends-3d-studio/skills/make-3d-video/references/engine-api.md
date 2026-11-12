@@ -182,6 +182,24 @@ head first, two small steps; `T.squash(ch, k)` volume-keeping squash/stretch fro
 `bleachers` (high from the stands) · `cafeteriaWide` (high establishing, o.height under the ceiling, default 2.4) · `backRow` (behind a's head toward the
 board) · `teacherView` (from the front down the rows) · `doorWindow` (long lens from the classroom door at o.at). `high` takes o.height too. Heights follow
 the subject's floor, so `lowHero` / `full` work on a stage or riser.
+**1.0.2 smart camera**: every `T.camShot` framing now dodges by itself: if a wall, a car, a prop or a person sits between the
+lens and the subject's face (or the lens would be inside something, or a head is right on the lens), it swings round the
+subject / comes closer until the face is clear, preferring views that see the face. The dodge is decided once per shot (from
+its first frame) so the camera never hops mid-shot. 180° rule: with config.json `"lineRule": true` (or `line: true`) two-person
+framings (`b` given) keep the camera on one side of the line between them (the side is fixed by the two names, so a conversation
+cuts cleanly; `lineSide: -1` takes the other side). `avoid: false` keeps the exact framing.
+**1.0.2 actions** (`T.act.*`, engine/act10.js — whole actions as one flowing movement, hands riding what they touch):
+`door(ch, T.W.swingDoor(), t, { t0, close })` · `carry(ch, obj, t, { from, pickAt, putAt, to, walk })` (poses ch itself) ·
+`sitOn(ch, t, { seat: [x, z, yaw, seatY] })` (any seat height) · `runStop` · `trip` · `vault(ch, t, { from, to, t0, h, at })` ·
+`climbOn(ch, t, { from, onto })` · two people → [poseA, poseB]: `hug`, `highFive`, `armAround`, `pullRun` (moves both),
+`catchFall` (b faints back into a's arms). `T.flow3(t, [[t, pose], …])` is the spline under them: use it instead of posesAt3 for
+any movement that must not stop at each key (swings, throws, reaches).
+**1.0.2 acting**: `T.act.gaze(ch, pose, target, k)` → `{ pose, look }` (head + a little chest turned to a point / person; pass
+`look` to `face`), `T.act.react(ch, pose, t, { t0, from, kind: 'startle' | 'turn' | 'hit' })`, `T.act.busyCrowd(st, { cast, spots,
+acts: ['talk', 'listen', 'laugh', 'phone', 'lean'] })` (roster extras that glance at each other and tick themselves).
+**1.0.2 body**: arms are 25 % longer (`arms: 1` in an outfit or `S().arms = 1` for the 1.0 body) so a raised hand clears the big
+head; elbows and knees never bend backwards; hands: `grip` (a handle, a pole, an umbrella), `pinch` (a pen, chalk, a note),
+`cup` (a ball, a phone, a cup) besides fist / open / point / relaxed; skirts, dresses and coats swing with the walk.
 **1.0.1 school motion**: `T.throw3(t, { t0, wind, idle, end })` wind-up → release (football, snowball); `T.toss(obj, t, { from, to, h, t0, dur, spin, hide })`
 flies a prop on an arc; `T.lockerDoor(h.locker(i, side).door, t, { t0, open, slam })` opens a locker and slams it with a rattle.
 **Motion blur**: shots.json `"mblur": "action"` (5 sub-frames, 300° shutter) for runs, punches, falls, a train going by; `T.FX3.swoosh(st, { pos, axis, from,
@@ -382,6 +400,8 @@ and raise their arms in waves; `cheer` 0–1 (or a function of t) sets how many 
   `bus.position.x`; `{ autumn, wet }`) → `stop`, `busDoor`, `porch(i)`. Props: `bookcase bankerLamp labBench beaker trophyCase usFlag bleachers scoreboard
   goalPost musicStand drumKit piano examBed mailbox stopSign pickup jukebox discoBall balloon balloonArch paSpeaker testPaper tray milkshake umbrella gradCap
   football pompom newspaper ballotBox sinkUnit`, `T.W.bell(st, { pos, yaw, t0, dur })` (rings), `T.W.LETTERMAN` (spread into an outfit for a varsity jacket).
+- **swingDoor** (1.0.2): `T.W.swingDoor({ w, h, color, hinge: 'L' | 'R' })` a door on a real hinge (`.setAngle(a)`, `.handle`); open it
+  with `T.act.door`.
 - **School weather, seasons, time of day** (engine/season10.js, 1.0.1, all tick themselves): `T.stage({ ...T.W.schoolTime('afterSchool') })` (morning ·
   noon · afterSchool · evening · night · storm · snow); `T.W.fallDay(st, { area, y })` maple leaves + piles; `T.W.snowDay(st, { area, groundY })` snow caps +
   snowfall (after the set); `T.W.breath(st, ch, { every })` cold breath; `T.W.windowRain(st, { pos, w, h, yaw })` drops running down a window (inside);

@@ -44,6 +44,7 @@ async function boot() {
   await prepareGag(three, mk);
   const dur = story.duration || E.shots[E.shots.length - 1].end;
   window.DURATION = dur; window.TOTAL_FRAMES = Math.ceil(dur * E.fps); window.OUT = [outW, outH];
+  globalThis.E3D_LINE_RULE = E.cfg.lineRule ?? false;   // 1.0.2: camera 180° rule (camera10.js)
   window.SHOT_LIST = E.shots.map(s => ({ id: s.id, start: s.start, end: s.end, ok: !!getShot(s.id) }));
   window.READY = true;
 }

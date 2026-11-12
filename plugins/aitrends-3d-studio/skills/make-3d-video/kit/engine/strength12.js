@@ -129,9 +129,9 @@ export function lightTower(st, o = {}) {
   const body = group(); body.position.set(0, 0, -0.6); pivot.add(body);
   const legs = []; const B = 0.6, T = 0.25;
   for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { const leg = group(); leg.position.set(sx * B, 0, sz * B); const len = Math.hypot(H, B - T);
-    const tube = cyl(0.07, 0.09, len, sm, 0, len / 2, 0, 8); leg.add(tube); leg.rotation.z = sx * Math.atan2(B - T, H); leg.rotation.x = -sz * Math.atan2(B - T, H); body.add(leg); legs.push(leg); }
+    const tube = cyl(0.12, 0.16, len, sm, 0, len / 2, 0, 8); leg.add(tube); leg.rotation.z = sx * Math.atan2(B - T, H); leg.rotation.x = -sz * Math.atan2(B - T, H); body.add(leg); legs.push(leg); }
   for (let y = 2; y < H; y += 2.5) { const k = y / H, half = lerp(B, T, k); for (const [a, b] of [[[-1, -1], [1, -1]], [[-1, 1], [1, 1]], [[-1, -1], [-1, 1]], [[1, -1], [1, 1]]]) { const ax = a[0] * half, az = a[1] * half, bx = b[0] * half, bz = b[1] * half; const L2 = Math.hypot(bx - ax, bz - az);
-      const br = cyl(0.025, 0.025, L2, sm, (ax + bx) / 2, y, (az + bz) / 2, 6); br.rotation.z = R2; br.rotation.y = Math.atan2(-(bz - az), bx - ax); body.add(br); } }
+      const br = cyl(0.045, 0.045, L2, sm, (ax + bx) / 2, y, (az + bz) / 2, 6); br.rotation.z = R2; br.rotation.y = Math.atan2(-(bz - az), bx - ax); body.add(br); } }
   const head = group(box(5, 2.4, 0.35, mat('#3a3e48'), 0, 0, 0)); head.position.set(0, H + 0.8, 0.2);
   for (let i = 0; i < 4; i++) for (let j = 0; j < 2; j++) head.add(box(1.0, 0.9, 0.05, night ? glowMat('#f4f8ff', 2.4) : mat('#e8ecf0', { rough: 0.3 }), -1.8 + i * 1.2, -0.5 + j * 1.05, 0.2));
   if (night) head.add(at(glow('#f4f8ff', 5, 0.55), 0, 0, 0.6)); body.add(head);

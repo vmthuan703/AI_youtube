@@ -114,7 +114,7 @@ EXPECTED = {
     "examples/v103-demo/scenes/shots/demo.js": "04c12bd0592c0ffe",
     "examples/v103-demo/story/shots.json": "4336c84d9068ac31",
     "examples/v103-demo/timeline/words.json": "aa20faf6a5976bb8",
-    "engine/strength12.js": "9031be9054202d9a",
+    "engine/strength12.js": "062c8a2108816f1f",
     "examples/v104-sets/config.json": "90c6cbe685f92fd0",
     "examples/v104-sets/scenes/cast.js": "cbff2cbdc12a71b7",
     "examples/v104-sets/scenes/shots/sets.js": "90cc6aeef7e0c09f",

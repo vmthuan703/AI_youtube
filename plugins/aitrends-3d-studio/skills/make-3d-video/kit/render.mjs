@@ -101,8 +101,16 @@ async function openPlayer(browser, style) {
 // capture: JPEG q96 is visually lossless under x264 and ~10x faster to grab than PNG; quality max uses PNG
 const shot = (page, f) => page.evaluate(i => window.renderFrame(i), f).then(() => page.screenshot({ type: FORMAT, ...(FORMAT === 'jpeg' ? { quality: 96 } : {}) }));
 let OUTW = 0, OUTH = 0, RENDERER = '';
+// 2.0: video memory. The film picture (style `cine`) keeps a 4096 shadow map, a depth pre-pass, AO and reflection targets per worker,
+// about 1.4 GB at 1080p. Workers are capped by the card's FREE memory, and on a card with little room the encoder moves to the CPU,
+// so a 6 GB card no longer runs out half-way (NVENC needs its own share).
+function vram() { try { const r = spawnSync('nvidia-smi', ['--query-gpu=memory.total,memory.used', '--format=csv,noheader,nounits'], { timeout: 8000, encoding: 'utf8' }); if (r.status !== 0) return null;
+  const [tot, used] = r.stdout.trim().split('\n')[0].split(',').map(x => +x); return isFinite(tot) && isFinite(used) ? { total: tot, free: tot - used } : null; } catch { return null; } }
+const VRAM = vram(), STYLE_ID = args.style || CFG.style || 'pearl', FILM = STYLE_ID === 'cine' && !args.legacy;
+const PER_WORKER = ({ '720p': 0.5, '1080p': 1, '1440p': 1.7, '2160p': 3.4, '4k': 3.4 }[CFG.resolution || '1080p'] || 1) * (+(args.scale || 1)) ** 2 * (FILM ? 1400 : 520);   // MB
 const ENCODER = (() => { const e = args.encoder || CFG.encoder || 'auto'; if (e === 'x264' || args.sheet || args.stills || args.styles || args.bench && e !== 'nvenc') return 'x264';
   if (e === 'nvenc') { if (nvencWorks()) return 'nvenc'; console.log('NVENC requested but ffmpeg cannot use it here (no NVIDIA GPU/driver, or an ffmpeg build without nvenc): using x264.'); return 'x264'; }
+  if (FILM && VRAM && VRAM.total < 7000) return 'x264';   // 2.0: keep a small card's memory for the frames
   return GPU_MODE && nvencWorks() ? 'nvenc' : 'x264'; })();
 const NV_CQ = { draft: 28, standard: 22, high: 18, max: 15 };
 const fmtT = s => `${Math.floor(s / 60)}m${String(Math.round(s % 60)).padStart(2, '0')}s`;
@@ -158,7 +166,8 @@ async function renderVideo() {
   if (!args.from && !args.to && !args['no-qc'] && !PREVIEW) { const q = await runQC(true); if (q.red && !args.force) throw new Error(`motion QC found ${q.red} red issue(s): fix them (node render.mjs --project P --qc) or render anyway with --force`); }
   const f0 = Math.max(0, Math.round((+args.from || 0) * fps)), f1 = Math.min(total, args.to ? Math.round(+args.to * fps) : total);
   // default workers: half the CPU threads (max 8); on a GPU, cap by video memory (≈0.5 GB/worker at 1080p, 1.2 GB at 4K on a 6 GB card)
-  const vramCap = GPU_MODE ? ({ '1440p': 5, '2160p': 3, '4k': 3 }[CFG.resolution] || 8) : 8;
+  let vramCap = GPU_MODE ? ({ '1440p': 5, '2160p': 3, '4k': 3 }[CFG.resolution] || 8) : 8;
+  if (GPU_MODE && VRAM) { const fit = Math.max(1, Math.floor((VRAM.free - 500) / PER_WORKER)); if (fit < vramCap) { vramCap = fit; if (!args.workers) console.log(`GPU memory: ${VRAM.free} MB free of ${VRAM.total} MB, about ${Math.round(PER_WORKER)} MB per worker -> ${fit} worker(s)${ENCODER === 'x264' ? ', CPU encoder' : ''}`); } }
   const W = Math.max(1, Math.min(+(args.workers || Math.max(1, Math.min(vramCap, Math.floor(os.cpus().length / 2)))), Math.ceil((f1 - f0) / 24)));
   const partsDir = path.join(BUILD, 'parts'); fs.rmSync(partsDir, { recursive: true, force: true }); fs.mkdirSync(partsDir, { recursive: true });
   const chunk = Math.ceil((f1 - f0) / W); let done = 0; const t0 = Date.now(); const errs = new Set();

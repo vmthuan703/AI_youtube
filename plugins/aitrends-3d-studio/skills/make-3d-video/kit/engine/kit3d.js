@@ -165,10 +165,10 @@ export function stage(o = {}) {
     // run every registered animator (particles, blinking signs, cars…) — call once per frame from draw()
     tick: (t) => { for (const f of tickers) f(t); },
     onTick: (f) => { tickers.push(f); return f; },
-    focus: (dist, aperture) => { if (!bokeh) return; bokeh.uniforms.focus.value = dist; if (aperture != null) bokeh.uniforms.aperture.value = aperture; },
+    focus: (dist, aperture) => { const bk = api.bokeh; if (!bk) return; bk.enabled = true; bk.uniforms.focus.value = dist; if (aperture != null) bk.uniforms.aperture.value = aperture; },
     // focus on an object/point automatically: st.focusOn([x,y,z])
     // the depth pass measures along the view axis, so focus uses view depth: off-centre subjects stay sharp
-    focusOn: (p) => { if (!bokeh) return; const v = Array.isArray(p) ? new THREE.Vector3(...p) : p.isVector3 ? p.clone() : p.getWorldPosition(new THREE.Vector3()); camera.updateMatrixWorld(); bokeh.uniforms.focus.value = Math.max(0.05, -v.applyMatrix4(camera.matrixWorldInverse).z); },
+    focusOn: (p) => { const bokeh = api.bokeh; if (!bokeh) return; const v = Array.isArray(p) ? new THREE.Vector3(...p) : p.isVector3 ? p.clone() : p.getWorldPosition(new THREE.Vector3()); camera.updateMatrixWorld(); bokeh.uniforms.focus.value = Math.max(0.05, -v.applyMatrix4(camera.matrixWorldInverse).z); },
     exposure: (x) => { R.toneMappingExposure = x; },
     // fitShadow([x,y,z], size): aim the sun's shadow box at the action and shrink it, so shadows under feet and props are crisp
     fitShadow: (c, size = 6) => { const d = sun.position.clone().sub(sun.target.position).normalize(); sun.target.position.set(...c); sun.position.copy(sun.target.position).addScaledVector(d, 30);

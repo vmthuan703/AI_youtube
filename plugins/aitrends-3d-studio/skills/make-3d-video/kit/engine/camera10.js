@@ -21,7 +21,8 @@ const where = (s) => (!s ? V(0, 1.4, 0) : Array.isArray(s) ? V(...s) : s.isVecto
 // 1.0.1: feet keep the subject's floor height (a stage, a riser, a bleacher), so heights below are measured from where it stands
 const feet = (s) => (!s ? V(0, 0, 0) : Array.isArray(s) ? V(s[0], 0, s[2]) : s.isVector3 ? V(s.x, 0, s.z) : s.getWorldPosition(V(0, 0, 0)));
 const facing = (s) => (s && s.rotation && !Array.isArray(s) && !s.isVector3 ? s.rotation.y : 0);
-export const CAMS = ['wide', 'full', 'medium', 'closeup', 'xcu', 'ots', 'twoShot', 'lowHero', 'high', 'dutch', 'pushIn', 'pullBack', 'orbit', 'track', 'reveal', 'insert', 'hallwayWalk', 'lockerPeek', 'bleachers', 'cafeteriaWide', 'backRow', 'teacherView', 'doorWindow'];
+const DOF_AP = { closeup: 0.0011, xcu: 0.0014, ots: 0.0009, insert: 0.0012, medium: 0.00045, pushIn: 0.0006, doorWindow: 0.0008, lockerPeek: 0.0008 };
+export const CAMS = ['establish', 'craneDown', 'wide', 'full', 'medium', 'closeup', 'xcu', 'ots', 'twoShot', 'lowHero', 'high', 'dutch', 'pushIn', 'pullBack', 'orbit', 'track', 'reveal', 'insert', 'hallwayWalk', 'lockerPeek', 'bleachers', 'cafeteriaWide', 'backRow', 'teacherView', 'doorWindow'];
 
 export function camShot(camera, t, name = 'medium', o = {}) {
   const dur = o.dur || 3, k = ease.inOut(clamp(t / dur)), drift = (t / dur) * 0.12, side = o.side ?? 1, ds = o.dist ?? 1;
@@ -31,6 +32,9 @@ export function camShot(camera, t, name = 'medium', o = {}) {
   let pos, look, fov = o.fov || 35, roll = 0;
   const head = A.clone(), chest = V(A.x, A.y - 0.38, A.z), waist = V(A.x, A.y - 0.7, A.z);
   switch (name) {
+    // 2.0 openings: the first shot of a place starts high and far and comes down to the subject (foreground slides past the lens)
+    case 'establish': { const far = front(FA, side * 0.5, 13 * ds, FA.y + 5.2), near = front(FA, side * 0.42, 6.2 * ds, FA.y + 1.45); pos = far.lerp(near, k); look = V(A.x, A.y - 0.2 + (1 - k) * 1.4, A.z); fov = o.fov || 34; break; }
+    case 'craneDown': pos = front(FA, side * 0.3, 5.5 * ds, FA.y + lerp(6.5, 1.3, k)); look = V(A.x, lerp(A.y + 2.2, A.y - 0.3, k), A.z); fov = o.fov || 34; break;
     case 'wide': { const B = o.b ? where(o.b) : A, mid = A.clone().lerp(B, 0.5), span = A.distanceTo(B); pos = front(V(mid.x, 0, mid.z), side * 0.35 + drift, (6.5 + span * 0.8) * ds, 1.7); look = V(mid.x, 1.0, mid.z); fov = o.fov || 38; break; }
     case 'full': pos = front(FA, side * 0.3 + drift, 4.2 * ds, FA.y + 1.2); look = V(A.x, A.y - 0.55, A.z); fov = o.fov || 34; break;
     case 'medium': pos = front(FA, side * 0.38 + drift, 2.9 * ds, A.y - 0.15); look = chest; fov = o.fov || 34; break;
@@ -72,6 +76,9 @@ export function camShot(camera, t, name = 'medium', o = {}) {
   }
   camera.position.copy(pos); camera.up.set(0, 1, 0); camera.lookAt(look); if (roll) camera.rotateZ(roll);
   if (camera.fov !== fov) { camera.fov = fov; camera.updateProjectionMatrix(); }
+  // 2.0: close framings blur the background by themselves on a film stage (o.dof: false keeps everything sharp, o.dof: 2 doubles it)
+  const stg = camera.userData.stage; if (stg && stg.autoDof && stg.bokeh && !o._probe) { const ap = o.dof === false ? 0 : (DOF_AP[name] || 0) * (typeof o.dof === 'number' ? o.dof : 1);
+    if (ap > 0) { stg.bokeh.enabled = true; stg.bokeh.uniforms.aperture.value = ap; stg.focusOn(name === 'ots' && o.b ? where(o.b) : name === 'insert' ? look : A); } else stg.bokeh.enabled = false; }
   return { pos, look };
 }
 // the side of the A–B line is fixed by the two subjects' names (sorted), so every shot of one conversation stays on the same side

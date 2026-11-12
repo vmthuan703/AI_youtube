@@ -10,6 +10,7 @@
 // Everything is a pure function of the shot time (st.tick(t)), so frames are identical in every worker.
 import * as THREE from 'three';
 import { Pass, FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
+import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
 import { E, S } from './core.js';
 
 const C = (c) => new THREE.Color(c);
@@ -230,6 +231,8 @@ export function apply(T, st, o = {}) {
   }
   const w = Math.round(E.W * E.PX), h = Math.round(E.H * E.PX), cp = new CinePass(st, L, w, h), lp = new LensPass(L.grade);
   st.composer.insertPass(cp, 1); st.composer.insertPass(lp, st.composer.passes.findIndex(p => p.isOutputPass || p.constructor.name === 'OutputPass') + 1);
+  // a lens that can blur: off until a close framing (T.camShot closeup / xcu / ots / insert) or st.focusOn() turns it on
+  if (!st.bokeh && o.autoDof !== false) { const bk = new BokehPass(st.scene, st.camera, { focus: 5, aperture: 0.001, maxblur: 0.008 }); bk.enabled = false; st.composer.insertPass(bk, 2); st.bokeh = bk; st.autoDof = true; }
   st.cine = cp; st.lens = lp; if (L.interior) st.exp = 1.1;
   // weather named in shots.json (or o.weather) falls round the action: o.wxAt = [x, z] centre, o.wxSize = half width
   if (weather && T.wx && !/interior/.test(st.moodName) && o.weatherFx !== false) { const [cx, cz] = o.wxAt || [0, 0], r = o.wxSize || 16, area = [cx - r, cx + r, 0, 11, cz - r * 0.8, cz + r * 0.8];

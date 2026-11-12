@@ -7,6 +7,12 @@ khung hình 2:1, sơ đồ giải thích hoạt hình.
 Mọi khung hình đều dựng bằng code (Three.js) và render từng khung một. Không dùng AI tạo ảnh/video, nên nhân vật
 giữ nguyên dáng suốt video và chữ luôn nét. Giọng đọc mặc định dùng Chatterbox (MIT, chạy máy cá nhân), dự phòng Kokoro-82M (Apache-2.0).
 
+## Mới trong 1.0.6 — tự kiểm tra trước khi render và ghép file
+- **Kiểm tra `story/shots.json` trước bản render cuối:** trùng id, cảnh chồng nhau, thời lượng không khớp cảnh cuối, hoặc thiếu file cảnh thì render dừng (`--force` để bỏ qua).
+- **Trạng thái render:** sau bản cuối ghi `build/render_status.json`; có lỗi cảnh thì thoát mã 1 và `audio/mix.py` không ghép file.
+- **Kiểm tra nhân vật trong cổng set match:** chạy `tools/cast_check.py` khi dự án có `scenes/cast.js`.
+- **Kiểm tra file MP4 sau khi ghép:** có hình và tiếng, thời lượng khớp câu chuyện, fps đúng cấu hình; sai thì báo lỗi.
+
 ## Mới trong 1.0.4
 - **Bảng điểm hình ảnh tự chạy** sau mỗi lần render bản cuối (độ sáng, độ rực, khung tối / trống / đứng yên, nhịp cảnh): in các mục cần xem ở cuối log, lưu `build/qc_scorecard.md` và đưa vào sổ bài học. Bỏ qua bằng `--no-scorecard`.
 - **Bối cảnh sức mạnh và tập luyện** (`engine/strength12.js`): phòng tập tạ có tường gương phản chiếu thật (`T.W.weightRoom`), phòng leo núi với tuyến bám màu (`T.W.climbingGym`, `c.hold(i, k)`), tháp đèn sân vận động gãy chân, đứt cáp, đổ nghiêng (`T.W.lightTower`), lốp máy kéo 200 kg, thanh tạ có đĩa, góc livestream có ring light và số người xem (`T.W.streamCorner`), dãy tủ sắt rời đổ được (`T.W.lockerRow`). Demo: `examples/v104-sets`.

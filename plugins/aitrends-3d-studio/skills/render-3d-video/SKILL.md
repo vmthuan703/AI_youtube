@@ -46,7 +46,8 @@ errors to fix and re-render. When it finishes it records the video's QC problems
 ## 5. Sound, mux and deliver
 Make sure the music plan and SFX are set (`/3d-video-sound`), then `python audio/mix.py --project projects/<slug>` →
 `out/<title>.mp4` (AAC 48 kHz; upscaled if `export.upscale`). QC with ffprobe (resolution, fps, duration, audio) and a
-final contact sheet and `python tools/qc_metrics.py --project projects/<slug>`, send the MP4, and say in plain words where it was saved.
+final contact sheet; the final render already printed the picture scorecard (1.0.4, build/qc_scorecard.md): read every
+CHECK line, and after the mix re-run `python tools/qc_metrics.py --project projects/<slug>` for loudness; send the MP4, and say in plain words where it was saved.
 
 ## 6. Clean up
 Once the user has the file: `python tools/tidy_project.py --project projects/<slug>`. It keeps only `out/` and moves the working files to a clearly named folder for the user to delete. It deletes nothing; never send big files to the Recycle Bin.

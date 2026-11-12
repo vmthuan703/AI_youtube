@@ -7,6 +7,9 @@ khung hình 2:1, sơ đồ giải thích hoạt hình.
 Mọi khung hình đều dựng bằng code (Three.js) và render từng khung một. Không dùng AI tạo ảnh/video, nên nhân vật
 giữ nguyên dáng suốt video và chữ luôn nét. Giọng đọc mặc định dùng Chatterbox (MIT, chạy máy cá nhân), dự phòng Kokoro-82M (Apache-2.0).
 
+## Mới trong 1.0.4
+- **Bảng điểm hình ảnh tự chạy** sau mỗi lần render bản cuối (độ sáng, độ rực, khung tối / trống / đứng yên, nhịp cảnh): in các mục cần xem ở cuối log, lưu `build/qc_scorecard.md` và đưa vào sổ bài học. Bỏ qua bằng `--no-scorecard`.
+
 ## Mới trong 1.0.3 — diễn xuất sống hơn, trang phục chuyển động, tháng 11 nước Mỹ
 - **Khẩu hình theo lời thoại** cho mọi kiểu miệng (cả khi cười, há miệng), lông mày nhướng ở từ nhấn mạnh, người nghe gật đầu (`T.listen3`). Chỉ cần `face({ gt })`.
 - **Tay có ngón:** đếm 1–5, chữ V, giơ ngón cái lên / xuống, xoè tay, chỉ lên (`handR: 'count3'`, tư thế `showCount`, `thumbsUp`, `peaceSign`).

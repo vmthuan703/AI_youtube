@@ -150,7 +150,8 @@ Read `references/render-qc.md`.
 3. `python audio/mix.py --project projects/<slug>`: music + SFX, ducking, −14 LUFS, AAC 48 kHz, and the upscale if
    `export.upscale` is set. Writes `out/<title>.mp4`.
 4. QC the final file: duration matches, audio present, resolution/fps as chosen, a 1-frame-per-10-s contact sheet looks
-   right, `python tools/qc_metrics.py --project projects/<slug>`. Deliver the MP4 (send the file), say in plain words where it was saved, and one line on what to tweak next.
+   right. The final render (1.0.4) already ran the picture scorecard on video_silent.mp4 (build/qc_scorecard.md, printed at the end of
+   the log, also in the lesson book); after the mix run it again on the MP4 for loudness: `python tools/qc_metrics.py --project projects/<slug>`. Deliver the MP4 (send the file), say in plain words where it was saved, and one line on what to tweak next.
 5. Lessons (1.0.3): the final render already wrote this video's QC problems into `channel/lessons.json` / `LESSONS.md`. Record
    every piece of feedback the user gave during the reviews, one line each, in their words: `node tools/retro.mjs --project
    projects/<slug> --note "..."` (also right when they give it). Then give a short proposal for the next video from the

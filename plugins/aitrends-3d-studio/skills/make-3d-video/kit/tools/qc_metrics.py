@@ -11,9 +11,9 @@ import numpy as np
 # name: (low, high, unit, what to do when outside). From the references, with the bars removed.
 TARGETS = {
     "bars": (0.05, 0.08, "share of height, each side", "Set config bars to cine."),
-    "luma": (0.19, 0.40, "median brightness 0-1", "Too dark: raise ambient, use the pearl style or a brighter palette."),
+    "luma": (0.19, 0.40, "median brightness 0-1", "Below: too dark, raise ambient, use the pearl style or a brighter palette. Above: too bright, lower exposure or the key light."),
     "dark": (0.03, 0.22, "share of near-black pixels", "Lift the shadows: pearl style, more ambient, lighter walls."),
-    "sat": (0.35, 0.47, "mean saturation 0-1", "Too intense: pearl style; keep only the hero outfit loud."),
+    "sat": (0.35, 0.47, "mean saturation 0-1", "Above: too intense, pearl style, keep only the hero outfit loud. Below: dull, a warmer palette or more coloured props."),
     "bright": (0.13, 0.65, "share of bright frames (median > 0.40)", "Add a daylight or outdoor sequence: nature sets (beach, island, snow, farm, underwater), moods beach/snow/day."),
     "places": (4.0, 60.0, "distinct locations (shots.json set)", "Fill each shot's set in shots.json; the references move through many places: add a location or vary the sets."),
     "murky": (0.0, 0.12, "share of frames too dark to read (median < 0.13)", "Night scenes: keep the stage faceLight on, add a practical lamp near the faces, lighter walls."),
@@ -145,7 +145,7 @@ def main():
         ok = lo <= M[k] <= hi
         bad += not ok
         fmt = (lambda x: f"{x:.3f}") if k == "gloss" else (lambda x: f"{x:.2f}") if k not in ("cuts", "wpm", "loud", "places") else (lambda x: f"{x:.1f}")
-        rows.append(f"| {unit} | {fmt(M[k])} | {fmt(lo)} to {fmt(hi)} | {'OK' if ok else 'CHECK: ' + fix} |")
+        rows.append(f"| {unit} | {fmt(M[k])} | {fmt(lo)} to {fmt(hi)} | {'OK' if ok else ('CHECK (above range): ' if M[k] > hi else 'CHECK (below range): ') + fix} |")
     md = f"# Scorecard: {os.path.basename(v)} ({dur:.0f} s)\n\n" + "\n".join(rows) + f"\n\n{len(rows) - 2 - bad} in range, {bad} to check. Targets describe one winning channel's template, not a rule.\n"
     if M.get("empty_at"):
         md += "\nNear-empty frames at (s): " + ", ".join(str(x) for x in M["empty_at"][:30]) + "\n"

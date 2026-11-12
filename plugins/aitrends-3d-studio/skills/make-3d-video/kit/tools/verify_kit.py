@@ -9,7 +9,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EXPECTED = {
     "package.json": "2aec62b73f96018d",
     "player.html": "5ffdd7da4a48cd4b",
-    "render.mjs": "ac80ae296528c561",
+    "render.mjs": "e2b46a24778be1c9",
     "audio/dsp.py": "589d305d94d8acc3",
     "audio/mix.py": "fabf2b05cad92d43",
     "audio/music.py": "2fb3ce1df2fe5c7d",
@@ -75,7 +75,7 @@ EXPECTED = {
     "tools/doctor.py": "8d037a2b0fa634f5",
     "tools/new_project.py": "cb5dd45c811db41a",
     "tools/parse_script.py": "f33853d2823efde2",
-    "tools/qc_metrics.py": "703e6142fb7c8be0",
+    "tools/qc_metrics.py": "6dc8d4a3b2c4368c",
     "tools/script_check.py": "d5a9105d621aa789",
     "tools/tidy_project.py": "37a1c24f85e1446d",
     "tools/transcribe.py": "ecd48d05a6655d13",

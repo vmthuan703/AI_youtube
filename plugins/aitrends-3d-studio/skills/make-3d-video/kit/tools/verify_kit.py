@@ -28,7 +28,7 @@ EXPECTED = {
     "engine/nature3d.js": "a058ae18ad5745ab",
     "engine/player.js": "afe855a4906c2c91",
     "engine/rig2d.js": "ec2a665e0aa8ffed",
-    "engine/rig3d.js": "8a856a674f3b6040",
+    "engine/rig3d.js": "52d1758920ac230c",
     "engine/school3d.js": "356ff750cbab5e58",
     "engine/screens3d.js": "250bbf664fff717b",
     "engine/sports3d.js": "982dcacc06b10a13",

@@ -363,7 +363,8 @@ const lum = (c) => { const k = new THREE.Color(c); return 0.2126 * k.r + 0.7152 
 // ---------------------------------------------------------------- character builder
 // outfit: { skin: 'pale' | 'ink' | '#hex' (head, neck, bare limbs, hands), eyes: 'dot' | 'big', outline: '#hex' | false,
 //           top: 'hoodie'|'tshirt'|'jacket'|'suit'|'dress'|'labcoat'|'vest'|'scrubs'|'aodai'|'none', color, color2 (trim), shirt,
-//           legs: pants colour | 'shorts:#hex' | null (bare stick legs), shoes: colour | null (round feet), shoeSole,
+//           legs: pants colour | 'shorts:#hex' | null (bare stick legs), legCuff (jogger cuff colour | true), shoes: colour | null (round feet), shoeSole,
+//           shoeToe, shoeStripe, shoeCollar, laces (1.0.2 sneaker details); puffer: crop, quilt: 'puff', edge, yoke, hood (1.0.2),
 //           gloves: colour (default: skin, i.e. ball hands), head: 'cap'|'capBack'|'beanie'|'hood'|'headband'|'crown'|'tophat',
 //           headColor, hair: see engine/hair3d.js, hairColor, hairShade, bow, sleeves, stripe, scarf, collar, bag (colours),
 //           face: 'glasses'|'sunglasses', tie, kid: bool, scale,
@@ -415,10 +416,15 @@ export function character(outfit = {}, opts = {}) {
   const coatC = top === 'labcoat' ? (outfit.color || '#d2d3da') : topC, coat = top === 'labcoat' || top === 'aodai';
   const topM = top === 'none' ? skinM : clothM(coat ? coatC : topC, popK ? { emissive: new THREE.Color(topC).multiplyScalar(popK) } : {});
   const trimM = clothM(trim, { rim: 0.4 });
+  // 1.0.2 puffer options: crop (waist length, the trousers show), quilt: 'puff' (fat quilted rows instead of thin seams),
+  // edge (collar, cuffs, hem band and zip in one contrast colour), yoke (shoulders + upper sleeves), hood (a hood folded behind the neck)
+  const crop = top === 'puffer' && !!outfit.crop, puff = top === 'puffer' && outfit.quilt === 'puff';
+  const edgeM = outfit.edge ? clothM(outfit.edge, { rim: 0.35 }) : null, yokeM = outfit.yoke ? clothM(outfit.yoke, { rim: 0.45 }) : null;
   const sleeveLong = ['hoodie', 'jacket', 'puffer', 'suit', 'labcoat', 'aodai'].includes(top), sleeveShort = ['tshirt', 'dress', 'scrubs'].includes(top);
   const chunky = top === 'hoodie' || top === 'jacket' || top === 'puffer';
   // torso (lathe profile, elliptical section). Hoodies are boxy and generous, like a 3D cartoon.
   const prof = top === 'none' ? [[0.001, -0.02], [0.06, 0], [0.065, 0.2], [0.07, 0.4], [0.05, 0.47], [0.001, 0.48]]
+    : crop ? [[0.001, -0.06], [0.185, -0.06], [0.2, -0.035], [0.205, 0.05], [0.205, 0.28], [0.205, 0.38], [0.18, 0.45], [0.11, 0.5], [0.06, 0.52], [0.001, 0.52]]
     : chunky ? [[0.001, -0.17], [0.19, -0.17], [0.205, -0.13], [0.2, 0.05], [0.205, 0.28], [0.205, 0.38], [0.18, 0.45], [0.11, 0.5], [0.06, 0.52], [0.001, 0.52]]
     : [[0.001, -0.07], [0.16, -0.07], [0.172, -0.03], [0.165, 0.12], [0.172, 0.28], [0.178, 0.37], [0.15, 0.44], [0.09, 0.49], [0.055, 0.51], [0.001, 0.51]];
   const torsoGeo = new THREE.LatheGeometry(prof.map(([r, y]) => new THREE.Vector2(r, y)), 32); torsoGeo.scale(1, 1, top === 'none' ? 1 : 0.7);
@@ -442,10 +448,20 @@ export function character(outfit = {}, opts = {}) {
   if (top === 'puffer') {
     // quilted down jacket: horizontal seams, high collar, zip. The seams follow the boxy torso section.
     const seamM = clothM(outfit.color2 || shade(topC, -0.3), { rim: 0.2 });
-    for (let i = 0; i < 6; i++) { const y = -0.115 + i * 0.09, r = i === 5 ? 0.198 : 0.209; const b = add(new THREE.Mesh(new THREE.TorusGeometry(r, 0.0085, 8, 44), seamM), chest); b.rotation.x = Math.PI / 2; b.scale.set(1, 0.72, 1); b.position.y = y; }
-    const collar = add(new THREE.Mesh(new THREE.TorusGeometry(0.095, 0.05, 12, 28), topM), chest); collar.rotation.x = Math.PI / 2; collar.position.y = 0.5; collar.scale.set(1.05, 0.95, 0.95); hull(collar, 1 + olW / 0.1);
-    const zip = add(new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.56, 0.006), seamM), chest); zip.position.set(0, 0.19, 0.149); zip.rotation.x = 0.02;
-    const pull = add(new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.034, 0.008), MAT('#e8e2d8', { rough: 0.4 })), chest); pull.position.set(0, 0.42, 0.152);
+    if (puff) {   // fat quilted rows: each row a soft roll round the body, the grooves between them read as the stitching
+      const rows = [-0.005, 0.095, 0.195, 0.295];
+      rows.forEach((y, i) => { const m = outfit.stripe && i === rows.length - 1 ? clothM(outfit.stripe, { rim: 0.35 }) : topM;
+        const b = add(new THREE.Mesh(new THREE.TorusGeometry(0.19, 0.036, 12, 48), m), chest); b.rotation.x = Math.PI / 2; b.scale.set(1, 0.74, 0.95); b.position.y = y; });
+      if (yokeM) { const yp = [[0.212, 0.345], [0.212, 0.385], [0.188, 0.45], [0.115, 0.5], [0.065, 0.523], [0.001, 0.523]];
+        const yk = add(new THREE.Mesh(new THREE.LatheGeometry(yp.map(([r, y]) => new THREE.Vector2(r, y)), 32), yokeM), chest); yk.scale.z = 0.71; hull(yk, 1 + olW / 0.2); }
+    } else for (let i = 0; i < 6; i++) { const y = -0.115 + i * 0.09, r = i === 5 ? 0.198 : 0.209; const b = add(new THREE.Mesh(new THREE.TorusGeometry(r, 0.0085, 8, 44), seamM), chest); b.rotation.x = Math.PI / 2; b.scale.set(1, 0.72, 1); b.position.y = y; }
+    if (crop) { const hem = add(new THREE.Mesh(new THREE.TorusGeometry(0.19, 0.026, 10, 44), edgeM || seamM), chest); hem.rotation.x = Math.PI / 2; hem.scale.set(1, 0.73, 1); hem.position.y = -0.045; }
+    if (outfit.hood) { const hM = clothM(outfit.hood, { rim: 0.45 });
+      const hood = add(new THREE.Mesh(new THREE.TorusGeometry(0.11, 0.07, 12, 28), hM), chest); hood.position.set(0, 0.5, -0.04); hood.rotation.x = Math.PI / 2 - 0.35; hood.scale.set(1.25, 1.25, 0.95); hull(hood, 1 + olW / 0.1);
+      const hb = add(new THREE.Mesh(new THREE.SphereGeometry(0.15, 20, 14), hM), chest); hb.position.set(0, 0.46, -0.13); hb.scale.set(1.2, 0.85, 0.62); hull(hb, 1 + olW / 0.12); }
+    const collar = add(new THREE.Mesh(new THREE.TorusGeometry(0.095, 0.05, 12, 28), edgeM || topM), chest); collar.rotation.x = Math.PI / 2; collar.position.y = 0.5; collar.scale.set(1.05, 0.95, 0.95); hull(collar, 1 + olW / 0.1);
+    const zip = add(new THREE.Mesh(new THREE.BoxGeometry(puff ? 0.03 : 0.012, crop ? 0.5 : 0.56, puff ? 0.03 : 0.006), edgeM || seamM), chest); zip.position.set(0, crop ? 0.22 : 0.19, puff ? 0.158 : 0.149); zip.rotation.x = 0.02;
+    const pull = add(new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.034, 0.008), MAT('#e8e2d8', { rough: 0.4 })), chest); pull.position.set(0, 0.42, puff ? 0.176 : 0.152);
   }
   if (top === 'jacket' || top === 'suit' || top === 'labcoat' || top === 'vest') {
     const vee = new THREE.BufferGeometry(); vee.setAttribute('position', new THREE.Float32BufferAttribute([-0.07, 0, 0, 0.07, 0, 0, 0, -0.27, 0], 3)); vee.setIndex([0, 2, 1]); vee.computeVertexNormals(); const shirt = add(new THREE.Mesh(vee, MAT(outfit.shirt || (top === 'suit' ? '#f4f4f4' : top === 'labcoat' ? '#8fa8cc' : trim), { rim: 0.3, side: THREE.DoubleSide })), chest); shirt.castShadow = false; shirt.position.set(0, 0.485, chunky ? 0.137 : 0.113); shirt.rotation.x = chunky ? -0.075 : -0.06;
@@ -454,8 +470,11 @@ export function character(outfit = {}, opts = {}) {
   if (outfit.tie) { const tie = add(new THREE.Mesh(new THREE.ConeGeometry(0.03, 0.28, 4), MAT(outfit.tie, { rim: 0.3 })), chest); tie.rotation.x = Math.PI; tie.position.set(0, 0.33, 0.128); tie.scale.set(1, 1, 0.3); }
   // small accents, at most one or two per supporting character
   const torsoR = chunky ? 0.209 : 0.178;
-  if (outfit.stripe) { const b = add(new THREE.Mesh(new THREE.CylinderGeometry(torsoR, torsoR, 0.07, 36, 1, true), clothM(outfit.stripe, { rim: 0.3, side: THREE.DoubleSide })), chest); b.scale.z = 0.71; b.position.y = 0.2; }
-  if (outfit.scarf) { const sm = clothM(outfit.scarf, { rim: 0.35 }); const ring = add(new THREE.Mesh(new THREE.TorusGeometry(0.098, 0.04, 12, 28), sm), chest); ring.rotation.x = Math.PI / 2; ring.position.y = 0.5; ring.scale.set(1.08, 0.92, 0.85); hull(ring, 1 + olW / 0.1); const tail = add(new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.24, 0.03), sm), chest); tail.position.set(-0.07, 0.34, chunky ? 0.158 : 0.135); tail.rotation.x = 0.07; }
+  if (outfit.stripe && !puff) { const b = add(new THREE.Mesh(new THREE.CylinderGeometry(torsoR, torsoR, 0.07, 36, 1, true), clothM(outfit.stripe, { rim: 0.3, side: THREE.DoubleSide })), chest); b.scale.z = 0.71; b.position.y = 0.2; }
+  if (outfit.scarf) { const sm = clothM(outfit.scarf, { rim: 0.35 }); const big = top === 'puffer';   // 1.0.2: over a puffer collar the scarf sits higher and fatter, and its end is a soft rounded drape
+    const hooded = big && !!outfit.hood, ring = add(new THREE.Mesh(new THREE.TorusGeometry(hooded ? 0.135 : big ? 0.112 : 0.098, hooded ? 0.062 : big ? 0.05 : 0.04, 12, 28), sm), chest); ring.rotation.x = Math.PI / 2; ring.position.set(0, hooded ? 0.535 : big ? 0.53 : 0.5, hooded ? 0.025 : 0); ring.scale.set(1.08, 0.92, 0.85); hull(ring, 1 + olW / 0.1);
+    if (big) { const tail = add(new THREE.Mesh(new THREE.CapsuleGeometry(0.04, 0.15, 6, 12), sm), chest); tail.scale.set(1.3, 1, 0.42); tail.position.set(-0.09, 0.37, puff ? 0.205 : 0.17); tail.rotation.set(0.1, 0, 0.1); hull(tail, 1 + olW / 0.04); }
+    else { const tail = add(new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.24, 0.03), sm), chest); tail.position.set(-0.07, 0.34, chunky ? 0.158 : 0.135); tail.rotation.x = 0.07; } }
   if (outfit.collar) { const cm = clothM(outfit.collar, { rim: 0.3 }); for (const sx of [-1, 1]) { const w = add(new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.03, 0.075), cm), chest); w.position.set(sx * 0.062, 0.485, 0.082); w.rotation.set(0.55, sx * -0.55, sx * -0.42); } }
   if (outfit.bag) { const bm = clothM(outfit.bag, { rim: 0.3 }); const pivot = new THREE.Group(); pivot.position.y = 0.19; pivot.rotation.z = -0.72; chest.add(pivot); const strap = add(new THREE.Mesh(new THREE.TorusGeometry(torsoR / Math.cos(0.72) + 0.005, 0.0105, 8, 48), bm), pivot); strap.rotation.x = Math.PI / 2; strap.scale.set(1, 0.56, 1); const bp = new THREE.Group(); bp.position.set(0.16, 0.04, chunky ? 0.125 : 0.105); chest.add(bp); dangles.push(['bag', bp, 0]); const pouch = add(new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.115, 0.055), bm), bp); pouch.position.set(0, -0.06, 0.004); hull(pouch, 1.08); }
   let skirt = null;
@@ -494,18 +513,20 @@ export function character(outfit = {}, opts = {}) {
   const sleeveM = top === 'none' || top === 'vest' ? skinM : outfit.sleeves ? clothM(outfit.sleeves) : topM;
   const limbR = dark ? B.limbR : B.limbR * 0.85;
   const armR = sleeveLong ? (top === 'puffer' ? 0.078 : chunky ? 0.068 : 0.058) : limbR;
-  const armSeams = top === 'puffer' ? clothM(outfit.color2 || shade(topC, -0.3), { rim: 0.2 }) : null, seamGeo = armSeams ? new THREE.TorusGeometry(1, 0.11, 8, 24) : null;
+  const armSeams = top === 'puffer' ? (puff ? topM : clothM(outfit.color2 || shade(topC, -0.3), { rim: 0.2 })) : null, seamGeo = armSeams ? new THREE.TorusGeometry(1, puff ? 0.3 : 0.11, puff ? 10 : 8, 24) : null;
   const sleeveRings = { L: [], R: [] };
   const L = {};
   for (const side of ['L', 'R']) {
     L['up' + side] = seg(sleeveLong || sleeveShort ? armR : limbR, sleeveLong || sleeveShort ? sleeveM : skinM);
     L['lo' + side] = seg(sleeveLong ? armR * 0.93 : limbR, sleeveLong ? sleeveM : skinM);
-    L['cuff' + side] = sleeveLong ? seg(armR * 1.02, top === 'hoodie' || top === 'puffer' ? trimM : sleeveM, false) : null;
-    if (armSeams) for (let i = 0; i < 4; i++) { const m = add(new THREE.Mesh(seamGeo, armSeams)); m.castShadow = false; m.scale.setScalar(armR * 1.0); sleeveRings[side].push(m); }
+    L['cuff' + side] = sleeveLong ? seg(armR * (puff ? 1.08 : 1.02), edgeM || (top === 'hoodie' || top === 'puffer' ? trimM : sleeveM), false) : null;
+    if (armSeams) for (let i = 0; i < 4; i++) { const m = add(new THREE.Mesh(seamGeo, puff && yokeM && i === 0 ? yokeM : armSeams)); m.castShadow = false; m.scale.setScalar(armR * (puff ? 0.86 : 1.0)); sleeveRings[side].push(m); }
     L['th' + side] = seg(bareLegs ? limbR : 0.062, pantsM);
-    L['sh' + side] = seg(bareLegs || shorts ? limbR : 0.056, shorts ? skinM : pantsM);
+    L['sh' + side] = seg(bareLegs || shorts ? limbR : 0.056, shorts ? skinM : pantsM, !outfit.shoes);   // 1.0.2: no ankle ball poking under a shoe
+    L['lc' + side] = outfit.legCuff && !bareLegs && !shorts ? seg(0.062, clothM(outfit.legCuff === true ? shade(pantsC, -0.25) : outfit.legCuff, { rim: 0.3 }), false) : null;   // 1.0.2 jogger cuff
   }
-  const shoulderBall = []; if (sleeveLong || sleeveShort) for (let i = 0; i < 2; i++) { const s = add(new THREE.Mesh(unitSph, sleeveM), body); s.scale.setScalar(sleeveLong ? armR * 1.15 : 0.065); shoulderBall.push(s); hull(s, 1 + olW / (armR * 1.15)); }
+  if (crop && !bareLegs) { const seat = add(new THREE.Mesh(unitSph, pantsM), pelvis); seat.scale.set(0.165, 0.085, 0.115); seat.position.y = -0.03; hull(seat, 1 + olW / 0.1); }   // 1.0.2: hips under a short jacket
+  const shoulderBall = []; if (sleeveLong || sleeveShort) for (let i = 0; i < 2; i++) { const s = add(new THREE.Mesh(unitSph, yokeM && sleeveLong ? yokeM : sleeveM), body); s.scale.setScalar(sleeveLong ? armR * 1.15 : 0.065); shoulderBall.push(s); hull(s, 1 + olW / (armR * 1.15)); }
   // hands: balls (mittens) in the skin colour unless gloves are given
   const handR = dark ? 0.055 : 0.074;   // ball hands are big in the pale look
   const gloveM = outfit.gloves ? MAT(outfit.gloves, { rough: 0.55, rim: 0.9 }) : skinM;
@@ -525,8 +546,17 @@ export function character(outfit = {}, opts = {}) {
     const f = new THREE.Group(); add(f);
     if (shoeC) {
       const shoeM = MAT(shoeC, { rough: 0.6, rim: 0.5, ...(G > 0 ? { clearcoat: 0.6 * G, clearcoatRough: 0.2, sheen: 0 } : {}) }), soleM = MAT(outfit.shoeSole || '#f4f4f4', { rough: 0.7, rim: 0.2 });
-      const up = add(new THREE.Mesh(unitSph, shoeM), f); up.scale.set(0.06, 0.056, 0.125); up.position.set(0, 0.035, 0.045); hull(up, 1.12);
-      const sole = add(new THREE.Mesh(roundedSole(), soleM), f); sole.position.set(0, -0.005, 0.045);
+      const sole = add(new THREE.Mesh(roundedSole(), soleM), f); sole.position.set(0, -0.005, 0.045); const det = !!(outfit.shoeToe || outfit.shoeStripe || outfit.shoeCollar || outfit.laces); if (det) { sole.scale.y = 0.62; sole.position.y = 0.0; }
+      if (!(outfit.shoeToe || outfit.shoeStripe || outfit.shoeCollar || outfit.laces)) { const up = add(new THREE.Mesh(unitSph, shoeM), f); up.scale.set(0.06, 0.056, 0.125); up.position.set(0, 0.035, 0.045); hull(up, 1.12); }
+      else {   // 1.0.2 sneaker: a low dome on the sole, a raised heel with a padded collar, a rubber toe cap, a side stripe rising to the heel, laces
+        const half = _halfSph || (_halfSph = new THREE.SphereGeometry(1, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2));
+        const up = add(new THREE.Mesh(half, shoeM), f); up.scale.set(0.066, 0.078, 0.13); up.position.set(0, 0.022, 0.045); hull(up, 1.08);
+        const heel = add(new THREE.Mesh(half, shoeM), f); heel.scale.set(0.062, 0.1, 0.064); heel.position.set(0, 0.022, -0.02); hull(heel, 1.08);
+        if (outfit.shoeToe) { const toe = add(new THREE.Mesh(half, MAT(outfit.shoeToe, { rough: 0.5, rim: 0.3 })), f); toe.scale.set(0.0672, 0.04, 0.06); toe.position.set(0, 0.022, 0.12); }
+        if (outfit.shoeStripe) { const st = add(new THREE.Mesh(unitSph, MAT(outfit.shoeStripe, { rough: 0.5, rim: 0.5 })), f); st.scale.set(0.0675, 0.02, 0.088); st.position.set(0, 0.05, 0.03); st.rotation.x = -0.3; }
+        if (outfit.shoeCollar) { const cl = add(new THREE.Mesh(new THREE.TorusGeometry(0.04, 0.014, 8, 20), MAT(outfit.shoeCollar, { rough: 0.8, rim: 0.3 })), f); cl.rotation.x = Math.PI / 2 + 0.2; cl.position.set(0, 0.118, -0.016); }
+        if (outfit.laces) { const lm = MAT(outfit.laces === true ? '#d8d8dc' : outfit.laces, { rough: 0.6 }); for (const z of [0.062, 0.088, 0.112]) { const zz = (z - 0.045) / 0.13, l = add(new THREE.Mesh(new THREE.BoxGeometry(0.032, 0.007, 0.01), lm), f); l.position.set(0, 0.022 + 0.078 * Math.sqrt(1 - zz * zz), z); l.rotation.x = Math.atan2(0.078 * zz, 0.13 * Math.sqrt(1 - zz * zz)); } }
+      }
     } else { const ft = add(new THREE.Mesh(unitSph, skinM), f); ft.scale.set(0.05, 0.04, 0.09); ft.position.set(0, 0.03, 0.04); hull(ft, 1.18); }
     feet[side] = f;
   }
@@ -624,7 +654,7 @@ export function character(outfit = {}, opts = {}) {
       else { const T = new THREE.Vector3(...a.to); el = ik(sh, T, B.upperArm, B.foreArm, a.pole ? new THREE.Vector3(...a.pole) : sh.clone().add(new THREE.Vector3(s * 0.4, -0.3, -0.5))); wr = el.clone().add(T.clone().sub(el).setLength(B.foreArm)); d2 = wr.clone().sub(el).normalize(); }
       place(L['up' + side], sh, el, L['up' + side].r); place(L['lo' + side], el, wr, L['lo' + side].r);
       if (sleeveRings[side].length) { const [a, b, c, d] = sleeveRings[side], setRing = (m, A, Bp, k) => { m.position.lerpVectors(A, Bp, k); tmp.copy(Bp).sub(A).normalize(); m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), tmp); }; setRing(a, sh, el, 0.38); setRing(b, sh, el, 0.76); setRing(c, el, wr, 0.3); setRing(d, el, wr, 0.66); }
-      if (L['cuff' + side]) { const c0 = wr.clone().addScaledVector(d2, -0.05); place(L['cuff' + side], c0, wr.clone().addScaledVector(d2, -0.005), L['cuff' + side].r); }
+      if (L['cuff' + side]) { const c0 = wr.clone().addScaledVector(d2, puff ? -0.025 : -0.05); place(L['cuff' + side], c0, wr.clone().addScaledVector(d2, puff ? 0.02 : -0.005), L['cuff' + side].r); }
       if (shoulderBall.length) shoulderBall[side === 'L' ? 0 : 1].position.copy(sh);
       setHand(hands[side], p['hand' + side] || 'relaxed', el, wr);
       const hp = toBody(pelvis, new THREE.Vector3(s * B.hipX, 0, 0)); const lg = p['leg' + side] || [0, 3, 2, 0]; let kn, an, ld2;
@@ -632,6 +662,7 @@ export function character(outfit = {}, opts = {}) {
       else if (Array.isArray(lg)) { const [d, dd] = fkLeg(lg, s); const bq = body.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(pelvis.getWorldQuaternion(new THREE.Quaternion())); d.applyQuaternion(bq); dd.applyQuaternion(bq); kn = hp.clone().addScaledVector(d, B.thigh); an = kn.clone().addScaledVector(dd, B.shin); ld2 = dd; }
       else { const T = new THREE.Vector3(...lg.to); kn = ik(hp, T, B.thigh, B.shin, lg.pole ? new THREE.Vector3(...lg.pole) : hp.clone().add(new THREE.Vector3(s * 0.05, 0, 1))); an = kn.clone().add(T.clone().sub(kn).setLength(B.shin)); ld2 = an.clone().sub(kn).normalize(); }
       place(L['th' + side], hp, kn, L['th' + side].r); place(L['sh' + side], kn, an, L['sh' + side].r);
+      if (L['lc' + side]) place(L['lc' + side], an.clone().addScaledVector(ld2, -0.055), an.clone().addScaledVector(ld2, -0.005), L['lc' + side].r);
       JB[side] = { sh: sh.clone(), el: el.clone(), wr: wr.clone(), hp: hp.clone(), kn: kn.clone(), an: an.clone() };
       const yaw = (p.hips?.[1] || 0) + (Array.isArray(lg) ? s * (lg[3] || 0) : 0) + s * 6;
       setFoot(feet[side], an, ld2, Array.isArray(lg) ? (p.flatFeet ?? 0.55) : 1, new THREE.Vector3(Math.sin(yaw * D2R), 0, Math.cos(yaw * D2R)));
@@ -690,4 +721,5 @@ export function character(outfit = {}, opts = {}) {
 }
 let _sole = null, _contactTex = null;
 function contactTex() { if (_contactTex) return _contactTex; const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'); const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.45, 'rgba(255,255,255,.55)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); _contactTex = new THREE.CanvasTexture(c); return _contactTex; }
+let _halfSph = null;
 function roundedSole() { if (_sole) return _sole; const s = new THREE.Shape(); s.absellipse(0, 0, 0.064, 0.14, 0, Math.PI * 2); _sole = new THREE.ExtrudeGeometry(s, { depth: 0.03, bevelEnabled: true, bevelThickness: 0.008, bevelSize: 0.008, bevelSegments: 2 }); _sole.rotateX(Math.PI / 2); _sole.translate(0, 0.03, 0); return _sole; }

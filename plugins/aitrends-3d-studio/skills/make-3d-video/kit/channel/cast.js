@@ -4,7 +4,16 @@
 // `pose` is the role's resting pose (T.character uses it when no pose is given); shots still pose every frame.
 
 // The hero: quilted lime puffer and platinum anime hair. This look is the channel's signature. Nobody else gets near-white hair, and the plain outfits around it stay calmer.
-export const HERO = { top: 'puffer', color: '#b4f02e', color2: '#6fae1e', hair: 'anime', hairColor: '#e8ecf6', hairShade: '#6f7fb8', legs: null, shoes: null };
+// 1.0.2 (2026-11-12, chosen by the user): waist-length puffer with fat quilted rows, charcoal edges (collar, cuffs, hem, zip) and a
+// charcoal hood folded behind the neck; charcoal joggers with ribbed cuffs; white sneakers with a grey toe cap, a lime side stripe,
+// a charcoal collar and laces (HERO_BASE). HERO_CLASSIC is the old look (no trousers, round feet) for re-rendering old videos unchanged.
+export const HERO_CLASSIC = { top: 'puffer', color: '#b4f02e', color2: '#6fae1e', hair: 'anime', hairColor: '#e8ecf6', hairShade: '#6f7fb8', legs: null, shoes: null };
+export const HERO_BASE = { ...HERO_CLASSIC, crop: true, quilt: 'puff', edge: '#2b2f3a', hood: '#2b2f3a', legs: '#33363f', legCuff: '#23252c',
+  shoes: '#f4f4f2', shoeSole: '#ffffff', shoeToe: '#8a90a0', shoeStripe: '#b4f02e', shoeCollar: '#2b2f3a', laces: true };
+// Fall (Sep–Nov, chosen 2026-11-12): heather-grey hoodie hood under the puffer, mustard scarf, olive-brown joggers.
+export const HERO_FALL = { ...HERO_BASE, hood: '#9a9ea8', scarf: '#d9a441', legs: '#4a4636', legCuff: '#38352a' };
+// The default hero follows the season the channel is publishing in; set it back to HERO_BASE (or a later HERO_WINTER) when it changes.
+export const HERO = HERO_FALL;
 
 // ---------------------------------------------------------------- supporting cast by role
 // Rules (style-bible.md → Characters): the costume tells the job at a glance; colours stay deep and muted; whites are dimmed

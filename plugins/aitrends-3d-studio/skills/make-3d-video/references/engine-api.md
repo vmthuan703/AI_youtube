@@ -197,6 +197,11 @@ any movement that must not stop at each key (swings, throws, reaches).
 **1.0.2 acting**: `T.act.gaze(ch, pose, target, k)` → `{ pose, look }` (head + a little chest turned to a point / person; pass
 `look` to `face`), `T.act.react(ch, pose, t, { t0, from, kind: 'startle' | 'turn' | 'hit' })`, `T.act.busyCrowd(st, { cast, spots,
 acts: ['talk', 'listen', 'laugh', 'phone', 'lean'] })` (roster extras that glance at each other and tick themselves).
+**1.0.2 hero look**: the channel HERO now wears a waist-length puffer (`crop: true`, `quilt: 'puff'`, `edge`, `hood` colours),
+charcoal joggers (`legs`, `legCuff`) and detailed sneakers (`shoeToe`, `shoeStripe`, `shoeCollar`, `laces: true`). Any outfit can use
+these keys; puffer also takes `yoke` (dark shoulders) and `stripe` (one quilted row in another colour). `HERO` is the fall look
+(`HERO_FALL`: grey hood, mustard scarf, olive joggers) on top of `HERO_BASE`; `HERO_CLASSIC` in channel/cast.js is the old look (no
+trousers) for re-rendering a video made before 1.0.2 unchanged.
 **1.0.2 body**: arms are 25 % longer (`arms: 1` in an outfit or `S().arms = 1` for the 1.0 body) so a raised hand clears the big
 head; elbows and knees never bend backwards; hands: `grip` (a handle, a pole, an umbrella), `pinch` (a pen, chalk, a note),
 `cup` (a ball, a phone, a cup) besides fist / open / point / relaxed; skirts, dresses and coats swing with the walk.

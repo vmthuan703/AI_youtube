@@ -11,6 +11,7 @@ giữ nguyên dáng suốt video và chữ luôn nét. Giọng đọc mặc đ�
 - **Kiểm tra lỗi tự động** (`--qc`): tay chân xuyên đồ vật hoặc người khác, mặt bị che, máy quay nằm trong tường / xe / người hoặc nhảy giữa cảnh, chân trượt, khớp giật. Còn lỗi đỏ thì không cho render bản cuối.
 - **Máy quay thông minh:** tự né vật chắn để thấy rõ mặt, ưu tiên góc nhìn thấy mặt, giữ nguyên tắc 180° khi hai người nói chuyện.
 - **Thư viện động tác** (`T.act`): mở cửa, nhặt / bê / đặt đồ, ngồi lên mọi độ cao, chạy dừng gấp, vấp ngã, nhảy qua vật, leo lên ghế, ôm, đập tay, khoác vai, kéo tay chạy, đỡ người ngã.
+- **Ngoại hình nhân vật chính mới:** áo phao lửng chần bông phồng, viền và mũ xám than, quần jogger bo gấu, sneaker trắng có mũi giày, sọc xanh chanh, cổ giày, dây giày. Đang mặc bộ mùa thu (`HERO_FALL`): mũ hoodie xám nhạt, khăn vàng mù tạt, jogger nâu ô liu. Video cũ muốn giữ dáng cũ thì dùng `HERO_CLASSIC`.
 - **Nhân vật:** tay dài hơn 25% (giơ tay cao hơn đầu), khớp không gập ngược, tay cầm nắm (cán ô, bút, quả bóng), váy áo lay theo bước đi.
 - **Diễn xuất:** ánh mắt nhìn theo người / vật, giật mình quay lại khi có tiếng động, đám đông tự nói chuyện, cười, xem điện thoại.
 - **Xem nhanh bằng GIF** (`--gif`) cho từng cảnh. Ví dụ: `examples/v102-motion` (18 cảnh).

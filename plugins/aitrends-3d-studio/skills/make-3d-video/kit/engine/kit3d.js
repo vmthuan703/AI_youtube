@@ -329,3 +329,6 @@ export * as W from './world3d.js';
 export * as FX3 from './fx3d.js';
 export * as act from './act10.js';   // 1.0.2: action library (door, carry, sitOn, runStop, trip, vault, climbOn, hug, highFive, armAround, pullRun, catchFall, gaze, react, busyCrowd)
 export { rng, key, smoothKey, ease, clamp, lerp, noise };
+export * as cine from './cine20.js';   // 2.0 film picture: T.cine.stage(T, { look })
+export * as usa from './usa20.js';     // 2.0 American sets with depth: T.usa.mapleStreet(st, { season })
+export * as wx from './weather20.js';  // 2.0 weather: T.wx.leaves / rain / snow / motes

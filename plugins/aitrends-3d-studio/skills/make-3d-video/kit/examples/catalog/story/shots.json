@@ -1,0 +1,468 @@
+{
+ "title": "catalog",
+ "duration": 132,
+ "shots": [
+  {
+   "id": "city",
+   "start": 0,
+   "end": 2,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "suburb",
+   "start": 2,
+   "end": 4,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "room.bedroom",
+   "start": 4,
+   "end": 6,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "room.living",
+   "start": 6,
+   "end": 8,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "room.office",
+   "start": 8,
+   "end": 10,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "room.kitchen",
+   "start": 10,
+   "end": 12,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "room.hallway",
+   "start": 12,
+   "end": 14,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "room.hospital",
+   "start": 14,
+   "end": 16,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "explainer",
+   "start": 16,
+   "end": 18,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "studio",
+   "start": 18,
+   "end": 20,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "gym",
+   "start": 20,
+   "end": 22,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "diner",
+   "start": 22,
+   "end": 24,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "gameshow",
+   "start": 24,
+   "end": 26,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "casino",
+   "start": 26,
+   "end": 28,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "store",
+   "start": 28,
+   "end": 30,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "park",
+   "start": 30,
+   "end": 32,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "beach",
+   "start": 32,
+   "end": 34,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "island",
+   "start": 34,
+   "end": 36,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "snow",
+   "start": 36,
+   "end": 38,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "farm",
+   "start": 38,
+   "end": 40,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "underwater",
+   "start": 40,
+   "end": 42,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "space",
+   "start": 42,
+   "end": 44,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "stadium",
+   "start": 44,
+   "end": 46,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "boxingRing",
+   "start": 46,
+   "end": 48,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "track",
+   "start": 48,
+   "end": 50,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "pool",
+   "start": 50,
+   "end": 52,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "busStop",
+   "start": 52,
+   "end": 54,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "busInside",
+   "start": 54,
+   "end": 56,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "lockerHall",
+   "start": 56,
+   "end": 58,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "schoolFront",
+   "start": 58,
+   "end": 60,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "cafeteria",
+   "start": 60,
+   "end": 62,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "court",
+   "start": 62,
+   "end": 64,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "schoolYard",
+   "start": 64,
+   "end": 66,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "stairwell",
+   "start": 66,
+   "end": 68,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "classroom",
+   "start": 68,
+   "end": 70,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "cityBusStop",
+   "start": 70,
+   "end": 72,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "shopStreet",
+   "start": 72,
+   "end": 74,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "residential",
+   "start": 74,
+   "end": 76,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "streetFood",
+   "start": 76,
+   "end": 78,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "cafe",
+   "start": 78,
+   "end": 80,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "supermarket",
+   "start": 80,
+   "end": 82,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "hospitalHall",
+   "start": 82,
+   "end": 84,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "rooftop",
+   "start": 84,
+   "end": 86,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "trainStation",
+   "start": 86,
+   "end": 88,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "library",
+   "start": 88,
+   "end": 90,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "chemLab",
+   "start": 90,
+   "end": 92,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "auditorium",
+   "start": 92,
+   "end": 94,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "footballField",
+   "start": 94,
+   "end": 96,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "lockerRoom",
+   "start": 96,
+   "end": 98,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "bandRoom",
+   "start": 98,
+   "end": 100,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "principalOffice",
+   "start": 100,
+   "end": 102,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "detention",
+   "start": 102,
+   "end": 104,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "nurseOffice",
+   "start": 104,
+   "end": 106,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "restroom",
+   "start": 106,
+   "end": 108,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "studentLot",
+   "start": 108,
+   "end": 110,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "promHall",
+   "start": 110,
+   "end": 112,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "dinerUS",
+   "start": 112,
+   "end": 114,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "suburbStop",
+   "start": 114,
+   "end": 116,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "weightRoom",
+   "start": 116,
+   "end": 118,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "climbingGym",
+   "start": 118,
+   "end": 120,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "thanksgivingDinner",
+   "start": 120,
+   "end": 122,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "pumpkinStreet",
+   "start": 122,
+   "end": 124,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "teenBedroom",
+   "start": 124,
+   "end": 126,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "homeKitchen",
+   "start": 126,
+   "end": 128,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "livingRoom",
+   "start": 128,
+   "end": 130,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "phoneClose",
+   "start": 130,
+   "end": 132,
+   "line": "",
+   "camera": "manual"
+  }
+ ]
+}

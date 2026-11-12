@@ -105,7 +105,7 @@ EXPECTED = {
     "engine/act10.js": "0234887d92214b03",
     "examples/v102-motion/config.json": "3c4e76602ccb5c13",
     "examples/v102-motion/scenes/cast.js": "19cc3da1956f35d8",
-    "examples/v102-motion/scenes/shots/motion.js": "0095389535417414",
+    "examples/v102-motion/scenes/shots/motion.js": "3e31a4d38dfc8df7",
     "examples/v102-motion/story/shots.json": "5f809124c26a6c3c",
 }
 bad = 0

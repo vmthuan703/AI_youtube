@@ -20,7 +20,7 @@ registerShot('carry', {
     const hero = st.add(T.character(HERO).place(-3, 0, 3.6, R2)); return { st, box, hero }; },
   draw(s, t, info, T) { const w = t > 1.7 ? T.walkTo(s.hero, t, { from: [-3, 3.6], to: [-1.2, 3.6], t0: 1.7, t1: 3.2 }) : null;
     T.act.carry(s.hero, s.box, t, { from: [-2.45, 0.15, 3.6], pickAt: 1.0, walk: w || T.idle3('stand', t) }); s.hero.face({ expr: [[0, 'neutral'], [1.0, 'determined']], t, blink: true });
-    cam(s, t, info, T, { a: s.hero, side: 1 }); },
+    cam(s, t, info, T, { a: s.hero, side: -1, dist: 0.9 }); },
 });
 registerShot('sitOn', {
   init(T) { const st = T.stage({ mood: 'interiorCool', fov: 34, fog: [8, 30] }); const n = T.W.nurseOffice(st, {});

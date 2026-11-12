@@ -136,6 +136,10 @@ function writeMd(book) {
   if (fresh.length) for (const [k, vi] of fresh) L.push(`- ${vi} (\`T.W.${k}\`)${everUsed.has(k) ? '' : ' — kênh chưa dùng lần nào'}`); else L.push('- Đã dùng hết bối cảnh hợp mùa trong 3 video gần nhất.');
   const mo = new Date().getMonth() + 1, ideas = sea.ideas.map(x => Array.isArray(x) ? x : [x, sea.months]).sort((p, q) => (q[1].includes(mo) ? 1 : 0) - (p[1].includes(mo) ? 1 : 0));
   L.push('', '**Bối cảnh mới nên thêm vào plugin:**', ''); for (const [idea] of ideas.slice(0, 3)) L.push(`- ${idea}`);
+  // 1.0.5: the set wishlist (tools/set_match.py): things the user chose to build inside a video, most-wanted first
+  const wish = (load(path.join(CH, 'set_wishlist.json'), { items: [] }).items || []).filter(w => w.status === 'wanted').sort((a, b) => b.videos.length - a.videos.length);
+  if (wish.length) { L.push('', '**Hàng chờ bối cảnh (đã dựng riêng trong video, `channel/set_wishlist.json`):**', '');
+    for (const w of wish.slice(0, 5)) L.push(`- ${w.name}: ${w.videos.length} video (${w.videos.slice(0, 3).join(', ')})${w.videos.length >= 2 ? ' — nên đưa vào plugin' : ''}`); }
   const lv = last.find(v => v.look), lookBad = lv ? Object.entries(LOOK).filter(([k, [lo, hi]]) => lv.look[k] != null && (lv.look[k] < lo || lv.look[k] > hi)) : [];
   L.push('', '**Đồ hoạ và kỹ xảo nên cải thiện:**', '');
   for (const [k, [lo, hi, low, high, fix]] of lookBad) L.push(`- ${lv.look[k] < lo ? low : high} ở ${lv.project} (${k} ${lv.look[k]}, nên ${lo}–${hi}): ${fix}.`);

@@ -23,6 +23,7 @@ the visuals fresh for every script; the style and the channel's hero stay fixed.
 - `references/style-bible.md`: **the look** (characters, sets, light, camera, shot vocabulary, editing, graphics, 9:16).
   Read it fully before designing any shot.
 - `references/story-breakdown.md`: script check, `story/bible.md`, `story/shots.json`, pacing.
+- `references/set-match.md`: 1.0.5 catalogue of ready-made sets, props, actions and effects; needs.json, the match report, decisions, adding a set to the plugin, the wishlist.
 - `references/engine-api.md`: config and shots.json schemas, the shot module API, characters, sets, diagrams, effects, cameras.
 - `references/sound-design.md`: music plan, SFX library, ambience, levels.
 - `references/render-qc.md`: quality presets, speed guide, preview and final render, scorecard, QC checklist, troubleshooting.
@@ -41,8 +42,10 @@ Stage commands re-run one stage: `/new-3d-video` (stages 1–4), `/3d-video-styl
    video. Change them only when the user asks, and then in `channel/`.
 5. **Draft, look, fix, then render.** Open contact sheets and stills yourself (read the PNGs) before any long render.
    Rendering 3D is slow; looking is fast.
-6. **Five user checkpoints:** the script check, the voice preview, the style and palette choice from rendered samples, the
-   video preview with its scorecard, and the final file. If the user is away, take the defaults, state what was assumed, and continue.
+6. **Six user checkpoints:** the script check, the **set match** (1.0.5: what the kit has, what is missing, and the user's choice
+   for each missing item), the voice preview, the style and palette choice from rendered samples, the video preview with its
+   scorecard, and the final file. If the user is away, take the defaults, state what was assumed, and continue; the one exception
+   is the set match: a missing item is never added to the plugin without the user's yes.
 7. **Files are the truth.** Each video lives in `aitrends-3d-studio/projects/<slug>/`; `story/shots.json` owns timing.
 
 ## Stage 1: Intake and script check
@@ -66,6 +69,27 @@ and any logic problem must be shown even if the user is away. The channel hero i
 Say which results matter most and ask whether the user wants to edit the script before the voice is generated. Never change
 the script yourself. If they say to continue as is, continue. When the user asks you to **write** a script, follow the rules in
 `references/story-breakdown.md` → "Writing a script" from the first draft.
+
+## Stage 1b: Set match (1.0.5), once the script is final
+Before the voice, find out which places, props, actions and effects the kit already has, so nothing is built twice and nothing
+missing is discovered halfway through the shots. Follow `references/set-match.md`:
+1. Read the whole script and write `projects/<slug>/story/needs.json`: every place the story goes, every prop the narration names,
+   every action that needs a body movement, every weather or effect, each with the script's own line (`quote`) and a short `desc`.
+2. `python tools/set_match.py --project projects/<slug> --script <file>` → `story/set_match.md` (✅ have, 🟡 near, ❌ missing, plus
+   catalogue entries the script names that the list missed). Fix needs.json if the automatic hits show something you forgot.
+3. **Checkpoint.** Show the user the ✅/🟡/❌ table in short and, for the sets you plan to use, their stills
+   (`node render.mjs --catalog id,id` → `examples/catalog/build/sheets`; not while Chatterbox runs). For every ❌ ask:
+   **add to the plugin**, **build only in this video**, or **use a ready-made one** (name the closest from the `alts`). Record the
+   answers with `--decide "<name>=plugin|project|use:<id>"`. Never pick "plugin" for the user.
+4. **Plugin additions** (only after the user said yes): build them in the plugin's source repo on a new version branch, add each
+   to `engine/catalog.json` with a demo recipe, `python tools/set_match.py --verify-catalog`, render `--catalog <new ids>` and
+   send the stills. After the user approves: commit, PR and merge (ask first, as for any release), update the installed plugin,
+   copy the kit into the studio (engine/, tools/, examples/, render.mjs; keep channel/ and projects/), run `verify_kit.py`, then
+   `--added "<name>=<new id>"`. The voice (Stage 3) can run meanwhile, but no renders while Chatterbox uses the GPU.
+5. `python tools/set_match.py --project projects/<slug> --check` must print "ready" before Stage 6, and `--shots` must pass after
+   Stage 4 (every shots.json `set` is a catalogue set or one built in `scenes/sets/`).
+"Build only in this video" items are written to `channel/set_wishlist.json`; when a second video needs the same thing, the
+report proposes moving it into the plugin.
 
 ## Stage 2: Install or check the studio
 Follow `references/install.md`: copy `kit/` to `aitrends-3d-studio/` in the workspace (skip if present), install
@@ -94,8 +118,9 @@ motifs, music plan), `scenes/cast.js` (import the hero and every supporting role
 **every character comes from the roster, extras included**: a second or third girl is `CLASSMATE_2` / `CLASSMATE_3`, a second boy `BRO_2` / `RIVAL_2`, background
 students `STUDENTS`; change one colour or the hair at most, never write an outfit from scratch; then run `python tools/cast_check.py --project projects/<slug>`), and
 rewrite `story/shots.json` (contiguous shots, cut on phrase boundaries 0.1–0.2 s early, 17–21 shots per minute, median 2.2–2.5 s,
-a quarter of shots under about 1.5 s, an establishing shot per location, a concrete `scene` per shot). Send a 5–10 line plan
-summary and continue unless the user objects.
+a quarter of shots under about 1.5 s, an establishing shot per location, a concrete `scene` per shot). Locations come from
+`story/set_match.json` (the `use` id of each place, or the user's choice); then run `python tools/set_match.py --project
+projects/<slug> --shots`. Send a 5–10 line plan summary and continue unless the user objects.
 
 ## Stage 5: Style and palette choice
 `pearl` is the channel's style. Build the 1–2 most-used sets plus 3 representative shots (a wide with ≥ 2 characters, a face
@@ -111,7 +136,7 @@ Palettes: `dusk`, `cozy`, `tropic`, `alert`, `school`, `midnight` (engine-api.md
 Tweaks: add a custom entry to `STYLES` or `PALETTES` in `engine/styles.js` and re-render that row.
 
 ## Stage 6: Build every shot
-Read `references/engine-api.md` and the example scenes in `examples/speed-demo/scenes/` (a full 32 s video),
+Read `references/engine-api.md` and the example scenes in `examples/speed-demo/scenes/` (a full 32 s video), `examples/catalog/` (1.0.5: every ready-made set built from its catalogue recipe),
 `examples/v103-demo/scenes/` (1.0.3 lip-sync on every mouth, listening nods, finger counts / thumbs up / peace, hands resting on desks, planted feet, scarf and wind, the hood, Thanksgiving dinner, pumpkin street, leaf gust, Friday-night football), `examples/v103-thumb/scenes/` (1.0.3 thumbnail layouts A–D with T.thumb, `--thumbs`), `examples/v102-motion/scenes/` (1.0.2 actions: door, carry, sitOn, runStop, trip, vault, climbOn, hug, high five, arm around, pull-run, catch a fall; gaze, react, busy crowds; longer arms before/after, grips, skirt sway, smart camera; motion QC and GIFs), `examples/v101-school/scenes/` (1.0.1 American high school: library, chem lab, auditorium, Friday-night football, principal, nurse, restroom mirror, band, locker room, student lot, prom, diner, suburb bus stop; fall, snow day, rain on windows, blackout, tornado-drill beacon, graduation caps; student poses and school cameras), `examples/v1-more/scenes/` (1.0 supermarket, hospital, rooftop, train station, snow, puddles, leaves, lightning, headlights, named cameras, lip-sync), `examples/v1-demo/scenes/` (1.0 everyday places: stairwell, classroom, city bus stop, shop street, residential, street food, café; gloss and motion), `examples/look-demo/scenes/` (sets and UI), `examples/diagram-gallery/scenes/` (every diagram, a blurred-scene backdrop) and
 `examples/worlds-demo/scenes/` (nature sets, light from props, game HUD and counters, first person, icons, planet) once.
 Work in batches of 8–12:

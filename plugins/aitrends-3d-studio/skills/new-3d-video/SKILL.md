@@ -20,6 +20,12 @@ one line (with the render-time estimate from `render-qc.md`), offer to change th
 
 Then `python tools/script_check.py --script <file> --title "<title>"`: show the table, answer the **Story logic** questions it lists (power rule, timeline, climax cause and effect, twist, safety, science, cast: the hero is a boy and the best friend is a girl) with the script lines that break them, say what matters most, and ask whether the user wants to edit the script first. It never changes the script, and neither do you.
 
+**Set match (1.0.5), once the script is final.** Follow `../make-3d-video/references/set-match.md`: write `projects/<slug>/story/needs.json`
+(places, props, actions, effects, each with its script line), run `python tools/set_match.py --project projects/<slug> --script <file>`,
+show the user the ✅ have / 🟡 near / ❌ missing table (stills of the planned sets: `node render.mjs --catalog id,id`), and ask for every ❌:
+add to the plugin, build only in this video, or use a ready-made one. Record with `--decide`. Plugin additions are built, shown and
+released (with the user's OK at each step) before shots are built; `--check` must say "ready" before Stage 6.
+
 ## 2. Studio
 If `aitrends-3d-studio/render.mjs` doesn't exist in the workspace, follow `../make-3d-video/references/install.md` in
 full. Otherwise run `python tools/doctor.py` inside it and fix anything reported.
@@ -37,7 +43,7 @@ A user-supplied voiceover goes through the Whisper route in `voiceover.md` inste
 
 ## 4. Story breakdown
 Read `../make-3d-video/references/style-bible.md` and `story-breakdown.md` fully, then write `story/bible.md`,
-`scenes/cast.js` (hero and every other character from the `/channel/cast.js` roster, extras included: `CLASSMATE_2/3`, `BRO_2`, `RIVAL_2`, `STUDENTS`; `speaker` on every speaking character; `python tools/cast_check.py --project projects/<slug>` must pass) and the rewritten `story/shots.json`, and send a 5–10 line summary (cast with colours, locations, palette,
+`scenes/cast.js` (hero and every other character from the `/channel/cast.js` roster, extras included: `CLASSMATE_2/3`, `BRO_2`, `RIVAL_2`, `STUDENTS`; `speaker` on every speaking character; `python tools/cast_check.py --project projects/<slug>` must pass) and the rewritten `story/shots.json` (locations from `story/set_match.json`; `python tools/set_match.py --project projects/<slug> --shots` must pass), and send a 5–10 line summary (cast with colours, locations, palette,
 signature device, shot count, highlights per act).
 
 Finish by saying the next step is `/3d-video-styles` (or continue with `make-3d-video` if the user asked for the whole

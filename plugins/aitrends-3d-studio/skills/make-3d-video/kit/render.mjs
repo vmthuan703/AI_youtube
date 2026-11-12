@@ -8,6 +8,7 @@
 // --legacy renders with the 0.2.x look (before/after comparisons).
 //   node render.mjs --project P --thumbs                              1.0.3 a 1280x720 JPG per shot + 2x2 grid (thumbnail projects)
 //   node render.mjs --project P --gif [id,id]                         1.0.2 a small looping GIF per shot (build/gifs) to check motion
+//   node render.mjs --catalog [id,id]                                  1.0.5 one still per ready-made set -> examples/catalog/build/sheets
 //   node render.mjs --project P --qc [--every 0.5]                   1.0.2 motion QC: clipping, hidden faces, camera in walls, sliding feet, snapping joints
 // Options: --workers N  --scale K  --fps N  --style ID  --quality draft|standard|high|max  --debug  --format png|jpeg  --crf N  --preset X
 //          --gl auto|gpu|swiftshader  --angle d3d11|gl|vulkan|metal  --encoder auto|x264|nvenc  --out FILE  --chrome PATH
@@ -24,6 +25,11 @@ import { chromium } from 'playwright';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const args = {}; { const a = process.argv.slice(2); for (let i = 0; i < a.length; i++) { if (a[i].startsWith('--')) { const k = a[i].slice(2); const v = a[i + 1] && !a[i + 1].startsWith('--') ? a[++i] : true; args[k] = v; } } }
+// 1.0.5: --catalog renders one still per ready-made set (engine/catalog.json) into examples/catalog/build/sheets
+if (args.catalog) { const C = JSON.parse(fs.readFileSync(path.join(ROOT, 'engine', 'catalog.json'), 'utf8')); const only = typeof args.catalog === 'string' ? new Set(args.catalog.split(',')) : null;
+  const sets = C.sets.filter(e => !only || only.has(e.id)); args.project = path.join(ROOT, 'examples', 'catalog'); args.sheet = true;
+  fs.writeFileSync(path.join(args.project, 'story', 'shots.json'), JSON.stringify({ title: 'catalog', duration: sets.length * 2, shots: sets.map((e, i) => ({ id: e.id, start: i * 2, end: i * 2 + 2, line: '', camera: 'manual' })) }, null, 1));
+  const cf = path.join(args.project, 'config.json'), cfg = JSON.parse(fs.readFileSync(cf, 'utf8')); cfg.duration = sets.length * 2; fs.writeFileSync(cf, JSON.stringify(cfg, null, 1)); }
 if (!args.project) { console.error('usage: node render.mjs --project projects/<name> [options]'); process.exit(1); }
 const PROJECT = path.resolve(args.project);
 const BUILD = path.join(PROJECT, 'build'); fs.mkdirSync(BUILD, { recursive: true });

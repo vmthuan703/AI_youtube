@@ -488,4 +488,5 @@ export * from './school10.js';   // 1.0.1: American high school sets + props (li
 export * from './season10.js';
 export * from './strength12.js';   // 1.0.4: weight room, climbing gym, breakable light tower, tractor tire, barbell, stream corner, locker row
 export * from './fall11.js';   // 1.0.3: American November (thanksgivingDinner, pumpkinStreet, leafGust, pumpkin, turkey, pie...)   // 1.0.1: school weather, seasons, time of day (fallDay, snowDay, breath, windowRain, powerCut, capToss, ...)
+export * from './home15.js';   // 1.0.5: home sets promoted from past videos (teenBedroom, homeKitchen, livingRoom, phoneClose) + ambulance, fireTruck, ladder, skateboard, cake
 export { swingDoor } from './act10.js';   // 1.0.2: a door on a real hinge (T.act.door opens it by the handle)

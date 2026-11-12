@@ -1,0 +1,17 @@
+{
+ "title": "1.0.5 catalogue: one still of every ready-made set (node render.mjs --catalog)",
+ "aspect": "16:9",
+ "resolution": "1080p",
+ "fps": 30,
+ "quality": "standard",
+ "style": "pearl",
+ "palette": null,
+ "voiceover": null,
+ "duration": 132,
+ "captions": false,
+ "bars": "none",
+ "fadeIn": 0,
+ "fadeOut": 0,
+ "speechBubbles": false,
+ "handheld": 0
+}

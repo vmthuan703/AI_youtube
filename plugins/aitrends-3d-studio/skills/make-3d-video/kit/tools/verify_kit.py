@@ -134,5 +134,11 @@ for rel, want in EXPECTED.items():
     got = hashlib.sha256(open(p, "rb").read().replace(b"\r\n", b"\n").strip()).hexdigest()[:16]
     if got != want:
         print(f"MISMATCH  {rel}"); bad += 1
+# 1.0.5: every call in the catalogue (engine/catalog.json) must exist in the engine
+try:
+    sys.path.insert(0, os.path.join(ROOT, "tools")); import set_match
+    if set_match.verify_catalog(set_match.catalog(), quiet=True): bad += 1
+except SystemExit:
+    print("MISSING   engine/catalog.json"); bad += 1
 print(f"{len(EXPECTED) - bad}/{len(EXPECTED)} files verified." + ("" if not bad else "  Copy the files listed above again from the plugin's kit folder, then run this again."))
 sys.exit(1 if bad else 0)

@@ -46,6 +46,9 @@ Stage commands re-run one stage: `/new-3d-video` (stages 1–4), `/3d-video-styl
 7. **Files are the truth.** Each video lives in `aitrends-3d-studio/projects/<slug>/`; `story/shots.json` owns timing.
 
 ## Stage 1: Intake and script check
+**Lessons first (1.0.3).** Run `node tools/retro.mjs --next` in the studio and read `channel/LESSONS.md`: the problems that
+came back in past videos and the checklist for this one. Tell the user the top 3 items in one short list and apply them while
+planning, building and checking shots.
 Get the script (a file, pasted text, or a path in the repo). Read `channel/brand.json` once the studio exists and do not ask
 again what it already answers: voice, style, format, export quality. State those in one line, with the render-time estimate
 from `references/render-qc.md`, and ask only what is missing (usually the title). Offer to change any of them for this video.
@@ -109,7 +112,7 @@ Tweaks: add a custom entry to `STYLES` or `PALETTES` in `engine/styles.js` and r
 
 ## Stage 6: Build every shot
 Read `references/engine-api.md` and the example scenes in `examples/speed-demo/scenes/` (a full 32 s video),
-`examples/v102-motion/scenes/` (1.0.2 actions: door, carry, sitOn, runStop, trip, vault, climbOn, hug, high five, arm around, pull-run, catch a fall; gaze, react, busy crowds; longer arms before/after, grips, skirt sway, smart camera; motion QC and GIFs), `examples/v101-school/scenes/` (1.0.1 American high school: library, chem lab, auditorium, Friday-night football, principal, nurse, restroom mirror, band, locker room, student lot, prom, diner, suburb bus stop; fall, snow day, rain on windows, blackout, tornado-drill beacon, graduation caps; student poses and school cameras), `examples/v1-more/scenes/` (1.0 supermarket, hospital, rooftop, train station, snow, puddles, leaves, lightning, headlights, named cameras, lip-sync), `examples/v1-demo/scenes/` (1.0 everyday places: stairwell, classroom, city bus stop, shop street, residential, street food, café; gloss and motion), `examples/look-demo/scenes/` (sets and UI), `examples/diagram-gallery/scenes/` (every diagram, a blurred-scene backdrop) and
+`examples/v103-demo/scenes/` (1.0.3 lip-sync on every mouth, listening nods, finger counts / thumbs up / peace, hands resting on desks, planted feet, scarf and wind, the hood, Thanksgiving dinner, pumpkin street, leaf gust, Friday-night football), `examples/v103-thumb/scenes/` (1.0.3 thumbnail layouts A–D with T.thumb, `--thumbs`), `examples/v102-motion/scenes/` (1.0.2 actions: door, carry, sitOn, runStop, trip, vault, climbOn, hug, high five, arm around, pull-run, catch a fall; gaze, react, busy crowds; longer arms before/after, grips, skirt sway, smart camera; motion QC and GIFs), `examples/v101-school/scenes/` (1.0.1 American high school: library, chem lab, auditorium, Friday-night football, principal, nurse, restroom mirror, band, locker room, student lot, prom, diner, suburb bus stop; fall, snow day, rain on windows, blackout, tornado-drill beacon, graduation caps; student poses and school cameras), `examples/v1-more/scenes/` (1.0 supermarket, hospital, rooftop, train station, snow, puddles, leaves, lightning, headlights, named cameras, lip-sync), `examples/v1-demo/scenes/` (1.0 everyday places: stairwell, classroom, city bus stop, shop street, residential, street food, café; gloss and motion), `examples/look-demo/scenes/` (sets and UI), `examples/diagram-gallery/scenes/` (every diagram, a blurred-scene backdrop) and
 `examples/worlds-demo/scenes/` (nature sets, light from props, game HUD and counters, first person, icons, planet) once.
 Work in batches of 8–12:
 1. Write `scenes/sets/<location>.js` (reusable builders on top of `T.W.*`) and `scenes/shots/NN_<name>.js` with
@@ -148,7 +151,11 @@ Read `references/render-qc.md`.
    `export.upscale` is set. Writes `out/<title>.mp4`.
 4. QC the final file: duration matches, audio present, resolution/fps as chosen, a 1-frame-per-10-s contact sheet looks
    right, `python tools/qc_metrics.py --project projects/<slug>`. Deliver the MP4 (send the file), say in plain words where it was saved, and one line on what to tweak next.
-5. Clean up once the user has the file: `python tools/tidy_project.py --project projects/<slug>` keeps only `out/` and moves the working
+5. Lessons (1.0.3): the final render already wrote this video's QC problems into `channel/lessons.json` / `LESSONS.md`. Record
+   every piece of feedback the user gave during the reviews, one line each, in their words: `node tools/retro.mjs --project
+   projects/<slug> --note "..."` (also right when they give it). Then give a short proposal for the next video from the
+   refreshed checklist (`--next`): what to watch for, and any problem the plugin itself should fix (the "Nên sửa" list).
+6. Clean up once the user has the file: `python tools/tidy_project.py --project projects/<slug>` keeps only `out/` and moves the working
    files to a clearly named folder for the user to delete. It deletes nothing, and never send big files to the Recycle Bin.
 
 ## Defaults and judgement calls

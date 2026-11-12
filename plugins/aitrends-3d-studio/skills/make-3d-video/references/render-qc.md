@@ -139,3 +139,8 @@ a locker or a person, or jumping mid-shot), **slide** (a planted foot skating), 
 change of speed). RED blocks the final render (`--force` to override), amber is a warning: hands resting on a desk and feet at the
 start of a walk show up amber and are usually fine. Silence an intended case per shot with `"qcIgnore": ["clip"]`.
 Watch the motion itself with `--gif` (build/gifs/<shot>.gif, 10 fps): stills cannot show a jerk.
+
+## 1.0.3 additions
+- Clipping: a hand / elbow / knee / foot that only touches a surface (less than 4 cm in) is contact, not a clip. Hands now rest on
+  furniture tops by themselves, so desk scenes stop showing amber clips.
+- `--thumbs`: one 1280×720 JPG per shot (+ grid.jpg) for thumbnail projects; check at 320 px that the hero's face and the labels read.

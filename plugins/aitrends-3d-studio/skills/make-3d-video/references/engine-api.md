@@ -197,6 +197,28 @@ any movement that must not stop at each key (swings, throws, reaches).
 **1.0.2 acting**: `T.act.gaze(ch, pose, target, k)` → `{ pose, look }` (head + a little chest turned to a point / person; pass
 `look` to `face`), `T.act.react(ch, pose, t, { t0, from, kind: 'startle' | 'turn' | 'hit' })`, `T.act.busyCrowd(st, { cast, spots,
 acts: ['talk', 'listen', 'laugh', 'phone', 'lean'] })` (roster extras that glance at each other and tick themselves).
+**1.0.3 talking**: `ch.face({ expr, t, blink: true, gt: info.globalT })` lip-syncs by the character's own `speaker` name (no
+`speaker`/`talk` needed). Every mouth follows the sounds now, also grins, teeth, open and o mouths (m/b/p close them, o/u/w round
+them, e/i widen them); stressed words (long words, numbers, ! ?, CAPS) lift the brows. `T.listen3(pose, me, globalT, { who })` gives
+a listener small nods on the speaker's stressed words and line ends; chain it with speak3: `T.speak3(T.listen3(p, 'MAYA', gt), 'MAYA', gt)`.
+**1.0.3 fingers**: hand modes `count1`…`count5`, `peace`, `pointUp`, `spread`, `rock`, `thumbsUp`, `thumbsDown` (real fingers, the
+wrist bends so they stand up, the thumb on the right side for each hand); poses `showCount` (set `handR: 'count3'`), `thumbsUp`,
+`peaceSign`. `T.FINGERS` lists the modes.
+**1.0.3 contact**: hands rest on desk, table, podium, counter and seat tops by themselves (lifted onto the surface, the arm re-solved;
+`rest: false` in an outfit or `noRest: true` in a pose turns it off). Walks ease in and out with the feet planted (the step rate
+follows the real leg swing). QC treats a hand or elbow touching a surface (under 4 cm) as contact, not clipping.
+**1.0.3 cloth**: scarf ends swing with the steps and flutter in the wind (`scene.userData.wind` 0..1; fallDay and pumpkinStreet set
+it, leafGust gusts it); the hood is a real folded hood seen from behind; a puffer bunches on the lap when seated.
+**1.0.3 November** (engine/fall11.js): `T.W.thanksgivingDinner(st)` (d.seat(i) → [x, z, yaw, seatY] for T.act.sitOn, d.carve,
+d.turkey), `T.W.pumpkinStreet(st)` (s.walk(i), s.porch(i)), `T.W.leafGust(st, { at: [x, z], t0, dur, r })`, props pumpkin({ face,
+lit }), hayBale, cornStalks, turkey, pie, candle, fallWreath. Friday-night football = T.W.footballField under schoolTime('night').
+**1.0.3 lessons**: `tools/retro.mjs` (run by the final render) keeps `channel/lessons.json` and writes `channel/LESSONS.md`:
+problems by kind across videos (QC red / amber, shot errors, the user's notes in projects/<slug>/feedback.md), what the plugin has
+already fixed, and the checklist for the next video (`--next`). `--note "..."` adds feedback; `--name slug --note` for a video with
+no project folder left.
+**1.0.3 thumbnails**: `T.thumb.tag / tagOn / bar / big / panel` draw the channel's thumbnail UI (prompts/thumbnail_style.md) in a
+shot's `overlay(g, t, info, state)`; `node render.mjs --project P --thumbs` writes build/thumbs/<shot>.jpg (1280×720, the frame
+at shots.json `thumbAt`) and grid.jpg. Example: examples/v103-thumb (layouts A–D).
 **1.0.2 hero look**: the channel HERO now wears a waist-length puffer (`crop: true`, `quilt: 'puff'`, `edge`, `hood` colours),
 charcoal joggers (`legs`, `legCuff`) and detailed sneakers (`shoeToe`, `shoeStripe`, `shoeCollar`, `laces: true`). Any outfit can use
 these keys; puffer also takes `yoke` (dark shoulders) and `stripe` (one quilted row in another colour). `HERO` is the fall look

@@ -12,6 +12,9 @@ Stages 1–4 of the aiTrends 3D Studio pipeline. Shared references live in `../m
 this skill's base directory); the studio kit is `../make-3d-video/kit/`.
 
 ## 1. Intake survey
+**Lessons first (1.0.3).** Run `node tools/retro.mjs --next` in the studio and read `channel/LESSONS.md`: the problems that
+came back in past videos and the checklist for this one. Tell the user the top 3 items in one short list and apply them while
+planning, building and checking shots.
 Get the script (file, pasted text, or repo path). Read `channel/brand.json` once the studio exists: voice, style, format and export quality are already decided, so state them in
 one line (with the render-time estimate from `render-qc.md`), offer to change them for this video, and ask only what is missing. Character voices go by role.
 

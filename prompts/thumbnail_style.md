@@ -48,7 +48,8 @@
 
 ## Cách dựng
 
-- Script mẫu: `D:\aitrends-3d-studio\projects\thumb-2d\gen_heal_jb.mjs`. Có sẵn hàm `hero`, `kid` (bạn cùng lớp), `grandpa`, `tag` (nhãn), `hp` (thanh máu). Sao chép rồi đổi khối `scenes2`.
+- Bản 3D (plugin 1.0.3): dự án mẫu `examples/v103-thumb` (4 cảnh = 4 bố cục, nhãn và thanh chỉ số bằng `T.thumb`), xuất bằng `node render.mjs --project ... --thumbs`.
+- Script mẫu 2D: `D:\aitrends-3d-studio\projects\thumb-2d\gen_heal_jb.mjs`. Có sẵn hàm `hero`, `kid` (bạn cùng lớp), `grandpa`, `tag` (nhãn), `hp` (thanh máu). Sao chép rồi đổi khối `scenes2`.
 - Mỗi video dựng **4 phương án theo 4 bố cục A–D**. Xuất JPG 1280×720 cạnh file MP4, kèm 1 ảnh ghép 2×2 để chọn.
 - **Kiểm tra trước khi gửi:**
   - Thu ảnh về 320 px: mặt hero và nhãn vẫn đọc được.

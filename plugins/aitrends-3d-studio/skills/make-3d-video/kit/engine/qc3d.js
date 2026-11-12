@@ -58,7 +58,8 @@ export function probe(stg, opts = {}) {
     const J = ch.joints(), who = ch.userData.label || ch.userData.speaker || 'character';
     const pts = { handL: J.L.wr, handR: J.R.wr, elbowL: J.L.el, elbowR: J.R.el, kneeL: J.L.kn, kneeR: J.R.kn, footL: J.L.an.clone().setY(J.L.an.y + 0.04), footR: J.R.an.clone().setY(J.R.an.y + 0.04), head: J.head, chest: J.chest };
     for (const [name, p] of Object.entries(pts)) {
-      if (inside(p, meshes)) out.issues.push({ kind: 'clip', sev: name === 'head' || name === 'chest' ? 'red' : 'amber', msg: `${who}: ${name} inside a prop` });
+      const deep = name === 'head' || name === 'chest' || inside(p.clone().setY(p.y + 0.04), meshes);   // 1.0.3: resting contact is not a clip
+      if (deep && inside(p, meshes)) out.issues.push({ kind: 'clip', sev: name === 'head' || name === 'chest' ? 'red' : 'amber', msg: `${who}: ${name} inside a prop` });
       for (const o of people) { if (o === ch) continue; const c = capsules(o); if (segDist(p, c.a, c.b) < c.r * 0.8 || p.distanceTo(c.head) < c.hr * 0.85) out.issues.push({ kind: 'clip', sev: 'amber', msg: `${who}: ${name} inside ${o.userData.label || 'another character'}` }); }
     }
     out.snap[ch.uuid] = { who, J };

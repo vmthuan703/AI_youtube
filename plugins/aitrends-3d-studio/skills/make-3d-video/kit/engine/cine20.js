@@ -223,7 +223,7 @@ export function apply(T, st, o = {}) {
     st.hemi.color.set(L.amb); st.hemi.groundColor.set(L.ambGnd); st.hemi.intensity = L.ambI;
     st.fill.color.set(L.fill); st.fill.intensity = L.fillI; st.fill.position.copy(sun.clone().multiplyScalar(-10).setY(4));
     if (st.faceLight && o.faceLight == null) st.faceLight.intensity = L.face ?? 0;
-    Object.assign(st.rimState, { color: o.rim || L.sunCol, strength: o.rimStrength ?? L.rim ?? 0.75, dir: sun.toArray() }); st.activate();
+    Object.assign(st.rimState, { color: o.rim || L.sunCol, strength: o.rimStrength ?? L.rim ?? 0.75, dir: sun.toArray(), sss: o.sss ?? L.sss ?? 0.5 }); st.activate();
     st.exp = L.exposure * (o.exposure ?? 1);
     if (st.bloom && o.bloom == null) { st.bloom.strength = L.bloom; st.bloom.threshold = o.bloomThreshold ?? L.bloomT; }
     if (L.sky !== false && o.skyCine !== false) st.sky = skyDome(st, L);

@@ -38,12 +38,13 @@ export const color = C;
 
 // ---------------------------------------------------------------- rim light (shared by all "rim" materials)
 // One set of uniforms per frame: the stage sets them from the mood; a shot can override with T.rim({...}).
-export const RIM = { rimColor: { value: new THREE.Color('#b9a6ff') }, rimStrength: { value: 0.6 }, rimPower: { value: 3.4 }, rimDir: { value: new THREE.Vector3(0, 0, 0) } };
+export const RIM = { rimColor: { value: new THREE.Color('#b9a6ff') }, rimStrength: { value: 0.6 }, rimPower: { value: 3.4 }, rimDir: { value: new THREE.Vector3(0, 0, 0) }, sssK: { value: 0 } };   // sssK (2.0): warm light bleeding through skin at the shadow edge
 export function rim(o = {}) {
   if (o.color) RIM.rimColor.value.set(o.color);
   if (o.strength != null) RIM.rimStrength.value = o.strength;
   if (o.power != null) RIM.rimPower.value = o.power;
   if (o.dir) RIM.rimDir.value.set(...o.dir).normalize(); else if (o.dir === null) RIM.rimDir.value.set(0, 0, 0);
+  RIM.sssK.value = o.sss ?? 0;
   return RIM;
 }
 // limit > 0: a soft ceiling on the lit colour (skin). Heads never clip to white or feed the bloom under strong keys.
@@ -53,13 +54,14 @@ function addRim(m, k = 1, limit = 0) {
     const ceiling = limit > 0 ? `
         { float mxL = max(gl_FragColor.r, max(gl_FragColor.g, gl_FragColor.b)); float kn = ${(limit * 0.62).toFixed(3)};
           if (mxL > kn) { float over = mxL - kn; gl_FragColor.rgb *= (kn + over / (1.0 + over / (${limit.toFixed(3)} - kn))) / mxL; } }` : '';
-    sh.fragmentShader = 'uniform vec3 rimColor; uniform float rimStrength; uniform float rimPower; uniform vec3 rimDir; uniform float rimK;\n' +
+    sh.fragmentShader = 'uniform vec3 rimColor; uniform float rimStrength; uniform float rimPower; uniform vec3 rimDir; uniform float rimK; uniform float sssK;\n' +
       sh.fragmentShader.replace('#include <opaque_fragment>', `
         { vec3 nV = normalize(normal); vec3 vV = normalize(vViewPosition);
           float fr = pow(1.0 - clamp(dot(nV, vV), 0.0, 1.0), rimPower);
           float side = 1.0;
           if (length(rimDir) > 0.01) { vec3 rd = normalize((viewMatrix * vec4(rimDir, 0.0)).xyz); side = smoothstep(-0.35, 0.55, dot(nV, rd)); }
-          outgoingLight += rimColor * fr * side * rimStrength * rimK; }
+          outgoingLight += rimColor * fr * side * rimStrength * rimK;
+          ${limit > 0 ? 'if (sssK > 0.0 && length(rimDir) > 0.01) { float wl = dot(nV, normalize((viewMatrix * vec4(rimDir, 0.0)).xyz)); outgoingLight += vec3(1.0, 0.42, 0.34) * diffuseColor.rgb * rimColor * sssK * smoothstep(-0.6, 0.0, wl) * smoothstep(0.55, 0.0, wl); }' : ''} }
         #include <opaque_fragment>${ceiling}`);
   };
   m.customProgramCacheKey = () => 'rim' + k + '/' + limit;

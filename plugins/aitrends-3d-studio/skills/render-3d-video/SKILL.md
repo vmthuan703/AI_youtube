@@ -17,7 +17,12 @@ and `render-qc.md` in `../make-3d-video/references/` before writing or fixing sc
 - Write `scenes/sets/*.js` and `scenes/shots/NN_name.js` (`registerShot(id, { init, draw, overlay })`). Study
   `examples/speed-demo/scenes/`, `examples/look-demo/scenes/` and `examples/diagram-gallery/scenes/` for working patterns. Explainers use `engine/diagrams2d.js`, never just text.
 - After each batch, re-run the sheet and **open every sheet PNG** against the QC checklist. Repeat until clean.
-- Motion: `--stills t1,t2,t3` or `--from A --to B --scale 0.5 [--fps 30]` (writes `build/preview.mp4`).
+- Motion: `--gif` (1.0.2: one small looping GIF per shot in `build/gifs/`, `--gif id,id` for some) — open the GIFs of every
+  shot with people moving: stills hide jerks and sliding feet. `--stills t1,t2,t3` or `--from A --to B --scale 0.5` (preview.mp4).
+- **Motion QC (1.0.2)**: `node render.mjs --project projects/<slug> --qc` checks sampled frames for limbs inside props or other
+  bodies, hidden faces, the camera inside a wall / car / person or jumping mid-shot, sliding feet and snapping joints
+  (`build/qc_motion.json`). Fix every RED before the final render (the full render refuses while any is left, `--force`
+  overrides); read the amber ones (hands resting on a desk are fine). An intended case: shots.json `"qcIgnore": ["clip"]`.
 
 ## 2. Export quality
 Confirm or change `config.json`: `resolution` (720p/1080p/1440p/2160p), `fps` (24/30/60), `quality`
@@ -28,7 +33,7 @@ Switching aspect needs a fresh sheet review (9:16 framing differs).
 
 ## 3. Preview checkpoint
 `node render.mjs --project projects/<slug> --from 0 --to 40 --scale 0.5`, then `python tools/qc_metrics.py --project projects/<slug>`, and send the preview (or the sheets) and the scorecard with the
-final render-time estimate before the long render. Fix anything marked CHECK that the user cares about first.
+final render-time estimate before the long render. Fix anything marked CHECK that the user cares about first. Include the motion QC line (red / amber counts).
 
 ## 4. Final render
 `nohup node render.mjs --project projects/<slug> > projects/<slug>/build/render.log 2>&1 &`. Poll the log and report

@@ -129,3 +129,13 @@ Final file QC: `python tools/qc_metrics.py --project projects/<slug>`, `ffprobe 
 ## Gloss (1.0)
 The scorecard row `gloss` is the share of pixels that are small near-white highlights (glossy skin, hair, wet floors), lit windows and skies excluded.
 0.2.x videos measured ~0.005, the 1.0 demo ~0.015; under 0.008 reads flat: keep the 1.0 defaults (style gloss/env), add a mirror floor or wet street, a light shaft, a practical near the faces.
+
+
+## Motion QC (1.0.2)
+`node render.mjs --project P --qc [--every 0.5]` probes frames (and the frames either side) of every 3D shot and writes
+`build/qc_motion.json`: **clip** (a hand / elbow / knee / foot / head / chest inside a prop or another body), **occluded** (the
+subject's face — `YOU` unless shots.json `qcSubject` says otherwise — more than half hidden), **camera** (lens inside a wall, a car,
+a locker or a person, or jumping mid-shot), **slide** (a planted foot skating), **jerk** (a joint snapping in one frame, a sudden
+change of speed). RED blocks the final render (`--force` to override), amber is a warning: hands resting on a desk and feet at the
+start of a walk show up amber and are usually fine. Silence an intended case per shot with `"qcIgnore": ["clip"]`.
+Watch the motion itself with `--gif` (build/gifs/<shot>.gif, 10 fps): stills cannot show a jerk.

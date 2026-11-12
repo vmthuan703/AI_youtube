@@ -6,6 +6,8 @@
 //   node render.mjs --project P --styles cinematic,ink,toon,golden,neon,noir --at 3.5,12,40   style comparison grid
 //   node render.mjs --project P --bench                               time this machine (GPU or CPU) and estimate the full render
 // --legacy renders with the 0.2.x look (before/after comparisons).
+//   node render.mjs --project P --gif [id,id]                         1.0.2 a small looping GIF per shot (build/gifs) to check motion
+//   node render.mjs --project P --qc [--every 0.5]                   1.0.2 motion QC: clipping, hidden faces, camera in walls, sliding feet, snapping joints
 // Options: --workers N  --scale K  --fps N  --style ID  --quality draft|standard|high|max  --debug  --format png|jpeg  --crf N  --preset X
 //          --gl auto|gpu|swiftshader  --angle d3d11|gl|vulkan|metal  --encoder auto|x264|nvenc  --out FILE  --chrome PATH
 // Quality (config.json "quality", default high): draft = no anti-aliasing, fast encode; standard = FXAA, CRF 18;
@@ -69,8 +71,9 @@ const QUALITY = {
   max: { crf: 10, preset: 'slower', ss: 1.5, format: 'png' },
 };
 const QN = QUALITY[args.quality] ? args.quality : QUALITY[CFG.quality] ? CFG.quality : 'high', Q = QUALITY[QN];
+if (args.gif && !args.scale) args.scale = '0.35';
 const PREVIEW = !!(args.from || args.to || (args.scale && +args.scale < 1));
-const SS = PREVIEW || args.sheet || args.stills || args.styles ? 1 : +(args.ss || Q.ss);
+const SS = PREVIEW || args.sheet || args.stills || args.styles || args.gif ? 1 : +(args.ss || Q.ss);
 const FORMAT = (args.format || (PREVIEW ? 'jpeg' : Q.format)) === 'jpeg' ? 'jpeg' : 'png';
 
 async function openPlayer(browser, style) {
@@ -97,11 +100,30 @@ const ENCODER = (() => { const e = args.encoder || CFG.encoder || 'auto'; if (e 
 const NV_CQ = { draft: 28, standard: 22, high: 18, max: 15 };
 const fmtT = s => `${Math.floor(s / 60)}m${String(Math.round(s % 60)).padStart(2, '0')}s`;
 
+// --qc (1.0.2): motion QC over sampled frames (engine/qc3d.js) → build/qc_motion.json + a table. Red issues block the full render
+// (renderVideo runs this first) unless --force. --every S sets the sampling step (default 0.5 s), --from/--to a range.
+async function runQC(quiet = false) {
+  const browser = await launch(); const page = await openPlayer(browser); const fps = FPS, total = await page.evaluate('window.TOTAL_FRAMES');
+  await page.waitForFunction('typeof window.qcSample === "function"', null, { timeout: 20000 });
+  const step = Math.max(1, Math.round((+args.every || 0.5) * fps)), f0 = Math.max(1, Math.round((+args.from || 0) * fps)), f1 = Math.min(total - 2, args.to ? Math.round(+args.to * fps) : total - 2);
+  const groups = new Map(); let n = 0;
+  for (let f = f0; f <= f1; f += step) { const r = await page.evaluate(i => window.qcSample(i), f); n++;
+    for (const is of r.issues) { const k = `${r.shot}|${is.kind}|${is.msg.replace(/[\d.]+/g, '#')}`; const g = groups.get(k) || { shot: r.shot, kind: is.kind, sev: is.sev, msg: is.msg, times: [] };
+      if (is.sev === 'red') g.sev = 'red'; g.times.push(r.t); groups.set(k, g); } }
+  await browser.close();
+  const issues = [...groups.values()].sort((a, b) => (a.sev === b.sev ? 0 : a.sev === 'red' ? -1 : 1) || a.times[0] - b.times[0]);
+  const red = issues.filter(i => i.sev === 'red').length, amber = issues.length - red;
+  fs.writeFileSync(path.join(BUILD, 'qc_motion.json'), JSON.stringify({ samples: n, step: step / fps, red, amber, issues }, null, 1));
+  if (!quiet || red) { console.log(`Motion QC: ${n} samples, ${red} red, ${amber} amber  (build/qc_motion.json)`);
+    for (const i of issues.slice(0, 60)) console.log(`  ${i.sev === 'red' ? 'RED  ' : 'amber'} ${String(i.shot).padEnd(14)} ${i.kind.padEnd(8)} ${i.msg}  @ ${i.times.slice(0, 5).join(', ')}${i.times.length > 5 ? ' …' : ''}s`); }
+  return { red, amber };
+}
 async function renderVideo() {
   const b0 = await launch(); const p0 = await openPlayer(b0);
   const total = await p0.evaluate('window.TOTAL_FRAMES'), fps = FPS; [OUTW, OUTH] = await p0.evaluate('window.OUT');
   const missing = (await p0.evaluate('window.SHOT_LIST')).filter(s => !s.ok); if (missing.length) console.log(`WARNING: ${missing.length} shots have no scene file yet: ${missing.slice(0, 12).map(s => s.id).join(', ')}${missing.length > 12 ? ' …' : ''}`);
   await b0.close();
+  if (!args.from && !args.to && !args['no-qc'] && !PREVIEW) { const q = await runQC(true); if (q.red && !args.force) throw new Error(`motion QC found ${q.red} red issue(s): fix them (node render.mjs --project P --qc) or render anyway with --force`); }
   const f0 = Math.max(0, Math.round((+args.from || 0) * fps)), f1 = Math.min(total, args.to ? Math.round(+args.to * fps) : total);
   // default workers: half the CPU threads (max 8); on a GPU, cap by video memory (≈0.5 GB/worker at 1080p, 1.2 GB at 4K on a 6 GB card)
   const vramCap = GPU_MODE ? ({ '1440p': 5, '2160p': 3, '4k': 3 }[CFG.resolution] || 8) : 8;
@@ -160,6 +182,21 @@ async function renderStills() {
   else { const per = 24; for (let i = 0; i < all.length; i += per) await contactSheet(browser, all.slice(i, i + per), path.join(dir, `sheet_${String(i / per + 1).padStart(2, '0')}.png`), 4, 440); }
   await browser.close(); console.log(`Wrote ${all.length} stills + contact sheet(s) to ${dir}`);
 }
+// --gif [ids] (1.0.2): a looping GIF per shot (10 fps, small) to judge motion — stills hide jerks and sliding feet.
+// ids: comma-separated shot ids, default all. --gifFps N, --scale K (default 0.35). Output build/gifs/<id>.gif.
+async function renderGifs() {
+  const browser = await launch(); const page = await openPlayer(browser); const fps = FPS, gfps = +(args.gifFps || 10);
+  const list = (await page.evaluate('window.SHOT_LIST')).filter(s => args.gif === true || String(args.gif).split(',').includes(s.id));
+  const dir = path.join(BUILD, 'gifs'); fs.mkdirSync(dir, { recursive: true });
+  for (const sh of list) {
+    const tmp = path.join(dir, '_' + sh.id); fs.rmSync(tmp, { recursive: true, force: true }); fs.mkdirSync(tmp, { recursive: true }); let k = 0;
+    for (let t = sh.start; t < sh.end - 1e-6; t += 1 / gfps) { await page.evaluate(i => window.renderFrame(i), Math.round(t * fps)); fs.writeFileSync(path.join(tmp, `f${String(k++).padStart(4, '0')}.png`), await page.screenshot({ type: 'png' })); }
+    const out = path.join(dir, `${sh.id}.gif`);
+    const r = spawnSync('ffmpeg', ['-v', 'error', '-y', '-framerate', String(gfps), '-i', path.join(tmp, 'f%04d.png'), '-vf', 'split[a][b];[a]palettegen=max_colors=128[p];[b][p]paletteuse=dither=bayer:bayer_scale=4', '-loop', '0', out]);
+    if (r.status) console.log('  gif failed:', sh.id, String(r.stderr).slice(0, 200)); fs.rmSync(tmp, { recursive: true, force: true });
+  }
+  await browser.close(); console.log(`Wrote ${list.length} GIF(s) to ${dir}`);
+}
 // --bench: time one worker on frames spread across the video, then estimate the full render for this machine
 async function bench() {
   const browser = await launch(); const page = await openPlayer(browser); const total = await page.evaluate('window.TOTAL_FRAMES'); [OUTW, OUTH] = await page.evaluate('window.OUT');
@@ -181,6 +218,6 @@ async function bench() {
   console.log(`  one worker ≈ ${fpsW.toFixed(2)} frames/s; ${W} workers ≈ ${(fpsW * eff).toFixed(2)} frames/s (estimate)`);
   console.log(`  this video: ${total} frames ≈ ${fmtT(est)} to render (+ encode). Encoder: ${ENCODER}. CPU threads: ${cores}.`);
 }
-try { if (args.bench) await bench(); else if (args.sheet || args.stills || args.styles) await renderStills(); else await renderVideo(); }
+try { if (args.bench) await bench(); else if (args.qc) { const q = await runQC(); if (q.red) process.exitCode = 2; } else if (args.gif) await renderGifs(); else if (args.sheet || args.stills || args.styles) await renderStills(); else await renderVideo(); }
 catch (e) { console.error('RENDER FAILED:', e.message); process.exitCode = 1; }
 finally { server.close(); }

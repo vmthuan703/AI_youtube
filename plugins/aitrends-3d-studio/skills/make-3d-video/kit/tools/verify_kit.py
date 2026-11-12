@@ -118,7 +118,7 @@ EXPECTED = {
     "examples/v103-thumb/scenes/cast.js": "06440a3ddb11b87b",
     "examples/v103-thumb/scenes/shots/thumbs.js": "50ad2e72d7dfe046",
     "examples/v103-thumb/story/shots.json": "757d778839acd9c8",
-    "tools/retro.mjs": "7228336e8a77e9fe",
+    "tools/retro.mjs": "5e059ad6fde30a50",
 }
 bad = 0
 for rel, want in EXPECTED.items():

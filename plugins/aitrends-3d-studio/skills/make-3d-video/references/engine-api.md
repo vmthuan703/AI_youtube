@@ -214,7 +214,8 @@ d.turkey), `T.W.pumpkinStreet(st)` (s.walk(i), s.porch(i)), `T.W.leafGust(st, { 
 lit }), hayBale, cornStalks, turkey, pie, candle, fallWreath. Friday-night football = T.W.footballField under schoolTime('night').
 **1.0.3 lessons**: `tools/retro.mjs` (run by the final render) keeps `channel/lessons.json` and writes `channel/LESSONS.md`:
 problems by kind across videos (QC red / amber, shot errors, the user's notes in projects/<slug>/feedback.md), what the plugin has
-already fixed, and the checklist for the next video (`--next`). `--note "..."` adds feedback; `--name slug --note` for a video with
+already fixed, the checklist for the next video (`--next`), and proposals for it: seasonal sets (built but unused lately, and new
+ones to add), graphics (from build/qc_scorecard.json and the engine backlog) and effects (T.FX3 / camera effects left unused, new ones). `--note "..."` adds feedback; `--name slug --note` for a video with
 no project folder left.
 **1.0.3 thumbnails**: `T.thumb.tag / tagOn / bar / big / panel` draw the channel's thumbnail UI (prompts/thumbnail_style.md) in a
 shot's `overlay(g, t, info, state)`; `node render.mjs --project P --thumbs` writes build/thumbs/<shot>.jpg (1280×720, the frame

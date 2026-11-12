@@ -154,7 +154,7 @@ Read `references/render-qc.md`.
 5. Lessons (1.0.3): the final render already wrote this video's QC problems into `channel/lessons.json` / `LESSONS.md`. Record
    every piece of feedback the user gave during the reviews, one line each, in their words: `node tools/retro.mjs --project
    projects/<slug> --note "..."` (also right when they give it). Then give a short proposal for the next video from the
-   refreshed checklist (`--next`): what to watch for, and any problem the plugin itself should fix (the "Nên sửa" list).
+   refreshed checklist (`--next`): what to watch for, and any problem the plugin itself should fix (the "Nên sửa" list), plus the sets, graphics and effects the book proposes.
 6. Clean up once the user has the file: `python tools/tidy_project.py --project projects/<slug>` keeps only `out/` and moves the working
    files to a clearly named folder for the user to delete. It deletes nothing, and never send big files to the Recycle Bin.
 

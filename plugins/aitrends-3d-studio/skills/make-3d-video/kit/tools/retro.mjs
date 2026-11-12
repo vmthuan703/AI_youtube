@@ -40,6 +40,20 @@ const catOf = (txt) => Object.entries(CATS).filter(([, c]) => c.kw.test(txt)).ma
 // ---------------------------------------------------------------- sets and graphics (proposals for the next video)
 // sets a video used: every T.W.<name>( call in its scene code
 function setsOf(P) { const out = new Set(), walk = (d) => { if (!fs.existsSync(d)) return; for (const f of fs.readdirSync(d)) { const q = path.join(d, f); if (fs.statSync(q).isDirectory()) walk(q); else if (/\.m?js$/.test(f)) for (const m of fs.readFileSync(q, 'utf8').matchAll(/\bT\.W\.([a-zA-Z]\w*)\s*\(/g)) out.add(m[1]); } }; walk(path.join(P, 'scenes')); return [...out]; }
+// effects a video used: T.FX3.<name>( particles / magic, and the camera effects T.punch / shake / dutch / crashZoom / rackFocus / pov
+function fxOf(P) { const out = new Set(), walk = (d) => { if (!fs.existsSync(d)) return; for (const f of fs.readdirSync(d)) { const q = path.join(d, f); if (fs.statSync(q).isDirectory()) walk(q); else if (/\.m?js$/.test(f)) { const t = fs.readFileSync(q, 'utf8');
+  for (const m of t.matchAll(/\bT\.FX3\.([a-zA-Z]\w*)/g)) out.add(m[1]); for (const m of t.matchAll(/\bT\.(punch|shake|dutch|crashZoom|rackFocus|pov|handheld|chase)\b/g)) out.add(m[1]); } } }; walk(path.join(P, 'scenes')); return [...out]; }
+// effects the kit has (Vietnamese label for the ones worth proposing) and new effects to add (key = the export that marks it done)
+const FXV = { aura: 'hào quang quanh người có năng lực', trail: 'vệt sáng theo chuyển động nhanh', ghosts: 'bóng ảnh nhân đôi khi lao đi', frozen: 'đóng băng thời gian (mọi thứ dừng, hạt lơ lửng)',
+  shockwave: 'sóng xung kích lan ra mặt đất', slice: 'vết chém xé khung hình', swoosh: 'vệt gió khi vung tay', speedLines: 'đường tốc độ kiểu anime', burst: 'bùng nổ hạt sáng', blade: 'lưỡi năng lượng',
+  glowLight: 'đèn phát sáng có quầng', bokeh: 'đốm sáng nhoè nền', sparks: 'tia lửa', debris: 'mảnh vỡ văng', splash: 'nước bắn', smoke: 'khói', fire: 'lửa', dust: 'bụi bay',
+  crashZoom: 'zoom giật vào mặt', rackFocus: 'chuyển tiêu cự giữa hai nhân vật', dutch: 'nghiêng khung khi căng thẳng', pov: 'góc nhìn thứ nhất', chase: 'máy quay đuổi theo' };
+export const VFX = [
+  ['Khung hình va chạm (impact frame): 2–3 khung đen trắng tương phản mạnh lúc cú đánh trúng', 'impactFrame'], ['Slow motion ở khoảnh khắc đỉnh, kèm vệt mờ chuyển động', 'slowMo'],
+  ['Năng lượng tụ về tay trước khi tung chiêu (charge-up: hạt hút vào, sáng dần)', 'chargeUp'], ['Tua ngược thời gian kiểu VHS: nhiễu sọc, chữ REWIND, mọi thứ chạy lùi', 'rewindFx'],
+  ['Biến hình: nhân vật loé sáng, nổ hạt rồi hiện ngoại hình mới', 'transformFx'], ['Chuyển cảnh theo dáng nhân vật (wipe hình bóng, xoáy, zoom xuyên vật)', 'shapeWipe'],
+  ['Màn hình vỡ kính khi sốc / thua cuộc', 'glassShatter'], ['Chữ hiệu ứng 3D bật ra theo cú đánh (POW, BAM) gắn vào cảnh', 'onoText'],
+];
 // the sets this kit can build (functions taking the stage), read from the engine
 export function catalogue() { const out = new Set(), dir = path.join(KIT, 'engine'); for (const f of fs.readdirSync(dir)) if (/\.js$/.test(f)) for (const m of fs.readFileSync(path.join(dir, f), 'utf8').matchAll(/^export function ([a-zA-Z]\w*)\(st\b/gm)) out.add(m[1]); return out; }
 // American sets by season (month 1-12) with a Vietnamese label; ideas the engine does not have yet are proposed as new sets
@@ -66,6 +80,8 @@ export const GFX = [
 ];
 function gfxDone() { const src = fs.readdirSync(path.join(KIT, 'engine')).filter(f => /\.js$/.test(f)).map(f => fs.readFileSync(path.join(KIT, 'engine', f), 'utf8')).join('\n');
   return new Set(GFX.filter(([, key]) => new RegExp(`\\bexport (function|const) ${key}\\b`).test(src)).map(([, key]) => key)); }
+function gfxDoneKeys(keys) { const src = fs.readdirSync(path.join(KIT, 'engine')).filter(f => /\.js$/.test(f)).map(f => fs.readFileSync(path.join(KIT, 'engine', f), 'utf8')).join('\n');
+  return new Set(keys.filter(key => new RegExp(`\\bexport (function|const) ${key}\\b`).test(src))); }
 function metricsOf(P) { const m = load(path.join(P, 'build', 'qc_scorecard.json'), null); if (!m) return null; const o = {}; for (const k of Object.keys(LOOK)) if (typeof m[k] === 'number') o[k] = +m[k].toFixed(3); return o; }
 
 function load(f, d) { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch { return d; } }
@@ -81,7 +97,7 @@ export function collect(P, extra = {}) {
   const errs = (extra.errors || []).map(e => String(e)); if (errs.length) byKind.render = { red: errs.length, amber: 0, n: errs.length };
   if (extra.missing?.length) byKind.render = { ...(byKind.render || { red: 0, amber: 0, n: 0 }), red: (byKind.render?.red || 0) + extra.missing.length };
   return { project: slug, date: today(), qc: qc ? { samples: qc.samples, red: qc.red, amber: qc.amber } : null, byKind,
-    sets: setsOf(P), look: metricsOf(P),
+    sets: setsOf(P), fx: fxOf(P), look: metricsOf(P),
     worstShots: Object.entries(shots).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([s]) => s), errors: errs.slice(0, 20), missing: extra.missing || [], feedback: feedbackOf(P), renderSec: extra.renderSec ?? null };
 }
 
@@ -89,7 +105,7 @@ export function record(P, extra = {}) {
   fs.mkdirSync(CH, { recursive: true }); const book = load(BOOK, { videos: [] }), e = collect(P, extra);
   const old = book.videos.find(v => v.project === e.project); if (old && old.renderSec && e.renderSec == null) e.renderSec = old.renderSec;
   if (old && old.date && !e.qc) e.date = old.date;
-  if (old) { const have = new Set(e.feedback.map(f => f.text)); e.feedback = (old.feedback || []).filter(f => !have.has(f.text)).concat(e.feedback); if (!e.sets.length) e.sets = old.sets || []; if (!e.look) e.look = old.look || null; }   // keep notes recorded with --name
+  if (old) { const have = new Set(e.feedback.map(f => f.text)); e.feedback = (old.feedback || []).filter(f => !have.has(f.text)).concat(e.feedback); if (!e.sets.length) e.sets = old.sets || []; if (!e.fx?.length) e.fx = old.fx || []; if (!e.look) e.look = old.look || null; }   // keep notes recorded with --name
   book.videos = book.videos.filter(v => v.project !== e.project).concat(e); fs.writeFileSync(BOOK, JSON.stringify(book, null, 1)); writeMd(book); return e;
 }
 
@@ -121,9 +137,14 @@ function writeMd(book) {
   const mo = new Date().getMonth() + 1, ideas = sea.ideas.map(x => Array.isArray(x) ? x : [x, sea.months]).sort((p, q) => (q[1].includes(mo) ? 1 : 0) - (p[1].includes(mo) ? 1 : 0));
   L.push('', '**Bối cảnh mới nên thêm vào plugin:**', ''); for (const [idea] of ideas.slice(0, 3)) L.push(`- ${idea}`);
   const lv = last.find(v => v.look), lookBad = lv ? Object.entries(LOOK).filter(([k, [lo, hi]]) => lv.look[k] != null && (lv.look[k] < lo || lv.look[k] > hi)) : [];
-  L.push('', '**Đồ hoạ nên cải thiện:**', '');
+  L.push('', '**Đồ hoạ và kỹ xảo nên cải thiện:**', '');
   for (const [k, [lo, hi, low, high, fix]] of lookBad) L.push(`- ${lv.look[k] < lo ? low : high} ở ${lv.project} (${k} ${lv.look[k]}, nên ${lo}–${hi}): ${fix}.`);
-  const done = gfxDone(); for (const [t] of GFX.filter(([, key]) => !done.has(key)).slice(0, Math.max(2, 4 - lookBad.length))) L.push(`- Nâng cấp engine: ${t}.`);
+  const done = gfxDone(); for (const [t] of GFX.filter(([, key]) => !done.has(key)).slice(0, Math.max(2, 3 - lookBad.length))) L.push(`- Nâng cấp đồ hoạ trong engine: ${t}.`);
+  // effects: ones the kit already has but the channel left out lately (rarest first), then new effects worth adding
+  const fxCat = new Set(Object.keys(FXV)), fxRecent = new Set(last.slice(0, 3).flatMap(v => v.fx || [])), fxCount = {}; for (const v of last) for (const k of v.fx || []) fxCount[k] = (fxCount[k] || 0) + 1;
+  const fxIdle = [...fxCat].filter(k => !fxRecent.has(k) && FXV[k]).sort((a, b) => (fxCount[a] || 0) - (fxCount[b] || 0)).slice(0, 4);
+  L.push('', '**Kỹ xảo có sẵn nên dùng lại (ít dùng gần đây):**', ''); for (const k of fxIdle) L.push(`- ${FXV[k]} (\`${['punch', 'shake', 'dutch', 'crashZoom', 'rackFocus', 'pov', 'handheld', 'chase'].includes(k) ? 'T.' + k : 'T.FX3.' + k}\`)${fxCount[k] ? `, dùng ở ${fxCount[k]} video` : ', kênh chưa dùng lần nào'}`);
+  const vdone = gfxDoneKeys(VFX.map(([, k]) => k)); L.push('', '**Kỹ xảo mới nên thêm vào plugin:**', ''); for (const [t] of VFX.filter(([, k]) => !vdone.has(k)).slice(0, 4)) L.push(`- ${t}`);
   const fb = last.flatMap(v => (v.feedback || []).map(f => ({ ...f, project: v.project, date: f.date || v.date }))).slice(0, 10);
   if (fb.length) { L.push('', '## Góp ý gần đây của bạn', ''); for (const f of fb) L.push(`- ${f.date} · ${f.project}: ${f.text}`); }
   L.push('', '## Từng video', '', '| Video | Ngày | QC đỏ / vàng | Cảnh nhiều lỗi nhất |', '|---|---|---|---|');

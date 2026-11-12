@@ -13,7 +13,7 @@ giữ nguyên dáng suốt video và chữ luôn nét. Giọng đọc mặc đ�
 - **Chạm đúng:** tay tự đặt lên mặt bàn, bục, ghế; chân bám đất khi bắt đầu và dừng bước; bộ kiểm tra coi chạm nhẹ là bình thường.
 - **Trang phục chuyển động:** khăn lắc theo bước và bay theo gió, mũ hoodie có dáng thật, áo phao gom lại khi ngồi.
 - **Bối cảnh tháng 11:** bữa tối Lễ Tạ ơn, phố bí ngô, cơn gió cuốn lá, trận bóng tối thứ Sáu.
-- **Sổ bài học tự động:** sau mỗi lần render bản cuối, lỗi kiểm tra, lỗi render và góp ý của bạn được gộp vào `channel/LESSONS.md`; đầu video sau Claude đọc sổ và đưa danh sách việc cần chú ý (`node tools/retro.mjs --next`), ghi góp ý bằng `--note`.
+- **Sổ bài học tự động:** sau mỗi lần render bản cuối, lỗi kiểm tra, lỗi render và góp ý của bạn được gộp vào `channel/LESSONS.md`; đầu video sau Claude đọc sổ và đưa danh sách việc cần chú ý (`node tools/retro.mjs --next`), ghi góp ý bằng `--note`. Sổ còn đề xuất bối cảnh hợp mùa (có sẵn chưa dùng và nên thêm mới), đồ hoạ và kỹ xảo (theo bảng điểm hình ảnh, kỹ xảo có sẵn ít dùng, kỹ xảo mới nên thêm).
 - **Thumbnail 3D** theo 4 bố cục A–D của kênh (`T.thumb`, `--thumbs`). Ví dụ: `examples/v103-demo`, `examples/v103-thumb`.
 
 ## Mới trong 1.0.2 — chuyển động tự nhiên, bắt lỗi tự động

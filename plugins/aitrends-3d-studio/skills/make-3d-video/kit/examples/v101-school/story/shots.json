@@ -1,0 +1,148 @@
+{
+ "title": "v101-school",
+ "duration": 60,
+ "shots": [
+  {
+   "id": "suburb",
+   "start": 0,
+   "end": 3,
+   "line": "",
+   "camera": "wide"
+  },
+  {
+   "id": "locker",
+   "start": 3,
+   "end": 6,
+   "line": "",
+   "camera": "medium",
+   "mblur": "action"
+  },
+  {
+   "id": "chem",
+   "start": 6,
+   "end": 9,
+   "line": "",
+   "camera": "medium"
+  },
+  {
+   "id": "library",
+   "start": 9,
+   "end": 12,
+   "line": "",
+   "camera": "twoShot"
+  },
+  {
+   "id": "rainClass",
+   "start": 12,
+   "end": 15,
+   "line": "",
+   "camera": "medium"
+  },
+  {
+   "id": "detention",
+   "start": 15,
+   "end": 18,
+   "line": "",
+   "camera": "doorWindow"
+  },
+  {
+   "id": "blackout",
+   "start": 18,
+   "end": 21,
+   "line": "",
+   "camera": "teacherView"
+  },
+  {
+   "id": "cafeteria",
+   "start": 21,
+   "end": 24,
+   "line": "",
+   "camera": "cafeteriaWide"
+  },
+  {
+   "id": "football",
+   "start": 24,
+   "end": 27,
+   "line": "",
+   "camera": "full",
+   "mblur": "action"
+  },
+  {
+   "id": "principal",
+   "start": 27,
+   "end": 30,
+   "line": "",
+   "camera": "twoShot"
+  },
+  {
+   "id": "nurse",
+   "start": 30,
+   "end": 33,
+   "line": "",
+   "camera": "medium"
+  },
+  {
+   "id": "restroom",
+   "start": 33,
+   "end": 36,
+   "line": "",
+   "camera": "medium"
+  },
+  {
+   "id": "band",
+   "start": 36,
+   "end": 39,
+   "line": "",
+   "camera": "high"
+  },
+  {
+   "id": "stage",
+   "start": 39,
+   "end": 42,
+   "line": "",
+   "camera": "medium"
+  },
+  {
+   "id": "lockerRoom",
+   "start": 42,
+   "end": 45,
+   "line": "",
+   "camera": "medium"
+  },
+  {
+   "id": "snowLot",
+   "start": 45,
+   "end": 48,
+   "line": "",
+   "camera": "twoShot"
+  },
+  {
+   "id": "prom",
+   "start": 48,
+   "end": 51,
+   "line": "",
+   "camera": "twoShot"
+  },
+  {
+   "id": "diner",
+   "start": 51,
+   "end": 54,
+   "line": "",
+   "camera": "twoShot"
+  },
+  {
+   "id": "graduation",
+   "start": 54,
+   "end": 57,
+   "line": "",
+   "camera": "medium"
+  },
+  {
+   "id": "rainLot",
+   "start": 57,
+   "end": 60,
+   "line": "",
+   "camera": "full"
+  }
+ ]
+}

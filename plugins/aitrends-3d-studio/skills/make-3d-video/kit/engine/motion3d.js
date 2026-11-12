@@ -8,7 +8,7 @@
 //   T.dolly(cam, t, keys); T.crashZoom(cam, t, { at: 1.2, to: 18 }); T.handheld(cam, t, 0.6);
 import * as THREE from 'three';
 import { E, clamp, lerp, ease, prog, noise, hash01, speakerAt } from './core.js';
-import { POSES3, walkPose3, blendPose3, breathe3 } from './rig3d.js';
+import { POSES3, walkPose3, blendPose3, breathe3, posesAt3, flow3 } from './rig3d.js';
 
 const D2R = Math.PI / 180;
 const getPose = (p) => (typeof p === 'string' ? POSES3[p] || POSES3.stand : p);
@@ -278,3 +278,34 @@ export function turn3(ch, t, o = {}) {
   const leg = (l, s) => Array.isArray(l) ? [l[0] + s, l[1], l[2] + s * 1.6, l[3]] : l;
   return { ...base, head: [base.head[0], base.head[1] + clamp(lead, -40, 40), base.head[2]], legL: leg(base.legL, stepL), legR: leg(base.legR, stepR), y: (base.y || 0) + 0.02 * Math.sin(Math.PI * k * 2) ** 2 };
 }
+
+// ================================================================ 1.0.1 school motion: throws, lockers, tossed things
+// throw3(t, { t0, wind, idle, end }) — an overhand right-hand throw (football, snowball, a paper ball) as one flowing movement
+// (flow3): hold the ball at the chest → turn the throwing shoulder back, cock the arm behind the head, point the free hand at the
+// target, load the back leg → step with the left foot, hips then shoulders rotate through, the arm whips over the top, the ball
+// leaves the hand at t0 → follow-through across the body, chest down, back heel lifts → settle. T.throwHand(ch) gives the hand.
+export function throw3(t, o = {}) {
+  const t0 = o.t0 ?? 0.8, w = o.wind ?? 0.55;
+  const hold = { y: 0, hips: [0, 0, 0], spine: [4, 0, 0], head: [2, 0, 0], armL: { to: [0.1, 0.98, 0.24], pole: [0.6, 0.6, -0.2] }, armR: { to: [-0.08, 0.98, 0.26], pole: [-0.6, 0.6, -0.2] }, legL: [2, 6, 4, 0], legR: [0, 6, 4, 0], handL: 'open', handR: 'fist' };
+  const cock = { y: -0.05, hips: [0, -22, 0], spine: [-6, -30, 0], head: [-2, 30, 0], armL: { to: [0.24, 1.22, 0.48], pole: [0.7, 0.9, -0.2] }, armR: { to: [-0.36, 1.52, -0.3], pole: [-0.8, 1.1, 0.1] }, legL: [26, 8, 30, 0], legR: [-8, 8, 22, 0], handL: 'open', handR: 'fist' };
+  const step = { y: -0.08, hips: [0, -4, 0], spine: [2, -16, 0], head: [-2, 16, 0], armL: { to: [0.3, 1.12, 0.36], pole: [0.8, 0.8, -0.2] }, armR: { to: [-0.32, 1.62, -0.12], pole: [-0.8, 1.2, -0.1] }, legL: [34, 8, 14, 0], legR: [-24, 8, 24, 0], handL: 'open', handR: 'fist' };
+  const release = { y: -0.07, hips: [0, 18, 0], spine: [12, 24, 0], head: [-4, -18, 0], armL: { to: [0.26, 0.98, 0.08], pole: [0.8, 0.8, -0.3] }, armR: { to: [-0.06, 1.66, 0.52], pole: [-0.7, 1.4, 0.0] }, legL: [32, 8, 16, 0], legR: [-34, 8, 22, 0], handL: 'fist', handR: 'open' };
+  const follow = { y: -0.08, hips: [0, 20, 0], spine: [22, 22, 0], head: [-12, -18, 0], armL: { to: [0.3, 0.9, -0.05], pole: [0.8, 0.8, -0.4] }, armR: { to: [0.2, 0.86, 0.38], pole: [-0.4, 0.9, 0.5] }, legL: [30, 8, 22, 0], legR: [-42, 8, 58, 0], handL: 'fist', handR: 'open' };
+  const settle = { y: -0.02, hips: [0, 10, 0], spine: [8, 10, 0], head: [-4, -8, 0], armL: { to: [0.22, 0.72, 0.06], pole: [0.7, 0.6, -0.3] }, armR: { to: [-0.2, 0.74, 0.12], pole: [-0.7, 0.6, -0.3] }, legL: [10, 8, 8, 0], legR: [-8, 8, 10, 0], handL: 'relaxed', handR: 'relaxed' };
+  return flow3(t, [[0, hold], [t0 - w - 0.25, hold], [t0 - w * 0.45, cock], [t0 - 0.12, step], [t0, release], [t0 + 0.28, follow], [t0 + 0.95, settle]]);
+}
+// the throwing hand's world position at time tt (pose the character at tt, read the hand, pose it back): where a held ball sits
+// before release and where its flight starts. hand: 'R' (default) or 'L'.
+export function throwHand(ch, tt, o = {}) { ch.pose(throw3(tt, o)); ch.updateMatrixWorld(true); return ch.handWorld(o.hand || 'R'); }
+// reachTo(ch, world) — a world point in the character's own space, for an IK arm: armR: { to: T.reachTo(ch, p) }
+export function reachTo(ch, p) { ch.updateMatrixWorld(true); const v = (p.isVector3 ? p.clone() : new THREE.Vector3(...p)); ch.worldToLocal(v); const k = ch.scale?.y || 1; return [v.x / k, v.y / k, v.z / k]; }
+// toss(obj, t, { from, to, h, t0, dur, spin, hide }) — an object flying on an arc (snowball, football, a cap, a note). Before t0 it sits at
+// `from` (or is hidden: hide true); after landing it stays at `to`. spin: [x, y, z] turns per second. Returns progress 0..1.
+export function toss(obj, t, o = {}) { const t0 = o.t0 ?? 0, dur = o.dur ?? 0.8, k = clamp((t - t0) / dur), f = o.from || [0, 1, 0], to = o.to || f, h = o.h ?? 1;
+  obj.visible = !(o.hide && t < t0); obj.position.set(lerp(f[0], to[0], k), lerp(f[1], to[1], k) + 4 * h * k * (1 - k), lerp(f[2], to[2], k));
+  const sp = o.spin || [0, 0, 0], u = Math.max(0, Math.min(t, t0 + dur) - t0); obj.rotation.set(sp[0] * u * Math.PI * 2, sp[1] * u * Math.PI * 2, sp[2] * u * Math.PI * 2); return k; }
+// lockerDoor(door, t, { t0, open, dur, slam }) — swing a T.W.lockerHall locker door (its pivot): opens to `open` rad (default 1.9);
+// slam: a time when it is slammed shut with a rattle. Returns the angle.
+export function lockerDoor(door, t, o = {}) { const t0 = o.t0 ?? 0, op = o.open ?? 1.9, dur = o.dur ?? 0.5; let a = op * ease.out(clamp((t - t0) / dur));
+  if (o.slam != null && t >= o.slam) { const u = t - o.slam; a = u < 0.12 ? op * (1 - u / 0.12) ** 2 : 0.08 * Math.exp(-(u - 0.12) * 9) * Math.abs(Math.sin((u - 0.12) * 40)); }
+  door.rotation.y = -a * (o.dir ?? 1); return a; }

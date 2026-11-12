@@ -70,7 +70,7 @@ export function schoolFront(st, o = {}) {
   st.add(box(4, 0.03, 9, mat('#b8aca4'), 0, 0.015, -7));   // the path from the sidewalk to the door
   const pole = group(cyl(0.06, 0.06, 9, mat('#c8c8d0', { metal: 0.8 }), 0, 4.5, 0), at(plane(1.8, 1.1, mat('#2c4a8a', { keepSat: true, side: THREE.DoubleSide })), 0.92, 8.3, 0));
   st.add(at(pole, -6, 0, -9));
-  if (o.bus === false) st.remove(r.bus);
+  if (o.bus === false) r.bus?.parent?.remove(r.bus);   // 1.0.1 fix: the stage has no remove()
   return { ...r, entrance: [0, 0, -11.6], path: [0, 0, -7] };
 }
 
@@ -107,14 +107,14 @@ export function busInside(st, o = {}) {
 // locker(i, side): i counts from the far end (z −d/2) in 0.52 m steps, side −1 left / +1 right. door.rotation.y = ±1.6 swings it open.
 export function lockerHall(st, o = {}) {
   const w = o.w ?? 4.6, d = o.d ?? 24, cols = o.colors || ['#2f6a72', '#2f6a72', '#2f6a72', '#b8403a'];
-  const r = room(st, { kind: 'hallway', w, d, wall: o.wall || '#5a4466', floor: o.floor || '#b89c90', window: false, ceiling: true, lockerRun: 0 });
+  const r = room(st, { kind: 'hallway', w, d, wall: o.wall || '#5a4466', floor: o.floor || '#b89c90', window: false, ceiling: true, lockers: false });   // 1.0.1: the room's own static lockers sat on top of these (doors could not open)
   const doors = {};
   const place = (i, side) => ({ x: side * (w / 2 - 0.26), z: -d / 2 + 1 + i * 0.52, yaw: side < 0 ? R2 : -R2 });
   for (const side of [-1, 1]) for (let i = 0; i < Math.floor((d - 2) / 0.52); i++) {
     if (o.gap && i % 12 > 9) continue;   // a door / poster gap every few metres
     const p = place(i, side), c = cols[(i * 7 + (side > 0 ? 3 : 0)) % cols.length], m = mat(c, { rough: 0.5, metal: 0.4 });
     const body = group(box(0.5, 1.9, 0.48, m, 0, 0.95, -0.02)); const door = group(box(0.48, 1.86, 0.03, m, 0.24, 0, 0)); for (let k = 0; k < 3; k++) door.add(box(0.3, 0.02, 0.01, shade(c, -0.4), 0.24, 0.65 + k * 0.05, 0.02));
-    door.add(box(0.03, 0.12, 0.03, '#c8c8d0', 0.42, 0.05, 0.03)); door.position.set(-0.24, 0.95, 0.23); body.add(door);
+    door.add(box(0.03, 0.12, 0.03, '#c8c8d0', 0.42, 0.05, 0.03)); door.position.set(-0.24, 0.95, 0.23); door.userData.dynamic = true; body.add(door);   // 1.0.1: kept out of the static merge so it can swing
     st.add(at(body, p.x, 0, p.z, p.yaw)); doors[`${i},${side}`] = door;
   }
   st.add(at(poster({ text: o.banner || 'GO EAGLES', c1: '#f2b632', c2: '#8d4a6b' }), w / 2 - 0.03, 2.25, -2, -R2));

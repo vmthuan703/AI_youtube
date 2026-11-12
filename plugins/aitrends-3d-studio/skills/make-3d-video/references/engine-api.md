@@ -178,6 +178,12 @@ head first, two small steps; `T.squash(ch, k)` volume-keeping squash/stretch fro
 **1.0 named cameras** (engine/camera10.js): `T.camShot(st.camera, t, info.shot.camera, { a, b, side, yaw, dist, dur: info.dur })` with shots.json
 `"camera"`: `wide` · `full` · `medium` · `closeup` · `xcu` · `ots` (over a's shoulder onto b) · `twoShot` · `lowHero` · `high` · `dutch` · `pushIn` ·
 `pullBack` · `orbit` · `track` · `reveal` · `insert` (o.at). Each framing works from the subject's own facing and drifts a little over the shot.
+**1.0.1 school cameras** (same call): `hallwayWalk` (backs up ahead of a walker, long lens) · `lockerPeek` (from beside the lockers at o.at onto a) ·
+`bleachers` (high from the stands) · `cafeteriaWide` (high establishing, o.height under the ceiling, default 2.4) · `backRow` (behind a's head toward the
+board) · `teacherView` (from the front down the rows) · `doorWindow` (long lens from the classroom door at o.at). `high` takes o.height too. Heights follow
+the subject's floor, so `lowHero` / `full` work on a stage or riser.
+**1.0.1 school motion**: `T.throw3(t, { t0, wind, idle, end })` wind-up → release (football, snowball); `T.toss(obj, t, { from, to, h, t0, dur, spin, hide })`
+flies a prop on an arc; `T.lockerDoor(h.locker(i, side).door, t, { t0, open, slam })` opens a locker and slams it with a rattle.
 **Motion blur**: shots.json `"mblur": "action"` (5 sub-frames, 300° shutter) for runs, punches, falls, a train going by; `T.FX3.swoosh(st, { pos, axis, from,
 to, r, w, t0, dur })` draws the cartoon smear arc of a punch or kick (tilt `axis` toward the camera so the band is not edge-on).
 **Secondary motion** is automatic: walkTo / climb / jump3 / turn3 make the hair bounce and sweep, hoodie strings and the bag swing a beat behind the steps.
@@ -251,7 +257,11 @@ Methods (all return the character, so they chain):
 
 Poses: `stand relaxed confident handsInPockets talk explain point pointUp pointAtViewer wave cheer fistPump handsOnHead
 facepalm think crossArms crossArmsAngry crossArmsLean armsBehindHead shrug scared shocked sad phone phoneEar holdFront reach ready fight punch kick crouch kneel kneelBoth kneelSad kneelPlead sitBed sitBedSad sitBedPhone sitFloor hugKnees liftSquat liftOverhead pushHeavy
-sit sitBack sitDesk lie jump fall superLand flexL hunch hunchCane handsOnHips handsOnBelt holdMic`. A pose object:
+sit sitBack sitDesk lie jump fall superLand flexL hunch hunchCane handsOnHips handsOnBelt holdMic`; 1.0.1 school: `raiseHand sitRaiseHand sleepDesk passNote
+copyPeek sitSlouch writeBoard holdBooks holdTray oneStrap dialLocker slamLocker holdUmbrella shareUmbrella throwWind throwRelease carryBall pomHigh pomLow
+capToss duckCover sitBleacher sitBooth atPodium` (seated ones at chair height 0.42; sitBooth / sitBleacher rest the hands on a table / the knees). `ch.wear(obj)` puts a
+grad cap, crown or party hat on the head. Blends between an angle limb and an IK limb (`{ to }`) are smooth since 1.0.1; keep pose
+changes at 0.35 s or more (posesAt3 blend) and walk at 1.2–1.5 m/s (walkTo distance / time) or the feet slide. A pose object:
 `{ y, hips:[pitch,yaw,roll], spine:[…], head:[…], armL:[raise, az, bend, twist] | {to:[x,y,z], pole}, armR, legL:[lift, side,
 knee, twist] | {to}, legR, handL:'fist'|'open'|'point'|'relaxed', handR }` in degrees. Pitch + leans/nods forward, yaw +
 turns to the character's left, arm raise 0 = hanging, 90 = horizontal, 180 = up; az 0 = forward, 90 = sideways. `{to}`
@@ -359,6 +369,25 @@ and raise their arms in waves; `cheer` 0–1 (or a function of t) sets how many 
   `station`, `panels` / `lights` (flicker them). `T.W.rooftop(st, { lights })` → roof at y 0 with parapet, water tank, vents, stair hut, city below; `edge`,
   `ledge(i)`, `door`. `T.W.trainStation(st, { board, name, line, trainX })` → platform along x (top y 0), `train` (move `.position.x`; arriving: ease out),
   `edgeZ`, `doorZ`, `bench(i)`. Props: `shelfUnit`, `cart`, `gurney`, `wheelchair`, `waterTank`, `trainCar`.
+- **American high school** (engine/school10.js, 1.0.1; with school3d.js lockerHall / cafeteria / schoolFront / schoolBus / court, `T.W.gym`, `T.W.classroom`,
+  `T.W.stairwell` it covers a whole US high-school story). Each returns anchors `[x, z, yaw]` (4th value = floor height when not 0):
+  `library` → `seat(table, side, i)`, `aisle(i)`, `desk`, `librarian` · `chemLab` → `station(i)` (stand), `teacher`, `flask` (glowing reaction) ·
+  `auditorium` → `stageY`, `stage(x)`, `podium`, `seat(row, i)`, `spots` · `footballField` (Friday night: `{ home, score: { home, guest, quarter, clock },
+  crowd, lights }`) → `sideline(i)`, `bleacher(row, i)`, `board` · `lockerRoom` → `bench(i)`, `locker(i)`, `shower` · `bandRoom` → `seat(row, i)` (risers),
+  `podium`, `piano` · `principalOffice` → `principal`, `guest(i)`, `door` (flag, trophy case, test paper with a red F) · `detention` (the classroom after
+  school, low sun, the board says DETENTION; classroom anchors + `teacher` chair) · `nurseOffice` → `bed` (pose 'sit' at its y), `nurse` · `restroom` →
+  `sink(i)` facing a real wall mirror, `stall(i)` · `studentLot` (`{ wet, buses, cars, gap: [x0, x1] }` keeps a strip free for the camera) → `car(i)`,
+  `busDoor` · `promHall` (the gym with a balloon arch, banner, disco ball and moving light dots) → `arch`, `punch` · `dinerUS` (50s diner: booths,
+  stools, jukebox, neon) → `booth(i, side)`, `stool(i)`, `jukebox` · `suburbStop` (porch houses, mailboxes, stop sign, the yellow bus: move
+  `bus.position.x`; `{ autumn, wet }`) → `stop`, `busDoor`, `porch(i)`. Props: `bookcase bankerLamp labBench beaker trophyCase usFlag bleachers scoreboard
+  goalPost musicStand drumKit piano examBed mailbox stopSign pickup jukebox discoBall balloon balloonArch paSpeaker testPaper tray milkshake umbrella gradCap
+  football pompom newspaper ballotBox sinkUnit`, `T.W.bell(st, { pos, yaw, t0, dur })` (rings), `T.W.LETTERMAN` (spread into an outfit for a varsity jacket).
+- **School weather, seasons, time of day** (engine/season10.js, 1.0.1, all tick themselves): `T.stage({ ...T.W.schoolTime('afterSchool') })` (morning ·
+  noon · afterSchool · evening · night · storm · snow); `T.W.fallDay(st, { area, y })` maple leaves + piles; `T.W.snowDay(st, { area, groundY })` snow caps +
+  snowfall (after the set); `T.W.breath(st, ch, { every })` cold breath; `T.W.windowRain(st, { pos, w, h, yaw })` drops running down a window (inside);
+  `T.W.fogGlass(st, { pos, w, h, yaw, draw: 'heart' | 'smile' | text })`; `T.W.powerCut(st, { t0, room })` blackout (lightning still flashes);
+  `T.W.alarmLight(st, { pos, t0 })` rotating red beacon (tornado drill); `T.W.capToss(st, { at, n, t0 })` graduation caps; `T.W.confetti(st, { area, t0 })`;
+  `T.W.haze(st, { area, opacity })` (stadium lights, morning fog); `T.W.blowingPaper(st, { area, wind })`.
 - **Dramatic light and weather** (engine/weather10.js, 1.0, all tick themselves): `T.W.lightning(st, { times })` double-strobe flashes;
   `T.W.cloudShadows(st, { at: [x, z] })` cloud shadows sliding over the ground, the sun dims when one passes; `T.W.headlights(st, { from, to, aim, t0, dur,
   power, angle, shadow })` a sweeping car beam (indoors: start at the window, `shadow: false`); `T.W.flicker(t, { rate, depth })` multiplier for a failing

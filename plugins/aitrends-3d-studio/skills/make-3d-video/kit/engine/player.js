@@ -188,7 +188,7 @@ function drawShot(buf, shot, lt, opts = {}) {
   if (!def) { g.fillStyle = '#20141c'; g.fillRect(0, 0, E.W, E.H); text(g, `MISSING SHOT ${shot.id}`, E.W / 2, E.H / 2 - 30, { size: 60, color: '#ff6f61' }); text(g, (shot.line || '').slice(0, 80), E.W / 2, E.H / 2 + 50, { size: 30, color: '#fff', font: FONTS.ui, weight: 800 }); return; }
   try {
     if (def.kind === '3d') {
-      const st = state3D(shot, def, info); const stg = st.stage || st.st || st; stg.activate?.();
+      const st = state3D(shot, def, info); const stg = st.stage || st.st || st; stg.activate?.(); if (!opts.noQcMark) window.CUR3D = { st, stg, shot, def, lt };
       // mblur: sub-frames (2–4) over a 180° shutter; 'action' (1.0) = 5 sub-frames over a 300° shutter for runs, punches and falls
       const mbv = shot.mblur ?? def.mblur ?? 1, nb = mbv === 'action' ? 5 : Math.max(1, Math.round(+mbv || 1)), shutter = mbv === 'action' ? 0.83 : 0.5;
       // a light hand-held drift on every 3D shot (config.handheld, shots.json/shot "handheld"), added only for the render
@@ -255,3 +255,14 @@ window.renderFrame = function (f) {
   mg.setTransform(1, 0, 0, 1, 0, 0);
 };
 boot().catch(e => { window.BOOT_ERROR = e.message + '\n' + e.stack; console.log('BOOT ERROR', e.message); });
+
+// 1.0.2 motion QC (engine/qc3d.js): window.qcFrame(f) renders frame f and returns the probe (issues + a joint snapshot)
+import('./qc3d.js').then(Q => {
+  window.qcFrame = (f) => { window.CUR3D = null; window.renderFrame(f); const c = window.CUR3D; if (!c) return { issues: [], snap: {}, shot: null };
+    const subject = c.shot.qcSubject ?? c.def.qcSubject ?? 'YOU'; const r = Q.probe(c.stg, { subject }); const ign = new Set([...(c.shot.qcIgnore || []), ...(c.def.qcIgnore || [])]);
+    return { issues: r.issues.filter(i => !ign.has(i.kind)), snap: r.snap, shot: c.shot.id, lt: c.lt, ignore: [...ign] }; };
+  // one sample: frames f-1, f, f+1 of the same shot → geometry issues at f + motion issues across the three
+  window.qcSample = (f) => { const a = window.qcFrame(Math.max(0, f - 1)), c0 = window.qcFrame(f + 1), b = window.qcFrame(f);
+    const mo = a.shot === b.shot && c0.shot === b.shot ? Q.motion(a.snap, b.snap, c0.snap, 1 / E.fps).filter(i => !(b.ignore || []).includes(i.kind)) : [];
+    return { shot: b.shot, t: +(f / E.fps).toFixed(2), lt: +(b.lt ?? 0).toFixed(2), issues: [...b.issues, ...mo] }; };
+});

@@ -125,7 +125,7 @@ export function stage(o = {}) {
   const envK = LEGACY || QS.has('noenv') || !R ? 0 : (o.env ?? st.env ?? 0.42);
   if (envK > 0) { scene.environment = moodEnv(sky, M, o.keyPos || [-6, 10, 6], o.keyColor || M.key); scene.environmentIntensity = envK; }
   const camera = new THREE.PerspectiveCamera(o.fov || V(35, 50), E.W / E.H, 0.05, 600);
-  camera.position.set(0, 1.6, 6); camera.lookAt(0, 1.2, 0);
+  camera.position.set(0, 1.6, 6); camera.lookAt(0, 1.2, 0); camera.userData.scene = scene;   // 1.0.2: camShot looks for blockers in it
   const hemi = new THREE.HemisphereLight(C(o.ambientSky || M.ambient), C(M.dark), (o.ambient ?? 1.0) * (L.ambient ?? 1) * (1 - 0.35 * envK)); scene.add(hemi);
   const sun = new THREE.DirectionalLight(C(o.keyColor || M.key), (o.keyIntensity ?? 2.0) * (L.key ?? 1));
   sun.position.set(...(o.keyPos || [-6, 10, 6]));

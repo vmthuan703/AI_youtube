@@ -593,6 +593,7 @@ export function character(outfit = {}, opts = {}) {
   const limbMix = (m, base, s, pts, l1, l2) => { const [j0, e0] = pts(m.mix[0], base, s), [j1, e1] = pts(m.mix[1], base, s), k = m.k;
     const e = e0.clone().lerp(e1, k), jGuess = j0.clone().lerp(j1, k), j = ik(base, e, l1, l2, jGuess.clone().multiplyScalar(2).sub(base.clone().add(e).multiplyScalar(0.5)));
     return [j, j.clone().add(e.clone().sub(j).setLength(l2))]; };
+  const JB = { L: {}, R: {} };   // 1.0.2: last solved joint points in body space (root.joints() → world)
   root.pose = (p) => {
     p = typeof p === 'string' ? POSES3[p] : p;
     // follow-through: hair lags the head and the body stretches a little when it rises or drops fast (poses from posesAt3 carry _prev)
@@ -623,6 +624,7 @@ export function character(outfit = {}, opts = {}) {
       else if (Array.isArray(lg)) { const [d, dd] = fkLeg(lg, s); const bq = body.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(pelvis.getWorldQuaternion(new THREE.Quaternion())); d.applyQuaternion(bq); dd.applyQuaternion(bq); kn = hp.clone().addScaledVector(d, B.thigh); an = kn.clone().addScaledVector(dd, B.shin); ld2 = dd; }
       else { const T = new THREE.Vector3(...lg.to); kn = ik(hp, T, B.thigh, B.shin, lg.pole ? new THREE.Vector3(...lg.pole) : hp.clone().add(new THREE.Vector3(s * 0.05, 0, 1))); an = kn.clone().add(T.clone().sub(kn).setLength(B.shin)); ld2 = an.clone().sub(kn).normalize(); }
       place(L['th' + side], hp, kn, L['th' + side].r); place(L['sh' + side], kn, an, L['sh' + side].r);
+      JB[side] = { sh: sh.clone(), el: el.clone(), wr: wr.clone(), hp: hp.clone(), kn: kn.clone(), an: an.clone() };
       const yaw = (p.hips?.[1] || 0) + (Array.isArray(lg) ? s * (lg[3] || 0) : 0) + s * 6;
       setFoot(feet[side], an, ld2, Array.isArray(lg) ? (p.flatFeet ?? 0.55) : 1, new THREE.Vector3(Math.sin(yaw * D2R), 0, Math.cos(yaw * D2R)));
     }
@@ -663,6 +665,9 @@ export function character(outfit = {}, opts = {}) {
   root.place = (x = 0, y = 0, z = 0, yaw = 0) => { root.position.set(x, y, z); root.rotation.y = yaw; return root; };
   root.faceTo = (x, z) => { root.rotation.y = Math.atan2(x - root.position.x, z - root.position.z); return root; };
   root.headWorld = () => head.getWorldPosition(new THREE.Vector3());
+  root.joints = () => { body.updateWorldMatrix(true, false); const w = (v) => body.localToWorld(v.clone()), side = (s) => { const o = {}; for (const k in JB[s]) o[k] = w(JB[s][k]); return o; };
+    const sx = root.scale?.y || 1; return { L: side('L'), R: side('R'), pelvis: pelvis.getWorldPosition(new THREE.Vector3()), neck: toW(chest, 0.47), chest: toW(chest, 0.25), head: head.getWorldPosition(new THREE.Vector3()), k: sx * scale, floor: root.position.y, moving: (root.userData.mo?.v || 0) > 0.2 }; };
+  const toW = (frame, y) => frame.localToWorld(new THREE.Vector3(0, y, 0));
   // 1.0.1: put something on the head (T.W.gradCap(), a crown, a party hat): sits on top, tilted back a little; o.pos / o.rot override
   root.wear = (obj, o = {}) => { head.add(obj); obj.position.set(...(o.pos || [0, BODY.headR * 1.12, -0.03])); obj.rotation.set(...(o.rot || [-0.18, 0, 0])); return obj; };
   root.handWorld = (side = 'L') => hands[side].g.getWorldPosition(new THREE.Vector3());

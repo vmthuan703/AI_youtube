@@ -7,6 +7,8 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { rng, shade, mix, lerp, noise } from './core.js';
 import { mat, box, rbox, cyl, cone, sphere, plane, group, glow, glowMat, canvasTex, cached, textTex, lightCone, basic, color } from './kit3d.js';
+import { car } from './world3d.js';
+import { schoolBus } from './school3d.js';
 
 const R2 = Math.PI / 2;
 const put = (o, x, y, z, ry = 0, s = 1) => { o.position.set(x, y, z); o.rotation.y = ry; if (s !== 1) o.scale.setScalar(s); return o; };
@@ -166,12 +168,7 @@ export function mapleStreet(st, o = {}) {
     const t = winter ? maple({ bare: true, snow: true, h: 7 + (Math.abs(k) % 3), seed: Math.abs(k) + 1 }) : maple({ colors: cols, h: 7.5 + (Math.abs(k) % 3) * 0.8, r: 3.1 + (Math.abs(k) % 4) * 0.25, seed: Math.abs(k) + 1 });
     put(t, x + ((Math.abs(k) % 5) - 2) * 0.5, 0, z + ((Math.abs(k) % 3) - 1) * 0.3, (Math.abs(k) % 7)); add(t); trees.push(t); }
   for (let i = 0; i < 9; i++) { const x = -Lx / 2 + 10 + i * 17, t = (i % 3 === 1 || winter) ? pine({ h: 8 + (i % 3) * 2, snow: winter, seed: i + 2 }) : maple({ colors: leafCols[(i + 1) % leafCols.length], h: 10 + (i % 3), r: 4.2, seed: 40 + i, clumps: 40 }); put(t, x, 0, -19 - (i % 3) * 3); add(t); }
-  // far layers: a tree line, hills, a water tower
-  for (let i = 0; i < 46; i++) { const x = -150 + i * 6.8 + r() * 3, z = -42 - r() * 16, big = 9 + r() * 7, cols = leafCols[(i * 3) % leafCols.length];
-    const t = winter ? pine({ h: big, snow: true, seed: i + 60, color: '#2a4a48' }) : (i % 4 === 0 ? pine({ h: big * 1.1, seed: i + 60 }) : maple({ colors: cols, h: big, r: big * 0.42, seed: 80 + i, clumps: 14 })); put(t, x, 0, z); add(t); }
-  const hillC = winter ? ['#cfd6f0', '#b8c2e6', '#a0acd8'] : fall ? ['#8a7a4a', '#9a6a44', '#7a7a6a'] : ['#5a8a4a', '#4a7a4a', '#5a7a6a'];
-  for (let i = 0; i < 9; i++) { const hsp = sphere(1, mat(hillC[i % 3], { rough: 1 }), -220 + i * 55 + r() * 20, -6, -110 - (i % 3) * 45, 24, 12); hsp.scale.set(60 + r() * 30, 22 + r() * 16, 40); hsp.castShadow = false; add(hsp); }
-  const wt = waterTower({ text: o.town || 'MAPLE FALLS' }); put(wt, o.towerX ?? 34, 0, -64, 0.3); add(wt);
+  backdrop(st, { season, town: o.town, towerX: o.towerX, seed: o.seed });
   // power poles and wires along the far verge
   const pp = []; for (let x = -Lx / 2; x <= Lx / 2; x += 24) { const p = powerPole({}); put(p, x, 0, 14.6); add(p); pp.push([x, 8.4, 14.6]); } wires(st, pp, 0.8);
   // street furniture
@@ -181,4 +178,110 @@ export function mapleStreet(st, o = {}) {
   const hyd = group(cyl(0.13, 0.15, 0.6, mat('#c8302a', { rough: 0.45, clearcoat: 0.5 }), 0, 0.3, 0), sphere(0.13, mat('#c8302a', { rough: 0.45 }), 0, 0.62, 0), cyl(0.05, 0.05, 0.42, mat('#c8302a'), 0, 0.42, 0)); hyd.children[2].rotation.z = R2; put(hyd, 5.4, 0.16, 0.55); hyd.traverse(q => { if (q.isMesh) q.castShadow = true; }); add(hyd);
   const sign = stopSign(); put(sign, -14, 0.16, 0.6, R2); add(sign);
   return { houses, trees, lamps, xmasRuns, season, leafCols };
+}
+
+// ---------------------------------------------------------------- far layers for any outdoor set
+// backdrop(st, { season, z (how far back the tree line starts, default -42), town, towerX, tower: false, side: 1 | -1 }) — a tree
+// line, rolling hills and a water tower that fade into the haze. Old outdoor sets can call it to get depth behind them.
+const LEAVES = { fall: [['#a8381a', '#e07a24', '#f4b83a'], ['#8a2a1c', '#c8442a', '#ee8a3a'], ['#c88a1c', '#f0c23a', '#fbe07a'], ['#5a7a2a', '#a8a02a', '#e8c040']], summer: [['#2f6a34', '#4f9a44', '#8ac85a'], ['#2a5a3a', '#3f8a48', '#7ab85a']] };
+export function backdrop(st, o = {}) {
+  const season = o.season || 'fall', winter = season === 'winter', fall = season === 'fall', r = rng((o.seed || 21) + 5), z0 = o.z ?? -42, sd = o.side ?? 1, cols = LEAVES[fall ? 'fall' : 'summer'], add = (x) => { st.scene.add(x); return x; };
+  for (let i = 0; i < 46; i++) { const x = -150 + i * 6.8 + r() * 3, z = (z0 - r() * 16) * sd, big = 9 + r() * 7, c = cols[(i * 3) % cols.length];
+    const t = winter ? pine({ h: big, snow: true, seed: i + 60, color: '#2a4a48' }) : (i % 4 === 0 ? pine({ h: big * 1.1, seed: i + 60 }) : maple({ colors: c, h: big, r: big * 0.42, seed: 80 + i, clumps: 14 })); put(t, x, 0, z); add(t); }
+  const hillC = winter ? ['#cfd6f0', '#b8c2e6', '#a0acd8'] : fall ? ['#8a7a4a', '#9a6a44', '#7a7a6a'] : ['#5a8a4a', '#4a7a4a', '#5a7a6a'];
+  for (let i = 0; i < 9; i++) { const h = sphere(1, mat(hillC[i % 3], { rough: 1 }), -220 + i * 55 + r() * 20, -6, (z0 - 68 - (i % 3) * 45) * sd, 24, 12); h.scale.set(60 + r() * 30, 22 + r() * 16, 40); h.castShadow = false; add(h); }
+  if (o.tower !== false) { const wt = waterTower({ text: o.town || 'MAPLE FALLS' }); put(wt, o.towerX ?? 34, 0, (z0 - 22) * sd, 0.3); add(wt); }
+}
+
+// ---------------------------------------------------------------- Main Street: the small-town American high street
+const brick = (c) => cached('brick' + c, () => canvasTex(256, 256, (g, w, h) => { g.fillStyle = shade(c, -0.25); g.fillRect(0, 0, w, h); const r = rng(5); for (let j = 0; j < 16; j++) for (let i = -1; i < 8; i++) { g.fillStyle = shade(c, (r() - 0.5) * 0.22); g.fillRect(i * 32 + (j % 2) * 16 + 1, j * 16 + 1, 30, 14); } }, [1, 1]));
+const awnTex = (c) => cached('awn' + c, () => canvasTex(128, 32, (g, w, h) => { for (let i = 0; i < 8; i++) { g.fillStyle = i % 2 ? '#f4f0e6' : c; g.fillRect(i * 16, 0, 16, h); } }, [1, 1]));
+// storefront({ w, floors, color, sign, signColor, signBg, awning, neon, lit, kind: 'shop' | 'diner' | 'cinema' }) — faces +z, front wall at z = 0
+export function storefront(o = {}) {
+  const w = o.w || 8, floors = o.floors || 2, h = 4 + (floors - 1) * 3.3, d = o.d || 10, c = o.color || '#9a4a3a', lit = o.lit ?? 0.5, r = rng(o.seed || 1), g = group();
+  const wall = mat('#ffffff', { rough: 0.95 }); tex(wall, brick(c), w / 2.2, h / 2.2); g.add(box(w, h, d, wall, 0, h / 2, -d / 2));
+  const trim = mat(o.trim || '#e8e2d4', { rough: 0.8 }), dark = mat('#22242c', { rough: 0.6 });
+  g.add(box(w + 0.3, 0.45, 0.5, trim, 0, h + 0.1, -0.1), box(w + 0.1, 0.2, 0.3, trim, 0, h - 0.5, 0.02));   // cornice
+  // ground floor: bulkhead, glass, door, sign band
+  g.add(box(w - 0.4, 0.55, 0.12, dark, 0, 0.44, 0.04));
+  const on = lit > 0, glassM = on ? new THREE.MeshBasicMaterial({ map: shopTex(o.seed || 1, o.kind), color: new THREE.Color(1.5 * lit + 0.5, 1.35 * lit + 0.45, 1.1 * lit + 0.4), toneMapped: false }) : mat('#ffffff', { map: winTex(false, 1), rough: 0.1, metal: 0.5 });
+  const gw = (w - 2.2) / 2; for (const sx of [-1, 1]) { const p = new THREE.Mesh(new THREE.PlaneGeometry(gw, 2.2), glassM); p.position.set(sx * (0.9 + gw / 2), 1.82, 0.06); g.add(p); g.add(box(0.1, 2.3, 0.14, trim, sx * (0.85), 1.85, 0.06), box(0.1, 2.3, 0.14, trim, sx * (w / 2 - 0.2), 1.85, 0.06)); }
+  g.add(rbox(1.3, 2.35, 0.08, 0.03, mat(o.door || '#2a3a34', { rough: 0.5, clearcoat: 0.4 }), 0, 1.33, -0.05), box(w - 0.3, 0.12, 0.16, trim, 0, 3.0, 0.06));
+  const sb = new THREE.Mesh(new THREE.PlaneGeometry(w - 0.6, 0.8), new THREE.MeshStandardMaterial({ map: textTex(o.sign || 'SHOP', { w: 1024, h: Math.round(1024 * 0.8 / (w - 0.6)), size: 96, color: o.signColor || '#f6e8c8', bg: o.signBg || '#2a3a34', font: 'Playfair Display', weight: 900 }), roughness: 0.6 })); sb.position.set(0, 3.52, 0.07); g.add(sb);
+  if (o.awning !== false) { const am = mat('#ffffff', { rough: 0.85, side: THREE.DoubleSide }); tex(am, awnTex(o.awning || '#b8342a'), w / 1.6, 1); const aw = box(w - 0.5, 0.05, 1.5, am, 0, 2.86, 0.72); aw.rotation.x = 0.32; g.add(aw, box(w - 0.5, 0.22, 0.04, am, 0, 2.52, 1.42)); }
+  if (o.neon) { const nt = new THREE.Mesh(new THREE.PlaneGeometry(o.neonW || 3.2, 1.0), new THREE.MeshBasicMaterial({ map: textTex(o.neon, { w: 512, h: 160, size: 120, color: '#ffffff', font: 'Fredoka', weight: 700, glow: 18 }), color: new THREE.Color(o.neonColor || '#ff3a6a').multiplyScalar(2.6), transparent: true, toneMapped: false, depthWrite: false }));
+    const board = box((o.neonW || 3.2) + 0.3, 1.2, 0.14, dark, 0, h + 0.95, 0.1); nt.position.set(0, h + 0.95, 0.19); g.add(board, nt, box(0.1, 0.5, 0.1, dark, -1, h + 0.3, 0.1), box(0.1, 0.5, 0.1, dark, 1, h + 0.3, 0.1)); const gl = glow(o.neonColor || '#ff3a6a', 5, 0.28); gl.position.set(0, h + 0.95, 0.5); g.add(gl); }
+  if (o.kind === 'cinema') { const mq = box(w * 0.8, 1.3, 2.0, mat('#f4ecd8', { rough: 0.6 }), 0, 4.1, 1.0); g.add(mq); const tt = new THREE.Mesh(new THREE.PlaneGeometry(w * 0.74, 1.0), new THREE.MeshBasicMaterial({ map: textTex(o.marquee || 'NOW SHOWING', { w: 1024, h: 220, size: 120, color: '#22242c', bg: '#fff6dc', font: 'Nunito', weight: 900 }), color: new THREE.Color(1.5, 1.4, 1.2), toneMapped: false })); tt.position.set(0, 4.1, 2.01); g.add(tt);
+    for (let i = 0; i < 14; i++) { const b = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 6), glowMat('#ffd890', 3)); b.position.set(-w * 0.38 + (i / 13) * w * 0.76, 3.42, 2.02); g.add(b); } const gl = glow('#ffd890', 7, 0.3); gl.position.set(0, 3.6, 2.6); g.add(gl); }
+  // upper floors
+  for (let f = 1; f < floors; f++) { const n = Math.max(2, Math.round(w / 2.6)); for (let i = 0; i < n; i++) { const x = -w / 2 + (i + 0.5) * (w / n), y = 4 + (f - 1) * 3.3 + 1.6, lon = r() < lit * 0.6;
+      const p = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 1.7), lon ? new THREE.MeshBasicMaterial({ map: winTex(true, 1 + ((r() * 5) | 0)), color: new THREE.Color(1.5, 1.3, 1.1), toneMapped: false }) : mat('#ffffff', { map: winTex(false, 1), rough: 0.12, metal: 0.4 })); p.position.set(x, y, 0.03); g.add(p, box(1.3, 0.16, 0.14, trim, x, y + 0.95, 0.05), box(1.3, 0.1, 0.2, trim, x, y - 0.9, 0.07)); } }
+  g.traverse(m => { if (m.isMesh && !m.material.isMeshBasicMaterial) { m.castShadow = true; m.receiveShadow = true; } }); g.size = [w, h, d]; return g;
+}
+const shopTex = (seed, kind) => cached('shop' + seed + kind, () => canvasTex(256, 160, (g, w, h) => { const r = rng(seed + 3); const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#ffe6b0'); gr.addColorStop(1, '#f0a860'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  g.fillStyle = 'rgba(90,40,20,.5)'; g.fillRect(0, h * 0.72, w, h); for (let i = 0; i < 7; i++) { g.fillStyle = ['#c8442a', '#2a6a8a', '#e8c040', '#4a8a5a', '#8a4a8a'][(r() * 5) | 0]; const bw = 14 + r() * 22, bh = 18 + r() * 40; g.fillRect(10 + i * 34 + r() * 8, h * 0.72 - bh, bw, bh); }
+  g.fillStyle = 'rgba(60,30,20,.45)'; for (let i = 0; i < 3; i++) g.fillRect(0, 18 + i * 30, w, 3); }));
+
+// mainStreet(st, { season, night, wet, lit, town }) — road z = 1..11 (parking on both sides), sidewalks z = -2.6..1 and 11..14.6,
+// shop fronts at z = -2.6 (facing +z) and 14.6 (facing -z). Stand people on the near sidewalk at y = 0.16.
+export function mainStreet(st, o = {}) {
+  st.outdoor = true; const season = o.season || 'fall', winter = season === 'winter', night = !!o.night, lit = o.lit ?? (night ? 1 : 0.55), Lx = o.length || 120, r = rng(o.seed || 8), add = (...a) => { a.forEach(x => x && st.scene.add(x)); return a[0]; };
+  const rec = (m) => { m.receiveShadow = true; m.castShadow = false; return m; }, walkC = winter ? '#e4e6f2' : '#b4aca0';
+  const gnd = plane(Lx + 200, 260, mat(winter ? '#e8ecf8' : '#6a7a52', { rough: 1 })); gnd.rotation.x = -R2; gnd.position.set(0, -0.03, 0); add(rec(gnd));
+  const road = plane(Lx + 200, 10, tex(mat('#ffffff', { rough: o.wet ? 0.18 : 0.9, metal: o.wet ? 0.25 : 0 }), roadTex(o.wet ? '#22242c' : '#484850', winter), (Lx + 200) / 20, 1)); road.rotation.x = -R2; road.position.set(0, 0, 6); add(rec(road));
+  for (const z of [-0.8, 12.8]) add(rec(box(Lx + 200, 0.16, 3.6, tex(mat('#ffffff', { rough: o.wet ? 0.45 : 0.9 }), walkTex(walkC), (Lx + 200) / 1.8, 2), 0, 0.08, z)));
+  for (const z of [1.08, 10.92]) add(box(Lx + 200, 0.18, 0.16, mat('#c8c2b8', { rough: 0.85 }), 0, 0.09, z));
+  for (let i = -3; i <= 3; i++) add(rec(box(0.5, 0.012, 9.6, mat('#e8e6e0', { rough: 0.8 }), -9 + i * 0.95, 0.006, 6)));   // crosswalk
+  const shops = [['MILLER\'S HARDWARE', '#8a3a2e', '#2a3a34', '#2f5a48'], ['SWEET PEA BAKERY', '#b89a7a', '#7a2a3a', '#d88aa0', { neon: 'BAKERY', neonColor: '#ffb04a' }], ['MAPLE DINER', '#6a7a8a', '#22364a', '#c8342a', { neon: 'DINER', neonColor: '#ff3a5a', kind: 'diner' }], ['BOOKS & RECORDS', '#7a4a3a', '#2a2a4a', '#2a4a7a'],
+    ['RIALTO', '#8a6a4a', '#5a1a24', false, { kind: 'cinema', marquee: 'FRIDAY NIGHT', neon: 'RIALTO', neonColor: '#ffd04a', floors: 3 }], ['BARBER SHOP', '#9a4a3a', '#f4f0e6', '#2a4a8a', { signColor: '#a8242a' }], ['FIRST BANK', '#b8b0a0', '#3a3a40', false, { floors: 3 }], ['PIZZA', '#8a3a2e', '#2a4a34', '#2f7a48', { neon: 'PIZZA', neonColor: '#5aff8a' }],
+    ['ICE CREAM', '#c8a8a0', '#f4a8b8', '#f48aa8', { signColor: '#7a2a3a' }], ['FLOWERS', '#7a8a6a', '#3a5a3a', '#e8c040'], ['ARCADE', '#5a4a7a', '#2a1a4a', false, { neon: 'ARCADE', neonColor: '#7a5aff' }], ['PHARMACY', '#a8a094', '#2a5a4a', '#2a7a5a', { neon: 'Rx', neonColor: '#4aff9a', neonW: 1.4 }]];
+  const fronts = []; const row = (z, ry, off) => { let x = -Lx / 2, i = off; while (x < Lx / 2) { const sp = shops[i % shops.length], ex = sp[4] || {}, w = 7 + ((i * 5) % 4) + (ex.kind === 'cinema' ? 4 : 0);
+      const sf = storefront({ w, floors: ex.floors || 2 + ((i * 3) % 2), color: sp[1], sign: sp[0], signBg: sp[2], awning: sp[3], lit, seed: i + 1, ...ex }); put(sf, x + w / 2, 0.16, z, ry); add(sf); sf.cx = x + w / 2; sf.label = sp[0]; fronts.push(sf); x += w + 0.25; i++; } };
+  row(-2.6, 0, 0); row(14.6, Math.PI, 5);
+  const lamps = []; for (let x = -Lx / 2 + 6; x < Lx / 2; x += 18) for (const [z, ry] of [[0.55, 0], [11.45, Math.PI]]) { const l = lampUS({ on: night || o.lamps, h: 5.2, color: o.lampColor || '#ffc888' }); put(l, x + (ry ? 9 : 0), 0.16, z, ry); l.userData.dynamic = true; add(l); lamps.push(l);
+      const bn = box(0.03, 1.5, 0.6, mat(['#2a4a7a', '#a8242a'][((x / 18) | 0) & 1 ? 0 : 1], { rough: 0.7 }), 0, 4.0, -0.4); l.add(bn); }
+  const cols = LEAVES[season === 'summer' ? 'summer' : 'fall']; for (let x = -Lx / 2 + 14; x < Lx / 2; x += 18) for (const z of [0.3, 11.7]) { const k = Math.abs(Math.round(x * 3 + z)); const t = winter ? maple({ bare: true, snow: true, h: 5.5, seed: k + 1 }) : maple({ colors: cols[k % cols.length], h: 5.8, r: 1.9, clumps: 20, seed: k + 1 }); put(t, x + (z > 5 ? 9 : 0), 0.16, z); add(t);
+      add(rec(box(1.3, 0.2, 1.3, mat('#5a5048', { rough: 0.9 }), x + (z > 5 ? 9 : 0), 0.18, z))); }
+  const carC = ['#2a4a7a', '#a8242a', '#d8d4cc', '#2f5a48', '#e8b830', '#3a3a40', '#7a8a9a']; const cars = [];
+  for (let x = -Lx / 2 + 5; x < Lx / 2; x += 6.2) for (const [z, ry] of [[2.2, R2], [9.8, -R2]]) { if (r() < 0.42 || Math.abs(x + 9) < 4.5 || (z < 5 && Math.abs(x) < (o.clear ?? 4))) continue; const cr = car({ type: ['sedan', 'suv', 'sedan', 'van'][(r() * 4) | 0], color: carC[(r() * carC.length) | 0], lights: false }); put(cr, x, 0, z, ry); cr.userData.dynamic = true; add(cr); cars.push(cr); }
+  backdrop(st, { season, z: -30, town: o.town, towerX: o.towerX ?? -30, seed: 9 });
+  return { fronts, lamps, cars, season };
+}
+
+// ---------------------------------------------------------------- the American high school, seen from the street
+// highSchool(st, { name, season, night, lit, buses }) — same street as mapleStreet (sidewalk z = -1..1 at y 0.16, road z = 1..9);
+// the building stands at z = -26, steps and a columned entrance in the middle, a flagpole on the lawn, buses at the curb.
+export function highSchool(st, o = {}) {
+  st.outdoor = true; const season = o.season || 'fall', winter = season === 'winter', fall = season === 'fall', night = !!o.night, lit = o.lit ?? (night ? 0.7 : 0.25), r = rng(o.seed || 12), add = (...a) => { a.forEach(x => x && st.scene.add(x)); return a[0]; };
+  const rec = (m) => { m.receiveShadow = true; m.castShadow = false; return m; }, walkC = winter ? '#e4e6f2' : '#b8b2a8', grassC = winter ? '#eef0fa' : fall ? '#7f9a48' : '#5fa04a';
+  const lawn = plane(360, 320, tex(mat('#ffffff', { rough: 0.95 }), lawnTex(grassC, fall ? ['#c8642a', '#e0a030', '#a8381a', '#e8c850'] : null), 60, 54)); lawn.rotation.x = -R2; lawn.position.set(0, -0.02, -20); add(rec(lawn));
+  const road = plane(360, 8, tex(mat('#ffffff', { rough: 0.9 }), roadTex('#4a4a52', winter), 22, 1)); road.rotation.x = -R2; road.position.set(0, 0, 5); add(rec(road));
+  add(rec(box(360, 0.16, 2, tex(mat('#ffffff', { rough: 0.9 }), walkTex(walkC), 220, 1), 0, 0.08, 0)), box(360, 0.18, 0.16, mat('#c8c2b8', { rough: 0.85 }), 0, 0.09, 1.08));
+  add(rec(box(5, 0.06, 15, tex(mat('#ffffff', { rough: 0.9 }), walkTex(walkC), 3, 9), 0, 0.03, -8.4)));   // the walk up to the steps
+  const W = 64, H = 8.4, D = 16, Z = -26, bc = o.color || '#9a4a38', wall = tex(mat('#ffffff', { rough: 0.95 }), brick(bc), W / 2.4, H / 2.4), trim = mat('#e8e2d4', { rough: 0.8 }), g = group();
+  g.add(box(W, H, D, wall, 0, H / 2, 0), box(W + 0.4, 0.5, D + 0.4, trim, 0, H + 0.2, 0), box(W + 0.2, 0.3, 0.3, trim, 0, 0.5, D / 2 + 0.05), box(W + 0.1, 0.22, 0.2, trim, 0, 4.25, D / 2 + 0.04));
+  for (let f = 0; f < 2; f++) for (let i = 0; i < 20; i++) { const x = -W / 2 + 1.9 + i * 3.17; if (Math.abs(x) < 6.6) continue; const y = 2.4 + f * 3.9, on = r() < lit;
+    const p = new THREE.Mesh(new THREE.PlaneGeometry(1.9, 2.2), on ? new THREE.MeshBasicMaterial({ map: winTex(true, 1 + ((r() * 5) | 0)), color: new THREE.Color(1.5, 1.35, 1.15), toneMapped: false }) : mat('#ffffff', { map: winTex(false, 1), rough: 0.12, metal: 0.4 })); p.position.set(x, y, D / 2 + 0.03); g.add(p, box(2.2, 0.16, 0.12, trim, x, y + 1.18, D / 2 + 0.05), box(2.3, 0.12, 0.2, trim, x, y - 1.16, D / 2 + 0.07)); }
+  // entrance: steps, four columns, a pediment with the name
+  const pw = 12.6, pz = D / 2; for (let i = 0; i < 6; i++) g.add(box(pw + 1.2 - i * 0.1, 0.2, 0.42, mat('#c8c0b4', { rough: 0.9 }), 0, 0.1 + i * 0.2, pz + 3.6 - i * 0.42));
+  g.add(box(pw, 0.24, 3.0, mat('#c0b8ac', { rough: 0.9 }), 0, 1.18, pz + 1.5)); for (const x of [-5.2, -1.8, 1.8, 5.2]) { g.add(cyl(0.36, 0.42, 5.6, trim, x, 4.1, pz + 2.5, 16), box(1.0, 0.24, 1.0, trim, x, 1.42, pz + 2.5), box(1.0, 0.24, 1.0, trim, x, 6.9, pz + 2.5)); }
+  g.add(box(pw + 0.6, 0.9, 3.4, trim, 0, 7.45, pz + 1.6)); const ped = gable(3.4, pw + 1.0, 2.3, trim); ped.rotation.y = R2; ped.position.set(0, 7.9, pz + 1.6); g.add(ped);
+  const nm = new THREE.Mesh(new THREE.PlaneGeometry(pw - 0.6, 0.7), new THREE.MeshStandardMaterial({ map: textTex(o.name || 'MAPLE FALLS HIGH SCHOOL', { w: 1536, h: 96, size: 68, color: '#3a3a44', font: 'Playfair Display', weight: 900 }), transparent: true, roughness: 0.7 })); nm.position.set(0, 7.45, pz + 3.32); g.add(nm);
+  for (const x of [-1.7, 1.7]) g.add(rbox(1.5, 3.0, 0.1, 0.03, mat('#2a3a5a', { rough: 0.5, clearcoat: 0.4 }), x * 0.5, 2.8, pz + 0.06)); g.add(box(3.6, 0.2, 0.2, trim, 0, 4.4, pz + 0.06));
+  const dg = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 0.9), new THREE.MeshBasicMaterial({ map: winTex(true, 2), color: new THREE.Color(1.1 + lit, 1.0 + lit * 0.8, 0.9 + lit * 0.5), toneMapped: false })); dg.position.set(0, 4.95, pz + 0.04); g.add(dg);
+  if (winter) g.add(box(W + 0.6, 0.25, D + 0.6, mat('#f4f6ff', { rough: 0.85 }), 0, H + 0.55, 0));
+  g.traverse(m => { if (m.isMesh && !m.material.isMeshBasicMaterial) { m.castShadow = true; m.receiveShadow = true; } }); put(g, 0, 0, Z); add(g);
+  // flagpole
+  const fp = group(cyl(0.06, 0.09, 11, mat('#d8d8dc', { metal: 0.7, rough: 0.35 }), 0, 5.5, 0, 10), sphere(0.14, mat('#d8b860', { metal: 0.9, rough: 0.3 }), 0, 11.05, 0)); const fl = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 1.4, 14, 1), new THREE.MeshStandardMaterial({ map: flagTex(), side: THREE.DoubleSide, roughness: 0.8 }));
+  fl.position.set(1.34, 10.2, 0); fl.castShadow = true; fp.add(fl); fp.userData.dynamic = true; put(fp, 9, 0, -7); add(fp); const base = fl.geometry.attributes.position.array.slice();
+  st.onTick((t) => { const p = fl.geometry.attributes.position; for (let i = 0; i < p.count; i++) { const x = base[i * 3] + 1.3; p.setZ(i, Math.sin(x * 3.2 - t * 5) * 0.12 * (x / 2.6)); } p.needsUpdate = true; fl.geometry.computeVertexNormals(); });
+  // trees, hedges, buses, bike rack, sign
+  const cols = LEAVES[fall ? 'fall' : 'summer']; const trees = [];
+  for (const [x, z, hh] of [[-22, -9, 9], [-11, -5, 8], [20, -10, 9.5], [30, -5, 8.5], [-33, -5, 9], [-44, -12, 10], [44, -12, 10], [-17, 12.5, 8], [5, 13, 9], [27, 12.5, 8.5], [-38, 13, 9], [48, 13, 9]]) { const k = Math.abs(Math.round(x * 5 + z)); const t = winter ? maple({ bare: true, snow: true, h: hh, seed: k + 2 }) : maple({ colors: cols[k % cols.length], h: hh, r: hh * 0.4, seed: k + 2 }); put(t, x, 0, z, k % 6); add(t); trees.push(t); }
+  for (let i = 0; i < 10; i++) { const x = -29 + i * 5.2; if (Math.abs(x) < 8) continue; const hd = rbox(3.6, 0.8, 0.9, 0.3, mat(winter ? '#e8ecf8' : '#3f6a3a', { rough: 0.95 }), x, 0.5, Z + D / 2 + 1.2); hd.castShadow = true; add(hd); }
+  const buses = []; for (let i = 0; i < (o.buses ?? 2); i++) { const b = schoolBus({ door: 0 }); put(b, -17 - i * 11.5, 0, 2.5); b.userData.dynamic = true; add(b); buses.push(b); }
+  const sg = group(box(4.4, 1.3, 0.3, tex(mat('#ffffff', { rough: 0.95 }), brick(bc), 2, 0.6), 0, 0.65, 0), box(4.6, 0.14, 0.4, trim, 0, 1.36, 0)); const st2 = new THREE.Mesh(new THREE.PlaneGeometry(4.0, 0.9), new THREE.MeshStandardMaterial({ map: textTex(o.sign || 'HOME OF THE EAGLES', { w: 1024, h: 230, size: 84, color: '#f4ecd8', font: 'Nunito', weight: 900 }), transparent: true, roughness: 0.6 })); st2.position.set(0, 0.68, 0.16); sg.add(st2); sg.traverse(m => { if (m.isMesh) m.castShadow = true; }); put(sg, -8, 0, -2.6); add(sg);
+  const pp = []; for (let x = -72; x <= 72; x += 24) { const p = powerPole({}); put(p, x, 0, 10.4); add(p); pp.push([x, 8.4, 10.4]); } wires(st, pp, 0.8);
+  backdrop(st, { season, z: -50, town: o.town, towerX: o.towerX ?? 46, seed: 14 });
+  return { building: g, buses, trees, door: [0, 1.3, Z + D / 2 + 3.4], flag: fp };
 }

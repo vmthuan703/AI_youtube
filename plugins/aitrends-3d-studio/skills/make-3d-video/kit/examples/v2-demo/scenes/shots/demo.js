@@ -9,8 +9,6 @@ registerShot('golden', {
     const hero = st.add(T.character(HERO).place(0, Y, 0.35, 0.25)), mia = st.add(T.character(MIA));
     const sign = st.add(T.usa.busStopSign()); sign.position.set(0.95, Y, -0.55);
     const bus = st.add(T.W.schoolBus({ door: 0 })); bus.userData.dynamic = true;
-    { const dk = T.mat('#16181e', { rough: 0.25, metal: 0.5 }), ws = T.box(0.04, 0.8, 2.2, dk, 4.52, 2.25, 0), gr = T.box(0.04, 0.55, 1.7, T.mat('#1e1a22'), 6.02, 1.15, 0), cap = T.box(0.05, 0.3, 1.6, T.mat('#1e1a22'), 4.53, 2.76, 0); bus.add(ws, gr, cap);
-      for (const z of [-0.95, 0.95]) { const hl = new T.THREE.Mesh(new T.THREE.SphereGeometry(0.13, 12, 8), T.glowMat('#fff2c8', 3)); hl.position.set(6.03, 1.2, z); bus.add(hl); const am = new T.THREE.Mesh(new T.THREE.SphereGeometry(0.09, 10, 8), T.glowMat('#ffa030', 2.5)); am.position.set(4.55, 2.78, z * 1.05); bus.add(am); } }
     T.wx.leaves(st, { area: [-16, 12, 0, 9, -5, 8], n: 320, colors: ['#c8442a', '#e8862a', '#f4c040', '#a8381a'], wind: [1.3, 0, 0.5] });
     T.wx.motes(st, { area: [-8, 8, 0.3, 5, -3, 6], n: 260 });
     st.fitShadow([-4, 0, 0], 26); return { st, ms, hero, mia, bus }; },

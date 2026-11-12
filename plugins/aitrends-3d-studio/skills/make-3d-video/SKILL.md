@@ -67,7 +67,7 @@ script after the voiceover is the most expensive fix, so raise them now. A MISS 
 and any logic problem must be shown even if the user is away. The channel hero is a **boy** and the best friend is a **girl**
 (`channel/cast.js`).
 Say which results matter most and ask whether the user wants to edit the script before the voice is generated. Never change
-the script yourself. If they say to continue as is, continue. When the user asks you to **write** a script, follow the rules in
+the script yourself. If they say to continue as is, continue. When the user asks you to **write** a script, follow the rules in (1.0.7: the voiceover stops while the check has LOOK/MISS items; after the user says to continue, re-run the voiceover with `--accept-script-check`.)
 `references/story-breakdown.md` → "Writing a script" from the first draft.
 
 ## Stage 1b: Set match (1.0.5), once the script is final

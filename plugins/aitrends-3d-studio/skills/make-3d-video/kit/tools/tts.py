@@ -187,6 +187,7 @@ def main(argv=None):
     p.add_argument("--lang", default="en-us")
     p.add_argument("--preview", type=int, default=0, help="chỉ đọc N đoạn đầu để nghe thử")
     p.add_argument("--no-mp3", action="store_true")
+    p.add_argument("--accept-script-check", action="store_true", help="1.0.7: go ahead after the user has read the script check")
     a = p.parse_args(argv)
 
     if a.download:
@@ -208,6 +209,9 @@ def main(argv=None):
     if a.list_speakers:
         print(json.dumps({k: {"lines": v[0], "chars": v[1]} for k, v in speakers.items()}, ensure_ascii=False, indent=1))
         return
+    if not a.preview:
+        from script_check import gate
+        gate(a.script, a.out_dir, a.accept_script_check)
 
     vmap = {"NARRATOR": a.narrator_voice, **parse_voice_map(a.voices, a.voice_map)}
     missing = [s for s in speakers if s not in vmap]

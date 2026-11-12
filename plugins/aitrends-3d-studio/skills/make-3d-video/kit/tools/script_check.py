@@ -198,6 +198,31 @@ The Memory 100x v2 script scored 6.5/10 on logic because of these, so read the w
 """
 
 
+def gate(script, out_dir, accepted=False, wpm=165):
+    """1.0.7: the voiceover stops while the script check has LOOK or MISS items, until the user has read them and
+    re-runs with --accept-script-check (the script itself is never changed). Writes out_dir/script_check.md."""
+    if accepted:
+        return
+    R = check(parse(script), "", wpm)
+    items = [r for r in R if r["state"] != "PASS"]
+    if not items:
+        print("script check: every item PASS")
+        return
+    rows = ["| Check | Result | Found | Worth considering |", "|---|---|---|---|"]
+    for r in R:
+        rows.append(f"| {r['check']} | {r['state']} | {r['found'].replace('|', ' ')} | {r['hint']} |")
+    md = "# Script check (nothing was changed)\n\n" + "\n".join(rows) + "\n\n" + LOGIC_REVIEW
+    os.makedirs(out_dir or ".", exist_ok=True)
+    open(os.path.join(out_dir or ".", "script_check.md"), "w", encoding="utf-8").write(md)
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    print(f"script check: {len(items)} item(s) to look at (report: {os.path.join(out_dir or '.', 'script_check.md')})")
+    for r in items:
+        print(f"  {r['state']:4} {r['check']}: {r['found'][:100]}")
+    print("Show these to the user. Once they say to continue as is, re-run with --accept-script-check.")
+    sys.exit(5)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--script", required=True)

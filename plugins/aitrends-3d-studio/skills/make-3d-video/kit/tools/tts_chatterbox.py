@@ -107,7 +107,7 @@ def make_ref(voice: str, ref_dir: str) -> str:
     open(txt, "w", encoding="utf-8").write(REF_TEXT)
     py = os.environ.get("KOKORO_PYTHON", "py -3.12").split()
     subprocess.run([*py, os.path.join(HERE, "tts.py"), "--script", txt, "--narrator-voice", voice, "--out-dir", tmp,
-                    "--no-mp3", "--sentence-pause", "0.2"], check=True, stdout=subprocess.DEVNULL, env={**os.environ, "PYTHONIOENCODING": "utf-8"})
+                    "--no-mp3", "--sentence-pause", "0.2", "--accept-script-check"], check=True, stdout=subprocess.DEVNULL, env={**os.environ, "PYTHONIOENCODING": "utf-8"})
     shutil.move(os.path.join(tmp, "voiceover.wav"), wav)
     shutil.rmtree(tmp, ignore_errors=True)
     return wav
@@ -183,8 +183,12 @@ def main(argv=None):
     p.add_argument("--preview", type=int, default=0, help="only the first N script paragraphs")
     p.add_argument("--lines", help="only these paragraph indexes, e.g. 0,5,12 (for comparisons)")
     p.add_argument("--no-mp3", action="store_true")
+    p.add_argument("--accept-script-check", action="store_true", help="1.0.7: go ahead after the user has read the script check")
     a = p.parse_args(argv)
 
+    if not a.preview and not a.lines:
+        from script_check import gate
+        gate(a.script, a.out_dir, a.accept_script_check)
     lines = parse_script(open(a.script, encoding="utf-8").read())
     speakers = {s for s, _, _ in lines}
     vmap = {"NARRATOR": a.narrator_voice}

@@ -7,6 +7,10 @@ khung hình 2:1, sơ đồ giải thích hoạt hình.
 Mọi khung hình đều dựng bằng code (Three.js) và render từng khung một. Không dùng AI tạo ảnh/video, nên nhân vật
 giữ nguyên dáng suốt video và chữ luôn nét. Giọng đọc mặc định dùng Chatterbox (MIT, chạy máy cá nhân), dự phòng Kokoro-82M (Apache-2.0).
 
+## Mới trong 1.0.7 — cổng kiểm tra kịch bản
+- **Giọng đọc dừng khi kịch bản còn mục LOOK/MISS:** `tools/script_check.py` ghi `build_voice/<slug>/script_check.md` và thoát mã 5 trước khi đọc. Sau khi bạn xem và chọn tiếp tục, chạy lại với `--accept-script-check`. Áp dụng cho `tts_chatterbox.py` và `tts.py`; bản nghe thử (`--preview`, `--lines`) và `--list-speakers` không bị chặn.
+- Kịch bản không bị sửa.
+
 ## Mới trong 1.0.6 — tự kiểm tra trước khi render và ghép file
 - **Kiểm tra `story/shots.json` trước bản render cuối:** trùng id, cảnh chồng nhau, thời lượng không khớp cảnh cuối, hoặc thiếu file cảnh thì render dừng (`--force` để bỏ qua).
 - **Trạng thái render:** sau bản cuối ghi `build/render_status.json`; có lỗi cảnh thì thoát mã 1 và `audio/mix.py` không ghép file.

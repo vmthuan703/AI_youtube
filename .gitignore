@@ -24,3 +24,7 @@ dist/
 
 # Cài đặt Claude Code cá nhân
 .claude/settings.local.json
+
+# 3D studio lesson book (generated per studio by tools/retro.mjs)
+plugins/aitrends-3d-studio/skills/make-3d-video/kit/channel/lessons.json
+plugins/aitrends-3d-studio/skills/make-3d-video/kit/channel/LESSONS.md

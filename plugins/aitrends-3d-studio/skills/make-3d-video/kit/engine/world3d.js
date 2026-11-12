@@ -485,5 +485,6 @@ export * from './places10.js';
 export * from './weather10.js';
 export * from './places10b.js';  // 1.0: supermarket, hospital hallway, rooftop, train station   // 1.0: lightning, cloud shadows, headlights, flicker, snow cover, puddles, leaves   // 1.0: stairwell, classroom, city bus stop, shop street, residential, street food, café, passers-by
 export * from './school10.js';   // 1.0.1: American high school sets + props (library, chem lab, auditorium, football field, ...)
-export * from './season10.js';   // 1.0.1: school weather, seasons, time of day (fallDay, snowDay, breath, windowRain, powerCut, capToss, ...)
+export * from './season10.js';
+export * from './fall11.js';   // 1.0.3: American November (thanksgivingDinner, pumpkinStreet, leafGust, pumpkin, turkey, pie...)   // 1.0.1: school weather, seasons, time of day (fallDay, snowDay, breath, windowRain, powerCut, capToss, ...)
 export { swingDoor } from './act10.js';   // 1.0.2: a door on a real hinge (T.act.door opens it by the handle)

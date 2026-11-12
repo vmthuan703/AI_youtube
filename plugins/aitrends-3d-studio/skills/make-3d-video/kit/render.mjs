@@ -6,6 +6,7 @@
 //   node render.mjs --project P --styles cinematic,ink,toon,golden,neon,noir --at 3.5,12,40   style comparison grid
 //   node render.mjs --project P --bench                               time this machine (GPU or CPU) and estimate the full render
 // --legacy renders with the 0.2.x look (before/after comparisons).
+//   node render.mjs --project P --thumbs                              1.0.3 a 1280x720 JPG per shot + 2x2 grid (thumbnail projects)
 //   node render.mjs --project P --gif [id,id]                         1.0.2 a small looping GIF per shot (build/gifs) to check motion
 //   node render.mjs --project P --qc [--every 0.5]                   1.0.2 motion QC: clipping, hidden faces, camera in walls, sliding feet, snapping joints
 // Options: --workers N  --scale K  --fps N  --style ID  --quality draft|standard|high|max  --debug  --format png|jpeg  --crf N  --preset X
@@ -73,7 +74,7 @@ const QUALITY = {
 const QN = QUALITY[args.quality] ? args.quality : QUALITY[CFG.quality] ? CFG.quality : 'high', Q = QUALITY[QN];
 if (args.gif && !args.scale) args.scale = '0.35';
 const PREVIEW = !!(args.from || args.to || (args.scale && +args.scale < 1));
-const SS = PREVIEW || args.sheet || args.stills || args.styles || args.gif ? 1 : +(args.ss || Q.ss);
+const SS = PREVIEW || args.sheet || args.stills || args.styles || args.gif || args.thumbs ? 1 : +(args.ss || Q.ss);
 const FORMAT = (args.format || (PREVIEW ? 'jpeg' : Q.format)) === 'jpeg' ? 'jpeg' : 'png';
 
 async function openPlayer(browser, style) {
@@ -159,6 +160,10 @@ async function renderVideo() {
   await new Promise((res, rej) => spawn('ffmpeg', ['-y', '-v', 'error', '-f', 'concat', '-safe', '0', '-i', list, '-c', 'copy', '-movflags', '+faststart', out], { stdio: 'inherit' }).on('close', c => (c ? rej(new Error('concat failed')) : res())));
   if (errs.size) { console.log(`\n${errs.size} shot error(s):`); [...errs].slice(0, 40).forEach(e => console.log('  ' + e)); }
   console.log(`\nDone: ${out}  (${fmtT((Date.now() - t0) / 1000)})`);
+  // 1.0.3: after every final render, record this video's problems in the channel lesson book (channel/LESSONS.md)
+  if (!PREVIEW && !args.from && !args.to && !args.out && !args['no-lessons']) { try { const { record } = await import('./tools/retro.mjs');
+    const e = record(PROJECT, { errors: [...errs], missing: missing.map(s => s.id), renderSec: Math.round((Date.now() - t0) / 1000) });
+    console.log(`Lessons: ${e.project} recorded → channel/LESSONS.md (checklist for the next video)`); } catch (err) { console.log('Lessons not recorded: ' + err.message); } }
 }
 // grid of labelled images, laid out by the browser (works on every OS)
 async function contactSheet(browser, items, outFile, cols = 4, cellW = 480) {
@@ -181,6 +186,19 @@ async function renderStills() {
   if (args.styles) { const n = all.length / styles.length; await contactSheet(browser, all, path.join(dir, 'style_grid.png'), n, 420); }
   else { const per = 24; for (let i = 0; i < all.length; i += per) await contactSheet(browser, all.slice(i, i + per), path.join(dir, `sheet_${String(i / per + 1).padStart(2, '0')}.png`), 4, 440); }
   await browser.close(); console.log(`Wrote ${all.length} stills + contact sheet(s) to ${dir}`);
+}
+// --thumbs (1.0.3): one JPG per shot (1280×720, the frame at shotsjson "thumbAt" or just before the shot ends) + a 2×2 grid to pick from.
+async function renderThumbs() {
+  const browser = await launch(); const page = await openPlayer(browser); const fps = FPS;
+  const list = await page.evaluate('window.SHOT_LIST'), dir = path.join(BUILD, 'thumbs'); fs.rmSync(dir, { recursive: true, force: true }); fs.mkdirSync(dir, { recursive: true });
+  const outs = [];
+  for (const sh of list) { const t = sh.thumbAt != null ? sh.start + sh.thumbAt : sh.end - 2 / fps; await page.evaluate(i => window.renderFrame(i), Math.round(t * fps));
+    const png = path.join(dir, `_${sh.id}.png`), out = path.join(dir, `${sh.id}.jpg`); fs.writeFileSync(png, await page.screenshot({ type: 'png' }));
+    spawnSync('ffmpeg', ['-v', 'error', '-y', '-i', png, '-vf', 'scale=1280:720:flags=lanczos', '-q:v', '2', out]); fs.rmSync(png, { force: true }); outs.push(out); }
+  if (outs.length >= 2) { const n = Math.min(4, outs.length), ins = outs.slice(0, n).flatMap(f => ['-i', f]), lay = ['0_0', 'w0_0', '0_h0', 'w0_h0'].slice(0, n).join('|');
+    spawnSync('ffmpeg', ['-v', 'error', '-y', ...ins, '-filter_complex', `xstack=inputs=${n}:layout=${lay}:fill=black`, '-q:v', '3', path.join(dir, 'grid.jpg')]); }
+  (await page.evaluate('window.ERRORS')).forEach(e => console.log('  shot error:', e));
+  await browser.close(); console.log(`Wrote ${outs.length} thumbnail(s) + grid to ${dir}`);
 }
 // --gif [ids] (1.0.2): a looping GIF per shot (10 fps, small) to judge motion — stills hide jerks and sliding feet.
 // ids: comma-separated shot ids, default all. --gifFps N, --scale K (default 0.35). Output build/gifs/<id>.gif.
@@ -218,6 +236,6 @@ async function bench() {
   console.log(`  one worker ≈ ${fpsW.toFixed(2)} frames/s; ${W} workers ≈ ${(fpsW * eff).toFixed(2)} frames/s (estimate)`);
   console.log(`  this video: ${total} frames ≈ ${fmtT(est)} to render (+ encode). Encoder: ${ENCODER}. CPU threads: ${cores}.`);
 }
-try { if (args.bench) await bench(); else if (args.qc) { const q = await runQC(); if (q.red) process.exitCode = 2; } else if (args.gif) await renderGifs(); else if (args.sheet || args.stills || args.styles) await renderStills(); else await renderVideo(); }
+try { if (args.bench) await bench(); else if (args.qc) { const q = await runQC(); if (q.red) process.exitCode = 2; } else if (args.thumbs) await renderThumbs(); else if (args.gif) await renderGifs(); else if (args.sheet || args.stills || args.styles) await renderStills(); else await renderVideo(); }
 catch (e) { console.error('RENDER FAILED:', e.message); process.exitCode = 1; }
 finally { server.close(); }

@@ -7,6 +7,15 @@ khung hình 2:1, sơ đồ giải thích hoạt hình.
 Mọi khung hình đều dựng bằng code (Three.js) và render từng khung một. Không dùng AI tạo ảnh/video, nên nhân vật
 giữ nguyên dáng suốt video và chữ luôn nét. Giọng đọc mặc định dùng Chatterbox (MIT, chạy máy cá nhân), dự phòng Kokoro-82M (Apache-2.0).
 
+## Mới trong 1.0.3 — diễn xuất sống hơn, trang phục chuyển động, tháng 11 nước Mỹ
+- **Khẩu hình theo lời thoại** cho mọi kiểu miệng (cả khi cười, há miệng), lông mày nhướng ở từ nhấn mạnh, người nghe gật đầu (`T.listen3`). Chỉ cần `face({ gt })`.
+- **Tay có ngón:** đếm 1–5, chữ V, giơ ngón cái lên / xuống, xoè tay, chỉ lên (`handR: 'count3'`, tư thế `showCount`, `thumbsUp`, `peaceSign`).
+- **Chạm đúng:** tay tự đặt lên mặt bàn, bục, ghế; chân bám đất khi bắt đầu và dừng bước; bộ kiểm tra coi chạm nhẹ là bình thường.
+- **Trang phục chuyển động:** khăn lắc theo bước và bay theo gió, mũ hoodie có dáng thật, áo phao gom lại khi ngồi.
+- **Bối cảnh tháng 11:** bữa tối Lễ Tạ ơn, phố bí ngô, cơn gió cuốn lá, trận bóng tối thứ Sáu.
+- **Sổ bài học tự động:** sau mỗi lần render bản cuối, lỗi kiểm tra, lỗi render và góp ý của bạn được gộp vào `channel/LESSONS.md`; đầu video sau Claude đọc sổ và đưa danh sách việc cần chú ý (`node tools/retro.mjs --next`), ghi góp ý bằng `--note`. Sổ còn đề xuất bối cảnh hợp mùa (có sẵn chưa dùng và nên thêm mới), đồ hoạ và kỹ xảo (theo bảng điểm hình ảnh, kỹ xảo có sẵn ít dùng, kỹ xảo mới nên thêm).
+- **Thumbnail 3D** theo 4 bố cục A–D của kênh (`T.thumb`, `--thumbs`). Ví dụ: `examples/v103-demo`, `examples/v103-thumb`.
+
 ## Mới trong 1.0.2 — chuyển động tự nhiên, bắt lỗi tự động
 - **Kiểm tra lỗi tự động** (`--qc`): tay chân xuyên đồ vật hoặc người khác, mặt bị che, máy quay nằm trong tường / xe / người hoặc nhảy giữa cảnh, chân trượt, khớp giật. Còn lỗi đỏ thì không cho render bản cuối.
 - **Máy quay thông minh:** tự né vật chắn để thấy rõ mặt, ưu tiên góc nhìn thấy mặt, giữ nguyên tắc 180° khi hai người nói chuyện.

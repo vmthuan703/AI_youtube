@@ -84,13 +84,14 @@ const sounds = (s) => { const out = []; for (let i = 0; i < s.length; i++) { con
 // talkShape('MIA', info.globalT) -> { open 0..1, round, wide, teeth, closed } (face() takes it as talk, or pass face({ speaker, gt }))
 export function talkShape(speaker, globalT) {
   const w = E.words.find(w => globalT >= w.start - 0.04 && globalT <= w.end + 0.03);
-  if (!w || (speaker != null && SPK(w) !== String(speaker).toUpperCase())) return { open: 0, round: 0, wide: 0, teeth: 0, closed: 0 };
+  if (!w || (speaker != null && SPK(w) !== String(speaker).toUpperCase())) return { open: 0, round: 0, wide: 0, teeth: 0, closed: 0, stress: 0 };
   let s = String(w.word || '').toLowerCase().replace(/[^a-z]/g, '').replace(/(.)\1+/g, '$1'); if (s.length > 3) s = s.replace(/e$/, '');
   if (/\d/.test(w.word || '') || !s) s = 'aea';
   const S2 = sounds(s), dur = Math.max(0.06, w.end - w.start), u = clamp((globalT - w.start + 0.03) / dur) * S2.length, i = Math.min(S2.length - 1, Math.floor(u)), f = u - i;
   const A = VIS(S2[i]), B = VIS(S2[Math.min(S2.length - 1, i + 1)]), k = ease.inOut(prog(f, 0.5, 1)), mixv = (j) => lerp(A[j], B[j], k);
   const env = clamp(Math.min((globalT - w.start + 0.04) / 0.07, (w.end + 0.03 - globalT) / 0.08));
-  return { open: clamp(mixv(0) * env * (0.75 + 0.25 * Math.min(1, dur / 0.25))), round: mixv(1), wide: mixv(2), teeth: mixv(3) * env, closed: mixv(4) * env };
+  const raw = String(w.word || ''), stress = (raw.replace(/[^A-Za-z]/g, '').length >= 7 || /\d/.test(raw) || /[!?]/.test(raw) || /^[A-Z]{2,}/.test(raw) ? 1 : 0) * env;   // 1.0.3
+  return { open: clamp(mixv(0) * env * (0.75 + 0.25 * Math.min(1, dur / 0.25))), round: mixv(1), wide: mixv(2), teeth: mixv(3) * env, closed: mixv(4) * env, stress };
 }
 // who is speaking around globalT: { speaker, since (s since their run of words began), prev (the speaker before), word }
 export function speakerAt(globalT, gap = 0.6) {

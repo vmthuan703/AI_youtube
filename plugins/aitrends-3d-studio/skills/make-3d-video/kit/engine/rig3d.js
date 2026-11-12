@@ -28,6 +28,27 @@ export const BODY = { hipY: 0.62, headR: 0.27, neck: 0.085, chestH: 0.47, should
 // 180 = straight up; az 0 = forward, 90 = out to the side, negative = across the body; bend = elbow flex.
 // Leg lift + = thigh forward, side + = outward, knee + = bend. L = character's left (+x side when facing +z).
 const P = (o) => ({ y: 0, hips: [0, 0, 0], spine: [0, 0, 0], head: [0, 0, 0], armL: [6, 12, 12, 0], armR: [6, 12, 12, 0], legL: [0, 3, 2, 0], legR: [0, 3, 2, 0], handL: 'relaxed', handR: 'relaxed', ...o });
+// 1.0.3 finger gestures (hand modes): f = which of index, middle, ring, pinky stand up; thumb 'out' | 'up' | 'in' (folded over
+// the palm); palm 'front' (to the viewer) or 'mid' (toward the body's middle, for thumbs up / down).
+// 1.0.3: furniture tops a hand can rest on, [minX, maxX, minZ, maxZ, topY] in world space, collected once per scene (before the
+// static meshes are merged; kit3d optimize() calls this first). Thin legs, walls, floors and tall cabinets are left out.
+export function restBoxes(scene) {
+  if (scene.userData.restBoxes) return scene.userData.restBoxes;
+  const out = [], bb = new THREE.Box3(); scene.updateMatrixWorld(true);
+  scene.traverse(m => { if (!m.isMesh || !m.visible || m.isInstancedMesh || m.material?.transparent) return;
+    for (let q = m; q; q = q.parent) if (q.name === 'character' || q.userData?.dynamic || q.userData?.noRest) return;
+    if (!m.geometry.boundingBox) m.geometry.computeBoundingBox(); bb.copy(m.geometry.boundingBox).applyMatrix4(m.matrixWorld);
+    const sx = bb.max.x - bb.min.x, sy = bb.max.y - bb.min.y, sz = bb.max.z - bb.min.z;
+    if (bb.max.y < 0.3 || bb.max.y > 1.35 || sx > 5 || sz > 5 || sy > 1.4 || sx < 0.08 || sz < 0.08) return;
+    out.push([bb.min.x, bb.max.x, bb.min.z, bb.max.z, bb.max.y]); });
+  return (scene.userData.restBoxes = out);
+}
+export const FINGERS = {
+  count1: { f: [1, 0, 0, 0], thumb: 'in' }, count2: { f: [1, 1, 0, 0], thumb: 'in' }, count3: { f: [1, 1, 1, 0], thumb: 'in' },
+  count4: { f: [1, 1, 1, 1], thumb: 'in' }, count5: { f: [1, 1, 1, 1], thumb: 'out', spread: 0.12 }, spread: { f: [1, 1, 1, 1], thumb: 'out', spread: 0.2 },
+  peace: { f: [1, 1, 0, 0], thumb: 'in', spread: 0.5 }, pointUp: { f: [1, 0, 0, 0], thumb: 'in' }, rock: { f: [1, 0, 0, 1], thumb: 'in' },
+  thumbsUp: { f: [0, 0, 0, 0], thumb: 'up', palm: 'mid', thumbTo: 'up' }, thumbsDown: { f: [0, 0, 0, 0], thumb: 'up', palm: 'mid', thumbTo: 'down' },
+};
 export const POSES3 = {
   stand: P({}),
   relaxed: P({ spine: [-2, 0, 0], armL: [8, 20, 18, 0], armR: [6, 10, 10, 0], legL: [2, 5, 3, 0], legR: [-3, 2, 4, 0] }),
@@ -91,6 +112,10 @@ export const POSES3 = {
   handsOnBelt: P({ spine: [-3, 0, 0], armL: { to: [0.2, 0.6, 0.06] }, armR: { to: [-0.2, 0.6, 0.06] }, handL: 'fist', handR: 'fist' }),
   holdMic: P({ armL: [62, 12, 118, 0], handL: 'fist' }),
   // 1.0.1 US high school: class, lockers, cafeteria, sports, weather. Seated ones match T.W.classroom / library chairs (hips 0.42).
+  // 1.0.3 gesture poses (right hand; for the left hand set armL / handL yourself). Pass the count with handR: 'count3'…
+  showCount: P({ spine: [-2, 0, 0], head: [-3, -6, 0], armR: { to: [-0.44, 1.12, 0.36], pole: [-0.8, 0.7, -0.2] }, handR: 'count1', armL: [8, 18, 14, 0] }),
+  thumbsUp: P({ spine: [-3, 0, 0], head: [-4, -4, 0], armR: { to: [-0.3, 1.0, 0.46], pole: [-0.7, 0.55, 0.0] }, handR: 'thumbsUp', armL: [8, 18, 14, 0] }),
+  peaceSign: P({ spine: [-2, 0, 4], head: [-2, -8, 6], armR: { to: [-0.42, 1.2, 0.34], pole: [-0.8, 0.75, -0.2] }, handR: 'peace', armL: [8, 18, 14, 0] }),
   raiseHand: P({ spine: [-2, 0, 6], head: [-4, 0, -4], armL: [162, 42, 0, 0], handL: 'open' }),   // big heads: the hand goes out beside the head, not over it
   sitRaiseHand: P({ y: -0.2, spine: [6, 0, 6], head: [-4, 0, 0], legL: [88, 6, 88, 0], legR: [88, 6, 88, 0], armL: [160, 44, 0, 0], armR: [72, -12, 20, 0], handL: 'open', handR: 'open' }),
   sleepDesk: P({ y: -0.2, spine: [52, 0, 0], head: [26, 18, 8], legL: [88, 6, 88, 0], legR: [88, 6, 88, 0], armL: [86, -42, 122, 0], armR: [86, -42, 122, 0], handL: 'relaxed', handR: 'relaxed' }),
@@ -402,7 +427,7 @@ export function character(outfit = {}, opts = {}) {
   // outline hull: a back-face copy pushed out by olW (scaled for spheres/lathes, or an explicit radius for segments)
   const hull = (m, k = 1.06) => { if (!olM) return null; const h = new THREE.Mesh(m.geometry, olM); h.castShadow = false; h.receiveShadow = false; h.scale.setScalar(k); m.add(h); return h; };
   // frames
-  const dangles = [];   // 1.0: parts that swing with motion (hoodie strings, the bag); see secondary() in pose()
+  const dangles = [], puffLow = [];   // puffLow: 1.0.3 the lowest quilted row (bunches out when seated)   // 1.0: parts that swing with motion (hoodie strings, the bag); see secondary() in pose()
   const pelvis = new THREE.Group(); body.add(pelvis);
   const chest = new THREE.Group(); pelvis.add(chest);
   const neck = new THREE.Group(); neck.position.set(0, B.chestH, 0); chest.add(neck);
@@ -450,15 +475,17 @@ export function character(outfit = {}, opts = {}) {
     const seamM = clothM(outfit.color2 || shade(topC, -0.3), { rim: 0.2 });
     if (puff) {   // fat quilted rows: each row a soft roll round the body, the grooves between them read as the stitching
       const rows = [-0.005, 0.095, 0.195, 0.295];
-      rows.forEach((y, i) => { const m = outfit.stripe && i === rows.length - 1 ? clothM(outfit.stripe, { rim: 0.35 }) : topM;
+      rows.forEach((y, i) => { const m = outfit.stripe && i === rows.length - 1 ? clothM(outfit.stripe, { rim: 0.35 }) : topM; if (i === 0) puffLow.push(y);
         const b = add(new THREE.Mesh(new THREE.TorusGeometry(0.19, 0.036, 12, 48), m), chest); b.rotation.x = Math.PI / 2; b.scale.set(1, 0.74, 0.95); b.position.y = y; });
       if (yokeM) { const yp = [[0.212, 0.345], [0.212, 0.385], [0.188, 0.45], [0.115, 0.5], [0.065, 0.523], [0.001, 0.523]];
         const yk = add(new THREE.Mesh(new THREE.LatheGeometry(yp.map(([r, y]) => new THREE.Vector2(r, y)), 32), yokeM), chest); yk.scale.z = 0.71; hull(yk, 1 + olW / 0.2); }
     } else for (let i = 0; i < 6; i++) { const y = -0.115 + i * 0.09, r = i === 5 ? 0.198 : 0.209; const b = add(new THREE.Mesh(new THREE.TorusGeometry(r, 0.0085, 8, 44), seamM), chest); b.rotation.x = Math.PI / 2; b.scale.set(1, 0.72, 1); b.position.y = y; }
     if (crop) { const hem = add(new THREE.Mesh(new THREE.TorusGeometry(0.19, 0.026, 10, 44), edgeM || seamM), chest); hem.rotation.x = Math.PI / 2; hem.scale.set(1, 0.73, 1); hem.position.y = -0.045; }
     if (outfit.hood) { const hM = clothM(outfit.hood, { rim: 0.45 });
-      const hood = add(new THREE.Mesh(new THREE.TorusGeometry(0.11, 0.07, 12, 28), hM), chest); hood.position.set(0, 0.5, -0.04); hood.rotation.x = Math.PI / 2 - 0.35; hood.scale.set(1.25, 1.25, 0.95); hull(hood, 1 + olW / 0.1);
-      const hb = add(new THREE.Mesh(new THREE.SphereGeometry(0.15, 20, 14), hM), chest); hb.position.set(0, 0.46, -0.13); hb.scale.set(1.2, 0.85, 0.62); hull(hb, 1 + olW / 0.12); }
+      // 1.0.3 hood: a ring round the neck, a soft pouch hanging down the upper back, its dark opening facing up and back
+      const hood = add(new THREE.Mesh(new THREE.TorusGeometry(0.105, 0.052, 12, 28), hM), chest); hood.position.set(0, 0.505, -0.03); hood.rotation.x = Math.PI / 2 - 0.3; hood.scale.set(1.18, 1.18, 0.95); hull(hood, 1 + olW / 0.1);
+      const hb = add(new THREE.Mesh(new THREE.SphereGeometry(0.15, 22, 16), hM), chest); hb.position.set(0, 0.395, -0.165); hb.rotation.x = -0.22; hb.scale.set(1.08, 1.0, 0.42); hull(hb, 1 + olW / 0.12);
+      const inner = add(new THREE.Mesh(new THREE.CircleGeometry(0.1, 24), clothM(shade(outfit.hood, -0.45), { rim: 0.1 })), chest); inner.position.set(0, 0.5, -0.17); inner.rotation.x = -Math.PI / 2 - 0.75; inner.scale.set(1.05, 0.5, 1); }
     const collar = add(new THREE.Mesh(new THREE.TorusGeometry(0.095, 0.05, 12, 28), edgeM || topM), chest); collar.rotation.x = Math.PI / 2; collar.position.y = 0.5; collar.scale.set(1.05, 0.95, 0.95); hull(collar, 1 + olW / 0.1);
     const zip = add(new THREE.Mesh(new THREE.BoxGeometry(puff ? 0.03 : 0.012, crop ? 0.5 : 0.56, puff ? 0.03 : 0.006), edgeM || seamM), chest); zip.position.set(0, crop ? 0.22 : 0.19, puff ? 0.158 : 0.149); zip.rotation.x = 0.02;
     const pull = add(new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.034, 0.008), MAT('#e8e2d8', { rough: 0.4 })), chest); pull.position.set(0, 0.42, puff ? 0.176 : 0.152);
@@ -473,7 +500,8 @@ export function character(outfit = {}, opts = {}) {
   if (outfit.stripe && !puff) { const b = add(new THREE.Mesh(new THREE.CylinderGeometry(torsoR, torsoR, 0.07, 36, 1, true), clothM(outfit.stripe, { rim: 0.3, side: THREE.DoubleSide })), chest); b.scale.z = 0.71; b.position.y = 0.2; }
   if (outfit.scarf) { const sm = clothM(outfit.scarf, { rim: 0.35 }); const big = top === 'puffer';   // 1.0.2: over a puffer collar the scarf sits higher and fatter, and its end is a soft rounded drape
     const hooded = big && !!outfit.hood, ring = add(new THREE.Mesh(new THREE.TorusGeometry(hooded ? 0.135 : big ? 0.112 : 0.098, hooded ? 0.062 : big ? 0.05 : 0.04, 12, 28), sm), chest); ring.rotation.x = Math.PI / 2; ring.position.set(0, hooded ? 0.535 : big ? 0.53 : 0.5, hooded ? 0.025 : 0); ring.scale.set(1.08, 0.92, 0.85); hull(ring, 1 + olW / 0.1);
-    if (big) { const tail = add(new THREE.Mesh(new THREE.CapsuleGeometry(0.04, 0.15, 6, 12), sm), chest); tail.scale.set(1.3, 1, 0.42); tail.position.set(-0.09, 0.37, puff ? 0.205 : 0.17); tail.rotation.set(0.1, 0, 0.1); hull(tail, 1 + olW / 0.04); }
+    if (big) { const piv = new THREE.Group(); piv.position.set(-0.075, 0.49, puff ? 0.19 : 0.16); chest.add(piv); dangles.push(['scarf', piv, 0]);   // 1.0.3: swings and flutters
+      const tail = add(new THREE.Mesh(new THREE.CapsuleGeometry(0.04, 0.15, 6, 12), sm), piv); tail.scale.set(1.3, 1, 0.42); tail.position.set(-0.012, -0.12, 0.012); tail.rotation.set(0.1, 0, 0.1); hull(tail, 1 + olW / 0.04); }
     else { const tail = add(new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.24, 0.03), sm), chest); tail.position.set(-0.07, 0.34, chunky ? 0.158 : 0.135); tail.rotation.x = 0.07; } }
   if (outfit.collar) { const cm = clothM(outfit.collar, { rim: 0.3 }); for (const sx of [-1, 1]) { const w = add(new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.03, 0.075), cm), chest); w.position.set(sx * 0.062, 0.485, 0.082); w.rotation.set(0.55, sx * -0.55, sx * -0.42); } }
   if (outfit.bag) { const bm = clothM(outfit.bag, { rim: 0.3 }); const pivot = new THREE.Group(); pivot.position.y = 0.19; pivot.rotation.z = -0.72; chest.add(pivot); const strap = add(new THREE.Mesh(new THREE.TorusGeometry(torsoR / Math.cos(0.72) + 0.005, 0.0105, 8, 48), bm), pivot); strap.rotation.x = Math.PI / 2; strap.scale.set(1, 0.56, 1); const bp = new THREE.Group(); bp.position.set(0.16, 0.04, chunky ? 0.125 : 0.105); chest.add(bp); dangles.push(['bag', bp, 0]); const pouch = add(new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.115, 0.055), bm), bp); pouch.position.set(0, -0.06, 0.004); hull(pouch, 1.08); }
@@ -537,7 +565,8 @@ export function character(outfit = {}, opts = {}) {
     const thumb = add(new THREE.Mesh(new THREE.CapsuleGeometry(0.02, 0.035, 4, 8), gloveM), h);
     const fing = add(new THREE.Mesh(new THREE.CapsuleGeometry(0.017, 0.06, 4, 8), gloveM), h);
     hull(palm, 1 + olW / handR); hull(fing, 1.3); hull(thumb, 1.3);
-    hands[side] = { g: h, palm, thumb, fing, mode: '' };
+    const f4 = [0, 1, 2, 3].map(i => { const m = add(new THREE.Mesh(new THREE.CapsuleGeometry(0.019, 0.075 - (i === 3 ? 0.018 : 0) + (i === 1 ? 0.008 : 0), 4, 8), gloveM), h); m.visible = false; hull(m, 1.3); return m; });   // 1.0.3 fingers
+    hands[side] = { g: h, palm, thumb, fing, f4, mode: '' };
   }
   // feet: sneakers if shoes given, else round stick-figure feet
   const feet = {};
@@ -574,9 +603,29 @@ export function character(outfit = {}, opts = {}) {
   const fkArm = (a, s) => { const [raise, az, bend0, twist] = a, bend = Math.max(0, Math.min(165, bend0)); /* 1.0.2: no reverse elbow */ const Q = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, s * az * D2R, 0)).multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(-raise * D2R, 0, 0))).multiply(new THREE.Quaternion().setFromAxisAngle(up, -s * (twist || 0) * D2R)); const d = new THREE.Vector3(0, -1, 0).applyQuaternion(Q), b = new THREE.Vector3(0, 0, 1).applyQuaternion(Q); const d2 = d.clone().multiplyScalar(Math.cos(bend * D2R)).addScaledVector(b, Math.sin(bend * D2R)); return [d, d2, b]; };
   const fkLeg = (a, s) => { const [lift, side, knee0, twist] = a, knee = Math.max(0, Math.min(165, knee0)); /* 1.0.2: no reverse knee */ const Q = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, 0, s * side * D2R)).multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(-lift * D2R, 0, 0))).multiply(new THREE.Quaternion().setFromAxisAngle(up, s * (twist || 0) * D2R)); const d = new THREE.Vector3(0, -1, 0).applyQuaternion(Q), b = new THREE.Vector3(0, 0, -1).applyQuaternion(Q); const d2 = d.clone().multiplyScalar(Math.cos(knee * D2R)).addScaledVector(b, Math.sin(knee * D2R)); return [d, d2, b]; };
   const ik = (A, T, l1, l2, pole) => { const dv = T.clone().sub(A); let d = dv.length(); d = clamp(d, Math.abs(l1 - l2) + 1e-3, (l1 + l2) * 0.999); const u = dv.normalize(); const a = Math.acos(clamp((l1 * l1 + d * d - l2 * l2) / (2 * l1 * d), -1, 1)); const pv = pole.clone().sub(A); pv.addScaledVector(u, -pv.dot(u)); if (pv.lengthSq() < 1e-8) pv.set(0, 0, 1); pv.normalize(); return A.clone().addScaledVector(u, Math.cos(a) * l1).addScaledVector(pv, Math.sin(a) * l1); };
-  const setHand = (H, mode, A, Bp) => {
-    H.g.position.copy(Bp); tmp.copy(Bp).sub(A).normalize(); H.g.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), tmp);
-    if (H.mode === mode) return; H.mode = mode;
+  const setHand = (H, mode, A, Bp, s = 1) => {
+    H.g.position.copy(Bp); tmp.copy(Bp).sub(A).normalize();
+    const G = FINGERS[mode];
+    if (G) {   // 1.0.3 finger gestures: a real hand frame so the palm faces where the gesture needs it (count / peace: palm to the
+      // viewer; thumbs up: palm toward the body's middle, thumb to the sky) and the thumb sits on the correct side for each hand
+      const fd = G.palm === 'mid' ? tmp.clone() : new THREE.Vector3(0, 1, 0).multiplyScalar(0.9).addScaledVector(tmp, 0.25).normalize();   // count / peace: the wrist bends so the fingers stand up
+      const yL = fd.negate(), pn = (G.palm === 'mid' ? new THREE.Vector3(-s, 0, 0) : new THREE.Vector3(0, 0, 1));
+      let zL = pn.addScaledVector(yL, -pn.dot(yL)); if (zL.lengthSq() < 1e-4) zL = new THREE.Vector3(0, 1, 0).addScaledVector(yL, -yL.y); zL.normalize();
+      const xL = new THREE.Vector3().crossVectors(yL, zL).normalize(); H.g.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(xL, yL, zL));
+      const hint = G.thumbTo === 'up' ? new THREE.Vector3(0, 1, 0) : G.thumbTo === 'down' ? new THREE.Vector3(0, -1, 0) : new THREE.Vector3(-s, 0, 0);
+      const sg = xL.dot(hint) >= 0 ? 1 : -1, key = mode + sg; if (H.mode === key) return; H.mode = key;
+      H.palm.scale.set(handR * 0.95, handR * 1.0, handR * 0.8); H.palm.position.set(0, -handR * 0.75, 0); H.fing.visible = false;
+      H.thumb.visible = true;
+      if (G.thumb === 'out') { H.thumb.position.set(sg * handR * 0.95, -handR * 0.75, 0); H.thumb.rotation.set(0, 0, Math.atan2(-sg * 0.85, -0.5)); }
+      else if (G.thumb === 'up') { H.thumb.position.set(sg * handR * 1.05, -handR * 0.55, handR * 0.1); H.thumb.rotation.set(0, 0, -sg * Math.PI / 2); }
+      else { H.thumb.position.set(sg * handR * 0.25, -handR * 1.05, handR * 0.62); H.thumb.rotation.set(0, 0, sg * 1.25); }
+      const spread = G.spread || 0;
+      H.f4.forEach((m, i) => { const on = G.f[i]; m.visible = !!on; if (!on) return; const x = sg * handR * (0.48 - i * 0.32), a = sg * (1.5 - i) * spread;
+        m.position.set(x - Math.sin(a) * handR * 1.1, -handR * (i === 1 ? 2.25 : i === 3 ? 2.0 : 2.15), 0); m.rotation.set(0, 0, a); });
+      return;
+    }
+    H.g.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), tmp);
+    if (H.mode === mode) return; H.mode = mode; H.f4.forEach(m => { m.visible = false; });
     const open = mode === 'open', point = mode === 'point';
     if (mode === 'grip' || mode === 'pinch' || mode === 'cup') {   // 1.0.2 grips
       const g = mode === 'grip', pc = mode === 'pinch';
@@ -604,17 +653,23 @@ export function character(outfit = {}, opts = {}) {
       for (const c of chest.children) if (c !== torso && c !== neck && c.position.y < -0.02) clothBase.kids.push([c, c.position.y]); }
     if (torso.morphTargetInfluences) { torso.morphTargetInfluences[0] = k; for (const h of torso.children) if (h.morphTargetInfluences) h.morphTargetInfluences[0] = k; }
     for (const [c, y0] of clothBase.kids) c.position.y = y0 * (1 - 0.9 * k);
+    if (puffLow.length) { if (!clothBase.row) clothBase.row = chest.children.find(c => c.geometry?.type === 'TorusGeometry' && Math.abs(c.position.y - puffLow[0]) < 1e-6) || null;
+      const r = clothBase.row; if (r) { r.scale.set(1 + 0.07 * k, 0.74 * (1 + 0.12 * k), 0.95 * (1 + 0.1 * k)); r.position.y = puffLow[0] + 0.015 * k; } }   // 1.0.3: the jacket bunches on the lap
     const sb = clothBase.skirt; if (sb) { const L = sb.len * sb.sy, sy = sb.sy * (1 - (sb.len > 0.35 ? 0.72 : 0.55) * k), top = sb.y + L / 2;
       skirt.scale.set(sb.sx * (1 - 0.18 * k), sy, sb.sz * (1 + 0.3 * k)); skirt.position.y = lerp(top - (sb.len * sy) / 2, 0.006 + (sb.len * sy) / 2, k); skirt.position.z = sb.z + 0.08 * k; skirt.rotation.x = -0.18 * k; }
   };
   // 1.0 secondary motion: motion helpers (walkTo, climb, jump3, turn3) leave root.userData.mo = { v, phase, vy, yawRate } for this
   // frame; the hair bounces and sweeps back, hoodie strings and the bag swing a beat behind the steps. Pure function of time.
+  const windK = () => { let sc = root; while (sc.parent) sc = sc.parent; const u = sc.userData || {}; return clamp(u.windAt ? u.windAt(globalThis.E3D_T || 0) : u.wind ?? 0); };   // 1.0.3
   const secondary = (p) => {
     const mo = root.userData.mo || {}; root.userData.mo = null;
     const sp = clamp((mo.v || 0) / 2.6), ph = mo.phase || 0, bob = Math.sin(2 * ph - 0.9), vy = clamp((mo.vy || 0) / 3, -1, 1), yr = clamp((mo.yawRate || 0) / 6, -1, 1);
     const q = p._prev, dSp = q ? clamp(((p.spine?.[0] || 0) - (q.spine?.[0] || 0)) / 20, -1, 1) : 0;
     hairG.rotation.x += (-0.09 * sp + 0.035 * bob * sp + 0.1 * vy) ; hairG.rotation.z += 0.03 * Math.sin(ph) * sp - 0.08 * yr; hairG.position.y = 0.006 * bob * sp;
     for (const [kind, g, sx] of dangles) {
+      if (kind === 'scarf') { const w = windK(), tt = globalThis.E3D_T || 0;
+        g.rotation.x = 0.08 + 0.4 * sp + 0.12 * bob * sp - 0.3 * vy - 0.35 * dSp + w * (0.1 + 0.12 * Math.sin(tt * 2.3));
+        g.rotation.z = 0.22 * Math.sin(ph + 0.5) * sp - 0.35 * yr + w * (0.18 * Math.sin(tt * 3.7 + 1.1) + 0.08 * Math.sin(tt * 9.1)); continue; }
       if (kind === 'string') { g.rotation.x = 0.08 - 0.55 * sp - 0.22 * bob * sp + 0.35 * vy - 0.4 * dSp; g.rotation.z = 0.18 * Math.sin(ph + sx * 20) * sp - 0.3 * yr; }
       else { g.rotation.z = 0.14 * Math.sin(ph + 0.6) * sp - 0.25 * yr; g.rotation.x = -0.22 * sp * (0.6 + 0.4 * bob) + 0.25 * vy; }
     }
@@ -631,6 +686,21 @@ export function character(outfit = {}, opts = {}) {
   const limbMix = (m, base, s, pts, l1, l2) => { const [j0, e0] = pts(m.mix[0], base, s), [j1, e1] = pts(m.mix[1], base, s), k = m.k;
     const e = e0.clone().lerp(e1, k), jGuess = j0.clone().lerp(j1, k), j = ik(base, e, l1, l2, jGuess.clone().multiplyScalar(2).sub(base.clone().add(e).multiplyScalar(0.5)));
     return [j, j.clone().add(e.clone().sub(j).setLength(l2))]; };
+  // 1.0.3 hand rest: a hand that would sink into a desk, table, podium, counter or seat top (static furniture tops between 0.3 and
+  // 1.35 m, found once per scene) is lifted onto the surface and the arm re-solved, so resting hands lie on the top
+  const restHand = (el, wr, sh) => {
+    let sc = root; while (sc.parent) sc = sc.parent; if (!sc.isScene) return null; const boxes = restBoxes(sc); if (!boxes.length) return null;
+    // the lift fades in over the last 6 cm inside the top's edges and fades out deep below it, so an arm sweeping past a desk
+    // edge never snaps (a hard on / off made forearms jump in one frame)
+    const w = body.localToWorld(wr.clone()), lift = handR * 0.85 * (root.scale.y || 1); let best = 0, goal = 0;
+    for (const b of boxes) { if (w.y >= b[4] + lift || w.y <= b[4] - 0.3) continue;
+      const edge = Math.min(w.x - b[0], b[1] - w.x, w.z - b[2], b[3] - w.z); if (edge <= -0.02) continue;
+      const sm = (u) => u * u * (3 - 2 * u), k = sm(clamp((edge + 0.02) / 0.08)) * sm(clamp((w.y - (b[4] - 0.3)) / 0.1));
+      if (k > best) { best = k; goal = b[4] + lift; } }
+    if (best < 0.01) return null;
+    w.y += (goal - w.y) * best; const T = body.worldToLocal(w), e = ik(sh, T, B.upperArm, B.foreArm, el.clone().multiplyScalar(2).sub(sh.clone().add(T).multiplyScalar(0.5)));
+    return [e, e.clone().add(T.clone().sub(e).setLength(B.foreArm))];
+  };
   const JB = { L: {}, R: {} };   // 1.0.2: last solved joint points in body space (root.joints() → world)
   root.pose = (p) => {
     p = typeof p === 'string' ? POSES3[p] : p;
@@ -652,11 +722,12 @@ export function character(outfit = {}, opts = {}) {
       if (a && a.mix) { [el, wr] = limbMix(a, sh, s, armPts, B.upperArm, B.foreArm); d2 = wr.clone().sub(el).normalize(); }
       else if (Array.isArray(a)) { const [d, dd] = fkArm(a, s); const bq = body.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(chest.getWorldQuaternion(new THREE.Quaternion())); d.applyQuaternion(bq); dd.applyQuaternion(bq); el = sh.clone().addScaledVector(d, B.upperArm); wr = el.clone().addScaledVector(dd, B.foreArm); d2 = dd; }
       else { const T = new THREE.Vector3(...a.to); el = ik(sh, T, B.upperArm, B.foreArm, a.pole ? new THREE.Vector3(...a.pole) : sh.clone().add(new THREE.Vector3(s * 0.4, -0.3, -0.5))); wr = el.clone().add(T.clone().sub(el).setLength(B.foreArm)); d2 = wr.clone().sub(el).normalize(); }
+      if (outfit.rest !== false && !p.noRest) { const r = restHand(el, wr, sh); if (r) { [el, wr] = r; d2 = wr.clone().sub(el).normalize(); } }   // 1.0.3
       place(L['up' + side], sh, el, L['up' + side].r); place(L['lo' + side], el, wr, L['lo' + side].r);
       if (sleeveRings[side].length) { const [a, b, c, d] = sleeveRings[side], setRing = (m, A, Bp, k) => { m.position.lerpVectors(A, Bp, k); tmp.copy(Bp).sub(A).normalize(); m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), tmp); }; setRing(a, sh, el, 0.38); setRing(b, sh, el, 0.76); setRing(c, el, wr, 0.3); setRing(d, el, wr, 0.66); }
       if (L['cuff' + side]) { const c0 = wr.clone().addScaledVector(d2, puff ? -0.025 : -0.05); place(L['cuff' + side], c0, wr.clone().addScaledVector(d2, puff ? 0.02 : -0.005), L['cuff' + side].r); }
       if (shoulderBall.length) shoulderBall[side === 'L' ? 0 : 1].position.copy(sh);
-      setHand(hands[side], p['hand' + side] || 'relaxed', el, wr);
+      setHand(hands[side], p['hand' + side] || 'relaxed', el, wr, s);
       const hp = toBody(pelvis, new THREE.Vector3(s * B.hipX, 0, 0)); const lg = p['leg' + side] || [0, 3, 2, 0]; let kn, an, ld2;
       if (lg && lg.mix) { [kn, an] = limbMix(lg, hp, s, legPts, B.thigh, B.shin); ld2 = an.clone().sub(kn).normalize(); }
       else if (Array.isArray(lg)) { const [d, dd] = fkLeg(lg, s); const bq = body.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(pelvis.getWorldQuaternion(new THREE.Quaternion())); d.applyQuaternion(bq); dd.applyQuaternion(bq); kn = hp.clone().addScaledVector(d, B.thigh); an = kn.clone().addScaledVector(dd, B.shin); ld2 = dd; }
@@ -679,7 +750,9 @@ export function character(outfit = {}, opts = {}) {
     let bl = typeof o.blink === 'number' ? o.blink : o.blink && o.blink !== true ? 1 : 0;
     if (o.blink === true && o.t != null) bl = blinkAt(o.t, seed, keys ? keys.slice(1).map(k => k[0]) : []);
     let talk = o.talk || 0, round = 0, vis = null;
-    if (o.speaker && o.gt != null) talk = talkShape(o.speaker, o.gt);
+    const spk = o.speaker ?? (o.gt != null && o.talk == null ? outfit.speaker : null); let stress = 0;   // 1.0.3: face({ gt }) lip-syncs by the character's own name
+    if (spk && o.gt != null) talk = talkShape(spk, o.gt);
+    if (typeof talk === 'object') stress = talk.stress || 0;
     if (typeof talk === 'object') { round = talk.round || 0; vis = { wide: Math.round((talk.wide || 0) * 2) / 2, teeth: talk.teeth > 0.5 ? 1 : 0, closed: talk.closed > 0.5 ? 1 : 0 }; talk = talk.open || 0; }
     talk = Math.round(clamp(talk) * 8) / 8;   // 1.0: 8 steps (was 4) so the mouth moves smoothly
     let look = o.look; if (!look) look = o.t != null && o.saccade !== false && !ex.eye.closed ? saccade(o.t, seed, typeof o.saccade === 'number' ? o.saccade : 1) : [0, 0];
@@ -687,6 +760,14 @@ export function character(outfit = {}, opts = {}) {
     let eye = ex.eye, mouth = ex.mouth; const blink = bl >= 0.7;
     if (!blink && bl > 0.05 && !eye.closed) eye = { ...eye, open: (eye.open ?? 0.82) * Math.round((1 - bl) * 4) / 4 };
     if (talk > 0.05 && round > 0.5 && ['flat', 'smile', 'smirk', 'frown'].includes(mouth.type)) mouth = { ...mouth, type: 'o', w: Math.max(0.22, (mouth.w || 0.5) * 0.6), open: 0 };
+    // 1.0.3: open-mouth expressions (grin, teeth, open, o, wavy) also follow the sounds: m/b/p nearly close them, o/u/w round and
+    // narrow them, e/i widen them; the jaw drop comes from the sound instead of a fixed opening
+    else if (vis && ['grin', 'teeth', 'open', 'o', 'wavy'].includes(mouth.type)) { const base = mouth.open || 0, w0 = mouth.w || 0.5;
+      mouth = { ...mouth, open: vis.closed ? base * 0.15 : base * 0.45 + talk * 0.6, w: w0 * (round > 0.5 ? 0.72 : 1) * (1 + 0.18 * (vis.wide || 0)) }; talk = 0; }
+    // stressed words: brows lift and the eyes open a touch, the way people underline a word
+    if (stress > 0.3 && !eye.closed) eye = { ...eye, open: (eye.open ?? 0.82) * (1 + 0.12 * stress), lid: (eye.lid || 0) - 0.18 * stress };
+    mouth = { ...mouth, open: mouth.open != null ? Math.round(mouth.open * 8) / 8 : mouth.open, w: mouth.w != null ? Math.round(mouth.w * 20) / 20 : mouth.w };
+    if (eye.open != null) eye = { ...eye, open: Math.round(eye.open * 16) / 16, lid: Math.round((eye.lid || 0) * 16) / 16 };
     const k = JSON.stringify([eye, mouth, talk, blink, look, eyeStyle, pal, vis]);
     if (k !== faceKey) { faceKey = k; faceMat.map = faceTexture(k, (g) => drawFace(g, { eye, mouth, talk, blink, look, style: eyeStyle, pal, vis })); faceMat.needsUpdate = true; }
     return root;

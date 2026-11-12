@@ -28,7 +28,7 @@ export function schoolTime(name = 'day') { return { ...(TIMES[name] || TIMES.day
 // ================================================================ seasons
 export const MAPLE = ['#d8402a', '#e86a2a', '#f2a02a', '#c8282a', '#f2c23a', '#a8382a'];
 export function fallDay(st, o = {}) {
-  const area = o.area || [-8, 8, 0, 6, -4, 4];
+  const area = o.area || [-8, 8, 0, 6, -4, 4]; st.scene.userData.wind = Math.max(st.scene.userData.wind || 0, o.wind ?? 0.45);   // 1.0.3: scarves flutter
   const lf = leaves(st, { area, n: o.n ?? 90, ground: o.ground ?? 220, colors: MAPLE, wind: o.wind ?? 0.3, y: o.y ?? 0, seed: o.seed });
   // a few raked piles
   const r = rng(o.seed || 6), g = group(); for (let i = 0; i < (o.piles ?? 2); i++) { const x = lerp(area[0], area[1], r()), z = lerp(area[4], area[5], r());

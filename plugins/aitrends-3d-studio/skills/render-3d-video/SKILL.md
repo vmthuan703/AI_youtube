@@ -19,6 +19,8 @@ and `render-qc.md` in `../make-3d-video/references/` before writing or fixing sc
 - After each batch, re-run the sheet and **open every sheet PNG** against the QC checklist. Repeat until clean.
 - Motion: `--gif` (1.0.2: one small looping GIF per shot in `build/gifs/`, `--gif id,id` for some) — open the GIFs of every
   shot with people moving: stills hide jerks and sliding feet. `--stills t1,t2,t3` or `--from A --to B --scale 0.5` (preview.mp4).
+- **Thumbnails (1.0.3)**: a thumbnail project (one shot per layout A–D, overlays with `T.thumb`) renders with `--thumbs` →
+  build/thumbs/*.jpg + grid.jpg; follow the AI_youtube prompts/thumbnail_style.md rules.
 - **Motion QC (1.0.2)**: `node render.mjs --project projects/<slug> --qc` checks sampled frames for limbs inside props or other
   bodies, hidden faces, the camera inside a wall / car / person or jumping mid-shot, sliding feet and snapping joints
   (`build/qc_motion.json`). Fix every RED before the final render (the full render refuses while any is left, `--force`
@@ -38,7 +40,8 @@ final render-time estimate before the long render. Fix anything marked CHECK tha
 ## 4. Final render
 `nohup node render.mjs --project projects/<slug> > projects/<slug>/build/render.log 2>&1 &`. Poll the log and report
 progress and ETA. Fewer workers if memory is tight. Output: `build/video_silent.mp4`; the end of the log lists shot
-errors to fix and re-render.
+errors to fix and re-render. When it finishes it records the video's QC problems in the channel lesson book (1.0.3,
+`channel/LESSONS.md`); add the user's review feedback with `node tools/retro.mjs --project projects/<slug> --note "..."`.
 
 ## 5. Sound, mux and deliver
 Make sure the music plan and SFX are set (`/3d-video-sound`), then `python audio/mix.py --project projects/<slug>` →

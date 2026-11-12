@@ -45,7 +45,7 @@ async function boot() {
   const dur = story.duration || E.shots[E.shots.length - 1].end;
   window.DURATION = dur; window.TOTAL_FRAMES = Math.ceil(dur * E.fps); window.OUT = [outW, outH];
   globalThis.E3D_LINE_RULE = E.cfg.lineRule ?? false;   // 1.0.2: camera 180° rule (camera10.js)
-  window.SHOT_LIST = E.shots.map(s => ({ id: s.id, start: s.start, end: s.end, ok: !!getShot(s.id) }));
+  window.SHOT_LIST = E.shots.map(s => ({ id: s.id, start: s.start, end: s.end, ok: !!getShot(s.id), thumbAt: s.thumbAt }));
   window.READY = true;
 }
 
@@ -185,7 +185,7 @@ function drawShot(buf, shot, lt, opts = {}) {
   g.fillStyle = '#000'; g.fillRect(0, 0, buf.width, buf.height); g.setTransform(E.PX, 0, 0, E.PX, 0, 0);
   const def = getShot(shot.id); const dur = shot.end - shot.start;
   const info = { ...(shot.params || {}), shot, dur, globalT: shot.start + lt, p: clamp(lt / dur), line: shot.line };
-  E.shotT = lt; E.shotDur = dur;   // overlays read these for exits (end: 'shot') and the living purple stage
+  E.shotT = lt; E.shotDur = dur; globalThis.E3D_T = shot.start + lt;   // 1.0.3: cloth flutter reads the global time   // overlays read these for exits (end: 'shot') and the living purple stage
   if (!def) { g.fillStyle = '#20141c'; g.fillRect(0, 0, E.W, E.H); text(g, `MISSING SHOT ${shot.id}`, E.W / 2, E.H / 2 - 30, { size: 60, color: '#ff6f61' }); text(g, (shot.line || '').slice(0, 80), E.W / 2, E.H / 2 + 50, { size: 30, color: '#fff', font: FONTS.ui, weight: 800 }); return; }
   try {
     if (def.kind === '3d') {

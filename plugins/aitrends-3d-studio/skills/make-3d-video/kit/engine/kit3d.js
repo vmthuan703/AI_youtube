@@ -3,6 +3,7 @@
 // practical lights (lit windows, street lamps, screens), fog, bloom, optional depth of field.
 // 1 world unit = 1 metre. Characters stand on y = 0 and face +z unless rotated.
 import * as THREE from 'three';
+import { restBoxes } from './rig3d.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
@@ -296,7 +297,7 @@ const matKey = (m) => [m.type, m.color?.getHexString(), m.roughness, m.metalness
 export function optimize(st, keep = []) {
   const keepSet = new Set(); const mark = (o) => { if (!o) return; if (Array.isArray(o)) return o.forEach(mark); if (o.isObject3D) o.traverse(x => keepSet.add(x)); else if (typeof o === 'object' && !o.isCamera && o.constructor === Object) Object.values(o).forEach(v => (v && (v.isObject3D || Array.isArray(v)) ? mark(v) : 0)); };
   mark(keep);
-  st.scene.updateMatrixWorld(true);
+  st.scene.updateMatrixWorld(true); restBoxes(st.scene);   // 1.0.3: hand-rest tops, found before the merge
   const buckets = new Map();
   st.scene.traverse(m => {
     if (!m.isMesh || m.isInstancedMesh || m.isSkinnedMesh || keepSet.has(m) || Array.isArray(m.material)) return;
@@ -319,8 +320,10 @@ export function optimize(st, keep = []) {
 }
 
 // re-export the rest of the 3D toolkit so shots only need `T`
+export { FINGERS, restBoxes } from './rig3d.js';
+export * as thumb from './thumb3d.js';   // 1.0.3 thumbnail overlays (T.thumb.tag / tagOn / bar / big / panel)
 export { character, POSES3, posesAt3, flow3, exprAt, walkPose3, breathe3, blendPose3, EXPRESSIONS, BODY } from './rig3d.js';
-export { walkTo, idle3, speak3, lookAtSpeaker, handheld, chase, crashZoom, punch, dutch, rackFocus, pov, povArms, armWrestle, reachPose, body3, squash, climb, jump3, sitDown, turn3, throw3, throwHand, reachTo, toss, lockerDoor } from "./motion3d.js";
+export { walkTo, idle3, speak3, listen3, lookAtSpeaker, handheld, chase, crashZoom, punch, dutch, rackFocus, pov, povArms, armWrestle, reachPose, body3, squash, climb, jump3, sitDown, turn3, throw3, throwHand, reachTo, toss, lockerDoor } from "./motion3d.js";
 export { camShot, CAMS } from './camera10.js';   // 1.0 named camera framings
 export * as W from './world3d.js';
 export * as FX3 from './fx3d.js';

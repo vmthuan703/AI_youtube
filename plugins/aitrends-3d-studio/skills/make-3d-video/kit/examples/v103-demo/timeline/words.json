@@ -1,0 +1,134 @@
+[
+{
+"word": "Wait,",
+"start": 0.3,
+"end": 0.62,
+"speaker": "YOU"
+},
+{
+"word": "you",
+"start": 0.66,
+"end": 0.8,
+"speaker": "YOU"
+},
+{
+"word": "SERIOUSLY",
+"start": 0.85,
+"end": 1.45,
+"speaker": "YOU"
+},
+{
+"word": "did",
+"start": 1.5,
+"end": 1.62,
+"speaker": "YOU"
+},
+{
+"word": "that?",
+"start": 1.66,
+"end": 2.05,
+"speaker": "YOU"
+},
+{
+"word": "Yeah!",
+"start": 2.3,
+"end": 2.62,
+"speaker": "MAYA"
+},
+{
+"word": "Totally",
+"start": 2.7,
+"end": 3.12,
+"speaker": "MAYA"
+},
+{
+"word": "worth",
+"start": 3.16,
+"end": 3.4,
+"speaker": "MAYA"
+},
+{
+"word": "it.",
+"start": 3.44,
+"end": 3.75,
+"speaker": "MAYA"
+},
+{
+"word": "Oh",
+"start": 4.3,
+"end": 4.5,
+"speaker": "YOU"
+},
+{
+"word": "this",
+"start": 4.55,
+"end": 4.75,
+"speaker": "YOU"
+},
+{
+"word": "is",
+"start": 4.8,
+"end": 4.92,
+"speaker": "YOU"
+},
+{
+"word": "AMAZING!",
+"start": 5.0,
+"end": 5.75,
+"speaker": "YOU"
+},
+{
+"word": "Look",
+"start": 5.9,
+"end": 6.15,
+"speaker": "YOU"
+},
+{
+"word": "at",
+"start": 6.2,
+"end": 6.3,
+"speaker": "YOU"
+},
+{
+"word": "me!",
+"start": 6.35,
+"end": 6.75,
+"speaker": "YOU"
+},
+{
+"word": "Happy",
+"start": 29.0,
+"end": 29.3,
+"speaker": "MOM"
+},
+{
+"word": "Thanksgiving,",
+"start": 29.35,
+"end": 30.05,
+"speaker": "MOM"
+},
+{
+"word": "everybody!",
+"start": 30.1,
+"end": 30.75,
+"speaker": "MOM"
+},
+{
+"word": "Pass",
+"start": 31.0,
+"end": 31.3,
+"speaker": "YOU"
+},
+{
+"word": "the",
+"start": 31.35,
+"end": 31.45,
+"speaker": "YOU"
+},
+{
+"word": "PIE!",
+"start": 31.5,
+"end": 31.95,
+"speaker": "YOU"
+}
+]

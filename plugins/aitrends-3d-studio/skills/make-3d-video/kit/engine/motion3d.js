@@ -39,7 +39,11 @@ export function walkTo(ch, t, o = {}) {
   ch.rotation.y = yaw;
   // cadence from distance: nominal stride per cycle (walk 1.45 m, run 2.85 m, sprint 4.7 m) adapted to the speed asked for
   const cad = o.sprint ? 1.9 : o.run ? 1.4 : 0.92, nominal = (o.sprint ? 4.7 : o.run ? 2.85 : 1.45) * sc;
-  const stride = clamp(vmax / cad, nominal * 0.6, nominal * 1.5), phase = (s / stride) * Math.PI * 2;
+  const stride = clamp(vmax / cad, nominal * 0.6, nominal * 1.5);
+  // 1.0.3: while the walk eases in or out the legs swing with a smaller amplitude (blended with the idle pose), so the same distance
+  // needs more steps: integrate speed / (stride × amplitude) instead of distance / stride. Deterministic (fixed 1/120 s steps).
+  const vAt = (u) => u <= 0 || u >= T ? 0 : u < a ? vmax * u / a : u < T - a ? vmax : vmax * (T - u) / a;
+  let phase = 0; { const dt = 1 / 120; for (let u = 0; u < tau; u += dt) { const h = Math.min(dt, tau - u), vv = vAt(u + h / 2), kb = ease.inOut(clamp((vv / Math.max(vmax, 1e-3)) * 1.6)); phase += vv * h / (stride * Math.max(0.35, kb)); } phase *= Math.PI * 2; }
   ch.userData.mo = { ...(ch.userData.mo || {}), v, phase };   // 1.0: drives hair / strings / bag swing in pose()
   const gait = walkPose3(phase, { run: o.run, sprint: o.sprint, lean: (o.lean ?? 1) * clamp(v / Math.max(vmax, 1e-3)) });
   const idle = getPose(o.idle || 'stand'), end = getPose(o.end || o.idle || 'stand');
@@ -69,6 +73,19 @@ export function idle3(pose, t, o = {}) {
 // ---------------------------------------------------------------- talking body
 // speak3(pose, speaker, globalT, { k }) — while `speaker` talks: a small nod on each word, a bigger one on long words and
 // numbers, and a beat of the free hand on stressed words. Wrap any pose (after idle3/breathe3). The narrator never does this.
+// 1.0.3 listen3(pose, me, globalT, { k, who }): while someone else talks (optionally only `who`), small nods on their stressed words
+// and a slower nod when a line ends, plus a slight head tilt toward the conversation. Pure function of time.
+export function listen3(pose, me, globalT, o = {}) {
+  const p = getPose(pose), W = E.words, k = o.k ?? 1, mine = String(me || '').toUpperCase(); if (!W.length) return p;
+  let nod = 0, live = false;
+  for (let i = W.length - 1; i >= 0; i--) { const w = W[i]; if (w.start > globalT) continue; if (globalT - w.end > 1.2) break;
+    const sp = String(w.speaker || 'NARRATOR').toUpperCase(); if (sp === mine || sp === 'NARRATOR' || (o.who && sp !== String(o.who).toUpperCase())) continue; live = true;
+    const raw = String(w.word || ''), strong = raw.replace(/[^A-Za-z]/g, '').length >= 7 || /[!?.]$/.test(raw);
+    if (strong) { const u = (globalT - w.end) / 0.5; if (u > 0 && u < 1) nod = Math.max(nod, Math.sin(Math.PI * u) * (/[.!?]$/.test(raw) ? 1 : 0.5)); } }
+  if (!live) return p;
+  const tilt = 3 * (hash01(mine.length * 7.3) - 0.5) * 2;
+  return { ...p, head: [p.head[0] + 6 * nod * k, p.head[1], p.head[2] + tilt * k] };
+}
 export function speak3(pose, speaker, globalT, o = {}) {
   const p = getPose(pose), k = o.k ?? 1, sp = String(speaker).toUpperCase(), W = E.words;
   if (!W.length) return p;

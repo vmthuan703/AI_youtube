@@ -8,6 +8,7 @@ whether to add it to the plugin, build it only in this video, or use a ready-mad
   python tools/set_match.py --project P --decide "kho hàng=plugin" --decide "xe tải=use:pickup" --decide "bãi rác=project"
   python tools/set_match.py --project P --check            exit 1 while a missing item has no decision (or waits for the plugin)
   python tools/set_match.py --project P --shots            every shots.json "set" must be a catalogue set or a project set
+  python tools/set_match.py --pending | --released          sets copied into the studio, waiting for the one plugin release after the video
   python tools/set_match.py --scan-projects                past videos' own sets → channel/set_wishlist.json (what to promote)
   python tools/set_match.py --verify-catalog               every call in the catalogue exists in the engine (verify_kit runs it)
   python tools/set_match.py --list [sets|props|actions|fx] the catalogue as a table
@@ -22,6 +23,7 @@ import argparse, datetime, glob, json, os, re, sys, unicodedata
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CAT_PATH = os.path.join(ROOT, "engine", "catalog.json")
 WISH_PATH = os.path.join(ROOT, "channel", "set_wishlist.json")
+QUIET = [False]
 KINDS = {"places": "sets", "props": "props", "actions": "actions", "fx": "fx"}
 KIND_VI = {"sets": "Bối cảnh", "props": "Đạo cụ", "actions": "Động tác", "fx": "Thời tiết / hiệu ứng"}
 STOP = set("a an the of in on at to and or with his her their my your its is are was be by for from into out up down this that it he she you they we "
@@ -116,7 +118,7 @@ def scan_script(text, cat):
     hits = {}
     for kind in ("sets", "fx", "props", "actions"):
         for e in cat[kind]:
-            if e.get("prefer") and e["prefer"] in hits:
+            if e.get("prefer"):
                 continue
             for a in e["_scan"]:
                 pat = re.compile(r" " + re.escape(a) + r"(?:s|es)? ")
@@ -206,48 +208,49 @@ def dec_text(d):
     return DEC_VI.get(d, d)
 
 
+def row_text(i, cat):
+    e = find(cat, i["use"]) if i["use"] else None
+    alts = ", ".join(i["alts"])
+    if i["status"] == "near":
+        return f"🟡 {KIND_VI[i['kind']]}: {i['name']} → {label(e)}; {NEAR_VI[i['kind']]}" + (f"; khác: {alts}" if alts else "")
+    q = i["quote"][:70].replace('"', "'")
+    return f"❌ {KIND_VI[i['kind']]}: {i['name']} (\"{q}\") → {dec_text(i.get('decision'))}" + (f"; thay thế được: {alts}" if alts else "")
+
+
 def write_md(P, res, cat):
+    """Short on purpose: Claude reads it and the user reads it. ✅ items are one line of ids; only 🟡 / ❌ get a row each."""
     items = res["items"]
     have = [i for i in items if i["status"] == "have"]
-    near = [i for i in items if i["status"] == "near"]
-    miss = [i for i in items if i["status"] == "missing"]
-    L = [f"# Đối chiếu bối cảnh: {res['project']}", "", f"Ngày {res['date']} · danh mục plugin {res.get('catalog')} · "
-         f"{len(have)} có sẵn, {len(near)} gần đúng, {len(miss)} thiếu.", ""]
-    for kind in ("sets", "props", "actions", "fx"):
-        rows = [i for i in items if i["kind"] == kind]
-        if not rows:
-            continue
-        L += [f"## {KIND_VI[kind]}", "", "| | Script cần | Câu trong script | Dùng | Ghi chú |", "|---|---|---|---|---|"]
-        for i in rows:
-            e = find(cat, i["use"]) if i["use"] else None
-            icon = {"have": "✅", "near": "🟡", "missing": "❌"}[i["status"]]
-            alts = ", ".join(f"`{a}`" for a in i["alts"])
-            note = ("có sẵn" if i["status"] == "have" else
-                    f"gần đúng: {NEAR_VI[kind]}{'; khác: ' + alts if alts else ''}" if i["status"] == "near" else
-                    f"{dec_text(i.get('decision'))}{'; thay thế được: ' + alts if alts else ''}")
-            q = i["quote"].replace("|", "/")[:90]
-            L.append(f"| {icon} | {i['name']} | {q} | {label(e) if e else '—'} | {note} |")
-        L.append("")
-    extra = [f for f in res["found"] if f["new"] and f["kind"] in ("sets", "fx")]
+    rest = [i for i in items if i["status"] != "have"]
+    L = [f"# Đối chiếu bối cảnh: {res['project']}", "", f"{res['date']} · danh mục {res.get('catalog')} · ✅ {len(have)} · 🟡 "
+         f"{sum(1 for i in rest if i['status'] == 'near')} · ❌ {sum(1 for i in rest if i['status'] == 'missing')}", ""]
+    if have:
+        L += ["✅ Có sẵn: " + ", ".join(f"{i['name']} = `{i['use']}`" for i in have), ""]
+    L += [f"- {row_text(i, cat)}" for i in rest]
+    extra = [f["id"] for f in res["found"] if f["new"] and f["kind"] == "sets"][:5]
     if extra:
-        L += ["## Script còn nhắc tới (tìm tự động, kiểm tra lại)", ""]
-        for f in extra:
-            e = find(cat, f["id"])
-            L.append(f"- {label(e)}: \"{f['quote'][:100]}\"")
-        L.append("")
-    if miss:
-        L += ["## Bạn chọn cho từng mục ❌", "", "- **thêm vào plugin**: mình dựng trên nhánh mới, gửi ảnh mẫu, bạn duyệt rồi mới PR, merge, cập nhật plugin;",
-              "- **dựng riêng**: chỉ dựng trong video này (ghi vào hàng chờ `channel/set_wishlist.json`, video sau cần lại sẽ đề xuất đưa vào plugin);",
-              "- **dùng bối cảnh thay thế**: chọn một mục có sẵn.", ""]
-    wish = load_json(WISH_PATH, {"items": []})["items"]
-    hot = [w for w in wish if w.get("status") == "wanted" and len(w.get("videos", [])) >= 2]
+        L += ["", "Script còn nhắc tới (kiểm tra lại): " + ", ".join(f"`{x}`" for x in extra)]
+    if any(i["status"] == "missing" for i in rest):
+        L += ["", "Chọn cho mỗi ❌: **thêm vào plugin** · **dựng riêng trong video** · **dùng bối cảnh có sẵn** (tên)."]
+    hot = [w for w in load_json(WISH_PATH, {"items": []})["items"] if w.get("status") == "wanted" and len(w.get("videos", [])) >= 2]
     if hot:
-        L += ["## Hàng chờ: đã dựng riêng ở ≥ 2 video, nên đưa vào plugin", ""]
-        for w in hot:
-            L.append(f"- {w['name']} ({len(w['videos'])} video: {', '.join(w['videos'][:5])})")
-        L.append("")
+        L += ["", "Hàng chờ (≥ 2 video, nên đưa vào plugin): " + "; ".join(f"{w['name']} ({len(w['videos'])})" for w in hot)]
     with open(os.path.join(P, "story", "set_match.md"), "w", encoding="utf-8") as f:
         f.write("\n".join(L) + "\n")
+    return L
+
+
+def stills(res):
+    """Ready-made stills (rendered once at install by node render.mjs --catalog) of the sets this video will use."""
+    d = os.path.join(ROOT, "examples", "catalog", "build", "sheets")
+    ids = sorted({i["use"] for i in res["items"] if i["kind"] == "sets" and i.get("use")} |
+                 {i["decision"][4:] for i in res["items"] if (i.get("decision") or "").startswith("use:")})
+    out = []
+    for eid in ids:
+        f = sorted(glob.glob(os.path.join(d, glob.escape(eid) + "_*.jpeg")))
+        if f:
+            out.append(f[0])
+    return out
 
 
 # ---------------------------------------------------------------- decisions, gates
@@ -289,7 +292,7 @@ def decide(P, pairs, cat):
     write_md(P, res, cat)
 
 
-def check(P, cat):
+def check(P, cat, quiet=False):
     res = load_json(os.path.join(P, "story", "set_match.json"), None)
     if not res:
         print("NO MATCH YET  run set_match.py --project P --script <file> --needs story/needs.json")
@@ -303,7 +306,8 @@ def check(P, cat):
             print(f"WAITING   {i['name']}: the user has not chosen (plugin / project / use:<id>)"); bad += 1
         elif d == "plugin" and not i.get("added"):
             print(f"PLUGIN    {i['name']}: waits for the plugin update (then: --added \"{i['name']}=<new id>\")"); bad += 1
-    print("set_match: " + ("ready to build shots." if not bad else f"{bad} item(s) still open."))
+    if bad or not quiet:
+        print("set_match: " + ("ready to build shots." if not bad else f"{bad} item(s) still open."))
     return 1 if bad else 0
 
 
@@ -319,12 +323,31 @@ def added(P, pairs, cat):
             sys.exit(f"no item named '{name}'")
         it.update(added=eid.strip(), use=eid.strip(), status="have")
         w = load_json(WISH_PATH, {"items": []})
-        for x in w["items"]:
-            if norm(x["name"]) == norm(name):
-                x["status"], x["added"] = "added", eid.strip()
+        x = next((x for x in w["items"] if norm(x["name"]) == norm(name)), None)
+        if not x:
+            x = {"name": it["name"], "desc": it.get("desc", ""), "videos": [res.get("project")], "first": today(), "source": "set_match"}
+            w["items"].append(x)
+        x["status"], x["added"] = "studio", eid.strip()   # in the studio now; the plugin gets it at the one release after the video
         save_json(WISH_PATH, w)
     save_json(p, res)
     write_md(P, res, cat)
+
+
+def pending(release=False):
+    """Sets copied into the studio but not yet released in the plugin (one PR / merge / plugin update after the video)."""
+    w = load_json(WISH_PATH, {"items": []})
+    todo = [x for x in w["items"] if x.get("status") == "studio"]
+    if release:
+        for x in todo:
+            x["status"] = "added"
+        save_json(WISH_PATH, w)
+        print(f"released: {', '.join(x['added'] for x in todo) or 'nothing'}")
+        return 0
+    for x in todo:
+        print(f"PENDING RELEASE  {x['added']} ({x['name']}, {', '.join(x.get('videos', []))})")
+    if not todo:
+        print("nothing waits for a plugin release.")
+    return 0
 
 
 def check_shots(P, cat):
@@ -336,7 +359,8 @@ def check_shots(P, cat):
     for b in bad:
         n = [s["id"] for s in shots if s.get("set") == b]
         print(f"UNKNOWN SET  '{b}' in {len(n)} shot(s) ({', '.join(n[:4])}): not in the catalogue, not built in scenes/sets/")
-    print(f"shots: {len(shots)} shots, {len({s.get('set') for s in shots})} sets, {len(bad)} unknown.")
+    if bad or not QUIET[0]:
+        print(f"shots: {len(shots)} shots, {len({s.get('set') for s in shots})} sets, {len(bad)} unknown.")
     return 1 if bad else 0
 
 
@@ -413,9 +437,13 @@ def main():
     ap.add_argument("--shots", action="store_true")
     ap.add_argument("--scan-projects", action="store_true")
     ap.add_argument("--verify-catalog", action="store_true")
+    ap.add_argument("--pending", action="store_true", help="sets in the studio waiting for the plugin release")
+    ap.add_argument("--released", action="store_true", help="mark them released (after the plugin update)")
+    ap.add_argument("--quiet", action="store_true", help="print only problems (render.mjs uses it)")
     ap.add_argument("--list", nargs="?", const="sets")
     ap.add_argument("--root", help="another studio folder for projects/ and channel/ (default: this kit)")
     a = ap.parse_args()
+    QUIET[0] = a.quiet
     if a.root:
         global ROOT, WISH_PATH
         ROOT = os.path.abspath(a.root); WISH_PATH = os.path.join(ROOT, "channel", "set_wishlist.json")
@@ -429,6 +457,8 @@ def main():
     if a.scan_projects:
         scan_projects(cat)
         return
+    if a.pending or a.released:
+        sys.exit(pending(a.released))
     if not a.project:
         ap.error("--project is required")
     P = os.path.abspath(a.project)
@@ -439,15 +469,23 @@ def main():
     if a.script or a.needs:
         needs = a.needs or (os.path.join(P, "story", "needs.json") if os.path.exists(os.path.join(P, "story", "needs.json")) else None)
         res = build_report(P, a.script, needs, cat)
-        n = {s: sum(1 for i in res["items"] if i["status"] == s) for s in ("have", "near", "missing")}
-        print(f"set_match: {n['have']} have, {n['near']} near, {n['missing']} missing; {len(res['found'])} catalogue entries named in the script "
-              f"-> {rel(os.path.join(P, 'story', 'set_match.md'))}")
+        # stdout is what Claude reads: the counts, the 🟡/❌ rows, and the stills to send (no need to open them)
+        lines = write_md(P, res, cat)
+        print("\n".join(l for l in lines[2:] if l) or "nothing to match")
+        for f in stills(res):
+            print("STILL " + f)
+        print(f"-> {rel(os.path.join(P, 'story', 'set_match.md'))}")
+    code = 0
     if a.shots:
-        sys.exit(check_shots(P, cat))
+        code |= check_shots(P, cat)
     if a.check:
-        sys.exit(check(P, cat))
+        code |= check(P, cat, a.quiet)
+    if a.shots or a.check:
+        sys.exit(code)
     if a.decide or a.added:
-        print(f"decisions saved -> {rel(os.path.join(P, 'story', 'set_match.md'))}")
+        res = load_json(os.path.join(P, "story", "set_match.json"), {"items": []})
+        left = [i["name"] for i in res["items"] if i["status"] == "missing" and not i.get("decision")]
+        print(f"decisions saved; ❌ without a choice: {', '.join(left) or 'none'}")
 
 
 if __name__ == "__main__":

@@ -45,6 +45,11 @@ source silently.
    `examples/speed-demo/build/sheets/sheet_01.png` with one finished frame per shot (bedroom, phone insert, night street,
    time-freeze, close-ups, super-speed) and prints no errors. Open the PNG to confirm, then delete
    `examples/speed-demo/build/`.
+3. Catalogue stills (1.0.5): `node render.mjs --catalog` in the background (about 6 minutes on a GTX 1660). It writes one JPEG
+   per ready-made set to `examples/catalog/build/sheets`, which the set match sends to the user. No need to open them. Keep
+   this folder; re-run after every plugin update (or `--catalog <new ids>` for only the new sets).
+4. Updating an existing studio from a newer kit: `python tools/sync_kit.py --to <studio>` (run from the new kit) copies the
+   code and runs verify_kit; it never touches `channel/` or `projects/`.
 
 ## Notes
 - No GPU (Linux servers, cloud sessions): Chromium uses SwiftShader (`--gl swiftshader`, the Linux default). It works,

@@ -249,6 +249,16 @@ async function bench() {
   console.log(`  one worker ≈ ${fpsW.toFixed(2)} frames/s; ${W} workers ≈ ${(fpsW * eff).toFixed(2)} frames/s (estimate)`);
   console.log(`  this video: ${total} frames ≈ ${fmtT(est)} to render (+ encode). Encoder: ${ENCODER}. CPU threads: ${cores}.`);
 }
+// 1.0.5: building shots needs a finished set match (every missing set decided, every shots.json set known). Projects made before
+// 1.0.5 have no story/set_match.json and pass with a note. --force renders anyway.
+function setGate() {
+  if (args.catalog || args.bench || args.force || PROJECT.startsWith(path.join(ROOT, 'examples'))) return;
+  if (!fs.existsSync(path.join(PROJECT, 'story', 'set_match.json'))) { console.log('set match: none for this project (made before 1.0.5), skipped'); return; }
+  const py = process.env.PYTHON || (process.platform === 'win32' ? 'python' : 'python3');
+  const r = spawnSync(py, [path.join(ROOT, 'tools', 'set_match.py'), '--project', PROJECT, '--check', '--shots', '--quiet'], { encoding: 'utf8', cwd: ROOT });
+  if (r.status) { console.error((r.stdout || '') + (r.stderr || '')); console.error('set match not ready: decide the missing sets (tools/set_match.py --decide) or render anyway with --force'); process.exit(3); }
+}
+setGate();
 try { if (args.bench) await bench(); else if (args.qc) { const q = await runQC(); if (q.red) process.exitCode = 2; } else if (args.thumbs) await renderThumbs(); else if (args.gif) await renderGifs(); else if (args.sheet || args.stills || args.styles) await renderStills(); else await renderVideo(); }
 catch (e) { console.error('RENDER FAILED:', e.message); process.exitCode = 1; }
 finally { server.close(); }

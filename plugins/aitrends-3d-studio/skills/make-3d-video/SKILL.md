@@ -71,30 +71,25 @@ the script yourself. If they say to continue as is, continue. When the user asks
 `references/story-breakdown.md` → "Writing a script" from the first draft.
 
 ## Stage 1b: Set match (1.0.5), once the script is final
-Before the voice, find out which places, props, actions and effects the kit already has, so nothing is built twice and nothing
-missing is discovered halfway through the shots. Follow `references/set-match.md`:
-1. Read the whole script and write `projects/<slug>/story/needs.json`: every place the story goes, every prop the narration names,
-   every action that needs a body movement, every weather or effect, each with the script's own line (`quote`) and a short `desc`.
-2. `python tools/set_match.py --project projects/<slug> --script <file>` → `story/set_match.md` (✅ have, 🟡 near, ❌ missing, plus
-   catalogue entries the script names that the list missed). Fix needs.json if the automatic hits show something you forgot.
-3. **Checkpoint.** Show the user the ✅/🟡/❌ table in short and, for the sets you plan to use, their stills
-   (`node render.mjs --catalog id,id` → `examples/catalog/build/sheets`; not while Chatterbox runs). For every ❌ ask:
-   **add to the plugin**, **build only in this video**, or **use a ready-made one** (name the closest from the `alts`). Record the
-   answers with `--decide "<name>=plugin|project|use:<id>"`. Never pick "plugin" for the user.
-4. **Plugin additions** (only after the user said yes): build them in the plugin's source repo on a new version branch, add each
-   to `engine/catalog.json` with a demo recipe, `python tools/set_match.py --verify-catalog`, render `--catalog <new ids>` and
-   send the stills. After the user approves: commit, PR and merge (ask first, as for any release), update the installed plugin,
-   copy the kit into the studio (engine/, tools/, examples/, render.mjs; keep channel/ and projects/), run `verify_kit.py`, then
-   `--added "<name>=<new id>"`. The voice (Stage 3) can run meanwhile, but no renders while Chatterbox uses the GPU.
-5. `python tools/set_match.py --project projects/<slug> --check` must print "ready" before Stage 6, and `--shots` must pass after
-   Stage 4 (every shots.json `set` is a catalogue set or one built in `scenes/sets/`).
-"Build only in this video" items are written to `channel/set_wishlist.json`; when a second video needs the same thing, the
-report proposes moving it into the plugin.
+1. In the same read as the Story logic answers, write `projects/<slug>/story/needs.json`: every place, named prop, non-trivial
+   action and weather/effect, each `{name, quote, desc}` (schema in `references/set-match.md`; don't read that file otherwise).
+2. `python tools/set_match.py --project projects/<slug> --script <file>`. Its output is the whole report: read it, not the .md and
+   not `engine/catalog.json`. Fix needs.json if a 🟡/✅ is wrong for the story; decide 🟡 yourself (`--decide "<name>=use:<id>"`).
+3. **Checkpoint.** Send the user the report lines plus the `STILL` files it printed (SendUserFile; don't open them), and ask for
+   every ❌: **plugin**, **project** (built only here) or **use:<id>**. Record: `--decide "<name>=plugin" --decide ...`.
+4. For each "plugin" item: read `references/set-match.md` → "Adding a set", build it in the plugin repo on the next version
+   branch with its catalogue entry, `--verify-catalog`, `node render.mjs --catalog <id>` and open only those stills; send them.
+   On the user's OK: `python tools/sync_kit.py --to <studio>` (copies the kit into the studio at once), then in the studio
+   `--added "<name>=<id>"` and `node render.mjs --catalog <id>` (its still for later videos). Continue the video; the plugin
+   release waits for Stage 8.
+Shot building needs no extra command: `render.mjs` refuses `--sheet`, previews and the final render while a ❌ is undecided or a
+shots.json `set` is unknown (`--force` overrides).
 
 ## Stage 2: Install or check the studio
 Follow `references/install.md`: copy `kit/` to `aitrends-3d-studio/` in the workspace (skip if present), install
 dependencies including the Chatterbox environment, run `python tools/verify_kit.py` and `python tools/doctor.py`, then the
-self-test, then `node render.mjs --project examples/speed-demo --bench`. Report what was installed in one short list,
+self-test, then `node render.mjs --project examples/speed-demo --bench`, then `node render.mjs --catalog` once in the background
+(one still per ready-made set for the set match; re-run after a plugin update). Report what was installed in one short list,
 the GPU line it printed (GPU or CPU) and its time estimate, which feeds the export-quality advice.
 
 ## Stage 3: Voiceover + timeline
@@ -119,8 +114,7 @@ motifs, music plan), `scenes/cast.js` (import the hero and every supporting role
 students `STUDENTS`; change one colour or the hair at most, never write an outfit from scratch; then run `python tools/cast_check.py --project projects/<slug>`), and
 rewrite `story/shots.json` (contiguous shots, cut on phrase boundaries 0.1–0.2 s early, 17–21 shots per minute, median 2.2–2.5 s,
 a quarter of shots under about 1.5 s, an establishing shot per location, a concrete `scene` per shot). Locations come from
-`story/set_match.json` (the `use` id of each place, or the user's choice); then run `python tools/set_match.py --project
-projects/<slug> --shots`. Send a 5–10 line plan summary and continue unless the user objects.
+`story/set_match.json` (the `use` id of each place, or the user's choice). Send a 5–10 line plan summary and continue unless the user objects.
 
 ## Stage 5: Style and palette choice
 `pearl` is the channel's style. Build the 1–2 most-used sets plus 3 representative shots (a wide with ≥ 2 characters, a face
@@ -181,7 +175,10 @@ Read `references/render-qc.md`.
    every piece of feedback the user gave during the reviews, one line each, in their words: `node tools/retro.mjs --project
    projects/<slug> --note "..."` (also right when they give it). Then give a short proposal for the next video from the
    refreshed checklist (`--next`): what to watch for, and any problem the plugin itself should fix (the "Nên sửa" list), plus the sets, graphics and effects the book proposes.
-6. Clean up once the user has the file: `python tools/tidy_project.py --project projects/<slug>` keeps only `out/` and moves the working
+6. Plugin release (1.0.5), once per video: `python tools/set_match.py --pending` lists sets this video added to the studio. If any,
+   ask the user once to release them together with any other plugin fixes from this video: commit and push the version branch,
+   PR and merge (with their OK), update the installed plugin, then `--released`. Nothing pending: skip.
+7. Clean up once the user has the file: `python tools/tidy_project.py --project projects/<slug>` keeps only `out/` and moves the working
    files to a clearly named folder for the user to delete. It deletes nothing, and never send big files to the Recycle Bin.
 
 ## Defaults and judgement calls

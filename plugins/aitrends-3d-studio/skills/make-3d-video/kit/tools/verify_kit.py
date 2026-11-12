@@ -9,7 +9,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EXPECTED = {
     "package.json": "2aec62b73f96018d",
     "player.html": "5ffdd7da4a48cd4b",
-    "render.mjs": "d91a7b2d4e2e6dc1",
+    "render.mjs": "e239697b114fcd98",
     "audio/dsp.py": "589d305d94d8acc3",
     "audio/mix.py": "fabf2b05cad92d43",
     "audio/music.py": "2fb3ce1df2fe5c7d",
@@ -127,8 +127,9 @@ EXPECTED = {
     "tools/retro.mjs": "fbbef16b9a936ded",
     "engine/home15.js": "e66b45793e1654e9",
     "engine/catalog.json": "1e40803471951ad5",
-    "tools/set_match.py": "e04e04042d85e12f",
+    "tools/set_match.py": "007ef6bb43713076",
     "examples/catalog/scenes/shots/catalog.js": "d525e985c5402491",
+    "tools/sync_kit.py": "0038b86e4f865028",
 }
 bad = 0
 for rel, want in EXPECTED.items():

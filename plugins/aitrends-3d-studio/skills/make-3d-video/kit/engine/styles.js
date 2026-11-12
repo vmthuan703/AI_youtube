@@ -97,7 +97,7 @@ export const STYLES = {
 };
 // 2.0: the film style. Neutral light multipliers and grade, because T.cine.stage lights and grades each shot by its look.
 STYLES.cine = { ...STYLES.pearl, name: 'Cine 2.0', desc: 'Film picture: real sky and sun, weather, contact shadows, aerial haze, god rays, split-tone lens.',
-  light: { ambient: 1, key: 1, fill: 1, rim: 1, practical: 1, exposure: 1 }, setSat: 1, skinGlow: 0.03,
+  cine: true, setSat: 0.92, skinGlow: 0.04,
   grade: { contrast: 1.0, sat: 1.0, vignette: 0.42, grain: 0.05, bloom: 0.5, bloomThreshold: 0.92 } };
 // alias so 2D-studio habits still work
 STYLES.dusk = STYLES.cinematic;

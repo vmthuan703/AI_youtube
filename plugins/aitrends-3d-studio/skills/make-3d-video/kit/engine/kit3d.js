@@ -14,6 +14,9 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { E, S, V, mood, shade, rng, key, smoothKey, ease, clamp, lerp, noise } from './core.js';
+import * as CINE from './cine20.js';
+import * as WX20 from './weather20.js';
+import * as W3 from './world3d.js';
 export { THREE };
 
 // ---------------------------------------------------------------- renderer (one per worker)
@@ -153,7 +156,7 @@ export function stage(o = {}) {
   if (E.quality === 'standard' && o.msaa == null) { const fx = new ShaderPass(FXAAShader); fx.uniforms.resolution.value.set(1 / w, 1 / h); composer.addPass(fx); }   // cheap anti-aliasing
   const tickers = [];
   const api = {
-    scene, camera, composer, sun, hemi, fill, M, bloom, bokeh, tickers, moodName, faceLight,
+    scene, camera, composer, sun, hemi, fill, M, bloom: bloomK > 0 ? bloom : null, bokeh, tickers, moodName, faceLight, rimState,
     // re-apply this stage's rim and mood before drawing it: another stage may have been built since (backdrops, transitions)
     activate: () => { rim(rimState); E.curMood = moodName; },
     add: (...objs) => { objs.forEach(ob => { if (!ob) return; scene.add(ob); if (typeof ob.tick === 'function') tickers.push(ob.tick); }); return objs[0]; },   // objects with .tick(t) animate by themselves (crowds)
@@ -169,9 +172,12 @@ export function stage(o = {}) {
     fitShadow: (c, size = 6) => { const d = sun.position.clone().sub(sun.target.position).normalize(); sun.target.position.set(...c); sun.position.copy(sun.target.position).addScaledVector(d, 30);
       Object.assign(sun.shadow.camera, { left: -size, right: size, top: size, bottom: -size, near: 1, far: 80 }); sun.shadow.camera.updateProjectionMatrix(); sun.target.updateMatrixWorld(); },
     render: () => { if (faceLight) { camera.updateMatrixWorld(); faceLight.position.copy(camera.position); faceLight.target.position.copy(camera.position).add(camera.getWorldDirection(new THREE.Vector3()).multiplyScalar(6)); faceLight.target.updateMatrixWorld(); }
-      R.toneMappingExposure = (o.exposure ?? 1) * (L.exposure ?? 1); camera.aspect = E.W / E.H; camera.updateProjectionMatrix(); R.info.autoReset = false; R.info.reset(); composer.render(); api.calls = R.info.render.calls; api.tris = R.info.render.triangles; },
+      R.toneMappingExposure = api.exp ?? (o.exposure ?? 1) * (L.exposure ?? 1); camera.aspect = E.W / E.H; camera.updateProjectionMatrix(); R.info.autoReset = false; R.info.reset(); composer.render(); api.calls = R.info.render.calls; api.tris = R.info.render.triangles; },
     dispose: () => { scene.traverse(x => { x.geometry?.dispose(); [].concat(x.material || []).forEach(m => { m.map?.dispose?.(); m.dispose(); }); }); composer.passes.forEach(p => p.dispose?.()); composer.dispose?.(); },   // free bloom/DOF targets too (long videos visit hundreds of shots per worker)
   };
+  camera.userData.stage = api;
+  // 2.0: the film picture. On for the `cine` style (the channel default) or when a look is named; o.cine: false or --legacy keeps the old picture.
+  if (!LEGACY && R && o.cine !== false && !QS.has('nocine') && (o.look || E.curShot?.look || st.cine)) CINE.apply({ wx: WX20, W: W3 }, api, o);
   return api;
 }
 

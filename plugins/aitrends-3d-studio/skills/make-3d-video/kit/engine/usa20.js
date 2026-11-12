@@ -135,7 +135,7 @@ function wires(st, pts, sag = 0.7, offs = [-1, 0, 1]) { const m = new THREE.Mesh
 
 // ---------------------------------------------------------------- Maple Street: the American suburb
 export function mapleStreet(st, o = {}) {
-  const season = o.season || 'fall', winter = season === 'winter', fall = season === 'fall', night = !!o.night, lit = o.lit ?? (night ? 0.75 : winter ? 0.8 : 0.3), r = rng(o.seed || 21), Lx = o.length || 150, add = (...a) => { a.forEach(x => x && st.scene.add(x)); return a[0]; };
+  st.outdoor = true; const season = o.season || 'fall', winter = season === 'winter', fall = season === 'fall', night = !!o.night, lit = o.lit ?? (night ? 0.75 : winter ? 0.8 : 0.3), r = rng(o.seed || 21), Lx = o.length || 150, add = (...a) => { a.forEach(x => x && st.scene.add(x)); return a[0]; };
   const leafCols = fall ? [['#a8381a', '#e07a24', '#f4b83a'], ['#8a2a1c', '#c8442a', '#ee8a3a'], ['#c88a1c', '#f0c23a', '#fbe07a'], ['#5a7a2a', '#a8a02a', '#e8c040']] : [['#2f6a34', '#4f9a44', '#8ac85a'], ['#2a5a3a', '#3f8a48', '#7ab85a']];
   const grassC = winter ? '#eef0fa' : fall ? '#7f9a48' : '#5fa04a', roadC = o.wet ? '#22242c' : '#4a4a52', walkC = winter ? '#e4e6f2' : '#b8b2a8';
   const R = (m, t, rx, ry) => tex(m, t, rx, ry), rec = (m) => { m.receiveShadow = true; m.castShadow = false; return m; };

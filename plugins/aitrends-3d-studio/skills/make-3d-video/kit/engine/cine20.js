@@ -22,7 +22,7 @@ export const LOOKS = {
     fill: '#ffd0a8', fillI: 0.35, cover: 0.42, cloudLit: '#ffd9b0', cloudDark: '#8a6f9a', fog: [0.0055, 0.1, 0.62], fogCol: '#eab08a', fogSun: '#ffc88a', rays: 0.85, ao: 0.9, aoTint: '#3a2a5a',
     exposure: 1.0, bloom: 0.5, bloomT: 0.92, stars: 0, grade: { shadow: '#1f3a5c', high: '#ffe2bc', split: 0.22, contrast: 1.1, sat: 1.1, ca: 0.0014 } },
   clearDay: { mood: 'day', sun: [-0.45, 0.62, -0.5], sunCol: '#fff3d6', key: '#fff1d6', keyI: 4.2, zen: '#2f6fd2', hor: '#bfdcf6', gnd: '#6f7a6a', amb: '#a8c6ff', ambGnd: '#7a8a60', ambI: 1.15,
-    fill: '#e0ecff', fillI: 0.3, cover: 0.36, cloudLit: '#ffffff', cloudDark: '#9aa8c8', fog: [0.006, 0.07, 0.7], fogCol: '#cfe0f4', fogSun: '#fff2d8', rays: 0.35, ao: 0.85, aoTint: '#2a3a6a',
+    fill: '#e0ecff', fillI: 0.3, cover: 0.36, cloudLit: '#ffffff', cloudDark: '#9aa8c8', fog: [0.003, 0.07, 0.5], fogCol: '#cfe0f4', fogSun: '#fff2d8', rays: 0.35, ao: 0.85, aoTint: '#2a3a6a',
     exposure: 1.0, bloom: 0.38, bloomT: 0.96, stars: 0, grade: { shadow: '#1f3f66', high: '#fff2dc', split: 0.14, contrast: 1.08, sat: 1.12, ca: 0.0012 } },
   rainNight: { mood: 'night', sun: [0.4, 0.55, -0.6], sunCol: '#8fa8e8', key: '#7f9ae6', keyI: 1.1, zen: '#070b1c', hor: '#1c2748', gnd: '#0c1020', amb: '#3a4c86', ambGnd: '#262a48', ambI: 1.35,
     fill: '#6a80c8', fillI: 0.25, cover: 0.85, cloudLit: '#2c3862', cloudDark: '#0c1226', fog: [0.016, 0.05, 0.7], fogCol: '#1c2850', fogSun: '#2a3a6a', rays: 0, ao: 0.8, aoTint: '#05081a',
@@ -33,6 +33,25 @@ export const LOOKS = {
   overcast: { mood: 'storm', sun: [-0.3, 0.7, -0.4], sunCol: '#dfe6f2', key: '#dfe6f4', keyI: 1.3, zen: '#6a7890', hor: '#aab4c4', gnd: '#5a6068', amb: '#c0cce0', ambGnd: '#70786a', ambI: 1.5,
     fill: '#c8d4e8', fillI: 0.3, cover: 0.95, cloudLit: '#c6ccd8', cloudDark: '#6a7488', fog: [0.02, 0.05, 0.85], fogCol: '#a4aebc', fogSun: '#c4ccd8', rays: 0, ao: 1.0, aoTint: '#1c2434',
     exposure: 1.0, bloom: 0.35, bloomT: 0.95, stars: 0, grade: { shadow: '#1c3448', high: '#f0ece0', split: 0.18, contrast: 1.1, sat: 0.98, ca: 0.0012 } },
+  dusk: { mood: 'dusk', sun: [-0.66, 0.1, -0.74], sunCol: '#ff9a6a', key: '#ffb08a', keyI: 2.6, zen: '#27306e', hor: '#f29a80', gnd: '#4a4460', amb: '#8a8ad8', ambGnd: '#7a5a6a', ambI: 1.25,
+    fill: '#b8a0e0', fillI: 0.4, cover: 0.45, cloudLit: '#ffb090', cloudDark: '#4a3a78', fog: [0.007, 0.08, 0.62], fogCol: '#b88aa8', fogSun: '#ffa880', rays: 0.6, ao: 0.9, aoTint: '#2a1e5a',
+    exposure: 1.05, bloom: 0.6, bloomT: 0.9, stars: 0.35, grade: { shadow: '#22306a', high: '#ffdcc0', split: 0.24, contrast: 1.08, sat: 1.1, ca: 0.0014 } },
+  night: { mood: 'night', sun: [0.45, 0.5, -0.74], sunCol: '#b8c8ff', key: '#93a8f0', keyI: 1.7, zen: '#060a22', hor: '#232e5e', gnd: '#0c1020', amb: '#4458a0', ambGnd: '#34345c', ambI: 2.1,
+    fill: '#7a8ad8', fillI: 0.3, cover: 0.3, cloudLit: '#3a4878', cloudDark: '#0e1430', fog: [0.008, 0.06, 0.6], fogCol: '#1a2450', fogSun: '#3a4a88', rays: 0, ao: 0.85, aoTint: '#060a22', face: 0.5, rim: 0.9,
+    exposure: 1.4, bloom: 0.6, bloomT: 0.9, stars: 1, disc: 0.5, grade: { shadow: '#10285a', high: '#ffdcb0', split: 0.28, contrast: 1.1, sat: 1.12, ca: 0.0016 } },
+  rainDay: { mood: 'storm', sun: [-0.3, 0.7, -0.4], sunCol: '#d4dcec', key: '#d0d8ea', keyI: 1.1, zen: '#566478', hor: '#98a4b6', gnd: '#4a5058', amb: '#b4c0d8', ambGnd: '#687064', ambI: 1.45,
+    fill: '#c0cce0', fillI: 0.3, cover: 1.0, cloudLit: '#b0b8c6', cloudDark: '#566070', fog: [0.026, 0.05, 0.86], fogCol: '#98a2b2', fogSun: '#b4bcc8', rays: 0, ao: 1.0, aoTint: '#18202e', face: 0.2,
+    exposure: 1.02, bloom: 0.4, bloomT: 0.94, stars: 0, disc: 0, grade: { shadow: '#18344c', high: '#ecebe0', split: 0.22, contrast: 1.1, sat: 0.96, ca: 0.0012 } },
+  snowDay: { mood: 'snow', sun: [-0.5, 0.42, -0.6], sunCol: '#fff0dc', key: '#fff0e0', keyI: 3.0, zen: '#4a78d0', hor: '#d4e2f6', gnd: '#b8c2dc', amb: '#b8ccff', ambGnd: '#c8d0ec', ambI: 1.2,
+    fill: '#e0e8ff', fillI: 0.35, cover: 0.4, cloudLit: '#ffffff', cloudDark: '#a8b4d4', fog: [0.008, 0.06, 0.65], fogCol: '#dce4f6', fogSun: '#fff4e0', rays: 0.3, ao: 0.8, aoTint: '#2a3c7a',
+    exposure: 0.95, bloom: 0.4, bloomT: 0.97, stars: 0, grade: { shadow: '#1c3a70', high: '#fff4e4', split: 0.16, contrast: 1.06, sat: 1.06, ca: 0.0012 } },
+  // interiors keep the set's own lamps and windows; the film pass adds contact shadows and the lens
+  interiorWarm: { mood: 'interiorWarm', interior: true, sun: [-0.5, 0.5, 0.5], sunCol: '#ffd0a0', fog: [0, 0.1, 0], fogCol: '#000000', fogSun: '#000000', rays: 0, ao: 0.95, aoTint: '#2a1420', aoRadius: 0.4,
+    grade: { shadow: '#2a2444', high: '#ffe4c0', split: 0.16, contrast: 1.03, sat: 1.08, ca: 0.0012 } },
+  interiorCool: { mood: 'interiorCool', interior: true, sun: [-0.5, 0.5, 0.5], sunCol: '#d0e0ff', fog: [0, 0.1, 0], fogCol: '#000000', fogSun: '#000000', rays: 0, ao: 0.95, aoTint: '#141a34', aoRadius: 0.4,
+    grade: { shadow: '#1c2c50', high: '#fff0dc', split: 0.16, contrast: 1.03, sat: 1.06, ca: 0.0012 } },
+  plain: { mood: 'void', interior: true, sun: [0, 1, 0], sunCol: '#ffffff', fog: [0, 0.1, 0], fogCol: '#000000', fogSun: '#000000', rays: 0, ao: 0.7, aoTint: '#101020', aoRadius: 0.4,
+    grade: { shadow: '#202040', high: '#ffffff', split: 0.08, contrast: 1.04, sat: 1.04, ca: 0.001 } },
   fogMorning: { mood: 'sunrise', sun: [0.6, 0.14, -0.78], sunCol: '#ffd0a0', key: '#ffd8b0', keyI: 2.6, zen: '#6a86c0', hor: '#f4d4c0', gnd: '#7a7470', amb: '#c0c8e8', ambGnd: '#8a8070', ambI: 1.1,
     fill: '#ffe0c8', fillI: 0.3, cover: 0.3, cloudLit: '#ffe6d0', cloudDark: '#a89ab8', fog: [0.05, 0.16, 0.92], fogCol: '#e6d2c8', fogSun: '#ffdcb4', rays: 1.1, ao: 0.8, aoTint: '#3a3050',
     exposure: 1.0, bloom: 0.55, bloomT: 0.9, stars: 0, grade: { shadow: '#2a3a5c', high: '#ffeed8', split: 0.18, contrast: 1.04, sat: 1.02, ca: 0.0012 } },
@@ -142,6 +161,7 @@ class CinePass extends Pass {
     scene.overrideMaterial = null; renderer.shadowMap.autoUpdate = au; for (const o of hid) o.visible = true;
     const A = this.ao.material.uniforms, M = this.mix.material.uniforms;
     A.projInv.value.copy(camera.projectionMatrixInverse); A.proj.value.copy(camera.projectionMatrix);
+    if (this.st.own && !this.checked) { this.checked = true; indoorCheck(this.st, this); }
     renderer.setRenderTarget(this.aoRT); this.ao.render(renderer);
     M.tDiffuse.value = readBuffer.texture; M.projInv.value.copy(camera.projectionMatrixInverse); M.camWorld.value.copy(camera.matrixWorld); M.camPos.value.setFromMatrixPosition(camera.matrixWorld);
     const sv = M.sunDir.value.clone().transformDirection(camera.matrixWorldInverse);   // the sun in view space: in front of the lens when z < 0
@@ -159,20 +179,69 @@ class LensPass extends Pass {
   dispose() { this.q.dispose(); }
 }
 
-// ---------------------------------------------------------------- stage
-// stage(T, { look, fov, dof, shadowSize, sun (override direction), any LOOKS field, any T.stage option })
-export function stage(T, o = {}) {
-  const L = { ...LOOKS[o.look || 'goldenHour'], ...o }; L.grade = { ...LOOKS[o.look || 'goldenHour'].grade, ...(o.grade || {}) };
-  const sl = S().light || {}, sun = V3(L.sun).normalize();
-  const st = T.stage({ mood: L.mood, fov: o.fov, fog: false, sky: [L.zen, L.hor], keyPos: sun.clone().multiplyScalar(40).toArray(), keyColor: L.key, shadowSize: o.shadowSize || 16, shadowMap: o.shadowMap || 4096,
-    bloom: L.bloom / 0.8, bloomThreshold: L.bloomT, exposure: L.exposure / (sl.exposure ?? 1), dof: o.dof, env: o.env ?? 0.55, faceLight: o.faceLight ?? 0, rim: o.rim || L.sunCol, rimStrength: (o.rimStrength ?? 0.75) / (sl.rim ?? 1), rimDir: sun.toArray(), msaa: o.msaa });
-  st.look = L; st.sunDir = sun;
-  st.sun.intensity = L.keyI; st.sun.shadow.radius = 4; st.sun.shadow.bias = -0.0003; st.sun.shadow.normalBias = 0.04;
-  st.hemi.color.set(L.amb); st.hemi.groundColor.set(L.ambGnd); st.hemi.intensity = L.ambI;
-  st.fill.color.set(L.fill); st.fill.intensity = L.fillI; st.fill.position.copy(sun.clone().multiplyScalar(-10).setY(4));
-  st.sky = skyDome(st, L);
+// A room built with an outdoor mood (a diner by day, a gym) must not get sun, haze and god rays inside it. On the first frame five
+// rays go up from the camera; when a ceiling is there, the stage gets its own lamps back and keeps only the sky (seen through
+// windows), contact shadows and the lens. { indoor: true | false } on the stage settles it by hand; outdoor sets set st.outdoor.
+function indoorCheck(st, pass) {
+  const own = st.own; let indoor = own.indoor;
+  if (indoor == null && !st.outdoor) { const rc = new THREE.Raycaster(), from = st.camera.getWorldPosition(new THREE.Vector3()), list = []; rc.far = 14;
+    st.scene.traverse(m => { if (m.isMesh && m.visible && !m.userData.noDepth && !m.material.transparent && m.name !== 'skyDome') list.push(m); });
+    let hits = 0; for (const d of [[0, 1, 0], [0.5, 0.86, 0], [-0.5, 0.86, 0], [0, 0.86, 0.5], [0, 0.86, -0.5]]) { rc.set(from, new THREE.Vector3(...d).normalize()); if (rc.intersectObjects(list, false).length) hits++; }
+    indoor = hits >= 4; }
+  if (!indoor) return;
+  st.indoor = true; st.sun.position.copy(own.sunP); st.sun.color.copy(own.sunC); st.sun.intensity = own.sunI; st.hemi.color.copy(own.hemiC); st.hemi.groundColor.copy(own.hemiG); st.hemi.intensity = own.hemiI;
+  st.fill.color.copy(own.fillC); st.fill.intensity = own.fillI; st.fill.position.copy(own.fillP); if (st.faceLight) st.faceLight.intensity = own.face; Object.assign(st.rimState, own.rim); st.activate();
+  if (st.bloom && own.bloom) { st.bloom.strength = own.bloom[0]; st.bloom.threshold = own.bloom[1]; } st.exp = 1.1;
+  const M = pass.mix.material.uniforms; M.fogP.value.set(0, 0.1, 0); M.rays.value = 0; pass.ao.material.uniforms.radius.value = 0.4;
+}
+
+// ---------------------------------------------------------------- looks by mood and weather
+// A set that only names a mood (T.stage({ mood: 'night' })) still gets the film picture: the mood picks the look.
+// shots.json can name them per shot: "look": "goldenHour", "weather": "rain" | "snow" | "leaves" | "fog" | "wind" | "storm".
+export const MOOD_LOOK = { day: 'clearDay', golden: 'goldenHour', dusk: 'dusk', night: 'night', storm: 'overcast', interiorWarm: 'interiorWarm', interiorCool: 'interiorCool', beach: 'clearDay', sunrise: 'goldenHour',
+  snow: 'snowDay', arctic: 'night', underwater: 'plain', void: 'plain' };
+const DARK = /night|dusk|arctic|storm/;
+export function lookFor(mood, weather) {
+  if (weather === 'rain' || weather === 'storm') return DARK.test(mood) ? 'rainNight' : 'rainDay';
+  if (weather === 'snow') return /interior/.test(mood) ? MOOD_LOOK[mood] : /night|dusk|golden|arctic/.test(mood) ? 'snowDusk' : 'snowDay';
+  if (weather === 'fog') return /interior/.test(mood) ? MOOD_LOOK[mood] : 'fogMorning';
+  return MOOD_LOOK[mood] || 'plain';
+}
+
+// apply(T, st, o): turn a finished T.stage into a film stage. T.stage calls it by itself when the style is `cine` (or o.look is given).
+export function apply(T, st, o = {}) {
+  const shot = E.curShot || {}, weather = o.weather ?? shot.weather ?? null, name = o.look || shot.look || lookFor(st.moodName, weather), base = LOOKS[name] || LOOKS.plain;
+  const L = { ...base, ...(o.cine || {}) }; for (const k of ['sun', 'rays', 'ao', 'cover', 'stars']) if (o[k] != null) L[k] = o[k]; L.grade = { ...base.grade, ...(o.grade || {}) };
+  if (o.fogCine) L.fog = o.fogCine;
+  const sun = V3(L.sun).normalize(); st.look = L; st.lookName = name; st.sunDir = sun; st.weather = weather;
+  st.scene.fog = null;
+  if (!L.interior) {
+    st.own = { sunP: st.sun.position.clone(), sunC: st.sun.color.clone(), sunI: st.sun.intensity, hemiC: st.hemi.color.clone(), hemiG: st.hemi.groundColor.clone(), hemiI: st.hemi.intensity, fillC: st.fill.color.clone(), fillI: st.fill.intensity, fillP: st.fill.position.clone(),
+      face: st.faceLight?.intensity, rim: { ...st.rimState }, bloom: st.bloom ? [st.bloom.strength, st.bloom.threshold] : null, indoor: o.indoor };
+    const tgt = st.sun.target.position; st.sun.position.copy(tgt).addScaledVector(sun, 40); st.sun.color.set(L.key); st.sun.intensity = L.keyI;
+    st.sun.shadow.radius = 4; st.sun.shadow.bias = -0.0003; st.sun.shadow.normalBias = 0.04;
+    st.hemi.color.set(L.amb); st.hemi.groundColor.set(L.ambGnd); st.hemi.intensity = L.ambI;
+    st.fill.color.set(L.fill); st.fill.intensity = L.fillI; st.fill.position.copy(sun.clone().multiplyScalar(-10).setY(4));
+    if (st.faceLight && o.faceLight == null) st.faceLight.intensity = L.face ?? 0;
+    Object.assign(st.rimState, { color: o.rim || L.sunCol, strength: o.rimStrength ?? L.rim ?? 0.75, dir: sun.toArray() }); st.activate();
+    st.exp = L.exposure * (o.exposure ?? 1);
+    if (st.bloom && o.bloom == null) { st.bloom.strength = L.bloom; st.bloom.threshold = o.bloomThreshold ?? L.bloomT; }
+    if (L.sky !== false && o.skyCine !== false) st.sky = skyDome(st, L);
+  }
   const w = Math.round(E.W * E.PX), h = Math.round(E.H * E.PX), cp = new CinePass(st, L, w, h), lp = new LensPass(L.grade);
-  st.composer.insertPass(cp, 1); st.composer.insertPass(lp, st.composer.passes.findIndex(p => p.constructor.name === 'OutputPass') + 1);
-  st.cine = cp; st.lens = lp;
+  st.composer.insertPass(cp, 1); st.composer.insertPass(lp, st.composer.passes.findIndex(p => p.isOutputPass || p.constructor.name === 'OutputPass') + 1);
+  st.cine = cp; st.lens = lp; if (L.interior) st.exp = 1.1;
+  // weather named in shots.json (or o.weather) falls round the action: o.wxAt = [x, z] centre, o.wxSize = half width
+  if (weather && T.wx && !/interior/.test(st.moodName) && o.weatherFx !== false) { const [cx, cz] = o.wxAt || [0, 0], r = o.wxSize || 16, area = [cx - r, cx + r, 0, 11, cz - r * 0.8, cz + r * 0.8];
+    if (weather === 'rain' || weather === 'storm') st.wx = T.wx.rain(st, { area, n: weather === 'storm' ? 4200 : 3000, wind: weather === 'storm' ? [4.5, 0, 1] : [2.2, 0, 0.5], len: 0.5, size: 0.014, opacity: 0.3 });
+    else if (weather === 'snow') st.wx = T.wx.snow(st, { area: [cx - r - 4, cx + r, 0, 12, cz - r, cz + r * 0.7] });
+    else if (weather === 'leaves' || weather === 'wind') st.wx = T.wx.leaves(st, { area: [cx - r, cx + r, 0, 9, cz - r * 0.5, cz + r * 0.5], n: weather === 'wind' ? 520 : 300, wind: weather === 'wind' ? [4.5, 0, 1.2] : [1.3, 0, 0.5], speed: weather === 'wind' ? 1.6 : 1.1 });
+    else if (weather === 'fog') st.wx = T.wx.motes(st, { area: [cx - 8, cx + 8, 0.3, 5, cz - 5, cz + 6], n: 200, color: '#fff0e0' });
+    if (weather === 'storm' && T.W && T.W.lightning && o.lightning !== false) T.W.lightning(st, { times: Array.isArray(o.lightning) ? o.lightning : [0.9, 2.6] }); }
   return st;
+}
+// stage(T, { look, weather, fov, dof, shadowSize, sun, ... }) - a film stage in one call (any T.stage option also works)
+export function stage(T, o = {}) {
+  const name = o.look || 'goldenHour', L = LOOKS[name] || LOOKS.plain;
+  return T.stage({ shadowSize: 16, env: 0.55, faceLight: 0, ...o, mood: o.mood || L.mood, look: name });
 }

@@ -48,7 +48,7 @@ export function mirror(st, o = {}) {
 // ---------------------------------------------------------------- sky dome: the mood's gradient + soft painted clouds + a sun glow
 // o: { clouds (count, 0 = none), sun: [x,y,z] direction | false, sunColor, seed, radius, tint, stars }.
 export function skyDome(st, o = {}) {
-  if (LEGACY) return null;
+  if (LEGACY || st.sky) return null;   // 2.0: a film stage already has its shader sky
   const M = st.M, sky = Array.isArray(M.sky) ? M.sky : [M.sky, M.sky], seed = o.seed || 4, n = o.clouds ?? 12;
   const night = /night|storm|arctic|void/.test(st.moodName);
   const sunDir = o.sun === false ? null : new THREE.Vector3(...(o.sun || [-0.45, 0.28, -1])).normalize();

@@ -27,7 +27,7 @@ const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const args = {}; { const a = process.argv.slice(2); for (let i = 0; i < a.length; i++) { if (a[i].startsWith('--')) { const k = a[i].slice(2); const v = a[i + 1] && !a[i + 1].startsWith('--') ? a[++i] : true; args[k] = v; } } }
 // 1.0.5: --catalog renders one still per ready-made set (engine/catalog.json) into examples/catalog/build/sheets
 if (args.catalog) { const C = JSON.parse(fs.readFileSync(path.join(ROOT, 'engine', 'catalog.json'), 'utf8')); const only = typeof args.catalog === 'string' ? new Set(args.catalog.split(',')) : null;
-  const sets = C.sets.filter(e => !only || only.has(e.id)); args.project = path.join(ROOT, 'examples', 'catalog'); args.sheet = true;
+  const sets = C.sets; args.project = path.join(ROOT, 'examples', 'catalog'); args.sheet = true; args.only = only;   // shots.json always lists every set; --catalog id,id renders only those and keeps the other stills
   fs.writeFileSync(path.join(args.project, 'story', 'shots.json'), JSON.stringify({ title: 'catalog', duration: sets.length * 2, shots: sets.map((e, i) => ({ id: e.id, start: i * 2, end: i * 2 + 2, line: '', camera: 'manual' })) }, null, 1));
   const cf = path.join(args.project, 'config.json'), cfg = JSON.parse(fs.readFileSync(cf, 'utf8')); cfg.duration = sets.length * 2; fs.writeFileSync(cf, JSON.stringify(cfg, null, 1)); }
 if (!args.project) { console.error('usage: node render.mjs --project projects/<name> [options]'); process.exit(1); }
@@ -186,12 +186,12 @@ async function contactSheet(browser, items, outFile, cols = 4, cellW = 480) {
 }
 async function renderStills() {
   const browser = await launch(); const styles = args.styles ? String(args.styles).split(',') : [args.style || null];
-  const dir = path.join(BUILD, args.styles ? 'styles' : args.sheet ? 'sheets' : 'stills'); fs.rmSync(dir, { recursive: true, force: true }); fs.mkdirSync(dir, { recursive: true });
+  const dir = path.join(BUILD, args.styles ? 'styles' : args.sheet ? 'sheets' : 'stills'); if (!args.only) fs.rmSync(dir, { recursive: true, force: true }); fs.mkdirSync(dir, { recursive: true });
   const all = [];
   for (const st of styles) {
     const page = await openPlayer(browser, st); const fps = FPS;
     let targets;
-    if (args.sheet) targets = (await page.evaluate('window.SHOT_LIST')).map(s => ({ t: s.start + (s.end - s.start) * 0.45, label: `${s.id}  ${s.start.toFixed(1)}s${s.ok ? '' : '  (MISSING)'}` }));
+    if (args.sheet) targets = (await page.evaluate('window.SHOT_LIST')).filter(s => !args.only || args.only.has(s.id)).map(s => ({ t: s.start + (s.end - s.start) * 0.45, label: `${s.id}  ${s.start.toFixed(1)}s${s.ok ? '' : '  (MISSING)'}` }));
     else targets = String(args.stills || args.at || '1').split(',').map(Number).map(t => ({ t, label: `${t}s` }));
     for (const tg of targets) { const img = await shot(page, Math.round(tg.t * fps)); const name = `${st ? st + '_' : ''}${tg.label.split(' ')[0].replace(/[^\w.]/g, '')}_${tg.t.toFixed(2)}.${FORMAT}`; fs.writeFileSync(path.join(dir, name), img); all.push({ img, label: `${st ? `[${st}] ` : ''}${tg.label}`, st }); }
     (await page.evaluate('window.ERRORS')).forEach(e => console.log('  shot error:', e)); await page.close();

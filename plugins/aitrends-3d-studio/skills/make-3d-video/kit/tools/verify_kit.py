@@ -9,7 +9,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EXPECTED = {
     "package.json": "2aec62b73f96018d",
     "player.html": "5ffdd7da4a48cd4b",
-    "render.mjs": "e239697b114fcd98",
+    "render.mjs": "b56e3c3eab86c23f",
     "audio/dsp.py": "589d305d94d8acc3",
     "audio/mix.py": "fabf2b05cad92d43",
     "audio/music.py": "2fb3ce1df2fe5c7d",

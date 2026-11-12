@@ -125,11 +125,36 @@ async function runQC(quiet = false) {
     for (const i of issues.slice(0, 60)) console.log(`  ${i.sev === 'red' ? 'RED  ' : 'amber'} ${String(i.shot).padEnd(14)} ${i.kind.padEnd(8)} ${i.msg}  @ ${i.times.slice(0, 5).join(', ')}${i.times.length > 5 ? ' …' : ''}s`); }
   return { red, amber };
 }
+// 1.0.6: checks story/shots.json before a full render: shots in order, no overlap, each shot has an id, and the
+// story duration equals the last shot's end (a mismatch makes the audio and picture end at different times).
+function shotsProblems() {
+  const p = []; let s;
+  try { s = JSON.parse(fs.readFileSync(path.join(PROJECT, 'story', 'shots.json'), 'utf8').replace(/^﻿/, '')); } catch (e) { return [`story/shots.json unreadable: ${e.message}`]; }
+  const shots = s.shots || [];
+  if (!shots.length) return ['story/shots.json has no shots'];
+  const ids = new Set();
+  shots.forEach((sh, i) => {
+    if (!sh.id) p.push(`shot #${i + 1} has no id`);
+    else if (ids.has(sh.id)) p.push(`shot id ${sh.id} is used twice`); else ids.add(sh.id);
+    if (!(typeof sh.start === 'number' && typeof sh.end === 'number') || sh.end <= sh.start) p.push(`shot ${sh.id || i + 1}: bad start/end`);
+    if (i && typeof sh.start === 'number' && sh.start < shots[i - 1].end - 0.01) p.push(`shot ${sh.id || i + 1} starts before the previous shot ends`);
+  });
+  const last = shots[shots.length - 1].end;
+  if (typeof s.duration === 'number' && Math.abs(s.duration - last) > 0.02) p.push(`story.duration ${s.duration}s differs from the last shot's end ${last}s`);
+  return p;
+}
+
 async function renderVideo() {
   const b0 = await launch(); const p0 = await openPlayer(b0);
   const total = await p0.evaluate('window.TOTAL_FRAMES'), fps = FPS; [OUTW, OUTH] = await p0.evaluate('window.OUT');
   const missing = (await p0.evaluate('window.SHOT_LIST')).filter(s => !s.ok); if (missing.length) console.log(`WARNING: ${missing.length} shots have no scene file yet: ${missing.slice(0, 12).map(s => s.id).join(', ')}${missing.length > 12 ? ' …' : ''}`);
   await b0.close();
+  // 1.0.6: a full render refuses to start with a broken timeline or missing scene files (unless --force).
+  const fullRender = !args.from && !args.to && !PREVIEW;
+  if (fullRender) {
+    const problems = [...shotsProblems(), ...missing.map(s => `shot ${s.id} has no scene file`)];
+    if (problems.length && !args.force) { problems.slice(0, 20).forEach(p => console.log('  ' + p)); throw new Error(`${problems.length} problem(s) in story/shots.json or scenes: fix them, or render anyway with --force`); }
+  }
   if (!args.from && !args.to && !args['no-qc'] && !PREVIEW) { const q = await runQC(true); if (q.red && !args.force) throw new Error(`motion QC found ${q.red} red issue(s): fix them (node render.mjs --project P --qc) or render anyway with --force`); }
   const f0 = Math.max(0, Math.round((+args.from || 0) * fps)), f1 = Math.min(total, args.to ? Math.round(+args.to * fps) : total);
   // default workers: half the CPU threads (max 8); on a GPU, cap by video memory (≈0.5 GB/worker at 1080p, 1.2 GB at 4K on a 6 GB card)
@@ -166,6 +191,13 @@ async function renderVideo() {
   await new Promise((res, rej) => spawn('ffmpeg', ['-y', '-v', 'error', '-f', 'concat', '-safe', '0', '-i', list, '-c', 'copy', '-movflags', '+faststart', out], { stdio: 'inherit' }).on('close', c => (c ? rej(new Error('concat failed')) : res())));
   if (errs.size) { console.log(`\n${errs.size} shot error(s):`); [...errs].slice(0, 40).forEach(e => console.log('  ' + e)); }
   console.log(`\nDone: ${out}  (${fmtT((Date.now() - t0) / 1000)})`);
+  // 1.0.6: a full render records its result in build/render_status.json. audio/mix.py refuses to mux a video whose
+  // status is not ok (unless --force), and this run exits with code 1 when shots raised errors.
+  if (fullRender) {
+    const ok = errs.size === 0;
+    fs.writeFileSync(path.join(BUILD, 'render_status.json'), JSON.stringify({ ok, shotErrors: [...errs], video: out, at: new Date().toISOString() }, null, 1));
+    if (!ok) { console.log(`RENDER HAS ${errs.size} SHOT ERROR(S): mux is blocked until fixed or re-run with --force`); if (!args.force) process.exitCode = 1; }
+  }
   // 1.0.4: the picture scorecard (tools/qc_metrics.py: brightness, colour, dark / empty / still frames, shot pace) runs on the
   // finished video by itself, writes build/qc_scorecard.md + .json, and feeds the lesson book below. --no-scorecard skips it.
   if (!PREVIEW && !args.from && !args.to && !args['no-scorecard']) { const py = process.env.PYTHON || (process.platform === 'win32' ? 'python' : 'python3');
@@ -253,10 +285,17 @@ async function bench() {
 // 1.0.5 have no story/set_match.json and pass with a note. --force renders anyway.
 function setGate() {
   if (args.catalog || args.bench || args.force || PROJECT.startsWith(path.join(ROOT, 'examples'))) return;
-  if (!fs.existsSync(path.join(PROJECT, 'story', 'set_match.json'))) { console.log('set match: none for this project (made before 1.0.5), skipped'); return; }
   const py = process.env.PYTHON || (process.platform === 'win32' ? 'python' : 'python3');
-  const r = spawnSync(py, [path.join(ROOT, 'tools', 'set_match.py'), '--project', PROJECT, '--check', '--shots', '--quiet'], { encoding: 'utf8', cwd: ROOT });
-  if (r.status) { console.error((r.stdout || '') + (r.stderr || '')); console.error('set match not ready: decide the missing sets (tools/set_match.py --decide) or render anyway with --force'); process.exit(3); }
+  if (!fs.existsSync(path.join(PROJECT, 'story', 'set_match.json'))) console.log('set match: none for this project (made before 1.0.5), skipped');
+  else {
+    const r = spawnSync(py, [path.join(ROOT, 'tools', 'set_match.py'), '--project', PROJECT, '--check', '--shots', '--quiet'], { encoding: 'utf8', cwd: ROOT });
+    if (r.status) { console.error((r.stdout || '') + (r.stderr || '')); console.error('set match not ready: decide the missing sets (tools/set_match.py --decide) or render anyway with --force'); process.exit(3); }
+  }
+  // 1.0.6: every character must come from the channel roster (tools/cast_check.py), same gate as the set match.
+  if (fs.existsSync(path.join(PROJECT, 'scenes', 'cast.js'))) {
+    const c = spawnSync(py, [path.join(ROOT, 'tools', 'cast_check.py'), '--project', PROJECT], { encoding: 'utf8', cwd: ROOT });
+    if (c.status) { console.error((c.stdout || '') + (c.stderr || '')); console.error('cast check failed: use a roster role (tools/cast_check.py explains) or render anyway with --force'); process.exit(4); }
+  }
 }
 setGate();
 try { if (args.bench) await bench(); else if (args.qc) { const q = await runQC(); if (q.red) process.exitCode = 2; } else if (args.thumbs) await renderThumbs(); else if (args.gif) await renderGifs(); else if (args.sheet || args.stills || args.styles) await renderStills(); else await renderVideo(); }

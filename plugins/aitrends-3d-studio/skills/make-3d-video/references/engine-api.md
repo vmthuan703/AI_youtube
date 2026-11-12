@@ -454,6 +454,16 @@ and raise their arms in waves; `cheer` 0–1 (or a function of t) sets how many 
   Materials: `T.mat(c, { clearcoat, clearcoatRough, sheen, sheenRough, sheenColor })` switches to the physical material. Characters get a clearcoat on
   skin, hair and shoes and a sheen on cloth automatically (`style.gloss` 0..1.5, 0 = the matte 0.2 look). `T.stage` lights every standard material with
   the mood's own sky/ground/sun (`env` 0..1, default 0.42; `style.env`). `st.fitShadow([x,y,z], size)` tightens the sun's shadow box around the action.
+- **Home sets, ready-made** (engine/home15.js, 1.0.5; promoted from five past videos that each rebuilt them). Seats are [x, z, yaw, seatY]:
+  `T.W.teenBedroom(st, { night, wall, bed, poster, skate })` → bed back-left, desk + lamp + chair right, window, rug, poster, skateboard;
+  `bedTop` [x, y, z] (pose 'sit'), `lieAt` (pose 'lie'), `desk` top, `chair`, `door`, `lamp`. `T.W.homeKitchen(st, { night, seats: 2|4, plates })`
+  → counter + cabinets + sink, fridge, dining table under a pendant; `seat(i)`, `table`, `fridge` / `counter` stand spots, `photo` spot.
+  `T.W.livingRoom(st, { night, tv: drawFn, sofa })` → wall TV that lights the room (`tv.screen.update(t)`), sofa facing it (`sofa(i)`), `stand`.
+  `T.W.phoneClose(st, { draw | feed, tilt })` → a glowing phone in front of a dark bedroom for screen inserts (camera z ≈ 1.75, fov 22–28).
+  Props: `T.W.ambulance()`, `T.W.fireTruck()` (front +x, light bar `.bar`), `T.W.ladder({ h })`, `T.W.skateboard()`, `T.W.cake({ candles, icing })`.
+- **Catalogue** (engine/catalog.json, 1.0.5): every set, prop, action and effect above with Vietnamese names and aliases, used by
+  `tools/set_match.py` before shots are planned (references/set-match.md). `node render.mjs --catalog [id,id]` renders a still per set.
+  **Use a catalogue set before writing a project set**; add new engine sets to the catalogue in the same commit.
 - Project sets: write `scenes/sets/<name>.js` exporting `function build(T, st, o)` that composes these, so every shot in
   a location uses the same geometry. Invent new props from boxes/cylinders/rounded boxes when the script needs them.
 

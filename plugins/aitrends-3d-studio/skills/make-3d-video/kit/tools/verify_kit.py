@@ -9,7 +9,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EXPECTED = {
     "package.json": "2aec62b73f96018d",
     "player.html": "5ffdd7da4a48cd4b",
-    "render.mjs": "e2b46a24778be1c9",
+    "render.mjs": "b56e3c3eab86c23f",
     "audio/dsp.py": "589d305d94d8acc3",
     "audio/mix.py": "fabf2b05cad92d43",
     "audio/music.py": "2fb3ce1df2fe5c7d",
@@ -34,7 +34,7 @@ EXPECTED = {
     "engine/sports3d.js": "982dcacc06b10a13",
     "engine/styles.js": "68040e8a4eed48a6",
     "engine/ui2d.js": "03062f7d8e5aff4d",
-    "engine/world3d.js": "88a059beae62ef8e",
+    "engine/world3d.js": "0c8ee15884ffef1d",
     "examples/diagram-gallery/config.json": "c1ac44eee0faf27d",
     "examples/diagram-gallery/scenes/shots/a.js": "c8ddaac2d475aa37",
     "examples/diagram-gallery/story/shots.json": "bb1cdf4dfb5cdef1",
@@ -124,7 +124,12 @@ EXPECTED = {
     "examples/v103-thumb/scenes/cast.js": "06440a3ddb11b87b",
     "examples/v103-thumb/scenes/shots/thumbs.js": "50ad2e72d7dfe046",
     "examples/v103-thumb/story/shots.json": "757d778839acd9c8",
-    "tools/retro.mjs": "5e059ad6fde30a50",
+    "tools/retro.mjs": "fbbef16b9a936ded",
+    "engine/home15.js": "e66b45793e1654e9",
+    "engine/catalog.json": "1e40803471951ad5",
+    "tools/set_match.py": "007ef6bb43713076",
+    "examples/catalog/scenes/shots/catalog.js": "d525e985c5402491",
+    "tools/sync_kit.py": "0038b86e4f865028",
 }
 bad = 0
 for rel, want in EXPECTED.items():
@@ -134,5 +139,11 @@ for rel, want in EXPECTED.items():
     got = hashlib.sha256(open(p, "rb").read().replace(b"\r\n", b"\n").strip()).hexdigest()[:16]
     if got != want:
         print(f"MISMATCH  {rel}"); bad += 1
+# 1.0.5: every call in the catalogue (engine/catalog.json) must exist in the engine
+try:
+    sys.path.insert(0, os.path.join(ROOT, "tools")); import set_match
+    if set_match.verify_catalog(set_match.catalog(), quiet=True): bad += 1
+except SystemExit:
+    print("MISSING   engine/catalog.json"); bad += 1
 print(f"{len(EXPECTED) - bad}/{len(EXPECTED)} files verified." + ("" if not bad else "  Copy the files listed above again from the plugin's kit folder, then run this again."))
 sys.exit(1 if bad else 0)

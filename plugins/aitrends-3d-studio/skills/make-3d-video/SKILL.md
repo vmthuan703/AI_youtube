@@ -23,6 +23,7 @@ the visuals fresh for every script; the style and the channel's hero stay fixed.
 - `references/style-bible.md`: **the look** (characters, sets, light, camera, shot vocabulary, editing, graphics, 9:16).
   Read it fully before designing any shot.
 - `references/story-breakdown.md`: script check, `story/bible.md`, `story/shots.json`, pacing.
+- `references/set-match.md`: 1.0.5 catalogue of ready-made sets, props, actions and effects; needs.json, the match report, decisions, adding a set to the plugin, the wishlist.
 - `references/engine-api.md`: config and shots.json schemas, the shot module API, characters, sets, diagrams, effects, cameras.
 - `references/sound-design.md`: music plan, SFX library, ambience, levels.
 - `references/render-qc.md`: quality presets, speed guide, preview and final render, scorecard, QC checklist, troubleshooting.
@@ -41,8 +42,10 @@ Stage commands re-run one stage: `/new-3d-video` (stages 1–4), `/3d-video-styl
    video. Change them only when the user asks, and then in `channel/`.
 5. **Draft, look, fix, then render.** Open contact sheets and stills yourself (read the PNGs) before any long render.
    Rendering 3D is slow; looking is fast.
-6. **Five user checkpoints:** the script check, the voice preview, the style and palette choice from rendered samples, the
-   video preview with its scorecard, and the final file. If the user is away, take the defaults, state what was assumed, and continue.
+6. **Six user checkpoints:** the script check, the **set match** (1.0.5: what the kit has, what is missing, and the user's choice
+   for each missing item), the voice preview, the style and palette choice from rendered samples, the video preview with its
+   scorecard, and the final file. If the user is away, take the defaults, state what was assumed, and continue; the one exception
+   is the set match: a missing item is never added to the plugin without the user's yes.
 7. **Files are the truth.** Each video lives in `aitrends-3d-studio/projects/<slug>/`; `story/shots.json` owns timing.
 
 ## Stage 1: Intake and script check
@@ -67,10 +70,26 @@ Say which results matter most and ask whether the user wants to edit the script 
 the script yourself. If they say to continue as is, continue. When the user asks you to **write** a script, follow the rules in
 `references/story-breakdown.md` → "Writing a script" from the first draft.
 
+## Stage 1b: Set match (1.0.5), once the script is final
+1. In the same read as the Story logic answers, write `projects/<slug>/story/needs.json`: every place, named prop, non-trivial
+   action and weather/effect, each `{name, quote, desc}` (schema in `references/set-match.md`; don't read that file otherwise).
+2. `python tools/set_match.py --project projects/<slug> --script <file>`. Its output is the whole report: read it, not the .md and
+   not `engine/catalog.json`. Fix needs.json if a 🟡/✅ is wrong for the story; decide 🟡 yourself (`--decide "<name>=use:<id>"`).
+3. **Checkpoint.** Send the user the report lines plus the `STILL` files it printed (SendUserFile; don't open them), and ask for
+   every ❌: **plugin**, **project** (built only here) or **use:<id>**. Record: `--decide "<name>=plugin" --decide ...`.
+4. For each "plugin" item: read `references/set-match.md` → "Adding a set", build it in the plugin repo on the next version
+   branch with its catalogue entry, `--verify-catalog`, `node render.mjs --catalog <id>` and open only those stills; send them.
+   On the user's OK: `python tools/sync_kit.py --to <studio>` (copies the kit into the studio at once), then in the studio
+   `--added "<name>=<id>"` and `node render.mjs --catalog <id>` (its still for later videos). Continue the video; the plugin
+   release waits for Stage 8.
+Shot building needs no extra command: `render.mjs` refuses `--sheet`, previews and the final render while a ❌ is undecided or a
+shots.json `set` is unknown (`--force` overrides).
+
 ## Stage 2: Install or check the studio
 Follow `references/install.md`: copy `kit/` to `aitrends-3d-studio/` in the workspace (skip if present), install
 dependencies including the Chatterbox environment, run `python tools/verify_kit.py` and `python tools/doctor.py`, then the
-self-test, then `node render.mjs --project examples/speed-demo --bench`. Report what was installed in one short list,
+self-test, then `node render.mjs --project examples/speed-demo --bench`, then `node render.mjs --catalog` once in the background
+(one still per ready-made set for the set match; re-run after a plugin update). Report what was installed in one short list,
 the GPU line it printed (GPU or CPU) and its time estimate, which feeds the export-quality advice.
 
 ## Stage 3: Voiceover + timeline
@@ -94,8 +113,8 @@ motifs, music plan), `scenes/cast.js` (import the hero and every supporting role
 **every character comes from the roster, extras included**: a second or third girl is `CLASSMATE_2` / `CLASSMATE_3`, a second boy `BRO_2` / `RIVAL_2`, background
 students `STUDENTS`; change one colour or the hair at most, never write an outfit from scratch; then run `python tools/cast_check.py --project projects/<slug>`), and
 rewrite `story/shots.json` (contiguous shots, cut on phrase boundaries 0.1–0.2 s early, 17–21 shots per minute, median 2.2–2.5 s,
-a quarter of shots under about 1.5 s, an establishing shot per location, a concrete `scene` per shot). Send a 5–10 line plan
-summary and continue unless the user objects.
+a quarter of shots under about 1.5 s, an establishing shot per location, a concrete `scene` per shot). Locations come from
+`story/set_match.json` (the `use` id of each place, or the user's choice). Send a 5–10 line plan summary and continue unless the user objects.
 
 ## Stage 5: Style and palette choice
 `pearl` is the channel's style. Build the 1–2 most-used sets plus 3 representative shots (a wide with ≥ 2 characters, a face
@@ -111,7 +130,7 @@ Palettes: `dusk`, `cozy`, `tropic`, `alert`, `school`, `midnight` (engine-api.md
 Tweaks: add a custom entry to `STYLES` or `PALETTES` in `engine/styles.js` and re-render that row.
 
 ## Stage 6: Build every shot
-Read `references/engine-api.md` and the example scenes in `examples/speed-demo/scenes/` (a full 32 s video),
+Read `references/engine-api.md` and the example scenes in `examples/speed-demo/scenes/` (a full 32 s video), `examples/catalog/` (1.0.5: every ready-made set built from its catalogue recipe),
 `examples/v103-demo/scenes/` (1.0.3 lip-sync on every mouth, listening nods, finger counts / thumbs up / peace, hands resting on desks, planted feet, scarf and wind, the hood, Thanksgiving dinner, pumpkin street, leaf gust, Friday-night football), `examples/v103-thumb/scenes/` (1.0.3 thumbnail layouts A–D with T.thumb, `--thumbs`), `examples/v102-motion/scenes/` (1.0.2 actions: door, carry, sitOn, runStop, trip, vault, climbOn, hug, high five, arm around, pull-run, catch a fall; gaze, react, busy crowds; longer arms before/after, grips, skirt sway, smart camera; motion QC and GIFs), `examples/v101-school/scenes/` (1.0.1 American high school: library, chem lab, auditorium, Friday-night football, principal, nurse, restroom mirror, band, locker room, student lot, prom, diner, suburb bus stop; fall, snow day, rain on windows, blackout, tornado-drill beacon, graduation caps; student poses and school cameras), `examples/v1-more/scenes/` (1.0 supermarket, hospital, rooftop, train station, snow, puddles, leaves, lightning, headlights, named cameras, lip-sync), `examples/v1-demo/scenes/` (1.0 everyday places: stairwell, classroom, city bus stop, shop street, residential, street food, café; gloss and motion), `examples/look-demo/scenes/` (sets and UI), `examples/diagram-gallery/scenes/` (every diagram, a blurred-scene backdrop) and
 `examples/worlds-demo/scenes/` (nature sets, light from props, game HUD and counters, first person, icons, planet) once.
 Work in batches of 8–12:
@@ -156,7 +175,10 @@ Read `references/render-qc.md`.
    every piece of feedback the user gave during the reviews, one line each, in their words: `node tools/retro.mjs --project
    projects/<slug> --note "..."` (also right when they give it). Then give a short proposal for the next video from the
    refreshed checklist (`--next`): what to watch for, and any problem the plugin itself should fix (the "Nên sửa" list), plus the sets, graphics and effects the book proposes.
-6. Clean up once the user has the file: `python tools/tidy_project.py --project projects/<slug>` keeps only `out/` and moves the working
+6. Plugin release (1.0.5), once per video: `python tools/set_match.py --pending` lists sets this video added to the studio. If any,
+   ask the user once to release them together with any other plugin fixes from this video: commit and push the version branch,
+   PR and merge (with their OK), update the installed plugin, then `--released`. Nothing pending: skip.
+7. Clean up once the user has the file: `python tools/tidy_project.py --project projects/<slug>` keeps only `out/` and moves the working
    files to a clearly named folder for the user to delete. It deletes nothing, and never send big files to the Recycle Bin.
 
 ## Defaults and judgement calls

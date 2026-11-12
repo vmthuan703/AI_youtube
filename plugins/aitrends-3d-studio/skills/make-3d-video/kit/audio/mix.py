@@ -37,8 +37,32 @@ def load_any(path, sr=SR):
     return load_audio(path, sr, mono=False)
 
 
+def _probe(path, entries):
+    r = subprocess.run(["ffprobe", "-v", "error", "-show_entries", entries, "-of", "json", path], capture_output=True, text=True)
+    return json.loads(r.stdout or "{}")
+
+def verify_final(out, total, cfg, upscaled=False):
+    """1.0.6: check the muxed MP4 before it is delivered: video and audio present, duration equals the story,
+    frame rate as configured. Exits 1 on any failure, so a bad file is never reported as done."""
+    problems = []
+    info = _probe(out, "format=duration:stream=codec_type,codec_name,avg_frame_rate,width,height")
+    streams = info.get("streams", [])
+    vids = [x for x in streams if x.get("codec_type") == "video"]; auds = [x for x in streams if x.get("codec_type") == "audio"]
+    if not vids: problems.append("no video stream")
+    if not auds: problems.append("no audio stream")
+    dur = float((info.get("format") or {}).get("duration", 0) or 0)
+    if abs(dur - float(total)) > 0.15: problems.append(f"duration {dur:.2f}s differs from the story's {float(total):.2f}s")
+    if vids and not upscaled and cfg.get("fps"):
+        num, _, den = (vids[0].get("avg_frame_rate") or "0/1").partition("/")
+        fps = float(num) / float(den or 1) if float(den or 1) else 0
+        if abs(fps - float(cfg["fps"])) > 0.5: problems.append(f"frame rate {fps:.2f} fps, config says {cfg['fps']}")
+    if problems:
+        print("FINAL FILE CHECK FAILED: " + "; ".join(problems)); sys.exit(1)
+    print(f"final file check: {dur:.2f}s, video + audio present" + (", fps as configured" if vids and not upscaled else ""))
+
+
 def main():
-    ap = argparse.ArgumentParser(); ap.add_argument("--project", required=True); ap.add_argument("--video"); ap.add_argument("--no-music", action="store_true"); ap.add_argument("--no-sfx", action="store_true"); ap.add_argument("--out"); ap.add_argument("--upscale", choices=["1440p", "2160p", "none"]); ap.add_argument("--encoder", choices=["auto", "x264", "nvenc"], default=None)
+    ap = argparse.ArgumentParser(); ap.add_argument("--project", required=True); ap.add_argument("--video"); ap.add_argument("--no-music", action="store_true"); ap.add_argument("--no-sfx", action="store_true"); ap.add_argument("--out"); ap.add_argument("--upscale", choices=["1440p", "2160p", "none"]); ap.add_argument("--encoder", choices=["auto", "x264", "nvenc"], default=None); ap.add_argument("--force", action="store_true", help="mux even if the render reported shot errors")
     a = ap.parse_args(); P = a.project
     cfg = json.load(open(os.path.join(P, "config.json"), encoding="utf-8")); story = json.load(open(os.path.join(P, "story", "shots.json"), encoding="utf-8"))
     total = story.get("duration") or story["shots"][-1]["end"]; n = secs(total)
@@ -100,6 +124,11 @@ def main():
     subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", raw, "-af", f"loudnorm=I={lufs}:TP=-1.5:LRA=11", "-ar", str(SR), out_wav], check=True)
     print(f"wrote {out_wav}  ({total:.1f}s, target {lufs} LUFS)")
     video = a.video or os.path.join(P, "build", "video_silent.mp4")
+    # 1.0.6: a render that reported shot errors or missing scenes is not muxed unless --force
+    rs = os.path.join(P, "build", "render_status.json")
+    if os.path.exists(rs) and not a.force:
+        st = json.load(open(rs, encoding="utf-8"))
+        if not st.get("ok", True): sys.exit(f"render reported {len(st.get('shotErrors', []))} shot error(s): fix the shots and re-render, or mux with --force")
     if os.path.exists(video):
         safe = re.sub(r"[^\w\- ]+", "", cfg.get("title") or "video").strip().replace(" ", "_") or "video"
         out = a.out or os.path.join(P, "out", f"{safe}.mp4"); os.makedirs(os.path.dirname(out), exist_ok=True)
@@ -116,6 +145,7 @@ def main():
                       "-g", str(max(1, round((cfg.get("fps") or 24) / 2))), "-bf", "2", "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709"]
             print(f"upscaling picture to {w}x{h} for upload ({'NVENC' if nv else 'x264'})…")
         subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", video, "-i", out_wav, "-map", "0:v:0", "-map", "1:a:0", *vcodec, "-c:a", "aac", "-b:a", abr, "-ar", "48000", "-shortest", "-movflags", "+faststart", out], check=True)
+        verify_final(out, total, cfg, upscaled=bool(up and up != "none"))
         print(f"FINAL VIDEO: {out}")
     else:
         print(f"(no silent video at {video} yet — render it, then run this again to mux)")

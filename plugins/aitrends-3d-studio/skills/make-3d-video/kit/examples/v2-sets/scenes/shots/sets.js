@@ -5,18 +5,18 @@ import { HERO, MIA } from '../cast.js';
 const Y = 0.16;
 
 registerShot('main_day', {
-  init(T) { const st = T.stage({ mood: 'golden', sun: [-0.94, 0.16, -0.3], fov: 34, shadowSize: 30 }); const ms = T.usa.mainStreet(st, { season: 'fall' });
+  init(T) { const st = T.stage({ mood: 'golden', sun: [-0.94, 0.16, -0.3], fov: 34, shadowSize: 30 }); const ms = T.usa.mainStreet(st, { season: 'fall', clearX: [-3, 16] });
     const hero = st.add(T.character(HERO)); st.fitShadow([-4, 0, 2], 30); return { st, ms, hero }; },
   draw(s, t, info, T) { s.hero.pose(T.walkTo(s.hero, t, { from: [3.5, -0.3], to: [-1, -0.2], t0: -1, t1: 4, y: Y })); s.hero.position.y = Y; s.hero.face({ expr: 'smile', t, blink: true });
     T.dolly(s.st.camera, t, [[0, { pos: [13, 2.0, 5.2], look: [-20, 3.0, 4.5] }], [3, { pos: [10.5, 1.7, 4.4], look: [-20, 2.8, 3.6] }]]); },
 });
 registerShot('main_night', {
-  init(T) { const st = T.stage({ mood: 'night', fov: 34, shadowSize: 22, wxAt: [0, 3] }); const ms = T.usa.mainStreet(st, { season: 'fall', night: true, wet: true });
+  init(T) { const st = T.stage({ mood: 'night', fov: 34, shadowSize: 22, wxAt: [0, 3] }); const ms = T.usa.mainStreet(st, { season: 'fall', night: true, wet: true, clearX: [-6, 9] });
     T.W.mirror(st, { w: 200, d: 10, x: 0, z: 6, y: 0.005, strength: 0.7, blur: 0.9, res: 0.85 });
     const hero = st.add(T.character(HERO).place(0.5, Y, -0.2, 0.5)), mia = st.add(T.character(MIA).place(-0.4, Y, 0.0, 0.7));
     st.add(T.spot('#ffbe78', 120, { pos: [3, 5.6, 1.0], target: [0.5, 0, 0.2], angle: 0.8, penumbra: 0.9, dist: 20 })); st.fitShadow([0, 0, 1], 18); return { st, hero, mia }; },
   draw(s, t, info, T) { s.hero.pose(T.idle3('stand', t)).face({ expr: 'smile', t, blink: true, look: [0.3, 0.2] }); s.mia.pose(T.idle3('relaxed', t, { seed: 3 })).face({ expr: 'smile', t, blink: true });
-    T.dolly(s.st.camera, t, [[0, { pos: [6.2, 1.3, 5.6], look: [-3, 2.2, -1] }], [3, { pos: [5.4, 1.25, 5.0], look: [-3, 2.1, -1] }]]); },
+    T.dolly(s.st.camera, t, [[0, { pos: [7.5, 1.3, 6.4], look: [-6, 2.6, 1] }], [3, { pos: [6.6, 1.25, 5.8], look: [-6, 2.5, 1] }]]); },
 });
 registerShot('school_day', {
   init(T) { const st = T.stage({ mood: 'day', fov: 36, shadowSize: 40 }); const hs = T.usa.highSchool(st, { season: 'fall' });

@@ -1,0 +1,55 @@
+{
+ "title": "v104-sets",
+ "duration": 21,
+ "shots": [
+  {
+   "id": "tire",
+   "start": 0,
+   "end": 3,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "weights",
+   "start": 3,
+   "end": 6,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "climb",
+   "start": 6,
+   "end": 9,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "tower",
+   "start": 9,
+   "end": 12,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "towerClose",
+   "start": 12,
+   "end": 15,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "stream",
+   "start": 15,
+   "end": 18,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "lockers",
+   "start": 18,
+   "end": 21,
+   "line": "",
+   "camera": "manual"
+  }
+ ]
+}

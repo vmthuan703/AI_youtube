@@ -89,7 +89,8 @@ The render log prints frames, fps, elapsed time and ETA every 48 frames; report 
 - [ ] 9:16: subjects in the middle, nothing important under the captions.
 - [ ] Audio: voice clear, music ducked, no SFX pile-ups, final loudness about −14 LUFS.
 
-Final file QC: `python tools/qc_metrics.py --project projects/<slug>`, `ffprobe -v error -show_entries stream=width,height,r_frame_rate,codec_name -of csv out/<file>.mp4`
+Final file QC: the full render runs the scorecard on build/video_silent.mp4 by itself (1.0.4; `--no-scorecard` skips it, `PYTHON`
+sets the interpreter) and the lesson book reads it; after the mix `python tools/qc_metrics.py --project projects/<slug>` adds loudness, `ffprobe -v error -show_entries stream=width,height,r_frame_rate,codec_name -of csv out/<file>.mp4`
 (resolution and fps as chosen, audio present), duration ≈ `story/shots.json` duration, and a contact sheet:
 `ffmpeg -i out/<file>.mp4 -vf fps=1/5,scale=384:-1,tile=6x4 -frames:v 1 build/final_sheet.png`.
 

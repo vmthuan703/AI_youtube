@@ -1,7 +1,7 @@
 {
   "name": "aitrends-3d-studio",
-  "version": "1.0.3",
-  "description": "Turn a script into a finished 3D animated story video: channel identity kit, script check, emotional open-source voiceover (Chatterbox, Kokoro fallback), word timings, story breakdown, code-built 3D sets (city, school, American high school (library, chem lab, auditorium, football field, locker room, band room, principal, nurse, prom, diner), stairwell, classroom, bus stop, shop street, residential street, street food, café, home, beach, island, snow, farm, underwater, space) and stick characters (Three.js), glossy materials, mirror floors, sky domes and light shafts, light from props, game HUD, first-person shots, animated explainer diagrams, style and palette choice, frame-by-frame render up to 4K / 60 fps, generated music and SFX, quality scorecard, final MP4.",
+  "version": "1.0.4",
+  "description": "Turn a script into a finished 3D animated story video: channel identity kit, script check, emotional open-source voiceover (Chatterbox, Kokoro fallback), word timings, story breakdown, code-built 3D sets (city, school, American high school (library, chem lab, auditorium, football field, locker room, band room, principal, nurse, prom, diner), weight room, climbing gym, breakable stadium light tower, livestream corner, stairwell, classroom, bus stop, shop street, residential street, street food, café, home, beach, island, snow, farm, underwater, space) and stick characters (Three.js), glossy materials, mirror floors, sky domes and light shafts, light from props, game HUD, first-person shots, animated explainer diagrams, style and palette choice, frame-by-frame render up to 4K / 60 fps, generated music and SFX, quality scorecard, final MP4.",
   "author": {
     "name": "aiTrends"
   },

@@ -1,0 +1,5 @@
+{
+ "title": "1.0.4 demo: weight room, climbing gym, breakable light tower, tractor tire, stream corner, toppling lockers",
+ "aspect": "16:9", "resolution": "1080p", "fps": 30, "quality": "high", "style": "pearl", "palette": null, "voiceover": null,
+ "duration": 21, "captions": false, "bars": "cine", "fadeIn": 0, "fadeOut": 0.4, "speechBubbles": false, "handheld": 0.25
+}

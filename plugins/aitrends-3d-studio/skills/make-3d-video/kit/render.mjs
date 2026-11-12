@@ -160,6 +160,13 @@ async function renderVideo() {
   await new Promise((res, rej) => spawn('ffmpeg', ['-y', '-v', 'error', '-f', 'concat', '-safe', '0', '-i', list, '-c', 'copy', '-movflags', '+faststart', out], { stdio: 'inherit' }).on('close', c => (c ? rej(new Error('concat failed')) : res())));
   if (errs.size) { console.log(`\n${errs.size} shot error(s):`); [...errs].slice(0, 40).forEach(e => console.log('  ' + e)); }
   console.log(`\nDone: ${out}  (${fmtT((Date.now() - t0) / 1000)})`);
+  // 1.0.4: the picture scorecard (tools/qc_metrics.py: brightness, colour, dark / empty / still frames, shot pace) runs on the
+  // finished video by itself, writes build/qc_scorecard.md + .json, and feeds the lesson book below. --no-scorecard skips it.
+  if (!PREVIEW && !args.from && !args.to && !args['no-scorecard']) { const py = process.env.PYTHON || (process.platform === 'win32' ? 'python' : 'python3');
+    const r = spawnSync(py, [path.join(ROOT, 'tools', 'qc_metrics.py'), '--video', out, '--project', PROJECT], { encoding: 'utf8', cwd: ROOT });
+    if (r.status) console.log('Scorecard not written: ' + String(r.stderr || r.error || '').trim().split('\n').pop());
+    else { const md = String(r.stdout || ''), bad = (md.match(/\| CHECK/g) || []).length; console.log(`Scorecard: ${bad ? bad + ' number(s) to check' : 'all in range'} → build/qc_scorecard.md`);
+      for (const row of md.split('\n').filter(l => l.includes('| CHECK')).slice(0, 8)) console.log('  ' + row.replace(/\s*\|\s*/g, ' | ').trim()); } }
   // 1.0.3: after every final render, record this video's problems in the channel lesson book (channel/LESSONS.md)
   if (!PREVIEW && !args.from && !args.to && !args.out && !args['no-lessons']) { try { const { record } = await import('./tools/retro.mjs');
     const e = record(PROJECT, { errors: [...errs], missing: missing.map(s => s.id), renderSec: Math.round((Date.now() - t0) / 1000) });

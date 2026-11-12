@@ -209,6 +209,12 @@ wrist bends so they stand up, the thumb on the right side for each hand); poses 
 follows the real leg swing). QC treats a hand or elbow touching a surface (under 4 cm) as contact, not clipping.
 **1.0.3 cloth**: scarf ends swing with the steps and flutter in the wind (`scene.userData.wind` 0..1; fallDay and pumpkinStreet set
 it, leafGust gusts it); the hood is a real folded hood seen from behind; a puffer bunches on the lap when seated.
+**1.0.4 strength** (engine/strength12.js): `T.W.weightRoom(st)` (mirror wall at −z; w.rack(i) stand spot, w.bar(i) the rack's dynamic
+barbell, w.bench(i) [x, z, yaw, seatY]), `T.W.climbingGym(st)` (c.wallSpot(i), c.hold(i, k) → world [x, y, z] of hold k on route i —
+put the climber with `ch.place(x, y, z + 0.42, PI)` and `T.reachPose`, c.mat(i), c.judges, c.matTop), `T.W.lightTower(st, { at, yaw, h })`
+(L.update(t, { lean, snap, cable }) tips it toward local +z; L.leg = world point to catch, L.top), `T.W.tractorTire({ stand })` (dynamic),
+`T.W.barbell({ plates })`, `T.W.streamCorner(st, { at, yaw, viewers })` (l.update(t, viewers), l.chair), `T.W.lockerRow({ n })` (r.tip(k),
+r.shake(t, a), r.topEdge(x)). Hold spots are stored at build time because `optimize()` merges static meshes.
 **1.0.3 November** (engine/fall11.js): `T.W.thanksgivingDinner(st)` (d.seat(i) → [x, z, yaw, seatY] for T.act.sitOn, d.carve,
 d.turkey), `T.W.pumpkinStreet(st)` (s.walk(i), s.porch(i)), `T.W.leafGust(st, { at: [x, z], t0, dur, r })`, props pumpkin({ face,
 lit }), hayBale, cornStalks, turkey, pie, candle, fallWreath. Friday-night football = T.W.footballField under schoolTime('night').

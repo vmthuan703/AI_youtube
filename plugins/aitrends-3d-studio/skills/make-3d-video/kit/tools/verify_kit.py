@@ -7,7 +7,7 @@ Prints MISMATCH/MISSING for any file that differs from the tested version; copy 
 import hashlib, os, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EXPECTED = {
-    "package.json": "99710d88c7fa8ea8",
+    "package.json": "3896c9ec4bc1b65e",
     "player.html": "5ffdd7da4a48cd4b",
     "render.mjs": "642182beb1e897bb",
     "audio/dsp.py": "589d305d94d8acc3",
@@ -23,12 +23,12 @@ EXPECTED = {
     "engine/gag.js": "728a86bf82e46afb",
     "engine/hair3d.js": "d279dae21fa878f0",
     "engine/icons2d.js": "e0eab43b5fd93c7a",
-    "engine/kit3d.js": "5a649d820f93f668",
-    "engine/motion3d.js": "c8ce89b9bd0a257c",
+    "engine/kit3d.js": "c5a27fb84b64d2ba",
+    "engine/motion3d.js": "4718722cdb71dddc",
     "engine/nature3d.js": "a058ae18ad5745ab",
     "engine/player.js": "5d98e9c0bffa2442",
     "engine/rig2d.js": "ec2a665e0aa8ffed",
-    "engine/rig3d.js": "1a2cdf77f7780998",
+    "engine/rig3d.js": "35984509f906f0bc",
     "engine/school3d.js": "771f84748e8b30d1",
     "engine/screens3d.js": "250bbf664fff717b",
     "engine/sports3d.js": "982dcacc06b10a13",
@@ -126,7 +126,7 @@ EXPECTED = {
     "examples/v103-thumb/story/shots.json": "757d778839acd9c8",
     "tools/retro.mjs": "fbbef16b9a936ded",
     "engine/home15.js": "e66b45793e1654e9",
-    "engine/catalog.json": "a1a10427642d22df",
+    "engine/catalog.json": "045bed7783ee3253",
     "tools/set_match.py": "007ef6bb43713076",
     "examples/catalog/scenes/shots/catalog.js": "d525e985c5402491",
     "tools/sync_kit.py": "0038b86e4f865028",
@@ -142,6 +142,10 @@ EXPECTED = {
     "examples/v2-sets/scenes/cast.js": "1c9122a55b4c4504",
     "examples/v2-sets/scenes/shots/sets.js": "98e911c46d95093d",
     "examples/v2-sets/story/shots.json": "bfd3c0083840449c",
+    "examples/v201-body/config.json": "26b3f3563db8d909",
+    "examples/v201-body/scenes/cast.js": "265485a933d54e31",
+    "examples/v201-body/scenes/shots/body.js": "c65b869f3e10e941",
+    "examples/v201-body/story/shots.json": "44f54e4b118b7e19",
 }
 bad = 0
 for rel, want in EXPECTED.items():

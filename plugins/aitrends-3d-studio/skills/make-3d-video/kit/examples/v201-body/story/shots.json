@@ -1,0 +1,11 @@
+{
+ "title": "v201-body",
+ "duration": 19.0,
+ "shots": [
+  { "id": "lineup", "start": 0, "end": 3.6, "line": "", "camera": "manual" },
+  { "id": "walkside", "start": 3.6, "end": 8.4, "line": "", "camera": "manual", "in": { "type": "fade", "dur": 0.3 } },
+  { "id": "run", "start": 8.4, "end": 11.6, "line": "", "camera": "manual", "in": { "type": "fade", "dur": 0.3 } },
+  { "id": "stopturn", "start": 11.6, "end": 16.2, "line": "", "camera": "manual", "in": { "type": "fade", "dur": 0.3 } },
+  { "id": "sit", "start": 16.2, "end": 19.0, "line": "", "camera": "manual", "in": { "type": "fade", "dur": 0.3 } }
+ ]
+}

@@ -7,6 +7,14 @@ khung hình 2:1, sơ đồ giải thích hoạt hình.
 Mọi khung hình đều dựng bằng code (Three.js) và render từng khung một. Không dùng AI tạo ảnh/video, nên nhân vật
 giữ nguyên dáng suốt video và chữ luôn nét. Giọng đọc mặc định dùng Chatterbox (MIT, chạy máy cá nhân), dự phòng Kokoro-82M (Apache-2.0).
 
+## Mới trong 2.0.1 — dáng người mới, đi đứng như người thật
+- **Cả dàn nhân vật có dáng mới, giữ nguyên khuôn mặt:** chân dài hơn, vai rộng hơn, áo thon ở eo, đùi và bắp chân thon dần (khoảng 3,45 lần đầu).
+- **Đi và chạy:** bàn chân bám đất (chạm gót → cả bàn → đạp mũi), hông hạ và dồn sang chân trụ, vai xoay ngược hông, tay vung như con lắc theo số đo người thật; chạy có lúc hai chân rời đất.
+- **Bắt đầu và dừng bước:** nhún nhẹ lúc xuất phát, bước ngắn dần khi dừng; quay người bằng cách bước chân; đứng yên dồn trọng lượng sang một chân.
+- **Ngồi:** các tư thế ngồi giữ đúng chiều cao ghế.
+- **Video cũ:** `pearl`, `--legacy` hoặc `build: 1` trong trang phục giữ dáng cũ.
+- **Hạn chế:** `sitDown` vào ghế có bàn sát phía trước có thể làm đùi xuyên mép bàn; hãy đặt nhân vật ngồi sẵn.
+
 ## Mới trong 2.0.0 — hình ảnh như phim, bối cảnh Mỹ, một prompt
 - **Kiểu hình `cine` là mặc định của kênh:** bầu trời có mặt trời và mây trôi, bóng tiếp xúc, sương xa dần, tia nắng xuyên tán cây, chỉnh màu kiểu phim. Mọi `T.stage({ mood })` cũ tự hưởng; phòng trong nhà được nhận ra và giữ đèn riêng. `pearl` vẫn còn để render lại video cũ (`--style pearl`, `--legacy`).
 - **Ánh sáng và thời tiết ghi trong `story/shots.json`:** `"look"` (goldenHour, clearDay, dusk, night, overcast, fogMorning, snowDay, snowDusk, rainNight, rainDay) và `"weather"` (rain, storm, snow, leaves, wind, fog).

@@ -17,7 +17,7 @@
 - Góp ý lỗi của một video đã chấp nhận là để sửa plugin cho video sau; không làm lại video cũ trừ khi người dùng nói rõ.
 
 ## Thumbnail
-- Khi được yêu cầu thiết kế thumbnail, dùng `/make-thumbnail` (plugin `aitrends-thumbnail`)
+- Khi được yêu cầu thiết kế thumbnail, dùng `/make-thumbnail` (plugin `aitrends-3d-studio`)
   theo quy tắc trong `prompts/thumbnail_style.md`: dựng 3–4 phương án là các khoảnh khắc
   khác nhau (không còn bố cục A–D cố định), biểu cảm hero theo bối cảnh, rồi gửi ảnh để chọn.
 

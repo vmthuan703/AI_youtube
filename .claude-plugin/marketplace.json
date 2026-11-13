@@ -8,6 +8,12 @@
       "source": "./plugins/aitrends-3d-studio",
       "description": "Kịch bản → giọng đọc mã nguồn mở → video hoạt hình 3D hoàn chỉnh (Three.js), tới 4K/60 fps.",
       "version": "0.2.7"
+    },
+    {
+      "name": "aitrends-thumbnail",
+      "source": "./plugins/aitrends-thumbnail",
+      "description": "Script → các phương án thumbnail 2D (hero đắc ý, giao diện game, người phản ứng), bố cục tự chỉnh theo script.",
+      "version": "0.1.0"
     }
   ]
 }

@@ -1,58 +1,74 @@
-# Quy tắc thumbnail (học từ dữ liệu đối thủ)
+# Quy tắc thumbnail
 
-**Trạng thái:** bạn đã duyệt ngày 2026-11-07. Thay toàn bộ phong cách "TINY." cũ (đã bỏ).
+**Trạng thái:** cập nhật 2026-11-13 theo plugin `aitrends-thumbnail` 0.2.0 (thumbnail điện ảnh dựng bằng engine 3D). Bỏ 4 bố cục A–D cố định và kiểu 2D phẳng của bản 2026-11-07; trước đó nữa đã bỏ phong cách "TINY.".
 
-**Nguồn:** [báo cáo đối thủ 07/11](../reports/2026-11-07_doi_thu_whatif/BAO_CAO.md).
-- 40 thumbnail của Jeremy Bearimy, mã hóa tay rồi so view.
-- 103 thumbnail của các kênh hạng A/B, xem bằng mắt.
-- Đo pixel trên 144 ảnh.
-- Mẫu nhỏ, chỉ là tương quan: chỉ coi là luật cứng khi đã qua A/B test.
+**Cách làm:** dùng lệnh `/make-thumbnail` (plugin `aitrends-thumbnail`). Quy tắc chi tiết, bằng tiếng Anh, nằm trong plugin: `plugins/aitrends-thumbnail/skills/make-thumbnail/references/thumbnail_rules.md`. File này tóm tắt bằng tiếng Việt, giữ số liệu gốc và ghi kết quả A/B test của kênh.
 
-**Công thức một câu:** hero với biểu cảm đúng khoảnh khắc + siêu năng lực hiện thành giao diện game + người khác phản ứng, trên nền sáng.
+**Công thức một câu:** một khung hình phim đúng khoảnh khắc luật của video phát huy, mặt hero to và được chiếu sáng, biểu cảm đúng khoảnh khắc, siêu năng lực hiện thành ánh sáng, có người khác đang phản ứng.
 
-## 5 quy tắc bắt buộc
+## Nguồn
 
-| # | Quy tắc | Bằng chứng (view trung vị, Jeremy Bearimy) |
+- [Báo cáo đối thủ 07/11](../reports/2026-11-07_doi_thu_whatif/BAO_CAO.md): 40 thumbnail của kênh What If dẫn đầu (mã hóa tay, so view), 103 thumbnail của các kênh hạng A/B (xem bằng mắt), đo pixel trên 144 ảnh.
+- Xem lại kênh dẫn đầu ngày 2026-11-13: cảnh thật có chiều sâu thay vì nền phẳng; nhân vật đổ bóng mềm, có ánh sáng; một hiệu ứng ánh sáng cho thấy năng lực; mặt rất to; màu rực; một yếu tố UI hoặc ≤ 3 chữ, thường là không có chữ.
+- Mẫu nhỏ, chỉ là tương quan: chỉ coi là luật cứng khi đã qua A/B test của kênh mình.
+- Học cấu trúc, không chép: không dùng nhân vật, linh vật, cảnh hay hình của kênh khác.
+
+## 8 quy tắc
+
+| # | Quy tắc | Cách kiểm |
 |---|---|---|
-| 1 | **Biểu cảm hero theo bối cảnh của thumbnail** (sửa 2026-11-13 theo góp ý của bạn): chọn mặt đúng với khoảnh khắc mà thumbnail kể. Ví dụ: buồn khi bạn thân tắt tiếng mình, bối rối khi đứng giữa hai phía, vui khi đang thắng, lo lắng trước con số xấu. Smug / tự tin (mắt nửa khép, nhếch mép) chỉ dùng khi hero đang thắng hoặc nắm lợi thế. Mặt phải đọc rõ ở 320 px | Dữ liệu cũ của đối thủ: smug 340k (n=20) · trung tính 56k · hoảng sợ 31k · không có hero 22k. Chỉ là tương quan; bạn thấy mặt smug ở mọi phương án không hợp truyện (video "Who Muted You") |
-| 2 | **Luật của video hiện thành 1 lớp giao diện game**: nhãn trên đầu người, thanh chỉ số/HP, số đếm, dòng lệnh, đồng hồ đo | Nhãn/UI 265k, 7/8 video ≥ 100k · chữ to 76k · không chữ 38k |
-| 3 | **Cược xã hội**: ít nhất 1 nhân vật phụ hoặc 1 đám đông phản ứng với hero. Nhân vật phụ màu trầm, không tranh với hero | Có nhân vật nữ 400k (8/8 ≥ 100k) · đám đông/chất đống 517k |
-| 4 | **Nền sáng, rực màu; hero to**: hero chiếm 1/3–1/2 khung, mặt còn đọc được khi thu ảnh về 320 px | Độ sáng 82/100 so với 51 của đối thủ · độ rực 134 so với 77 |
-| 5 | **Chữ ít, giọng nói chuyện**: tối đa 1 cụm chữ lớn ≤ 3 từ, không lặp tiêu đề ("oh yeah.", "this is fine..", "RESPAWN"). Bỏ hẳn chữ lớn nếu nhãn đã kể đủ chuyện | Video top 1 (1,57 triệu) chỉ có 3 nhãn, không có chữ lớn |
+| 1 | **Một khoảnh khắc, đọc trong một giây.** Khung hình là một khoảnh khắc trong script mà người lạ hiểu ngay | Che tiêu đề: vẫn nói được video về gì? |
+| 2 | **Mặt hero là thứ thấy đầu tiên, biểu cảm theo bối cảnh** (bạn sửa ngày 2026-11-13). Đầu cao 35–45 % khung, nằm trên đường 1/3. Chọn mặt đúng với khoảnh khắc thumbnail kể: buồn khi bị bạn thân tắt tiếng, bối rối khi đứng giữa hai phía, vui khi đang thắng, lo lắng trước con số xấu. Smug / tự tin chỉ dùng khi hero đang thắng hoặc nắm lợi thế. Không quay lưng | Hàng 320 px của sheet |
+| 3 | **Chiều sâu 3 lớp.** Hero ở tiền cảnh, người phản ứng ở trung cảnh, một nơi thật ở hậu cảnh, xóa phông | Nền mờ, mặt ở trung cảnh vẫn đọc được |
+| 4 | **Ánh sáng nói lên cảm xúc và có nguồn.** Nắng sau lưng hero, cửa sổ sáng đèn, ánh sáng của chính năng lực. Luôn có viền sáng (rim) trên hero và mặt đọc được | Hero tách khỏi nền cả khi chuyển ảnh xám |
+| 5 | **Năng lực hiện thành ánh sáng hoặc cảnh không thể có.** Hào quang màu của năng lực, thời tiết nghe lời, vật 200 kg trong một tay | Bỏ chữ đi: năng lực vẫn còn đó? |
+| 6 | **Có người phản ứng.** 1–3 nhân vật trong roster, mặt rõ, quay về phía hero. Cảm xúc của họ là cảm xúc của người xem | Mặt cao ≥ 15 % khung |
+| 7 | **Chỉ có chữ khi script cần.** Không chữ, hoặc 1 nhãn / con số, hoặc 1 cụm ≤ 3 từ không lặp tiêu đề. Trong các phương án, ít nhất 1 phương án không có chữ | `sheet.mjs` đếm số từ |
+| 8 | **Máy thấp, ống kính dài, kín khung.** Máy dưới tầm mặt nhìn lên, fov 26–34, không viền đen, màu rực | — |
 
-## 4 bố cục: mỗi lần dựng 1 phương án cho mỗi bố cục
+## Số liệu gốc (view trung vị, 40 thumbnail kênh dẫn đầu, 2026-11-07)
 
-| Bố cục | Cách dựng | Ví dụ thắng |
-|---|---|---|
-| **A. Nhãn trên đầu** | Hero một bên, biểu cảm theo tình huống. 2–3 người khác có nhãn trên đầu; nhãn bất ngờ, trái với vẻ ngoài | JB "Crush" (`friend / CRUSH / friend`) 1,57 tr · "murderer" 513k · ConChaser "160 IQ / 70 IQ" 1,25 tr |
-| **B. Chia đôi đối lập** | Hai vế (trước/sau, mình/người khác), mỗi vế 1 nhãn hoặc 1 thanh chỉ số | JB "Shooting" 863k · "27 / 19,342,514 follower" 286k |
-| **C. Đám đông / chất đống** | Hero giữa đám đông đang nhìn mình, hoặc ngồi trên đống tiền/đồ vật | JB "Only Guy at a Girls Only School" 870k · "Infinite Money" 782k · "Every Girl" 517k |
-| **D. Giao diện game cả khung** | Hero (biểu cảm hợp với con số trên bảng) + 1 bảng UI lớn: thanh HP, LEVEL, đồng hồ max, dòng lệnh | JB "/gamemode creative" 712k · "LUCK" 596k · "LEVEL 10" 243k |
+| Yếu tố | View trung vị |
+|---|---|
+| Hero smug (n=20) · trung tính · hoảng sợ · không có hero | 340k · 56k · 31k · 22k |
+| Có nhân vật nữ phản ứng · đám đông / chất đống | 400k · 517k |
+| Có nhãn / UI · chữ to · không chữ | 265k · 76k · 38k |
 
-## Không làm (rút từ thumbnail thua)
+Số liệu smug là tương quan trên kênh khác. Bạn thấy mặt smug ở mọi phương án không hợp truyện (video "Who Muted You"), nên quy tắc 2 chọn biểu cảm theo khoảnh khắc.
 
-- Mặt hoảng sợ, khổ sở, cầu cứu khi khoảnh khắc không đòi hỏi, hoặc chữ cầu cứu ("HELP", "MISSING", "10X SLOWER": đều dưới 80k). Biểu cảm theo mục 1.
-- Chủ đề ghê hoặc khó chịu ("2759 HOURS POOING", "10X FAT", "87 YEARS OLD": đều dưới 40k).
+## Phương án
+
+Mỗi video dựng **3 hoặc 4 phương án là các khoảnh khắc khác nhau** hoặc cách nhìn khác nhau về luật: nơi khác, giờ khác, khoảng cách khác, người phản ứng khác. Hai góc máy của cùng một khoảnh khắc chỉ tính là một phương án. Không còn 4 bố cục cố định.
+
+## Không làm
+
+- Mặt hoảng sợ, khổ sở, cầu cứu khi khoảnh khắc không đòi hỏi, hoặc chữ cầu cứu ("HELP", "MISSING", "10X SLOWER": đều dưới 80k ở kênh dẫn đầu). Biểu cảm theo quy tắc 2.
+- Hero nhỏ, quay lưng, lẫn vào cảnh (Control Water 17k, Shrunk 1cm 20k).
 - Cận cảnh trừu tượng không có câu chuyện (cận mắt "you see everything…", 24k).
-- Hero nhỏ, quay lưng, hoặc lẫn vào cảnh (Control Water 17k, Shrunk 1cm 20k).
-- Máu, súng chĩa thật vào người, nội dung không hợp khán giả trẻ.
-- Chữ dài hoặc chữ nhắc lại tiêu đề.
+- Ánh sáng trưa phẳng, mọi thứ đều nét (kiểu thumbnail 3D cũ: đọc được nhưng không hấp dẫn).
+- Khung đen hoặc xám. Cảnh đêm cần một nguồn sáng rực màu và cửa sổ sáng đèn.
+- Nhiều hơn một yếu tố chữ; chữ dài; chữ nhắc lại tiêu đề.
+- Chủ đề ghê, khó chịu; máu; vũ khí thật chĩa vào người; nội dung không hợp khán giả trẻ.
+- Lộ twist hoặc kết thúc. Chỉ cho thấy cái vui của luật, cùng lắm gợi cái giá.
+- Vùng trắng cháy trên mặt hoặc áo hero.
 
 ## Giữ nguyên từ kênh
 
-- **Hero của kênh:** đầu ngọc trai, tóc bạch kim nhọn, áo puffer xanh chanh, vẽ 2D phẳng viền dày. Đây là nhận diện kênh, tương đương linh vật áo xanh của Jeremy Bearimy.
-- **Font:** Fredoka 700.
-- **Màu:** viền `#241a3a`, lime `#b4f02e`, vàng `#ffe14a`, xanh lá UI `#3ddc5a`, đỏ UI `#ee3b2f`, nền nhãn tối `#14102a`.
-- **Chữ trắng phải có viền tối, không viền trắng** (viền trắng làm chữ mờ).
-- **Nhãn:** nền đặc, viền đậm 8 px, góc bo 18 px, mũi nhọn chỉ vào người.
+- **Hero:** hero trong `channel/cast.js` (tóc bạch kim nhọn, áo puffer xanh chanh). Không ai khác có tóc gần trắng hay màu nổi như hero.
+- **Dàn nhân vật:** chỉ dùng vai trong roster.
+- **Chữ (khi có):** Fredoka 700, trắng hoặc vàng, viền tối `#241a3a` (không viền trắng); nhãn trên nền tối `#14102a`.
+- Màu lime của hero không đặt trên nền xanh lá (bãi cỏ ngay sau áo): đổi góc máy hoặc chỗ đứng.
 
-## Cách dựng
+## Kiểm tra trước khi gửi
 
-- Bản 3D (plugin 1.0.3): dự án mẫu `examples/v103-thumb` (4 cảnh = 4 bố cục, nhãn và thanh chỉ số bằng `T.thumb`), xuất bằng `node render.mjs --project ... --thumbs`.
-- Script mẫu 2D: `D:\aitrends-3d-studio\projects\thumb-2d\gen_heal_jb.mjs`. Có sẵn hàm `hero`, `kid` (bạn cùng lớp), `grandpa`, `tag` (nhãn), `hp` (thanh máu). Sao chép rồi đổi khối `scenes2`.
-- Mỗi video dựng **4 phương án theo 4 bố cục A–D**. Xuất JPG 1280×720 cạnh file MP4, kèm 1 ảnh ghép 2×2 để chọn.
-- **Kiểm tra trước khi gửi:**
-  - Thu ảnh về 320 px: mặt hero và nhãn vẫn đọc được.
-  - Đủ 5 quy tắc bắt buộc.
-  - Không vướng mục "Không làm".
-- Sau khi đăng: dùng "Test & Compare" của YouTube Studio cho 2–3 phương án. Ghi kết quả vào file này để luật dựa trên CTR thật của kênh bạn.
+- `node render.mjs --project projects/thumb-<slug> --qc`: 0 lỗi đỏ.
+- `sheet.mjs`: sửa mọi ✗, đọc mọi !.
+- Xem sheet: mặt hero là thứ thấy đầu tiên ở 320 px, biểu cảm đúng khoảnh khắc, các phương án thật sự khác nhau.
+
+## Sau khi đăng
+
+Dùng "Test & Compare" của YouTube Studio cho 2–3 phương án. Ghi kết quả vào mục dưới để quy tắc dựa trên CTR thật của kênh bạn.
+
+### Kết quả A/B test của kênh
+
+(chưa có)

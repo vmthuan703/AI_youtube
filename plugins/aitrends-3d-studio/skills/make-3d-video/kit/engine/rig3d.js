@@ -183,8 +183,9 @@ export function walkPose2(ph, o = {}) {
   // arms: a beat behind the legs (shoulder 0.3 rad, elbow 0.6 rad)
   const lagz = (d) => { const a = leg(ph - d, 1), b = leg(ph + Math.PI - d, -1); return (a.z - b.z) / Math.max(D, 0.05); };
   const a1 = -lagz(0.3), a2 = -lagz(0.6), lean = (sprint ? 22 : run ? 12 : 3) * (o.lean ?? 1);
-  const arm = (a, b, s) => run ? [(sprint ? 20 : 16) + (sprint ? 58 : 46) * a, 14 - 8 * a, 86 - 16 * a + 10 * Math.max(0, -b), 0]
-    : [4 + 25 * a, 12 - 9 * Math.max(0, a), 14 + 24 * Math.max(0, b) + 4 * Math.max(0, -b), 0];
+  // 2.0.1 style B (energetic): wide swing, elbow folds on the forward swing, run hands come up to the chin
+  const arm = (a, b, s) => run ? [(sprint ? 30 : 28) + (sprint ? 50 : 44) * a, 12 - 7 * a, 92 - 8 * a + 22 * Math.max(0, b) + 8 * Math.max(0, -b), 0]
+    : [7 + 29 * a, 9 - 6 * Math.max(0, a), 20 + 42 * Math.max(0, b) + 6 * Math.max(0, -b), 0];
   return P({ y: H - B.hipY, sx: (run ? 0.008 : 0.02) * w,
     hips: [run ? 4 : 1, -6 * fz * (run ? 1.3 : 1), (run ? 2.5 : 4) * w],
     spine: [lean + (run ? 0 : 1.2 * Math.cos(2 * ph)), 10 * fz * (run ? 1.3 : 1), -2.5 * w],

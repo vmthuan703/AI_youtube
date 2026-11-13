@@ -1,7 +1,7 @@
 {
   "name": "aitrends-thumbnail",
-  "version": "0.1.0",
-  "description": "Turn a video script into YouTube thumbnail options for the What If channel: reads the script, finds the rule and the winning moment, composes each option freely for that script (smug channel hero, the rule as one game-UI layer, roster characters reacting, bright background, at most 3 words), draws them as flat 2D SVG, renders 1280×720 JPGs with a contact sheet and a rule check.",
+  "version": "0.2.0",
+  "description": "Turn a video script into cinematic YouTube thumbnail options for the What If channel: reads the script, picks the moments worth a poster and stages each as a film still on the aiTrends 3D engine (film light, depth of field, weather, low angle, the channel hero large in the foreground, roster characters reacting), text only where the script needs it; renders 1280x720 JPGs with a picking sheet and checks.",
   "author": {
     "name": "aiTrends"
   },
@@ -10,7 +10,8 @@
     "youtube",
     "what if",
     "faceless youtube",
-    "svg",
-    "game ui"
+    "cinematic",
+    "3d",
+    "three.js"
   ]
 }

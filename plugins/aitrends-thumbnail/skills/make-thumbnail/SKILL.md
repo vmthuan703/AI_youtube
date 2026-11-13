@@ -1,123 +1,145 @@
 ---
 name: make-thumbnail
-description: "This skill should be used when the user runs /make-thumbnail or asks to \"make a thumbnail from this script\", \"design thumbnails for this video\", \"tạo thumbnail từ script\", \"làm thumbnail cho video\", \"thiết kế thumbnail\", \"redo the thumbnail\", or \"give me thumbnail options\" for the What If channel. It reads the script, finds the video's rule and its winning moment, composes each option freely for that script (smug channel hero, the rule as one game-UI layer, roster characters reacting, bright background, at most 3 words), draws them as flat 2D SVG and renders 1280×720 JPGs with a contact sheet and a rule check.\n"
+description: "This skill should be used when the user runs /make-thumbnail or asks to \"make a thumbnail from this script\", \"design thumbnails for this video\", \"tạo thumbnail từ script\", \"làm thumbnail cho video\", \"thiết kế thumbnail\", \"thumbnail điện ảnh\", \"redo the thumbnail\", or \"give me thumbnail options\" for the What If channel. It reads the script, picks the moments worth a poster, and stages each one as a cinematic 3D still on the aiTrends 3D engine (film light, depth of field, weather, low angle, the channel hero large in the foreground, roster characters reacting behind), with text only where the script needs it, then renders 1280×720 JPGs with a picking sheet and checks.\n"
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
   author: aiTrends
 ---
 
-# aiTrends Thumbnail: script → thumbnail options
+# aiTrends Thumbnail: script → cinematic thumbnail options
 
-Every thumbnail is drawn by code: a spec file composes SVG with the kit's helpers, and headless Chromium renders it. No image
-model, no stock art, no other channel's characters.
+A thumbnail here is a **film still**: one moment of the script staged in a real place with depth, lit like a movie, with the
+channel hero large in the foreground. It is rendered by the aiTrends 3D engine (style `cine`, 2.0 or newer), so the hero, the cast
+and the sets are the same as in the video. No flat 2D drawing, no image model, no other channel's characters.
 
 - Rules: `references/thumbnail_rules.md`. Read it before composing.
-- Kit: `kit/thumb_kit.mjs` (drawing helpers), `kit/render_thumbs.mjs` (render, sheet, rule check), `kit/example_spec.mjs` (a worked example).
-- `${CLAUDE_PLUGIN_ROOT}/skills/make-thumbnail` is this folder.
+- Kit: `kit/template/` (project skeleton with a worked example), `kit/template/scenes/_thumb.js` (composition and light helpers),
+  `kit/new_thumb_project.mjs`, `kit/sheet.mjs`.
+- Engine reference: the `make-3d-video` skill's `references/engine-api.md` (stages, looks, sets, poses, faces, effects).
+- `${CLAUDE_PLUGIN_ROOT}/skills/make-thumbnail` is this folder. The studio is `D:\aitrends-3d-studio` unless the user says otherwise.
 
 ## 1. Input
 
-Take the script from, in this order: the path the user gave; `<project>/input/script.txt` when they named a studio project;
-the script pasted in the chat. Also note the video title if there is one. If there is no script, ask for it; do not compose
-from a title alone.
+Take the script from, in this order: the path the user gave; `<project>/input/script.txt` when they named a studio project; the
+script pasted in the chat. Note the video title. With no script, ask for it; do not compose from a title alone.
 
-Follow the user's standing instruction on previews: say in a few lines which ideas will be drawn and ask before rendering,
+Follow the user's standing instruction on previews: say in a few lines which moments will be staged and ask before rendering,
 unless they already said to go ahead.
 
-## 2. Read the script
+## 2. Read the script like a poster designer
 
-Write these down (in the chat, short) before drawing:
+Write this down (short, in the chat) before building anything:
 
 | Item | What to find |
 |---|---|
-| Rule | The one rule or power, in ≤ 10 words, and how a game would display it (counter, bar, label, price, level, command, timer) |
-| Winning moments | 3–5 moments where the hero enjoys the rule with other people watching. Quote the line |
-| Reactions | Who reacts in those moments and how. Map each person to a roster role (`ROSTER` in the kit): best friend → `BESTIE`, girl friend → `BRO`, rival → `RIVAL`, classmates → `CLASSMATE*`, `BRO_2`, `RIVAL_2`, adults by job |
-| Numbers | Concrete numbers from the script that fit a label (200 kg, ×11, 1 hour, LIVES 1) |
-| Words | A ≤ 3-word spoken phrase from the script that is not the title, or none |
-| Avoid | The twist or ending (do not spoil), anything in the "Do not" list |
+| Rule | The one rule or power of the video in ≤ 10 words |
+| Poster moments | 3–5 moments where the rule is visible in ONE frame and the hero is on top. Quote the line. Prefer the impossible sight (a tire in one hand, a street of people frozen) over a talking scene |
+| Place and hour | Where each moment happens and which light makes it strongest (see the looks table) |
+| The power, visible | What in the frame shows the power: a prop held wrong, a glow, a colour on the hero, weather, a crowd's state |
+| Reactions | Who watches and what they feel. Map each to a roster role |
+| Text | Does this moment read without words? If not, the one label, number or ≤ 3-word phrase that completes it |
+| Avoid | The twist or ending, and the "Do not" list |
 
-## 3. Compose the options
+## 3. Choose the options
 
-Draw **3 or 4 options, each a different idea** (a different moment, a different way to show the rule, or a different
-reaction). There are no fixed layouts: arrange each picture the way its idea reads fastest. Use a contrast only when the
-script has a before/after or me/them, a crowd only when the script has one, a game window only when the rule works like a system.
+Stage **3 or 4 options, each a different moment or a different way of seeing the rule**. Vary place, hour and distance, not
+just the camera. Text is decided per option from the script: at least one option carries no text at all, and no option carries
+more than one text element.
 
-For every option decide, in this order:
-1. Where the hero goes and how big (scale 1.4–1.8; head centre `x, y`; main hero is `smug`, `grin` or `wink`).
-2. The single UI layer that states the rule (one kind per picture: labels, or bars, or a window. Not all three).
-3. Who reacts, where, with which face, looking at the hero (`look: -1 | 1`).
-4. One script prop at most, drawn in the kit's look.
-5. Big text, or none.
-6. Background that fits the mood and keeps lime readable (not green).
+For each option decide: the moment → the set and look → where the hero's head sits and how big → who reacts and where in the
+frame → the one light or effect that shows the power → text or none.
 
-## 4. Write the spec
+## 4. Build the project
 
-Create `<project>/thumbs/spec.mjs` (or `D:\aitrends-3d-studio\projects\thumb-2d\<slug>\spec.mjs` when there is no project) by
-copying `kit/example_spec.mjs`. A spec does not import the kit; each `draw` receives it as `K`.
-
-```js
-export default {
-  title: 'What If …?',
-  options: [
-    { name: 'A', idea: 'which moment and why, one line', bigText: '', bg: 'sun',
-      draw: K => `${K.mate({ x: 1090, y: 500, s: 1.15, role: 'BRO_2', face: 'shock', look: -1 })}
-                  ${K.hero({ x: 400, y: 440, s: 1.7, expr: 'smug', arms: 'raiseR' })}
-                  ${K.tag(1090, 345, 'STR 0', { fg: K.C.RED, size: 56 })}` },
-  ],
-};
+```bash
+node "${CLAUDE_PLUGIN_ROOT}/skills/make-thumbnail/kit/new_thumb_project.mjs" --slug <video-slug> --script <script.txt> --studio D:/aitrends-3d-studio
 ```
 
-Kit helpers (all return SVG strings; frame is 1280×720; characters are placed by the centre of the head):
+This creates `<studio>/projects/thumb-<slug>/`. Then edit three files:
+
+- `scenes/cast.js`: the hero and every other character as roster roles with the script's names. Never write an outfit from scratch.
+- `story/shots.json`: one shot per option (3 s each, `"thumbAt": 2.5`, `"camera": "manual"`, `"hud": false`), with `"idea"` (the
+  moment, one line) and `"text"` (the words on the picture, or `""`). Keep `duration` = 3 × the number of options.
+- `scenes/shots/thumbs.js`: one `registerShot` per option. Copy the worked example and change it.
+
+### The order inside `draw()` (always)
+
+```js
+s.hero.pose(...).face({ expr: 'smug', look: [0.35, -0.1], t: 0, blink: false, saccade: false });   // 1 pose the hero
+frameHead(T, s.st, s.hero, { u: 0.34, v: 0.56, size: 0.38, yaw: 0.25, pitch: -0.2 });             // 2 the camera, from where the head should be
+s.theo.pose('shocked'); placeAt(T, s.st, s.theo, { u: 0.71, size: 0.22, face: s.hero });            // 3 everyone else, by position in the frame
+watch(s.theo, s.hero).face({ expr: 'shocked', t: 0, blink: false, saccade: false });               // 4 heads turn to the hero, then faces
+s.lights.aim(s.st, s.hero, { side: -1 }); s.power?.update();                                       // 5 lights follow the camera
+```
+
+### Helpers (`scenes/_thumb.js`)
 
 | Helper | Use |
 |---|---|
-| `K.hero({ x, y, s, expr, arms, flip })` | `expr`: `smug` `grin` `wink` (main hero), `awe` `sad` (only the "before" half of a contrast). `arms`: `pointR` `pointL` `raiseR` `both` `shh` `chin` `shrug` `crossed`, or `{ R: [from, control, to], L: [...] }` in hero units (shoulders at ±100,170) |
-| `K.mate({ x, y, s, role, face, look, flip })` | Roster character. `face`: `shock` `smile` `love` `angry` `meh` `jealous` |
-| `K.crowd({ x0, x1, y, n, s, roles, face, lookAt })` | A row of roster extras looking at one point |
-| `K.tag(x, y, str, { bg, fg, size, ptr })` | Label over a head. `ptr: false` for a plain plate or a button |
-| `K.pill(x, y, str, { icon, bg, fg, size, delta })` | Label with a `heart` / `coin` / `star` icon and an optional "+99" / "-8" |
-| `K.bar(x, y, w, pct, { name, col, label })` | Stat or HP bar |
-| `K.ring(x, y, n, { r, col, caption })` | Countdown or number ring |
-| `K.panel(x, y, w, h, { title, head })` | Game window; draw its content on top |
-| `K.cmd(x, y, '/command')` · `K.meter(x, y, lit, { n, name })` · `K.icons(x, y, n, filled, { icon })` | Command line, segmented meter, row of hearts/stars/coins |
-| `K.text(str, x, y, size, fill, { anchor, rot })` | Big text with a dark outline |
-| `K.split(col, x0, x1, side)` · `K.floor(y, col)` | Put in `under: K => …` for a contrast panel or a floor |
-| `K.pile(x, y, w, h, icon)` · `K.sparkle` · `K.glow` · `K.arrow` · `K.glitch()` | Accents |
-| `K.prop(svg, x, y, s, rot)` | Places a script-specific prop you draw: flat fills, `K.C.OUT` outline 7–10 px, round joins |
-| `bg` | `'sun'` `'sky'` `'candy'` `'royal'` `'mint'` `'fire'` or `{ c1, c2, rays, raysAt: [x, y] }` |
+| `frameHead(T, st, ch, { u, v, size, yaw, pitch, roll })` | Puts the camera so `ch`'s head is at screen `(u, v)` (0..1 from top-left) and `size` of the frame height tall. `yaw` orbits round the face (0 = front, ± 0.2–0.6 for a three-quarter view), `pitch` negative = low angle. Focuses the lens on the head |
+| `placeAt(T, st, ch, { u, size, ground, face, turn })` | Stands `ch` on the ground so its head appears at screen x `u` with head height `size`. Size is depth: 0.3 right behind the hero, 0.2 mid-ground, 0.12 far. `ground` = the set's floor height (0.16 on `T.usa` sidewalks) |
+| `watch(ch, target)` | Turns `ch`'s head to the target's head. Call after `.pose()`, before `.face()` |
+| `heroLights(T, st, { rim, rimPower, fill, fillPower })` → `.aim(st, hero, { side })` | A rim light from behind the hero (the bright edge on hair and shoulders) and a soft face fill, both following the camera. `rim` in a power colour (`#b4f02e`, cyan, violet) makes the hero look charged. Powers above 60 blow out |
+| `powerGlow(T, st, hero, { color, intensity, halo })` → `.update()` | A coloured light on the hero and a halo behind the head. Intensity 0.8–1.5 |
+| `screenOf(st, point)` | Where a world point lands on screen, to place a label by hand |
 
-Composition pitfalls (learned on the example):
-- Paint order is draw order. Back row first, then the hero, then labels, so labels are never hidden behind hair or arms.
-- A raised hand ends at about `x ± 220·s, y − 70·s`. Put the thing it holds or points at there, and keep labels out of the arm's path.
-- A label over a supporting head sits at `y_head − 150·s` (size 44–56). Stagger neighbouring labels by 40–50 px.
-- `crossed` arms are only in frame when the hero's head is at `y ≤ 330`.
-- Keep text and labels ≥ 40 px from the edges and out of the bottom-right corner (the duration badge covers it).
-- Supporting characters stay at `s` 0.7–1.2, always smaller than the hero.
-- Roles outside `ROSTER` throw an error. Do not invent outfits; pick the nearest roster role.
+Text, when an option has it, goes in the shot's `overlay(g, t, info, s)` with the engine's `s.T.thumb.tagOn(g, character, s.st.camera, 'STR 0', { fg, size })`,
+`.tag`, `.bar`, `.big` or `.panel` (return `T` from `init` to reach it).
 
-## 5. Render and check
+### Looks (pick by the feeling of the moment)
+
+| Feeling | Stage | Notes |
+|---|---|---|
+| Winning, warm, "life is good" | `look: 'goldenHour'`, `sun: [-0.5, 0.34, -0.8]`, `rays: 1.1` | Put the sun behind or beside the hero for the flare and the rim; add `T.wx.motes` and, in fall, `T.wx.leaves` |
+| Power, secret, danger at night | `look: 'rainNight'` + `T.W.mirror` on the road, lamps as spots | The hero's own light (`powerGlow`, a coloured rim) carries the frame; `faceLight: 0.75` |
+| Magic hour, romance | `look: 'dusk'` or `'snowDusk'` | Lit windows and string lights behind, warm rim |
+| Bright, open, funny | `look: 'clearDay'` | Needs a strong shape and colour in frame; the weakest look for drama |
+| Eerie, time stopped | `look: 'fogMorning'`, shot `"look": "freeze"` | Sun shafts through fog; `T.FX3.frozen` droplets |
+
+Always: `fov` 26–34 (a longer lens flatters the big heads), `dof: { focus: 2.6, aperture: 0.003, maxblur: 0.016 }`, `faceLight` 0.6–0.8
+when the sun is behind the hero, `bars: "none"`, `st.fitShadow` on the hero's spot.
+
+### Pitfalls (learned on the example)
+
+- A prop in a raised hand must sit clear of the head: offset it from `handWorld('R')` until `--qc` stops reporting "head inside a prop".
+- `placeAt` only knows the ground height you give it. A reactor dropped onto a porch, a bush or a car clips: change `u` or `size`.
+- Reactors smaller than `size` 0.15 are unreadable at 320 px. Three clear faces beat eight tiny ones.
+- Keep the hero's face out of the bottom-right corner (the duration badge) and at least 6 % from any edge.
+- Night frames wash out toward grey: give them one saturated light (the power colour) and lit windows.
+- Raw light powers are sensitive. If the hero's jacket turns white, halve `rimPower` / `intensity` before touching anything else.
+
+## 5. Render and check (in the studio folder)
 
 ```bash
-node "${CLAUDE_PLUGIN_ROOT}/skills/make-thumbnail/kit/render_thumbs.mjs" --spec <spec.mjs> --out <project>/out --studio D:/aitrends-3d-studio
+node render.mjs --project projects/thumb-<slug> --qc
 ```
 
-- `--studio` is any folder with `node_modules/playwright` (the aiTrends studio). `--only A,C` re-renders some options.
-- Output: `Thumbnail_<name>.jpg` (1280×720) for each option and `thumbnails_sheet.jpg` (every option large, then at 320 px).
-- The script prints `OK` or `RED` per option. Fix every red line (`✗`) and re-render; read every warning (`!`).
-- Then **look at the sheet yourself** and fix what the check cannot see: a label over a face, a hidden character, a prop
-  that does not read, a face that is unreadable in the 320 px row, two options that tell the same idea.
+```bash
+node render.mjs --project projects/thumb-<slug> --thumbs
+```
 
-Only show the user the sheet after the check is clean and you have looked at it.
+```bash
+node "${CLAUDE_PLUGIN_ROOT}/skills/make-thumbnail/kit/sheet.mjs" --project projects/thumb-<slug>
+```
+
+- `--qc` must report 0 red (bodies through props, heads inside things). Fix and re-run before anything else.
+- `--thumbs` writes `build/thumbs/<id>.jpg` at 1280×720. The template renders at 1440p `max` for the final pass; while composing,
+  set `"resolution": "1080p"`, `"quality": "high"` in `config.json` (about 4× faster) and switch back for the last render.
+- `sheet.mjs` writes `build/thumbs/sheet.jpg` (each option large with its idea, then at 320 px) and prints `OK` / `RED` with
+  brightness, contrast, colour and blown-out area. Fix every `✗`; read every `!`.
+- Then **look at the sheet** and judge it against `references/thumbnail_rules.md`: does each option make someone want to
+  know what happens next? Is the hero's face the first thing seen at 320 px? Are the options really different? Re-stage weak ones.
+
+Only show the user the sheet after QC is clean and you have looked at it.
 
 ## 6. Hand over
 
-Send `thumbnails_sheet.jpg` with one line per option (the idea and the script line it comes from) and your pick with the
-reason. After the user chooses, copy the chosen JPG next to the video's MP4 as `Thumbnail.jpg`, and move the other
-renders to the clean-up folder if the user keeps one. Suggest testing 2–3 options with YouTube Studio "Test & Compare".
+Send `build/thumbs/sheet.jpg` with one line per option (the moment and the script line it comes from) and your pick with the
+reason. After the user chooses, copy that JPG next to the video's MP4 as `Thumbnail.jpg`. Suggest testing 2–3 options with
+YouTube Studio "Test & Compare".
 
-## Extending the kit
+## Extending
 
-When a script needs something the kit lacks (a new roster role, a new UI element, a hero expression), add it to
-`kit/thumb_kit.mjs` in the plugin source (`D:\AI_youtube\plugins\aitrends-thumbnail`) rather than only in the spec, so the
-next video has it. A one-off prop stays in the spec.
+A helper every thumbnail could use goes into `kit/template/scenes/_thumb.js` in the plugin source
+(`D:\AI_youtube\plugins\aitrends-thumbnail`); re-running `new_thumb_project.mjs` on an existing project refreshes only that file.
+A set, prop or effect the engine lacks belongs in the 3D studio plugin, not here.

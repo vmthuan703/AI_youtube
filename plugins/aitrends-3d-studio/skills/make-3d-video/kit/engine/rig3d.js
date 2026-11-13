@@ -160,6 +160,7 @@ for (const [n, p] of Object.entries(POSES3)) for (const k of ['armL', 'armR']) i
 // floor and reaches out heel first. The hips ride as high as the legs allow (they dip as the feet spread), drop on the swing
 // side and sway over the standing foot; the chest turns against the hips; the head stays level; the arms swing from the
 // shoulder a beat behind the legs, elbows trailing. o.stride = metres per cycle in body units (walkTo sets it from the speed).
+const ARMH = {};
 export function walkPose2(ph, o = {}) {
   const B = BODY2, Lg = B.thigh + B.shin, sprint = !!o.sprint, run = sprint || !!o.run;
   const beta = sprint ? 0.27 : run ? 0.32 : 0.6, stride = o.stride ?? (sprint ? 3.4 : run ? 2.4 : 1.3) * Lg, D = stride * beta;
@@ -181,16 +182,19 @@ export function walkPose2(ph, o = {}) {
   for (const [f, s] of [[fL, 1], [fR, -1]]) { const dx = f.x - s * B.hipX, r2 = (0.972 * Lg) ** 2 - dx * dx - f.z * f.z; H = smin(H, f.y + Math.sqrt(Math.max(r2, 0)) + (1 - f.g) * 0.6, 0.012); }
   const fz = (fL.z - fR.z) / Math.max(D, 0.05), w = fL.st - fR.st;
   // arms: a beat behind the legs (shoulder 0.3 rad, elbow 0.6 rad)
-  const lagz = (d) => { const a = leg(ph - d, 1), b = leg(ph + Math.PI - d, -1); return (a.z - b.z) / Math.max(D, 0.05); };
-  const a1 = -lagz(0.3), a2 = -lagz(0.6), lean = (sprint ? 22 : run ? 12 : 3) * (o.lean ?? 1);
-  // 2.0.1 style B (energetic): wide swing, elbow folds on the forward swing, run hands come up to the chin
-  const arm = (a, b, s) => run ? [(sprint ? 30 : 28) + (sprint ? 50 : 44) * a, 12 - 7 * a, 92 - 8 * a + 22 * Math.max(0, b) + 8 * Math.max(0, -b), 0]
-    : [7 + 29 * a, 9 - 6 * Math.max(0, a), 20 + 42 * Math.max(0, b) + 6 * Math.max(0, -b), 0];
+  // arms swing like a pendulum: only the first harmonic of the feet's fore-aft motion (no kinks from heel strike / toe-off),
+  // the upper arm a beat behind the legs, the forearm later still (follow-through). Style B: lively, elbow folds going forward.
+  const key = sprint ? 2 : run ? 1 : 0; let hm = ARMH[key];
+  if (!hm) { let c = 0, s = 0; const N = 48; for (let i = 0; i < N; i++) { const q = 2 * Math.PI * i / N, a = leg(q, 1), b = leg(q + Math.PI, -1), v = (a.z - b.z) / Math.max(D, 0.05); c += v * Math.cos(q); s += v * Math.sin(q); }
+    hm = ARMH[key] = Math.atan2(s, c); }
+  const sw = (d) => -am * Math.cos(ph - d - hm), a1 = sw(0.35), a2 = sw(0.8), lean = (sprint ? 22 : run ? 12 : 3) * (o.lean ?? 1);
+  const arm = (a, b) => run ? [(sprint ? 30 : 26) + (sprint ? 48 : 42) * a, 11 - 5 * a, 100 + 16 * b, 0]
+    : [8 + 27 * a, 8 - 4 * a, 32 + 20 * b + 6 * b * b, 0];
   return P({ y: H - B.hipY, sx: (run ? 0.008 : 0.02) * w,
     hips: [run ? 4 : 1, -6 * fz * (run ? 1.3 : 1), (run ? 2.5 : 4) * w],
     spine: [lean + (run ? 0 : 1.2 * Math.cos(2 * ph)), 10 * fz * (run ? 1.3 : 1), -2.5 * w],
     head: [-lean * 0.7 - 2, -4 * fz, -1.2 * w],
-    armL: arm(a1, a2, 1), armR: arm(-a1, -a2, -1), handL: run ? 'fist' : 'relaxed', handR: run ? 'fist' : 'relaxed',
+    armL: arm(a1, a2), armR: arm(-a1, -a2), handL: run ? 'fist' : 'relaxed', handR: run ? 'fist' : 'relaxed',
     legL: { to: [fL.x, fL.y, fL.z], pole: [0.2, 0.45, 1.3] }, legR: { to: [fR.x, fR.y, fR.z], pole: [-0.2, 0.45, 1.3] }, footL: fL.pitch, footR: fR.pitch });
 }
 export function walkPose3(ph, o = {}) {

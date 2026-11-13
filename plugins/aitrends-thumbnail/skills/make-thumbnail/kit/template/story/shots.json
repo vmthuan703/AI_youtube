@@ -1,0 +1,4 @@
+{ "title": "thumbnails", "duration": 6, "shots": [
+  { "id": "A", "start": 0, "end": 3, "line": "", "camera": "manual", "thumbAt": 2.5, "hud": false, "idea": "The cold open: one hand under a 200 kg tire at golden hour, friends frozen behind him", "text": "" },
+  { "id": "B", "start": 3, "end": 6, "line": "", "camera": "manual", "thumbAt": 2.5, "hud": false, "idea": "The rule at night: the hero charged with everyone's strength, the linebacker drained", "text": "STR 0" }
+] }

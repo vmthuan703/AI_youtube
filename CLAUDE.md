@@ -17,9 +17,9 @@
 - Góp ý lỗi của một video đã chấp nhận là để sửa plugin cho video sau; không làm lại video cũ trừ khi người dùng nói rõ.
 
 ## Thumbnail
-- Khi được yêu cầu thiết kế thumbnail, dùng quy tắc học từ dữ liệu đối thủ trong
-  `prompts/thumbnail_style.md` (đã bỏ phong cách "TINY." cũ). Dựng 4 phương án
-  theo 4 bố cục A–D trong file đó rồi gửi ảnh để chọn.
+- Khi được yêu cầu thiết kế thumbnail, dùng `/make-thumbnail` (plugin `aitrends-thumbnail`)
+  theo quy tắc trong `prompts/thumbnail_style.md`: dựng 3–4 phương án là các khoảnh khắc
+  khác nhau (không còn bố cục A–D cố định), biểu cảm hero theo bối cảnh, rồi gửi ảnh để chọn.
 
 ## Viết script
 - Trước khi viết hoặc sửa script, đọc `prompts/QUY_TAC_VIET_SCRIPT_KENH.md` đầu tiên.

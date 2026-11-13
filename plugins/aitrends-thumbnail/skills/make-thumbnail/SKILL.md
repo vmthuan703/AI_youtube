@@ -2,7 +2,7 @@
 name: make-thumbnail
 description: "This skill should be used when the user runs /make-thumbnail or asks to \"make a thumbnail from this script\", \"design thumbnails for this video\", \"tạo thumbnail từ script\", \"làm thumbnail cho video\", \"thiết kế thumbnail\", \"thumbnail điện ảnh\", \"redo the thumbnail\", or \"give me thumbnail options\" for the What If channel. It reads the script, picks the moments worth a poster, and stages each one as a cinematic 3D still on the aiTrends 3D engine (film light, depth of field, weather, low angle, the channel hero large in the foreground, roster characters reacting behind), with text only where the script needs it, then renders 1280×720 JPGs with a picking sheet and checks.\n"
 metadata:
-  version: "0.2.0"
+  version: "0.2.1"
   author: aiTrends
 ---
 
@@ -36,6 +36,7 @@ Write this down (short, in the chat) before building anything:
 | Poster moments | 3–5 moments where the rule is visible in ONE frame and the hero is on top. Quote the line. Prefer the impossible sight (a tire in one hand, a street of people frozen) over a talking scene |
 | Place and hour | Where each moment happens and which light makes it strongest (see the looks table) |
 | The power, visible | What in the frame shows the power: a prop held wrong, a glow, a colour on the hero, weather, a crowd's state |
+| Hero's face | What the hero feels at that moment (rule 2): joy, smug only when winning, hurt, confused, worried… |
 | Reactions | Who watches and what they feel. Map each to a roster role |
 | Text | Does this moment read without words? If not, the one label, number or ≤ 3-word phrase that completes it |
 | Avoid | The twist or ending, and the "Do not" list |
@@ -65,7 +66,7 @@ This creates `<studio>/projects/thumb-<slug>/`. Then edit three files:
 ### The order inside `draw()` (always)
 
 ```js
-s.hero.pose(...).face({ expr: 'smug', look: [0.35, -0.1], t: 0, blink: false, saccade: false });   // 1 pose the hero
+s.hero.pose(...).face({ expr: 'smug', look: [0.35, -0.1], t: 0, blink: false, saccade: false });   // 1 pose the hero (expr = the moment's feeling, rule 2)
 frameHead(T, s.st, s.hero, { u: 0.34, v: 0.56, size: 0.38, yaw: 0.25, pitch: -0.2 });             // 2 the camera, from where the head should be
 s.theo.pose('shocked'); placeAt(T, s.st, s.theo, { u: 0.71, size: 0.22, face: s.hero });            // 3 everyone else, by position in the frame
 watch(s.theo, s.hero).face({ expr: 'shocked', t: 0, blink: false, saccade: false });               // 4 heads turn to the hero, then faces

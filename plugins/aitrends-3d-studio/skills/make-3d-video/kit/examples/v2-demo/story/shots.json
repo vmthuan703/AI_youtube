@@ -1,0 +1,10 @@
+{
+ "title": "v2-demo",
+ "duration": 15.0,
+ "shots": [
+  { "id": "golden", "start": 0, "end": 4.6, "line": "", "camera": "manual" },
+  { "id": "close", "start": 4.6, "end": 7.4, "line": "", "camera": "manual" },
+  { "id": "rain", "start": 7.4, "end": 11.4, "line": "", "camera": "manual", "in": { "type": "fade", "dur": 0.4 } },
+  { "id": "snow", "start": 11.4, "end": 15.0, "line": "", "camera": "manual", "in": { "type": "fade", "dur": 0.4 } }
+ ]
+}

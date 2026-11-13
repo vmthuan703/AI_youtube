@@ -81,6 +81,7 @@ const cache3D = new Map();
 function state3D(shot, def, info) {
   if (cache3D.has(shot.id)) return cache3D.get(shot.id);
   for (const [k, v] of cache3D) if (cache3D.size >= 2) { v.dispose?.(); (v.stage || v.st)?.dispose?.(); cache3D.delete(k); }
+  E.curShot = shot;   // 2.0: T.stage reads the shot's "look" and "weather"
   const st = def.init(three, info); const stg = st.stage || st.st || st;
   if (def.optimize !== false && three.optimize && stg.scene) { const r = three.optimize(stg, st); if (q.has('prof')) console.log(`ERROR-INFO optimize ${shot.id}: ${r.before} -> ${r.after} static meshes`); }
   cache3D.set(shot.id, st); return st;

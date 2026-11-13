@@ -5,6 +5,20 @@ reference videos of the genre (10–11 min each) and compared with the channel's
 text is the spec. The section "Measured from the reference videos" at the end has the numbers. Learn the structure, keep the channel's own identity:
 never copy a reference's devices, gags or wording.
 
+## 2.0: the film picture (read this first)
+- **Beautiful in the first frame.** Open on the place, not on a face: a low sun in or near the frame, long shadows across the ground, a
+  row of things running to a vanishing point, something close to the lens sliding past as the camera comes down (`establish`).
+- **Three planes in every outdoor frame:** a foreground (branch, fence, mailbox, parked car, lamp), the subject, and far layers that fade
+  into the air (tree line, hills, water tower). Flat walls straight behind a character are for interiors only.
+- **America, specifically:** clapboard houses with porches, flags and pumpkins, mailboxes at the curb, yellow school buses, a brick high
+  school with white columns, a Main Street with a diner, a cinema marquee and a barber, power lines, a water tower with the town's name.
+- **Weather is part of the story.** Every scene has a time of day and a weather the viewer can name at once: golden autumn afternoon
+  with falling leaves, rainy night with reflections, snowy dusk with lit windows, foggy morning. Change it when the story turns.
+- **Light motivates feeling:** hope and beginnings in golden hour, doubt in overcast or rain, the lowest point at night in the rain, the
+  payoff in clear light or first snow. The hero's lime jacket stays the loudest colour in every look.
+- **Characters keep their design.** They get better light, not new shapes: turn faces toward the sun's side, let the rim light sit on
+  the hair, keep close-ups on a blurred background.
+
 ## The channel's identity (does not change between videos)
 - **Hero:** quilted lime puffer and platinum anime hair (`channel/cast.js`). The rest of the cast is calmer, so the eye always finds the hero. Near-white, silver or pale blond hair belongs to the hero only: give everyone else a clearly darker or warmer colour, so the hero is recognisable from the hair alone.
 - **Voice:** the emotional `am_puck` narrator through Chatterbox.

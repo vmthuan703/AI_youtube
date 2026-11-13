@@ -95,9 +95,13 @@ export const STYLES = {
     moods: { night: { sky: ['#05080f', '#101a2a', '#1e2c44'], ambient: '#2a3650', rim: '#a8c4ff' }, dusk: { sky: ['#101828', '#2a3650', '#5a6a80'] } },
   },
 };
+// 2.0: the film style. Neutral light multipliers and grade, because T.cine.stage lights and grades each shot by its look.
+STYLES.cine = { ...STYLES.pearl, name: 'Cine 2.0', desc: 'Film picture: real sky and sun, weather, contact shadows, aerial haze, god rays, split-tone lens.',
+  cine: true, setSat: 0.92, skinGlow: 0.04,
+  grade: { contrast: 1.0, sat: 1.0, vignette: 0.42, grain: 0.05, bloom: 0.5, bloomThreshold: 0.92 } };
 // alias so 2D-studio habits still work
 STYLES.dusk = STYLES.cinematic;
-export const STYLE_IDS = ['pearl', 'cinematic', 'soft', 'ink', 'toon', 'golden', 'neon', 'noir'];
+export const STYLE_IDS = ['cine', 'pearl', 'cinematic', 'soft', 'ink', 'toon', 'golden', 'neon', 'noir'];
 
 // A PALETTE gives one video its own colour world on top of the style (config.json "palette"). The purple explainer stage
 // stays the same in every palette: it is what the whole series has in common.

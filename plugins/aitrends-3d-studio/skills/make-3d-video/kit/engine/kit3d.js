@@ -14,6 +14,9 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { E, S, V, mood, shade, rng, key, smoothKey, ease, clamp, lerp, noise } from './core.js';
+import * as CINE from './cine20.js';
+import * as WX20 from './weather20.js';
+import * as W3 from './world3d.js';
 export { THREE };
 
 // ---------------------------------------------------------------- renderer (one per worker)
@@ -35,12 +38,13 @@ export const color = C;
 
 // ---------------------------------------------------------------- rim light (shared by all "rim" materials)
 // One set of uniforms per frame: the stage sets them from the mood; a shot can override with T.rim({...}).
-export const RIM = { rimColor: { value: new THREE.Color('#b9a6ff') }, rimStrength: { value: 0.6 }, rimPower: { value: 3.4 }, rimDir: { value: new THREE.Vector3(0, 0, 0) } };
+export const RIM = { rimColor: { value: new THREE.Color('#b9a6ff') }, rimStrength: { value: 0.6 }, rimPower: { value: 3.4 }, rimDir: { value: new THREE.Vector3(0, 0, 0) }, sssK: { value: 0 } };   // sssK (2.0): warm light bleeding through skin at the shadow edge
 export function rim(o = {}) {
   if (o.color) RIM.rimColor.value.set(o.color);
   if (o.strength != null) RIM.rimStrength.value = o.strength;
   if (o.power != null) RIM.rimPower.value = o.power;
   if (o.dir) RIM.rimDir.value.set(...o.dir).normalize(); else if (o.dir === null) RIM.rimDir.value.set(0, 0, 0);
+  RIM.sssK.value = o.sss ?? 0;
   return RIM;
 }
 // limit > 0: a soft ceiling on the lit colour (skin). Heads never clip to white or feed the bloom under strong keys.
@@ -50,13 +54,14 @@ function addRim(m, k = 1, limit = 0) {
     const ceiling = limit > 0 ? `
         { float mxL = max(gl_FragColor.r, max(gl_FragColor.g, gl_FragColor.b)); float kn = ${(limit * 0.62).toFixed(3)};
           if (mxL > kn) { float over = mxL - kn; gl_FragColor.rgb *= (kn + over / (1.0 + over / (${limit.toFixed(3)} - kn))) / mxL; } }` : '';
-    sh.fragmentShader = 'uniform vec3 rimColor; uniform float rimStrength; uniform float rimPower; uniform vec3 rimDir; uniform float rimK;\n' +
+    sh.fragmentShader = 'uniform vec3 rimColor; uniform float rimStrength; uniform float rimPower; uniform vec3 rimDir; uniform float rimK; uniform float sssK;\n' +
       sh.fragmentShader.replace('#include <opaque_fragment>', `
         { vec3 nV = normalize(normal); vec3 vV = normalize(vViewPosition);
           float fr = pow(1.0 - clamp(dot(nV, vV), 0.0, 1.0), rimPower);
           float side = 1.0;
           if (length(rimDir) > 0.01) { vec3 rd = normalize((viewMatrix * vec4(rimDir, 0.0)).xyz); side = smoothstep(-0.35, 0.55, dot(nV, rd)); }
-          outgoingLight += rimColor * fr * side * rimStrength * rimK; }
+          outgoingLight += rimColor * fr * side * rimStrength * rimK;
+          ${limit > 0 ? 'if (sssK > 0.0 && length(rimDir) > 0.01) { float wl = dot(nV, normalize((viewMatrix * vec4(rimDir, 0.0)).xyz)); outgoingLight += vec3(1.0, 0.42, 0.34) * diffuseColor.rgb * rimColor * sssK * smoothstep(-0.6, 0.0, wl) * smoothstep(0.55, 0.0, wl); }' : ''} }
         #include <opaque_fragment>${ceiling}`);
   };
   m.customProgramCacheKey = () => 'rim' + k + '/' + limit;
@@ -153,25 +158,28 @@ export function stage(o = {}) {
   if (E.quality === 'standard' && o.msaa == null) { const fx = new ShaderPass(FXAAShader); fx.uniforms.resolution.value.set(1 / w, 1 / h); composer.addPass(fx); }   // cheap anti-aliasing
   const tickers = [];
   const api = {
-    scene, camera, composer, sun, hemi, fill, M, bloom, bokeh, tickers, moodName, faceLight,
+    scene, camera, composer, sun, hemi, fill, M, bloom: bloomK > 0 ? bloom : null, bokeh, tickers, moodName, faceLight, rimState,
     // re-apply this stage's rim and mood before drawing it: another stage may have been built since (backdrops, transitions)
     activate: () => { rim(rimState); E.curMood = moodName; },
     add: (...objs) => { objs.forEach(ob => { if (!ob) return; scene.add(ob); if (typeof ob.tick === 'function') tickers.push(ob.tick); }); return objs[0]; },   // objects with .tick(t) animate by themselves (crowds)
     // run every registered animator (particles, blinking signs, cars…) — call once per frame from draw()
     tick: (t) => { for (const f of tickers) f(t); },
     onTick: (f) => { tickers.push(f); return f; },
-    focus: (dist, aperture) => { if (!bokeh) return; bokeh.uniforms.focus.value = dist; if (aperture != null) bokeh.uniforms.aperture.value = aperture; },
+    focus: (dist, aperture) => { const bk = api.bokeh; if (!bk) return; bk.enabled = true; bk.uniforms.focus.value = dist; if (aperture != null) bk.uniforms.aperture.value = aperture; },
     // focus on an object/point automatically: st.focusOn([x,y,z])
     // the depth pass measures along the view axis, so focus uses view depth: off-centre subjects stay sharp
-    focusOn: (p) => { if (!bokeh) return; const v = Array.isArray(p) ? new THREE.Vector3(...p) : p.isVector3 ? p.clone() : p.getWorldPosition(new THREE.Vector3()); camera.updateMatrixWorld(); bokeh.uniforms.focus.value = Math.max(0.05, -v.applyMatrix4(camera.matrixWorldInverse).z); },
+    focusOn: (p) => { const bokeh = api.bokeh; if (!bokeh) return; const v = Array.isArray(p) ? new THREE.Vector3(...p) : p.isVector3 ? p.clone() : p.getWorldPosition(new THREE.Vector3()); camera.updateMatrixWorld(); bokeh.uniforms.focus.value = Math.max(0.05, -v.applyMatrix4(camera.matrixWorldInverse).z); },
     exposure: (x) => { R.toneMappingExposure = x; },
     // fitShadow([x,y,z], size): aim the sun's shadow box at the action and shrink it, so shadows under feet and props are crisp
     fitShadow: (c, size = 6) => { const d = sun.position.clone().sub(sun.target.position).normalize(); sun.target.position.set(...c); sun.position.copy(sun.target.position).addScaledVector(d, 30);
       Object.assign(sun.shadow.camera, { left: -size, right: size, top: size, bottom: -size, near: 1, far: 80 }); sun.shadow.camera.updateProjectionMatrix(); sun.target.updateMatrixWorld(); },
     render: () => { if (faceLight) { camera.updateMatrixWorld(); faceLight.position.copy(camera.position); faceLight.target.position.copy(camera.position).add(camera.getWorldDirection(new THREE.Vector3()).multiplyScalar(6)); faceLight.target.updateMatrixWorld(); }
-      R.toneMappingExposure = (o.exposure ?? 1) * (L.exposure ?? 1); camera.aspect = E.W / E.H; camera.updateProjectionMatrix(); R.info.autoReset = false; R.info.reset(); composer.render(); api.calls = R.info.render.calls; api.tris = R.info.render.triangles; },
+      R.toneMappingExposure = api.exp ?? (o.exposure ?? 1) * (L.exposure ?? 1); camera.aspect = E.W / E.H; camera.updateProjectionMatrix(); R.info.autoReset = false; R.info.reset(); composer.render(); api.calls = R.info.render.calls; api.tris = R.info.render.triangles; },
     dispose: () => { scene.traverse(x => { x.geometry?.dispose(); [].concat(x.material || []).forEach(m => { m.map?.dispose?.(); m.dispose(); }); }); composer.passes.forEach(p => p.dispose?.()); composer.dispose?.(); },   // free bloom/DOF targets too (long videos visit hundreds of shots per worker)
   };
+  camera.userData.stage = api;
+  // 2.0: the film picture. On for the `cine` style (the channel default) or when a look is named; o.cine: false or --legacy keeps the old picture.
+  if (!LEGACY && R && o.cine !== false && !QS.has('nocine') && (o.look || E.curShot?.look || st.cine)) CINE.apply({ wx: WX20, W: W3 }, api, o);
   return api;
 }
 
@@ -329,3 +337,6 @@ export * as W from './world3d.js';
 export * as FX3 from './fx3d.js';
 export * as act from './act10.js';   // 1.0.2: action library (door, carry, sitOn, runStop, trip, vault, climbOn, hug, highFive, armAround, pullRun, catchFall, gaze, react, busyCrowd)
 export { rng, key, smoothKey, ease, clamp, lerp, noise };
+export * as cine from './cine20.js';   // 2.0 film picture: T.cine.stage(T, { look })
+export * as usa from './usa20.js';     // 2.0 American sets with depth: T.usa.mapleStreet(st, { season })
+export * as wx from './weather20.js';  // 2.0 weather: T.wx.leaves / rain / snow / motes

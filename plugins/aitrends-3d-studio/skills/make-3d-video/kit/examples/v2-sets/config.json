@@ -1,0 +1,17 @@
+{
+ "title": "2.0 sets: Main Street and the high school",
+ "aspect": "16:9",
+ "resolution": "1080p",
+ "fps": 30,
+ "quality": "high",
+ "style": "cine",
+ "palette": null,
+ "voiceover": null,
+ "duration": 15,
+ "captions": false,
+ "bars": "cine",
+ "fadeIn": 0.4,
+ "fadeOut": 0.5,
+ "speechBubbles": false,
+ "handheld": 0.25
+}

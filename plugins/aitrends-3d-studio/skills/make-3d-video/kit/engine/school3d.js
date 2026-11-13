@@ -11,7 +11,7 @@
 //   const k = T.W.court(st)          // outdoor basketball court (asphalt, hoops at x = ±11.5); indoor games: T.W.gym
 import * as THREE from 'three';
 import { S, shade, rng } from './core.js';
-import { mat, box, rbox, cyl, plane, group, at, canvasTex, lamp, glow, textTex, ground, torus, asphalt } from './kit3d.js';
+import { mat, box, rbox, cyl, plane, group, at, canvasTex, lamp, glow, glowMat, textTex, ground, torus, asphalt } from './kit3d.js';
 import { tree, bench, locker, counter, poster, ceilingLamp, trashCan, bulletinBoard, wallClock, room } from './world3d.js';
 
 const PI = Math.PI, R2 = PI / 2, SEAT = 0.42;
@@ -32,6 +32,10 @@ export function schoolBus(o = {}) {
   g.add(box(0.9, 0.08, 0.35, mat('#3a3640'), 3.9, 0.62, 1.38), box(0.9, 0.08, 0.3, mat('#3a3640'), 3.9, 0.34, 1.6));   // two steps down to the curb
   g.add(plane(1.9, 0.26, sign('SCHOOL BUS', 1.9, 0.26, '#1e1a22', '#f2b632'), -0.5, 1.42, 1.262));
   g.add(glow('#fff2c8', 0.5, 6.0, 1.1, 0.8), glow('#fff2c8', 0.5, 6.0, 1.1, -0.8));
+  // 2.0: the front reads as a bus from down the street
+  { const dk = mat('#16181e', { rough: 0.25, metal: 0.5 }); g.add(box(0.04, 0.8, 2.2, dk, 4.52, 2.25, 0), box(0.04, 0.55, 1.7, blk, 6.02, 1.15, 0), box(0.05, 0.3, 1.6, blk, 4.53, 2.76, 0), box(1.62, 0.06, 2.42, blk, 5.2, 1.92, 0));
+    for (const z of [-0.95, 0.95]) { const hl = new THREE.Mesh(new THREE.SphereGeometry(0.13, 12, 8), glowMat('#fff2c8', 3)); hl.position.set(6.03, 1.2, z); g.add(hl); const am = new THREE.Mesh(new THREE.SphereGeometry(0.09, 10, 8), glowMat('#ffa030', 2.5)); am.position.set(4.55, 2.78, z * 1.05); g.add(am);
+      g.add(box(0.05, 0.05, 0.5, blk, 4.7, 2.3, z * 1.45), box(0.04, 0.34, 0.2, blk, 4.7, 2.3, z * 1.72)); } }
   g.doorX = 3.9; g.stepY = [0.62, 0.34];
   return g;
 }

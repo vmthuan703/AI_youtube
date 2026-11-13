@@ -17,6 +17,13 @@ The check also flags these: **Hero name fits the hero** (a girl's name for the b
 (a "thirty days to ..." deadline that ends after the story's last day) and **Punchlines land when heard** (a 1–4 word answer such as
 "You say YouTube."). It also checks the opening rules from the 2026-11-11 retention review: **Rule stated early** (the "Here's the rule" line before word 70, about 26 s) and **Name, age and flash-forward are short** (25 words or fewer from "Your name is"). Story-logic question 10 asks for the first consequence of the power before word 120. These are a trial: the channel compares the 11/11-12/11 videos with the 13/11 ones. Under the table it lists the **Story logic** questions. Answer each one in writing before the voice.
 
+## Hooks and retention (2.0)
+- Write three openings of about 28 words (10 seconds). Each one starts inside an action the viewer can picture, speaks to "you", shows
+  what can be lost or the catch, and leaves one question open. No name, age or welcome in the first 10 seconds. Rank them with
+  `python tools/retention.py --hooks <file>` and keep the best; show all three with their scores at the script checkpoint.
+- `python tools/retention.py --script <file>` scores every 30 seconds (a turn, an open question, stakes, a number, a second voice, short
+  sentences). A window under 5 is FLAT: add the thing it names. No two FLAT windows in a row, and none in the first two minutes.
+
 ## Writing a script (when the user asks you to write or rewrite one)
 These rules come from the Memory 100x v2 review (logic 6.5/10) and the user's notes on the finished video. Follow them from the first draft:
 - **Cast.** The hero ("you") is a **boy**, with a boy's name and he/him. The **best friend is a girl**. Write a cast table (name, gender,

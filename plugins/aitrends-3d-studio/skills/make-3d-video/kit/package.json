@@ -1,6 +1,6 @@
 {
   "name": "aitrends-3d-studio",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
   "description": "aiTrends 3D Studio: code-rendered 3D stick-figure story videos (Three.js), rendered frame by frame in headless Chromium",

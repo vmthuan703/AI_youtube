@@ -1,0 +1,11 @@
+{
+ "title": "v2-sets",
+ "duration": 15.0,
+ "shots": [
+  { "id": "main_day", "start": 0, "end": 3, "line": "", "camera": "manual", "look": "goldenHour", "weather": "leaves" },
+  { "id": "main_night", "start": 3, "end": 6, "line": "", "camera": "manual", "weather": "rain" },
+  { "id": "school_day", "start": 6, "end": 9, "line": "", "camera": "establish", "look": "clearDay" },
+  { "id": "school_snow", "start": 9, "end": 12, "line": "", "camera": "manual", "weather": "snow" },
+  { "id": "school_close", "start": 12, "end": 15, "line": "", "camera": "closeup", "look": "fogMorning", "weather": "fog" }
+ ]
+}

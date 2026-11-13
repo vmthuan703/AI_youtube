@@ -7,6 +7,16 @@ khung hình 2:1, sơ đồ giải thích hoạt hình.
 Mọi khung hình đều dựng bằng code (Three.js) và render từng khung một. Không dùng AI tạo ảnh/video, nên nhân vật
 giữ nguyên dáng suốt video và chữ luôn nét. Giọng đọc mặc định dùng Chatterbox (MIT, chạy máy cá nhân), dự phòng Kokoro-82M (Apache-2.0).
 
+## Mới trong 2.1.0 — thumbnail điện ảnh ngay trong `/make-3d-video`
+- **Mỗi video xong là có luôn thumbnail:** sau khi xuất MP4, `/make-3d-video` tự dựng 3–4 phương án thumbnail từ chính script, dàn nhân vật và bối cảnh của video, rồi gửi ảnh ghép để bạn chọn.
+- **Thumbnail là một khung hình phim:** hero to ở tiền cảnh, người phản ứng ở trung cảnh, bối cảnh thật xóa phông phía sau; ánh sáng theo cảm xúc (ngược nắng hoàng hôn, đêm mưa, sương sớm), viền sáng quanh hero.
+- **Biểu cảm theo khoảnh khắc:** mặt hero đúng với lúc thumbnail kể, chỉ đắc ý khi đang thắng.
+- **Chữ tùy script:** có phương án không chữ; nhiều nhất 1 nhãn, 1 con số hoặc ≤ 3 chữ.
+- **Bố cục theo vị trí trên khung hình** (`engine/thumbcine.js`): `frameHead`, `placeAt`, `watch`, `heroLights`, `powerGlow`.
+- **Công cụ:** `tools/new_thumbs.mjs` (tạo project thumbnail dùng lại cast của video), `tools/thumb_sheet.mjs` (ảnh ghép có hàng 320 px, đo độ sáng, tương phản, cháy sáng, số chữ). Ví dụ: `examples/thumb-cine`.
+- **Lệnh riêng `/make-thumbnail`** để làm hoặc làm lại thumbnail cho video đã xong. Plugin `aitrends-thumbnail` đã gộp vào đây và được gỡ khỏi marketplace.
+- Bỏ ví dụ `examples/v103-thumb` (4 bố cục A–D cũ).
+
 ## Mới trong 2.0.1 — dáng người mới, đi đứng như người thật
 - **Cả dàn nhân vật có dáng mới, giữ nguyên khuôn mặt:** chân dài hơn, vai rộng hơn, áo thon ở eo, đùi và bắp chân thon dần (khoảng 3,45 lần đầu).
 - **Đi và chạy:** bàn chân bám đất (chạm gót → cả bàn → đạp mũi), hông hạ và dồn sang chân trụ, vai xoay ngược hông, tay vung như con lắc theo số đo người thật; chạy có lúc hai chân rời đất.
@@ -47,7 +57,7 @@ giữ nguyên dáng suốt video và chữ luôn nét. Giọng đọc mặc đ�
 - **Trang phục chuyển động:** khăn lắc theo bước và bay theo gió, mũ hoodie có dáng thật, áo phao gom lại khi ngồi.
 - **Bối cảnh tháng 11:** bữa tối Lễ Tạ ơn, phố bí ngô, cơn gió cuốn lá, trận bóng tối thứ Sáu.
 - **Sổ bài học tự động:** sau mỗi lần render bản cuối, lỗi kiểm tra, lỗi render và góp ý của bạn được gộp vào `channel/LESSONS.md`; đầu video sau Claude đọc sổ và đưa danh sách việc cần chú ý (`node tools/retro.mjs --next`), ghi góp ý bằng `--note`. Sổ còn đề xuất bối cảnh hợp mùa (có sẵn chưa dùng và nên thêm mới), đồ hoạ và kỹ xảo (theo bảng điểm hình ảnh, kỹ xảo có sẵn ít dùng, kỹ xảo mới nên thêm).
-- **Thumbnail 3D** theo 4 bố cục A–D của kênh (`T.thumb`, `--thumbs`). Ví dụ: `examples/v103-demo`, `examples/v103-thumb`.
+- **Thumbnail 3D** (`T.thumb`, `--thumbs`). Ví dụ: `examples/v103-demo`. Từ 2.1.0 thumbnail dựng kiểu điện ảnh, xem mục 2.1.0.
 
 ## Mới trong 1.0.2 — chuyển động tự nhiên, bắt lỗi tự động
 - **Kiểm tra lỗi tự động** (`--qc`): tay chân xuyên đồ vật hoặc người khác, mặt bị che, máy quay nằm trong tường / xe / người hoặc nhảy giữa cảnh, chân trượt, khớp giật. Còn lỗi đỏ thì không cho render bản cuối.

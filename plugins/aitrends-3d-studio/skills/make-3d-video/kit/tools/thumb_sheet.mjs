@@ -1,14 +1,14 @@
 #!/usr/bin/env node
-// sheet.mjs — check rendered thumbnails and build the picking sheet.
-//   node sheet.mjs --project <studio>/projects/thumb-<slug> [--studio <studio folder>]
+// tools/thumb_sheet.mjs — 2.1 check rendered thumbnails and build the picking sheet (references/thumbnails.md). Run in the studio folder.
+//   node tools/thumb_sheet.mjs --project projects/thumb-<slug>
 // Reads build/thumbs/<id>.jpg (from `render.mjs --thumbs`) and story/shots.json ("idea" and "text" per shot).
 // Writes build/thumbs/sheet.jpg: every option large with its idea, then every option at 320 px (the size it is seen at on a phone).
 // Prints OK / RED per option; exit code 1 on a red line. The check measures the picture; it cannot judge the idea. Look at the sheet.
-import fs from 'node:fs'; import path from 'node:path'; import { createRequire } from 'node:module';
+import fs from 'node:fs'; import path from 'node:path'; import { createRequire } from 'node:module'; import { fileURLToPath } from 'node:url';
 const arg = n => { const i = process.argv.indexOf('--' + n); return i > 0 ? process.argv[i + 1] : null; };
-if (!arg('project')) { console.error('usage: node sheet.mjs --project <thumbnail project> [--studio <studio folder>]'); process.exit(2); }
-const proj = path.resolve(arg('project')), studio = path.resolve(arg('studio') || path.join(proj, '..', '..')), dir = path.join(proj, 'build', 'thumbs');
-if (!fs.existsSync(path.join(studio, 'node_modules', 'playwright'))) { console.error(`playwright not found in ${studio}. Pass --studio <aiTrends studio folder>.`); process.exit(2); }
+if (!arg('project')) { console.error('usage: node tools/thumb_sheet.mjs --project projects/thumb-<slug>'); process.exit(2); }
+const proj = path.resolve(arg('project')), studio = path.resolve(arg('studio') || path.join(path.dirname(fileURLToPath(import.meta.url)), '..')), dir = path.join(proj, 'build', 'thumbs');
+if (!fs.existsSync(path.join(studio, 'node_modules', 'playwright'))) { console.error(`playwright not found in ${studio}: run npm install there (Stage 2).`); process.exit(2); }
 const { chromium } = createRequire(path.join(studio, 'package.json'))('playwright');
 const shots = JSON.parse(fs.readFileSync(path.join(proj, 'story', 'shots.json'), 'utf8')).shots.filter(s => fs.existsSync(path.join(dir, s.id + '.jpg')));
 if (!shots.length) { console.error(`no thumbnails in ${dir}. Run: node render.mjs --project ${proj} --thumbs`); process.exit(2); }

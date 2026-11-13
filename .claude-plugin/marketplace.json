@@ -1,19 +1,17 @@
 {
   "name": "ai-youtube",
-  "owner": { "name": "vmthuan703" },
-  "metadata": { "description": "Plugin làm video cho kênh YouTube What If: dựng video 3D từ kịch bản." },
+  "owner": {
+    "name": "vmthuan703"
+  },
+  "metadata": {
+    "description": "Plugin làm video cho kênh YouTube What If: dựng video 3D từ kịch bản."
+  },
   "plugins": [
     {
       "name": "aitrends-3d-studio",
       "source": "./plugins/aitrends-3d-studio",
-      "description": "Kịch bản → giọng đọc mã nguồn mở → video hoạt hình 3D hoàn chỉnh (Three.js), tới 4K/60 fps.",
-      "version": "0.2.7"
-    },
-    {
-      "name": "aitrends-thumbnail",
-      "source": "./plugins/aitrends-thumbnail",
-      "description": "Script → các phương án thumbnail điện ảnh dựng bằng engine 3D (ánh sáng phim, xóa phông, hero to ở tiền cảnh, người phản ứng), chữ tùy script.",
-      "version": "0.2.0"
+      "description": "Kịch bản → giọng đọc mã nguồn mở → video hoạt hình 3D hoàn chỉnh (Three.js), tới 4K/60 fps, kèm thumbnail điện ảnh.",
+      "version": "2.1.0"
     }
   ]
 }

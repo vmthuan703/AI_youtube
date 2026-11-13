@@ -1,9 +1,9 @@
-// Cinematic thumbnail options: one registerShot per option (ids match story/shots.json).
+// thumb-cine (2.1): cinematic thumbnail options, one registerShot per option (ids match story/shots.json). references/thumbnails.md
 // Worked example: "What If You Could Borrow Your Friends' Strength?". Replace the shots; keep the order of calls inside draw().
-// Render: node render.mjs --project projects/<this> --thumbs   →   build/thumbs/<id>.jpg (1280×720)
+// Render: node render.mjs --project examples/thumb-cine --thumbs   →   build/thumbs/<id>.jpg (1280×720), then node tools/thumb_sheet.mjs --project examples/thumb-cine
 import { registerShot } from '/engine/core.js';
 import { HERO, THEO, NORA, EXTRAS } from '../cast.js';
-import { frameHead, placeAt, watch, heroLights, powerGlow } from '../_thumb.js';
+import { frameHead, placeAt, watch, heroLights, powerGlow } from '/engine/thumbcine.js';
 const still = { t: 0, blink: false, saccade: false };   // a thumbnail is one frozen frame: no blinks, no eye darts
 
 // A — golden hour, low angle, the sun behind the hero. No text: the picture tells it.

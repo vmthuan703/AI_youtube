@@ -13,7 +13,7 @@
       "name": "aitrends-thumbnail",
       "source": "./plugins/aitrends-thumbnail",
       "description": "Script → các phương án thumbnail điện ảnh dựng bằng engine 3D (ánh sáng phim, xóa phông, hero to ở tiền cảnh, người phản ứng), chữ tùy script.",
-      "version": "0.2.0"
+      "version": "0.2.1"
     }
   ]
 }

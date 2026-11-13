@@ -188,8 +188,10 @@ export function walkPose2(ph, o = {}) {
   if (!hm) { let c = 0, s = 0; const N = 48; for (let i = 0; i < N; i++) { const q = 2 * Math.PI * i / N, a = leg(q, 1), b = leg(q + Math.PI, -1), v = (a.z - b.z) / Math.max(D, 0.05); c += v * Math.cos(q); s += v * Math.sin(q); }
     hm = ARMH[key] = Math.atan2(s, c); }
   const sw = (d) => -am * Math.cos(ph - d - hm), a1 = sw(0.35), a2 = sw(0.8), lean = (sprint ? 22 : run ? 12 : 3) * (o.lean ?? 1);
-  const arm = (a, b) => run ? [(sprint ? 30 : 26) + (sprint ? 48 : 42) * a, 11 - 5 * a, 100 + 16 * b, 0]
-    : [8 + 27 * a, 8 - 4 * a, 32 + 20 * b + 6 * b * b, 0];
+  // human gait numbers: walking shoulder about +15° forward / -20° back with the elbow 12–32°; running elbow near 90°, the
+  // hand swings from the hip pocket to chest height (not the chin), more behind the body than in front
+  const arm = (a, b) => run ? [(sprint ? 8 : 4) + (sprint ? 46 : 40) * a, 10 - 4 * a, 84 + 14 * b, 0]
+    : [-2 + 18 * a, 6 - 2 * a, 20 + 11 * b, 0];
   return P({ y: H - B.hipY, sx: (run ? 0.008 : 0.02) * w,
     hips: [run ? 4 : 1, -6 * fz * (run ? 1.3 : 1), (run ? 2.5 : 4) * w],
     spine: [lean + (run ? 0 : 1.2 * Math.cos(2 * ph)), 10 * fz * (run ? 1.3 : 1), -2.5 * w],

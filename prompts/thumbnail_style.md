@@ -1,8 +1,8 @@
 # Quy tắc thumbnail
 
-**Trạng thái:** cập nhật 2026-11-13 theo plugin `aitrends-thumbnail` 0.2.0 (thumbnail điện ảnh dựng bằng engine 3D). Bỏ 4 bố cục A–D cố định và kiểu 2D phẳng của bản 2026-11-07; trước đó nữa đã bỏ phong cách "TINY.".
+**Trạng thái:** cập nhật 2026-11-13 theo plugin `aitrends-3d-studio` 2.1.0 (thumbnail điện ảnh dựng bằng engine 3D). Bỏ 4 bố cục A–D cố định và kiểu 2D phẳng của bản 2026-11-07; trước đó nữa đã bỏ phong cách "TINY.".
 
-**Cách làm:** dùng lệnh `/make-thumbnail` (plugin `aitrends-thumbnail`). Quy tắc chi tiết, bằng tiếng Anh, nằm trong plugin: `plugins/aitrends-thumbnail/skills/make-thumbnail/references/thumbnail_rules.md`. File này tóm tắt bằng tiếng Việt, giữ số liệu gốc và ghi kết quả A/B test của kênh.
+**Cách làm:** dùng lệnh `/make-thumbnail` (plugin `aitrends-3d-studio`; `/make-3d-video` cũng tự chạy bước này sau khi xuất MP4). Quy tắc chi tiết, bằng tiếng Anh, nằm trong plugin: `plugins/aitrends-3d-studio/skills/make-3d-video/references/thumbnails.md`. File này tóm tắt bằng tiếng Việt, giữ số liệu gốc và ghi kết quả A/B test của kênh.
 
 **Công thức một câu:** một khung hình phim đúng khoảnh khắc luật của video phát huy, mặt hero to và được chiếu sáng, biểu cảm đúng khoảnh khắc, siêu năng lực hiện thành ánh sáng, có người khác đang phản ứng.
 

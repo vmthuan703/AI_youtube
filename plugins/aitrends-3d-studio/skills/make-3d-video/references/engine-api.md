@@ -58,6 +58,7 @@ aitrends-3d-studio/
   examples/diagram-gallery/ (every picture in diagrams2d.js and a diagram on a blurred scene)
   examples/worlds-demo/  (0.2.7: beach, sunrise wading, island, snow, aurora, farm, underwater, campfire, blade, torch, phone light, game HUD + counters, POV, icons, versus, planet;
                           wave2.js: slice, debris, pool splash, farm animals, beach critters, stadium, boxing ring, track + results board, clone army, news wall, billboard, phone feed)
+  examples/thumb-cine/   (2.1: two cinematic thumbnail options, golden hour and wet night)
   examples/school-demo/  (0.2.8: bus stop, inside the bus, locker hall, school front, cafeteria arm wrestling, outdoor court, PE yard, bed and floor poses, car lift, body3)
   projects/<slug>/
      config.json   input/ (voiceover, script, music)   timeline/ (words, sentences, beats, lines)
@@ -268,9 +269,13 @@ problems by kind across videos (QC red / amber, shot errors, the user's notes in
 already fixed, the checklist for the next video (`--next`), and proposals for it: seasonal sets (built but unused lately, and new
 ones to add), graphics (from build/qc_scorecard.json and the engine backlog) and effects (T.FX3 / camera effects left unused, new ones). `--note "..."` adds feedback; `--name slug --note` for a video with
 no project folder left.
-**1.0.3 thumbnails**: `T.thumb.tag / tagOn / bar / big / panel` draw the channel's thumbnail UI (prompts/thumbnail_style.md) in a
-shot's `overlay(g, t, info, state)`; `node render.mjs --project P --thumbs` writes build/thumbs/<shot>.jpg (1280×720, the frame
-at shots.json `thumbAt`) and grid.jpg. Example: examples/v103-thumb (layouts A–D).
+**2.1 cinematic thumbnails** (`references/thumbnails.md`): `import { frameHead, placeAt, watch, heroLights, powerGlow, screenOf } from
+'/engine/thumbcine.js'` composes a still in screen space: `frameHead(T, st, hero, { u, v, size, yaw, pitch })` puts the camera so the
+head lands at (u, v) with that height, `placeAt(T, st, ch, { u, size, ground, face })` stands anyone else where they should appear,
+`heroLights` adds a rim and a face fill that follow the camera, `powerGlow` the power's light. Text: `T.thumb.tag / tagOn / bar / big /
+panel` in the shot's `overlay(g, t, info, state)`. `node tools/new_thumbs.mjs --project P` starts `projects/thumb-<slug>` with the
+video's cast; `node render.mjs --project P --thumbs` writes build/thumbs/<shot>.jpg (1280×720, the frame at shots.json `thumbAt`);
+`node tools/thumb_sheet.mjs --project P` checks them and writes sheet.jpg. Example: examples/thumb-cine.
 **1.0.2 hero look**: the channel HERO now wears a waist-length puffer (`crop: true`, `quilt: 'puff'`, `edge`, `hood` colours),
 charcoal joggers (`legs`, `legCuff`) and detailed sneakers (`shoeToe`, `shoeStripe`, `shoeCollar`, `laces: true`). Any outfit can use
 these keys; puffer also takes `yoke` (dark shoulders) and `stripe` (one quilted row in another colour). `HERO` is the fall look

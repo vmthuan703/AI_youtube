@@ -1,5 +1,6 @@
-// _thumb.js — composition and light helpers for cinematic thumbnails on the aiTrends 3D engine (style `cine`, 2.0+).
-// Copied into a thumbnail project as scenes/_thumb.js (files starting with "_" are not auto-loaded; import it from the shot file).
+// engine/thumbcine.js — 2.1 composition and light helpers for cinematic thumbnails (style `cine`): a thumbnail is a film still of one
+// moment of the script. In a thumbnail project's shot file:  import { frameHead, placeAt, watch, heroLights, powerGlow } from '/engine/thumbcine.js';
+// Text on the picture still comes from engine/thumb3d.js (T.thumb.tagOn / tag / bar / big / panel). Example: examples/thumb-cine.
 // The idea: compose in SCREEN space. Frame the hero's head first, then drop everyone else where they should appear in the frame.
 // All functions are pure (no state between frames): call them in draw(), in this order: pose → frameHead → placeAt → watch → lights.aim.
 

@@ -144,7 +144,7 @@ Watch the motion itself with `--gif` (build/gifs/<shot>.gif, 10 fps): stills can
 ## 1.0.3 additions
 - Clipping: a hand / elbow / knee / foot that only touches a surface (less than 4 cm in) is contact, not a clip. Hands now rest on
   furniture tops by themselves, so desk scenes stop showing amber clips.
-- `--thumbs`: one 1280×720 JPG per shot (+ grid.jpg) for thumbnail projects; check at 320 px that the hero's face and the labels read.
+- `--thumbs`: one 1280×720 JPG per shot (+ grid.jpg) for thumbnail projects (references/thumbnails.md; then `node tools/thumb_sheet.mjs`); check at 320 px that the hero's face and the labels read.
 
 ## 2.0 film picture: memory and speed
 - The `cine` style needs about 1.4 GB of video memory per worker at 1080p (4096 shadow map, depth pre-pass, AO, reflections). The

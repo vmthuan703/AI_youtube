@@ -330,7 +330,7 @@ export function optimize(st, keep = []) {
 // re-export the rest of the 3D toolkit so shots only need `T`
 export { FINGERS, restBoxes } from './rig3d.js';
 export * as thumb from './thumb3d.js';   // 1.0.3 thumbnail overlays (T.thumb.tag / tagOn / bar / big / panel)
-export { character, POSES3, posesAt3, flow3, exprAt, walkPose3, breathe3, blendPose3, EXPRESSIONS, BODY } from './rig3d.js';
+export { character, POSES3, posesAt3, flow3, exprAt, walkPose3, walkPose2, breathe3, blendPose3, EXPRESSIONS, BODY, BODY2, build2 } from './rig3d.js';
 export { walkTo, idle3, speak3, listen3, lookAtSpeaker, handheld, chase, crashZoom, punch, dutch, rackFocus, pov, povArms, armWrestle, reachPose, body3, squash, climb, jump3, sitDown, turn3, throw3, throwHand, reachTo, toss, lockerDoor } from "./motion3d.js";
 export { camShot, CAMS } from './camera10.js';   // 1.0 named camera framings
 export * as W from './world3d.js';

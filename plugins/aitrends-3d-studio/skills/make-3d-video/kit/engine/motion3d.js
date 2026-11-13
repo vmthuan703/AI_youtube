@@ -8,7 +8,7 @@
 //   T.dolly(cam, t, keys); T.crashZoom(cam, t, { at: 1.2, to: 18 }); T.handheld(cam, t, 0.6);
 import * as THREE from 'three';
 import { E, clamp, lerp, ease, prog, noise, hash01, speakerAt } from './core.js';
-import { POSES3, walkPose3, blendPose3, breathe3, posesAt3, flow3 } from './rig3d.js';
+import { POSES3, walkPose3, blendPose3, breathe3, posesAt3, flow3, build2, BODY2 } from './rig3d.js';
 
 const D2R = Math.PI / 180;
 const getPose = (p) => (typeof p === 'string' ? POSES3[p] || POSES3.stand : p);
@@ -37,6 +37,7 @@ export function walkTo(ch, t, o = {}) {
   else if (t < t0) yaw = startYaw;
   if (t > t1) yaw = o.yaw1 != null ? angLerp(endYaw, o.yaw1, ease.inOut(prog(t, t1, t1 + 0.4))) : endYaw;
   ch.rotation.y = yaw;
+  if (ch.userData.build === 2) return walk2(ch, t, o, { T, a, vmax, tau, v, t0, t1 });
   // cadence from distance: nominal stride per cycle (walk 1.45 m, run 2.85 m, sprint 4.7 m) adapted to the speed asked for
   const cad = o.sprint ? 1.9 : o.run ? 1.4 : 0.92, nominal = (o.sprint ? 4.7 : o.run ? 2.85 : 1.45) * sc;
   const stride = clamp(vmax / cad, nominal * 0.6, nominal * 1.5);
@@ -45,11 +46,55 @@ export function walkTo(ch, t, o = {}) {
   const vAt = (u) => u <= 0 || u >= T ? 0 : u < a ? vmax * u / a : u < T - a ? vmax : vmax * (T - u) / a;
   let phase = 0; { const dt = 1 / 120; for (let u = 0; u < tau; u += dt) { const h = Math.min(dt, tau - u), vv = vAt(u + h / 2), kb = ease.inOut(clamp((vv / Math.max(vmax, 1e-3)) * 1.6)); phase += vv * h / (stride * Math.max(0.35, kb)); } phase *= Math.PI * 2; }
   ch.userData.mo = { ...(ch.userData.mo || {}), v, phase };   // 1.0: drives hair / strings / bag swing in pose()
-  const gait = walkPose3(phase, { run: o.run, sprint: o.sprint, lean: (o.lean ?? 1) * clamp(v / Math.max(vmax, 1e-3)) });
+  const gait = walkPose3(phase, { v2: false, run: o.run, sprint: o.sprint, lean: (o.lean ?? 1) * clamp(v / Math.max(vmax, 1e-3)) });
   const idle = getPose(o.idle || 'stand'), end = getPose(o.end || o.idle || 'stand');
   const k = clamp((v / Math.max(vmax, 1e-3)) * 1.6);
   if (t >= t1) return end;
   return blendPose3(t < t0 + T / 2 ? idle : end, gait, ease.inOut(k));
+}
+
+// 2.0.1 walkTo for the new body: placed feet (rig3d walkPose2). The stride follows the speed (cadence rises before the stride
+// grows too long for the legs). The first step starts with the left foot lifting (no slide), a small lean into the start and a
+// settle back at the stop. The legs never blend toward a swinging idle: they shrink their stride instead.
+function walk2(ch, t, o, w) {
+  const { T, a, vmax, tau, v, t0, t1 } = w, sc = (ch.scale?.y || 1) * (ch.userData.bodyScale || 1), Lg = BODY2.thigh + BODY2.shin;
+  const cad = o.sprint ? 2.25 : o.run ? 1.75 : 1.45, nominal = (o.sprint ? 3.4 : o.run ? 2.4 : 1.3) * Lg * sc, beta = o.sprint ? 0.27 : o.run ? 0.32 : 0.6;
+  // a long stride first; past it the cadence rises; only a very fast 'walk' (a jog, really) stretches the stride further
+  const stride = clamp(vmax / cad, nominal * 0.55, clamp(vmax / (o.sprint ? 3 : o.run ? 2.6 : 1.9), nominal * 1.12, nominal * 1.5));
+  const vAt = (u) => u <= 0 || u >= T ? 0 : u < a ? vmax * u / a : u < T - a ? vmax : vmax * (T - u) / a;
+  const amp = (vv) => Math.max(0.3, ease.inOut(clamp((vv / Math.max(vmax, 1e-3)) * 1.5)));
+  let phase = 0; { const dt = 1 / 120; for (let u = 0; u < tau; u += dt) { const h = Math.min(dt, tau - u), vv = vAt(u + h / 2); phase += vv * h / (stride * amp(vv)); } phase = (phase + beta) * Math.PI * 2; }
+  ch.userData.mo = { ...(ch.userData.mo || {}), v, phase };
+  const k = clamp((v / Math.max(vmax, 1e-3)) * 1.6), kk = ease.inOut(k);
+  const gait = walkPose3(phase, { v2: true, run: o.run, sprint: o.sprint, lean: (o.lean ?? 1) * clamp(v / Math.max(vmax, 1e-3)), stride: stride * amp(v) / sc, amp: amp(v) });
+  const idle = getPose(o.idle || 'stand'), end = getPose(o.end || o.idle || 'stand');
+  if (t >= t1) return end;
+  const base = t < t0 + T / 2 ? idle : end, out = blendPose3(base, gait, kk);
+  // feet: placed by the gait whenever moving; at a standstill they ease to the pose's own feet
+  const m = smooth01(k * 3);
+  for (const [sd, s] of [['L', 1], ['R', -1]]) { const g = gait['leg' + sd]; out['leg' + sd] = m >= 1 ? g : blendPose3({ l: base['leg' + sd] || [0, 3, 2, 0] }, { l: g }, m).l; out['foot' + sd] = gait['foot' + sd] * m; }
+  out.sx = (gait.sx || 0) * kk;
+  // anticipation and settle: lean into the first steps, rock back a touch on the last
+  const accel = tau < a ? Math.sin(Math.PI * clamp(tau / a)) : 0, decel = tau > T - a ? Math.sin(Math.PI * clamp((tau - (T - a)) / a)) : 0;
+  out.spine = [out.spine[0] + (o.run || o.sprint ? 7 : 4) * accel - 3 * decel, out.spine[1], out.spine[2]];
+  return out;
+}
+const smooth01 = (x) => { x = clamp(x); return x * x * (3 - 2 * x); };
+
+// 2.0.1 turn on the spot with real steps: the foot on the turning side steps first while the other stays planted (it twists
+// in body space by exactly the turn so far, so it does not spin on the floor), then the second foot follows.
+function turn2(ch, t, o, k, e, base) {
+  const from = o.from ?? 0, d = ((o.to - from + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI, dur = o.dur ?? 0.55;
+  ch.userData.mo = { yawRate: d / dur * Math.sin(Math.PI * k) * 1.5 };
+  const yawAt = (kk) => d * ease.inOut(kk), Y = yawAt(k), Yh = yawAt(0.5), first = d > 0 ? -1 : 1;   // first = the foot that stays planted first (away from the turn)
+  const f0 = (s) => { const l = Array.isArray(base['leg' + (s > 0 ? 'L' : 'R')]) ? base['leg' + (s > 0 ? 'L' : 'R')] : [0, 3, 2, 0], Lg = BODY2.thigh + BODY2.shin; return [s * (BODY2.hipX + Math.sin(l[1] * D2R) * Lg), BODY2.ankleY, Math.sin(l[0] * D2R) * Lg * 0.9]; }, rot = (v, ang) => [v[0] * Math.cos(ang) + v[2] * Math.sin(ang), v[1], -v[0] * Math.sin(ang) + v[2] * Math.cos(ang)];
+  const foot = (s) => { const a = f0(s); let to, yawD;
+    if (s === first) { if (k < 0.5) { to = rot(a, -Y); yawD = -Y; } else { const u = smooth01((k - 0.5) / 0.5); const p0 = rot(a, -Yh); to = [lerp(p0[0], a[0], u), a[1] + 0.06 * Math.sin(Math.PI * u), lerp(p0[2], a[2], u)]; yawD = -Yh * (1 - u); } }
+    else { if (k < 0.5) { const u = smooth01(k / 0.5), p1 = rot(a, d - Yh); to = [lerp(a[0], p1[0], u), a[1] + 0.06 * Math.sin(Math.PI * u), lerp(a[2], p1[2], u)]; yawD = (d - Yh) * u; } else { to = rot(a, d - Y); yawD = d - Y; } }
+    return [{ to, pole: [s * 0.2, 0.45, 1.3] }, yawD / D2R]; };
+  const [lL, yL] = foot(1), [lR, yR] = foot(-1), lead = (1 - e) * d * 0.45 / D2R * Math.min(1, k * 4);
+  return { ...base, head: [base.head[0], base.head[1] + clamp(lead, -40, 40), base.head[2]], hips: [base.hips[0], base.hips[1], base.hips[2] + 3 * Math.sin(Math.PI * k * 2) * first], sx: 0.018 * Math.sin(Math.PI * k * 2) * first,
+    legL: lL, legR: lR, footYawL: yL, footYawR: yR, footL: 0, footR: 0, y: (base.y || 0) - 0.012 * Math.sin(Math.PI * k) };
 }
 
 // ---------------------------------------------------------------- idle life
@@ -59,6 +104,8 @@ export function idle3(pose, t, o = {}) {
   const seed = o.seed ?? 1, k = o.k ?? 1, p = breathe3(getPose(pose), t, k, seed), out = { ...p };
   const w = noise(t * 0.16 + seed * 3.1, seed + 11) * (o.weight ?? 1) * k;   // -1..1: which leg carries the weight
   out.hips = [p.hips[0], p.hips[1], p.hips[2] + 3.2 * w]; out.spine = [p.spine[0], p.spine[1], p.spine[2] - 2.2 * w];
+  // 2.0.1: the body moves over the standing leg and the free hip drops, so the free knee bends forward with its foot still down
+  if ((o.v2 ?? build2()) && Math.abs(p.y || 0) < 0.08) { const ws = Math.sign(w) * Math.pow(Math.abs(w), 0.7); out.hips[2] = p.hips[2] + 5 * ws; out.spine[2] = p.spine[2] - 3.6 * ws; out.head = [out.head[0], out.head[1], out.head[2] - 1.5 * ws]; out.sx = (p.sx || 0) + 0.024 * ws; out.y = (out.y || 0) - 0.01 * Math.abs(ws); }
   if (Array.isArray(p.legL) && Array.isArray(p.legR) && Math.abs(p.y || 0) < 0.08) {
     out.legL = [p.legL[0] + 3 * Math.max(0, -w), p.legL[1] + 1.5 * w, p.legL[2] + 9 * Math.max(0, -w), p.legL[3]];
     out.legR = [p.legR[0] + 3 * Math.max(0, w), p.legR[1] - 1.5 * w, p.legR[2] + 9 * Math.max(0, w), p.legR[3]];
@@ -244,6 +291,9 @@ export function climb(ch, t, o = {}) {
     return [y, slope]; };
   const pose = walkTo(ch, t, { ...o, path: P.map(p => [p[0], p[2]]), y: (x, z) => yAt(x, z)[0] });
   const [, slope] = yAt(ch.position.x, ch.position.z), up = clamp(slope / 0.6, -1, 1);
+  if (Math.abs(up) >= 0.05 && pose.legL?.to && pose.legR?.to) {   // 2.0.1: a placed foot lands on the slope (ahead = higher going up)
+    const sl = slope / (ch.userData.bodyScale || 1), f = (l) => ({ ...l, to: [l.to[0], l.to[1] + Math.max(0, sl * l.to[2]) + 0.05 * Math.abs(up) * Math.max(0, l.to[1] - BODY2.ankleY) / 0.075, l.to[2]] });
+    return { ...pose, y: pose.y + Math.min(0, sl * 0.1), legL: f(pose.legL), legR: f(pose.legR), spine: [pose.spine[0] + (up > 0 ? 7 : -3) * Math.abs(up), pose.spine[1], pose.spine[2]] }; }
   if (Math.abs(up) < 0.05 || !Array.isArray(pose.legL) || !Array.isArray(pose.legR)) return pose;
   const lift = (l) => [l[0] + Math.max(0, l[0]) * 0.9 * Math.abs(up) + 8 * Math.abs(up), l[1], l[2] + (up > 0 ? 34 : 18) * Math.abs(up) * clamp(0.3 + Math.max(0, l[0]) / 20), l[3]];
   return { ...pose, legL: lift(pose.legL), legR: lift(pose.legR), spine: [pose.spine[0] + (up > 0 ? 9 : -4) * Math.abs(up), pose.spine[1], pose.spine[2]], head: [pose.head[0] + (up > 0 ? 4 : 8) * Math.abs(up), pose.head[1], pose.head[2]] };
@@ -289,6 +339,7 @@ export function turn3(ch, t, o = {}) {
   const t0 = o.t0 ?? 0, dur = o.dur ?? 0.55, k = prog(t, t0, t0 + dur), e = ease.inOut(k), base = getPose(o.pose || 'stand');
   ch.rotation.y = angLerp(o.from ?? 0, o.to ?? 0, e);
   if (k <= 0 || k >= 1) return base;
+  if (ch.userData.build === 2) return turn2(ch, t, o, k, e, base);
   { let dd = ((o.to - o.from + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI; ch.userData.mo = { yawRate: dd / dur * Math.sin(Math.PI * k) * 1.5 }; }
   let d = ((o.to - o.from + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
   const lead = (1 - e) * d * 0.45 / D2R * Math.min(1, k * 4), stepL = Math.max(0, Math.sin(Math.PI * k * 2)) * 16, stepR = Math.max(0, -Math.sin(Math.PI * k * 2)) * 16;

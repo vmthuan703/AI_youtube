@@ -71,7 +71,7 @@ function walk2(ch, t, o, w) {
   if (t >= t1) return end;
   const base = t < t0 + T / 2 ? idle : end, out = blendPose3(base, gait, kk);
   // feet: placed by the gait whenever moving; at a standstill they ease to the pose's own feet
-  const m = smooth01(k * 3);
+  const m = smooth01(k * 1.5);   // not faster: a quick start (short accel) would snap the shins from the stand to the gait
   for (const [sd, s] of [['L', 1], ['R', -1]]) { const g = gait['leg' + sd]; out['leg' + sd] = m >= 1 ? g : blendPose3({ l: base['leg' + sd] || [0, 3, 2, 0] }, { l: g }, m).l; out['foot' + sd] = gait['foot' + sd] * m; }
   out.sx = (gait.sx || 0) * kk;
   // anticipation and settle: lean into the first steps, rock back a touch on the last

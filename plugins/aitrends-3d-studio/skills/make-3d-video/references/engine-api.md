@@ -326,6 +326,12 @@ Methods (all return the character, so they chain):
   later, the arms 60 ms, the head 90 ms). `lively` 0 = the old even blend, 1 default, 1.5 cartoon snap. It also carries the pose 0.1 s
   earlier, so the hair lags a turn of the head and the body stretches a little on fast rises and drops.
   `T.walkPose3(phase, {run, sprint, lean})`, `T.breathe3(pose, t, k, seed)`, `T.blendPose3(a, b, k)`.
+- **2.0.1 body (build 2, the default on `cine`):** same head and face, longer legs (`T.BODY2`: hips 0.74, about 3.45 heads), wider
+  shoulders, a waist, tapered thighs and shins. Gait (`T.walkPose2`, picked by `walkPose3`/`walkTo`): planted feet with heel strike →
+  toe-off, hip drop and sway, chest counter-turn, pendulum arm swing (walk +16°/-20°, elbow 10–30°; run elbow ~90°, hands to chest),
+  a flight phase when running, speed-up/settle at the ends of `walkTo`, step-turns in `turn3`, weight shift in `idle3`. Seated and
+  low poses keep their seat height. Old body: `{ ...outfit, build: 1 }`, style `pearl` or `render.mjs --legacy`; `walkPose3(ph, { v2: false })`.
+  Known limit: `sitDown` into a seat with a desk right in front can clip the thighs; place the character seated instead.
 - Body and contact helpers (engine/motion3d.js, 0.2.8):
   `T.body3(pose, t, kind, amount, { t0 })` layers living movement on any pose: 'pant' (out of breath), 'sob', 'laugh', 'shiver', 'nod', 'shake' (no), 'sigh' (once from t0),
   'strain' (trembling effort), 'fidget' (nervous). Use it in every held emotional beat instead of a frozen pose.

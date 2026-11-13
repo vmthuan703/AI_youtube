@@ -7,6 +7,16 @@ khung hình 2:1, sơ đồ giải thích hoạt hình.
 Mọi khung hình đều dựng bằng code (Three.js) và render từng khung một. Không dùng AI tạo ảnh/video, nên nhân vật
 giữ nguyên dáng suốt video và chữ luôn nét. Giọng đọc mặc định dùng Chatterbox (MIT, chạy máy cá nhân), dự phòng Kokoro-82M (Apache-2.0).
 
+## Mới trong 2.0.0 — hình ảnh như phim, bối cảnh Mỹ, một prompt
+- **Kiểu hình `cine` là mặc định của kênh:** bầu trời có mặt trời và mây trôi, bóng tiếp xúc, sương xa dần, tia nắng xuyên tán cây, chỉnh màu kiểu phim. Mọi `T.stage({ mood })` cũ tự hưởng; phòng trong nhà được nhận ra và giữ đèn riêng. `pearl` vẫn còn để render lại video cũ (`--style pearl`, `--legacy`).
+- **Ánh sáng và thời tiết ghi trong `story/shots.json`:** `"look"` (goldenHour, clearDay, dusk, night, overcast, fogMorning, snowDay, snowDusk, rainNight, rainDay) và `"weather"` (rain, storm, snow, leaves, wind, fog).
+- **Bối cảnh Mỹ có chiều sâu** (`engine/usa20.js`): `mapleStreet` (phố ngoại ô), `mainStreet` (phố chính thị trấn), `highSchool` (trường trung học), `backdrop` (lớp xa cho bối cảnh cũ). Xe buýt trường có đầu xe rõ ràng.
+- **Nhân vật giữ nguyên thiết kế**, thêm ánh ấm ở rìa bóng trên da, viền sáng theo hướng mặt trời, bóng dưới cằm và chân.
+- **Máy quay:** `establish`, `craneDown` cho cảnh mở đầu; cảnh cận tự xóa phông.
+- **Script:** `tools/retention.py` chấm 10 giây đầu và từng 30 giây, xếp hạng 3 phương án mở đầu.
+- **Một prompt:** `/make-3d-video <ý tưởng hoặc script>` chạy thẳng đến MP4, chỉ dừng một lần ở script.
+- **Render:** tự chọn số luồng và bộ mã hóa theo bộ nhớ trống của card đồ họa.
+
 ## Mới trong 1.0.7 — cổng kiểm tra kịch bản
 - **Giọng đọc dừng khi kịch bản còn mục LOOK/MISS:** `tools/script_check.py` ghi `build_voice/<slug>/script_check.md` và thoát mã 5 trước khi đọc. Sau khi bạn xem và chọn tiếp tục, chạy lại với `--accept-script-check`. Áp dụng cho `tts_chatterbox.py` và `tts.py`; bản nghe thử (`--preview`, `--lines`) và `--list-speakers` không bị chặn.
 - Kịch bản không bị sửa.

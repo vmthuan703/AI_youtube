@@ -5,7 +5,7 @@
 Everything else defaults to channel/brand.json (style, palette, bars, resolution, fps, quality, upscale, bubbles, subscribe gag), so
 a new video starts with the channel's choices. Any option can still be given for one video:
   --aspect 16:9|9:16 --resolution 720p|1080p|1440p|2160p --fps 24|30|60 --quality draft|standard|high|max
-  --style pearl --palette dusk|cozy|tropic|alert|school|midnight --bars cine|none --captions --upscale 1440p --no-gag --no-bubbles
+  --style cine|pearl --palette dusk|cozy|tropic|alert|school|midnight --bars cine|none --captions --upscale 1440p --no-gag --no-bubbles
 
 quality: draft (fast preview) · standard (CRF 18) · high (CRF 14, slow x264, lossless capture; default) ·
 max (CRF 10 + 1.5x supersampling). fps 60 doubles the frames to render. --upscale makes the final MP4 1440p/4K for YouTube.
@@ -28,7 +28,7 @@ ap.add_argument("--script")
 ap.add_argument("--lines", help="lines.json from the voiceover step (speaker windows for lip-sync and speech bubbles)")
 ap.add_argument("--aspect", default=BRAND.get("aspect", "16:9"), choices=["16:9", "9:16"])
 ap.add_argument("--resolution", default=EX.get("resolution", "1080p"), choices=["720p", "1080p", "1440p", "2160p", "4k"])
-ap.add_argument("--style", default=BRAND.get("style", "pearl"))
+ap.add_argument("--style", default=BRAND.get("style", "cine"))
 ap.add_argument("--palette", default=BRAND.get("palette"), help="this video's colour world: dusk, cozy, tropic, alert, school, midnight")
 ap.add_argument("--bars", default=BRAND.get("bars", "cine"), help="cine (2:1 picture), none, wide, scope")
 ap.add_argument("--fps", type=int, default=EX.get("fps", 30), choices=[24, 25, 30, 50, 60])

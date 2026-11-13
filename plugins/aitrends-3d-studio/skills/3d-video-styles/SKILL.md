@@ -18,11 +18,12 @@ face close-up with `dof`, and an action or night-exterior shot. Pick one time ~4
 
 ## 2. Render the grid
 ```bash
-node render.mjs --project projects/<slug> --styles pearl,cinematic,soft --at <t1>,<t2>,<t3> --scale 0.5      # add the others if asked: ink,toon,golden,neon,noir
-node render.mjs --project projects/<slug> --style pearl --palette tropic --stills <t1>,<t2>,<t3> --scale 0.5   # one palette at a time: dusk, cozy, tropic, alert, school, midnight
+node render.mjs --project projects/<slug> --styles cine,pearl,cinematic --at <t1>,<t2>,<t3> --scale 0.5      # add the others if asked: ink,toon,golden,neon,noir
+node render.mjs --project projects/<slug> --style cine --palette tropic --stills <t1>,<t2>,<t3> --scale 0.5   # one palette at a time: dusk, cozy, tropic, alert, school, midnight
 ```
 Open `build/styles/style_grid.png` (one row per style), check it, send it, one line each:
-- **pearl — Pearl Dusk:** the channel's look: soft contrast, lifted shadows, pastel dusk, coloured houses, a loud hero.
+- **cine — Cine 2.0:** the channel's look since 2.0: film picture with a real sky and sun, weather, contact shadows, haze, god rays and a split-tone lens. Light and weather are named per shot in shots.json (`"look"`, `"weather"`).
+- **pearl — Pearl Dusk:** the channel's look before 2.0: soft contrast, lifted shadows, pastel dusk, coloured houses, a loud hero.
 - **cinematic — Night Toon Cinema:** ivory round heads with lavender shading and an outline, chunky hoodies, purple
   night, warm practicals, serif labels (the "crush" reference).
 - **soft — Soft Pastel Glow:** no outline, glossy pastel heads, dreamy purple grade with glow, rounded bold labels (the

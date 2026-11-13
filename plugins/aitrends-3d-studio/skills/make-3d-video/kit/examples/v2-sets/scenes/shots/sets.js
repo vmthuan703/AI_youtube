@@ -20,13 +20,19 @@ registerShot('main_night', {
 });
 registerShot('school_day', {
   init(T) { const st = T.stage({ mood: 'day', fov: 36, shadowSize: 40 }); const hs = T.usa.highSchool(st, { season: 'fall' });
-    const hero = st.add(T.character(HERO).place(1.5, Y, 0.3, Math.PI)); st.fitShadow([0, 0, -8], 40); return { st, hs, hero }; },
+    const hero = st.add(T.character(HERO).place(1.5, Y, 0.3, 0.2)); st.fitShadow([0, 0, -8], 40); return { st, hs, hero }; },
   draw(s, t, info, T) { s.hero.pose(T.idle3('stand', t)).face({ expr: 'neutral', t, blink: true });
-    T.dolly(s.st.camera, t, [[0, { pos: [7, 1.2, 9.5], look: [-1, 4.2, -18] }], [3, { pos: [5.5, 1.4, 8.0], look: [-1, 4.4, -18] }]]); },
+    T.camShot(s.st.camera, t, info.shot.camera, { a: s.hero, dur: info.dur, side: -1 }); },   // "establish": comes down from high and far
 });
 registerShot('school_snow', {
   init(T) { const st = T.stage({ mood: 'dusk', sun: [-0.8, 0.15, -0.58], fov: 36, shadowSize: 40, wxAt: [0, 0] }); const hs = T.usa.highSchool(st, { season: 'winter', lit: 0.8 });
     const hero = st.add(T.character(HERO).place(0.4, 0.03, -4, Math.PI * 0.9)); st.fitShadow([0, 0, -8], 40); return { st, hs, hero }; },
   draw(s, t, info, T) { s.hero.pose(T.idle3('stand', t)).face({ expr: 'smile', t, blink: true });
     T.dolly(s.st.camera, t, [[0, { pos: [-9, 1.3, 6], look: [3, 4.6, -18] }], [3, { pos: [-7.5, 1.5, 5], look: [3, 4.6, -18] }]]); },
+});
+registerShot('school_close', {
+  init(T) { const st = T.stage({ mood: 'sunrise', fov: 32, shadowSize: 30 }); const hs = T.usa.highSchool(st, { season: 'fall' });
+    const hero = st.add(T.character(HERO).place(1.5, Y, 0.3, 0.3)), mia = st.add(T.character(MIA).place(0.6, Y, 0.1, 0.5)); st.fitShadow([0, 0, -6], 30); return { st, hero, mia }; },
+  draw(s, t, info, T) { s.hero.pose(T.idle3('confident', t)).face({ expr: [[0, 'neutral'], [1.2, 'smile']], t, blink: true }); s.mia.pose(T.idle3('relaxed', t, { seed: 5 })).face({ expr: 'smile', t, blink: true });
+    T.camShot(s.st.camera, t, info.shot.camera, { a: s.hero, dur: info.dur }); },   // "closeup" blurs the background by itself
 });

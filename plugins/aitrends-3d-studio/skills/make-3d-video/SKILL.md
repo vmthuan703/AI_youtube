@@ -1,8 +1,8 @@
 ---
 name: make-3d-video
-description: "This skill should be used when the user wants a narrated 3D animated story video from a SCRIPT in the aiTrends 3D style (toy-like 3D stick characters with big round heads, a loud channel hero in a lime puffer, simple cinematic sets, soft pastel dusk light, a 2:1 picture, animated explainer diagrams), e.g. \"make a 3D video from this script\", \"turn my script into a 3D animation\", \"tạo video 3D từ kịch bản\", \"làm video what if 3D\", \"animate this story in 3D\", or \"do the whole 3D video\". It runs the full pipeline: channel settings, script check, emotional voiceover (Chatterbox, with Kokoro as fallback) with word timings, story breakdown, style and palette choice, 3D scene building, rendering up to 4K/60 fps, music, SFX, scorecard and the final MP4.\n"
+description: "This skill should be used when the user wants a narrated 3D animated story video from a SCRIPT in the aiTrends 3D style (toy-like 3D stick characters with big round heads, a loud channel hero in a lime puffer, American sets with real depth, a film picture with sky, sun, weather, haze and god rays, a 2:1 picture, animated explainer diagrams), e.g. \"make a 3D video from this script\", \"turn my script into a 3D animation\", \"tạo video 3D từ kịch bản\", \"làm video what if 3D\", \"animate this story in 3D\", or \"do the whole 3D video\", also from a bare idea in ONE prompt (it writes the script, stops once for the script, then runs to the MP4). It runs the full pipeline: channel settings, script check, emotional voiceover (Chatterbox, with Kokoro as fallback) with word timings, story breakdown, style and palette choice, 3D scene building, rendering up to 4K/60 fps, music, SFX, scorecard and the final MP4.\n"
 metadata:
-  version: "0.2.7"
+  version: "2.0.0"
   author: aiTrends
 ---
 
@@ -48,6 +48,23 @@ Stage commands re-run one stage: `/new-3d-video` (stages 1–4), `/3d-video-styl
    is the set match: a missing item is never added to the plugin without the user's yes.
 7. **Files are the truth.** Each video lives in `aitrends-3d-studio/projects/<slug>/`; `story/shots.json` owns timing.
 
+## One-prompt run (2.0): `/make-3d-video <idea or script>`
+The user gives one prompt and gets the MP4. Run every stage without asking, with the channel's defaults (`channel/brand.json`:
+voice, `cine` style, format, export quality), and stop **once**:
+- **The script checkpoint** (the only stop). From an idea: write the script by the channel rules (`prompts/QUY_TAC_VIET_SCRIPT_KENH.md` in
+  the repo when it exists, and `references/story-breakdown.md` -> "Writing a script"), write **three openings** of about 28 words each to
+  `build_voice/<slug>/hooks.txt` (blocks separated by `---`) and rank them: `python tools/retention.py --hooks build_voice/<slug>/hooks.txt`.
+  Put the best one on the script, then run `tools/script_check.py` and `python tools/retention.py --script <file> --out
+  build_voice/<slug>/retention.md`. Fix every FLAT window and every LOOK/MISS you can yourself and re-run (the script is yours until the
+  user has seen it). Then show: the title, the three hooks with their scores, the retention table, what is still open, and the script
+  file. Ask once: continue, or edit. A script the user brought is checked the same way but never rewritten: show the tables and ask.
+- After the user's yes nothing else stops the run. The set match decides by itself (`use:<id>` for the nearest ready-made set, `project`
+  for anything missing: never add to the plugin without a yes; list those in the final summary instead). The voice preview, the style
+  grid and the video preview are skipped: listen to and look at them yourself (contact sheets, `--qc` with 0 red, the scorecard).
+- **Final summary** with the MP4: what was assumed, the hook chosen, the weather and look per location, QC results, what was built only
+  for this project and could go into the plugin, and the one thing most worth changing.
+The user can still ask for any checkpoint ("show me the styles", "let me hear the voice"); then the staged flow below applies.
+
 ## Stage 1: Intake and script check
 **Lessons first (1.0.3).** Run `node tools/retro.mjs --next` in the studio and read `channel/LESSONS.md`: the problems that
 came back in past videos and the checklist for this one. Tell the user the top 3 items in one short list and apply them while
@@ -66,6 +83,8 @@ script line for each problem. These are the faults that cost the Memory 100x v2 
 script after the voiceover is the most expensive fix, so raise them now. A MISS on **Hero name fits the hero** or **Day count adds up**
 and any logic problem must be shown even if the user is away. The channel hero is a **boy** and the best friend is a **girl**
 (`channel/cast.js`).
+Also run `python tools/retention.py --script <file> --out build_voice/<slug>/retention.md` (2.0): the hook score for the first 10 seconds and a
+score for every 30 seconds, with what each FLAT window lacks. Show the table with the script check.
 Say which results matter most and ask whether the user wants to edit the script before the voice is generated. Never change
 the script yourself. If they say to continue as is, continue. When the user asks you to **write** a script, follow the rules in (1.0.7: the voiceover stops while the check has LOOK/MISS items; after the user says to continue, re-run the voiceover with `--accept-script-check`.)
 `references/story-breakdown.md` → "Writing a script" from the first draft.
@@ -113,24 +132,30 @@ motifs, music plan), `scenes/cast.js` (import the hero and every supporting role
 **every character comes from the roster, extras included**: a second or third girl is `CLASSMATE_2` / `CLASSMATE_3`, a second boy `BRO_2` / `RIVAL_2`, background
 students `STUDENTS`; change one colour or the hair at most, never write an outfit from scratch; then run `python tools/cast_check.py --project projects/<slug>`), and
 rewrite `story/shots.json` (contiguous shots, cut on phrase boundaries 0.1–0.2 s early, 17–21 shots per minute, median 2.2–2.5 s,
-a quarter of shots under about 1.5 s, an establishing shot per location, a concrete `scene` per shot). Locations come from
+a quarter of shots under about 1.5 s, an establishing shot per location, a concrete `scene` per shot).
+**2.0: every shot names its light and weather in shots.json**: `"look"` (goldenHour, clearDay, dusk, night, overcast, fogMorning, snowDay,
+snowDusk, rainNight, rainDay; left out = from the stage's mood) and `"weather"` (rain, storm, snow, leaves, wind, fog). Pick them from the
+story's calendar and feeling, keep them the same for every shot of one scene, and change them when the story's day or mood changes: a
+video should pass through at least three clearly different skies. The first shot of the video and of each new place uses the camera
+`establish` or `craneDown` and holds 3-4.5 s. Locations come from
 `story/set_match.json` (the `use` id of each place, or the user's choice). Send a 5–10 line plan summary and continue unless the user objects.
 
 ## Stage 5: Style and palette choice
-`pearl` is the channel's style. Build the 1–2 most-used sets plus 3 representative shots (a wide with ≥ 2 characters, a face
+**2.0: `cine` is the channel's style** (film picture: shader sky, sun, contact shadows, haze, god rays, split-tone lens; `pearl` is the
+old look, kept for re-rendering old videos). In a one-prompt run skip this stage. When the user asks to compare, build the 1–2 most-used sets plus 3 representative shots (a wide with ≥ 2 characters, a face
 close-up with `dof`, an action or night-exterior shot). Then render the choices side by side:
 ```bash
-node render.mjs --project projects/<slug> --styles pearl,cinematic,soft --at <t1>,<t2>,<t3> --scale 0.5
-node render.mjs --project projects/<slug> --style pearl --palette <candidate> --stills <t1>,<t2>,<t3> --scale 0.5
+node render.mjs --project projects/<slug> --styles cine,pearl,cinematic --at <t1>,<t2>,<t3> --scale 0.5
+node render.mjs --project projects/<slug> --style cine --palette <candidate> --stills <t1>,<t2>,<t3> --scale 0.5
 ```
-Open `build/styles/style_grid.png`, then show it with one line per option: **pearl** (the channel: soft pastel dusk, lifted shadows,
+Open `build/styles/style_grid.png`, then show it with one line per option: **cine** (the channel: film picture), **pearl** (soft pastel dusk, lifted shadows,
 loud hero), **cinematic** (darker night, thin outline, warm practicals), **soft** (no outline, dreamy glow), plus the rest on request:
 **ink** (black stick figures), **toon** (bright cel-shaded), **golden** (sunset), **neon** (magenta and cyan), **noir** (cold thriller).
 Palettes: `dusk`, `cozy`, `tropic`, `alert`, `school`, `midnight` (engine-api.md). Save the picks in `config.json` → `style`, `palette`.
 Tweaks: add a custom entry to `STYLES` or `PALETTES` in `engine/styles.js` and re-render that row.
 
 ## Stage 6: Build every shot
-Read `references/engine-api.md` and the example scenes in `examples/speed-demo/scenes/` (a full 32 s video), `examples/catalog/` (1.0.5: every ready-made set built from its catalogue recipe),
+Read `references/engine-api.md` (start with "2.0 film picture") and the example scenes in `examples/v2-demo/scenes/` (2.0: one street in three weathers, the crane opening, the close-up with a blurred background) and `examples/v2-sets/scenes/` (2.0: Main Street and the high school; look and weather taken from shots.json), `examples/speed-demo/scenes/` (a full 32 s video), `examples/catalog/` (1.0.5: every ready-made set built from its catalogue recipe),
 `examples/v103-demo/scenes/` (1.0.3 lip-sync on every mouth, listening nods, finger counts / thumbs up / peace, hands resting on desks, planted feet, scarf and wind, the hood, Thanksgiving dinner, pumpkin street, leaf gust, Friday-night football), `examples/v103-thumb/scenes/` (1.0.3 thumbnail layouts A–D with T.thumb, `--thumbs`), `examples/v102-motion/scenes/` (1.0.2 actions: door, carry, sitOn, runStop, trip, vault, climbOn, hug, high five, arm around, pull-run, catch a fall; gaze, react, busy crowds; longer arms before/after, grips, skirt sway, smart camera; motion QC and GIFs), `examples/v101-school/scenes/` (1.0.1 American high school: library, chem lab, auditorium, Friday-night football, principal, nurse, restroom mirror, band, locker room, student lot, prom, diner, suburb bus stop; fall, snow day, rain on windows, blackout, tornado-drill beacon, graduation caps; student poses and school cameras), `examples/v1-more/scenes/` (1.0 supermarket, hospital, rooftop, train station, snow, puddles, leaves, lightning, headlights, named cameras, lip-sync), `examples/v1-demo/scenes/` (1.0 everyday places: stairwell, classroom, city bus stop, shop street, residential, street food, café; gloss and motion), `examples/look-demo/scenes/` (sets and UI), `examples/diagram-gallery/scenes/` (every diagram, a blurred-scene backdrop) and
 `examples/worlds-demo/scenes/` (nature sets, light from props, game HUD and counters, first person, icons, planet) once.
 Work in batches of 8–12:
@@ -140,7 +165,7 @@ Work in batches of 8–12:
    QC checklist in `references/render-qc.md`. Fix MISSING shots, errors printed by the renderer, composition, poses.
 3. Check motion with `--stills t1,t2,t3` or `--from A --to B --scale 0.5` (writes `build/preview.mp4`, draft encode).
 
-Non-negotiables: a camera move in every shot; expressions on the beat (`expr` keys, so they blend), deadpan as the hero's resting comedy face;
+Non-negotiables: **depth in every outdoor frame (2.0)**: something close to the lens (a branch, a fence, a parked car, a lamp), the subject, and far layers behind (use `T.usa.mapleStreet`, `mainStreet`, `highSchool`, or add `T.usa.backdrop(st, { season })` behind an older outdoor set); **the sun in or near the frame for openings** (`sun: [x, y, z]` on the stage) so god rays and long shadows show; wet streets get `T.W.mirror`; never more than one lamp cone between the lens and the subject; a camera move in every shot; expressions on the beat (`expr` keys, so they blend), deadpan as the hero's resting comedy face;
 **people act, not tween** (engine-api.md → Acting recipe: `posesAt3`, `idle3`, `speak3` + `face({ speaker, gt })`, `lookAtSpeaker`, `walkTo`);
 camera accents on the words that earn them (`crashZoom`, `punch`, `smash` cut, `ramp` slow motion, `rackFocus`); hands and feet in
 contact; colours from `st.M`/`S()` and the cast; every number the narrator says on screen (`wordTime()`); **no empty stage: every
@@ -165,7 +190,8 @@ Read `references/render-qc.md`.
    This is the last checkpoint before rendering. Check **moving** previews, not only stills, of every dialogue shot (bubbles stay
    put), every seated shot (legs, hands on tables) and every prop insert: jitter and clipping only show in motion.
 2. Final: `nohup node render.mjs --project projects/<slug> > build/render.log 2>&1 &` (quality, fps and resolution come
-   from config.json). Poll the log (it prints fps and ETA) and report progress at sensible intervals.
+   from config.json). 2.0: the renderer reads the card's free video memory and picks the number of workers and the encoder by itself
+   (the film picture needs about 1.4 GB per worker at 1080p); close other GPU programs first and do not pass `--workers` unless it fails. Poll the log (it prints fps and ETA) and report progress at sensible intervals.
 3. `python audio/mix.py --project projects/<slug>`: music + SFX, ducking, −14 LUFS, AAC 48 kHz, and the upscale if
    `export.upscale` is set. Writes `out/<title>.mp4`.
 4. QC the final file: duration matches, audio present, resolution/fps as chosen, a 1-frame-per-10-s contact sheet looks

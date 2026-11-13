@@ -177,7 +177,7 @@ export function mapleStreet(st, o = {}) {
   add(put(fence(-9.5, -3.2, -1.6), 0, 0, 0)); add(put(fence(3.4, 9.2, -1.6), 0, 0, 0));
   const hyd = group(cyl(0.13, 0.15, 0.6, mat('#c8302a', { rough: 0.45, clearcoat: 0.5 }), 0, 0.3, 0), sphere(0.13, mat('#c8302a', { rough: 0.45 }), 0, 0.62, 0), cyl(0.05, 0.05, 0.42, mat('#c8302a'), 0, 0.42, 0)); hyd.children[2].rotation.z = R2; put(hyd, 5.4, 0.16, 0.55); hyd.traverse(q => { if (q.isMesh) q.castShadow = true; }); add(hyd);
   const sign = stopSign(); put(sign, -14, 0.16, 0.6, R2); add(sign);
-  return { houses, trees, lamps, xmasRuns, season, leafCols };
+  return { houses, trees, lamps, xmasRuns, season, leafCols, heightAt: (x, z) => (z < 1.05 && z > -1 || z > 10 && z < 12 ? 0.16 : 0) };
 }
 
 // ---------------------------------------------------------------- far layers for any outdoor set
@@ -245,7 +245,7 @@ export function mainStreet(st, o = {}) {
   const carC = ['#2a4a7a', '#a8242a', '#d8d4cc', '#2f5a48', '#e8b830', '#3a3a40', '#7a8a9a']; const cars = [];
   for (let x = -Lx / 2 + 5; x < Lx / 2; x += 6.2) for (const [z, ry] of [[2.2, R2], [9.8, -R2]]) { if (r() < 0.42 || Math.abs(x + 9) < 4.5 || (z < 5 && x > (o.clearX ? o.clearX[0] : -4) && x < (o.clearX ? o.clearX[1] : 4))) continue; const cr = car({ type: ['sedan', 'suv', 'sedan', 'van'][(r() * 4) | 0], color: carC[(r() * carC.length) | 0], lights: false }); put(cr, x, 0, z, ry); cr.userData.dynamic = true; add(cr); cars.push(cr); }
   backdrop(st, { season, z: -30, town: o.town, towerX: o.towerX ?? -30, seed: 9 });
-  return { fronts, lamps, cars, season };
+  return { fronts, lamps, cars, season, heightAt: (x, z) => (z < 1.05 || z > 10.95 ? 0.16 : 0) };
 }
 
 // ---------------------------------------------------------------- the American high school, seen from the street
@@ -283,5 +283,5 @@ export function highSchool(st, o = {}) {
   const sg = group(box(4.4, 1.3, 0.3, tex(mat('#ffffff', { rough: 0.95 }), brick(bc), 2, 0.6), 0, 0.65, 0), box(4.6, 0.14, 0.4, trim, 0, 1.36, 0)); const st2 = new THREE.Mesh(new THREE.PlaneGeometry(4.0, 0.9), new THREE.MeshStandardMaterial({ map: textTex(o.sign || 'HOME OF THE EAGLES', { w: 1024, h: 230, size: 84, color: '#f4ecd8', font: 'Nunito', weight: 900 }), transparent: true, roughness: 0.6 })); st2.position.set(0, 0.68, 0.16); sg.add(st2); sg.traverse(m => { if (m.isMesh) m.castShadow = true; }); put(sg, -8, 0, -2.6); add(sg);
   const pp = []; for (let x = -72; x <= 72; x += 24) { const p = powerPole({}); put(p, x, 0, 10.4); add(p); pp.push([x, 8.4, 10.4]); } wires(st, pp, 0.8);
   backdrop(st, { season, z: -50, town: o.town, towerX: o.towerX ?? 46, seed: 14 });
-  return { building: g, buses, trees, door: [0, 1.3, Z + D / 2 + 3.4], flag: fp };
+  return { building: g, buses, trees, door: [0, 1.3, Z + D / 2 + 3.4], flag: fp, heightAt: (x, z) => (z < 1.05 && z > -1 ? 0.16 : 0) };
 }

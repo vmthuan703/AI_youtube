@@ -1,6 +1,6 @@
 {
  "title": "catalog",
- "duration": 132,
+ "duration": 138,
  "shots": [
   {
    "id": "city",
@@ -10,457 +10,478 @@
    "camera": "manual"
   },
   {
-   "id": "suburb",
+   "id": "mapleStreet",
    "start": 2,
    "end": 4,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "room.bedroom",
+   "id": "mainStreet",
    "start": 4,
    "end": 6,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "room.living",
+   "id": "highSchool",
    "start": 6,
    "end": 8,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "room.office",
+   "id": "suburb",
    "start": 8,
    "end": 10,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "room.kitchen",
+   "id": "room.bedroom",
    "start": 10,
    "end": 12,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "room.hallway",
+   "id": "room.living",
    "start": 12,
    "end": 14,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "room.hospital",
+   "id": "room.office",
    "start": 14,
    "end": 16,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "explainer",
+   "id": "room.kitchen",
    "start": 16,
    "end": 18,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "studio",
+   "id": "room.hallway",
    "start": 18,
    "end": 20,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "gym",
+   "id": "room.hospital",
    "start": 20,
    "end": 22,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "diner",
+   "id": "explainer",
    "start": 22,
    "end": 24,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "gameshow",
+   "id": "studio",
    "start": 24,
    "end": 26,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "casino",
+   "id": "gym",
    "start": 26,
    "end": 28,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "store",
+   "id": "diner",
    "start": 28,
    "end": 30,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "park",
+   "id": "gameshow",
    "start": 30,
    "end": 32,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "beach",
+   "id": "casino",
    "start": 32,
    "end": 34,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "island",
+   "id": "store",
    "start": 34,
    "end": 36,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "snow",
+   "id": "park",
    "start": 36,
    "end": 38,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "farm",
+   "id": "beach",
    "start": 38,
    "end": 40,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "underwater",
+   "id": "island",
    "start": 40,
    "end": 42,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "space",
+   "id": "snow",
    "start": 42,
    "end": 44,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "stadium",
+   "id": "farm",
    "start": 44,
    "end": 46,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "boxingRing",
+   "id": "underwater",
    "start": 46,
    "end": 48,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "track",
+   "id": "space",
    "start": 48,
    "end": 50,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "pool",
+   "id": "stadium",
    "start": 50,
    "end": 52,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "busStop",
+   "id": "boxingRing",
    "start": 52,
    "end": 54,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "busInside",
+   "id": "track",
    "start": 54,
    "end": 56,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "lockerHall",
+   "id": "pool",
    "start": 56,
    "end": 58,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "schoolFront",
+   "id": "busStop",
    "start": 58,
    "end": 60,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "cafeteria",
+   "id": "busInside",
    "start": 60,
    "end": 62,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "court",
+   "id": "lockerHall",
    "start": 62,
    "end": 64,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "schoolYard",
+   "id": "schoolFront",
    "start": 64,
    "end": 66,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "stairwell",
+   "id": "cafeteria",
    "start": 66,
    "end": 68,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "classroom",
+   "id": "court",
    "start": 68,
    "end": 70,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "cityBusStop",
+   "id": "schoolYard",
    "start": 70,
    "end": 72,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "shopStreet",
+   "id": "stairwell",
    "start": 72,
    "end": 74,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "residential",
+   "id": "classroom",
    "start": 74,
    "end": 76,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "streetFood",
+   "id": "cityBusStop",
    "start": 76,
    "end": 78,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "cafe",
+   "id": "shopStreet",
    "start": 78,
    "end": 80,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "supermarket",
+   "id": "residential",
    "start": 80,
    "end": 82,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "hospitalHall",
+   "id": "streetFood",
    "start": 82,
    "end": 84,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "rooftop",
+   "id": "cafe",
    "start": 84,
    "end": 86,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "trainStation",
+   "id": "supermarket",
    "start": 86,
    "end": 88,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "library",
+   "id": "hospitalHall",
    "start": 88,
    "end": 90,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "chemLab",
+   "id": "rooftop",
    "start": 90,
    "end": 92,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "auditorium",
+   "id": "trainStation",
    "start": 92,
    "end": 94,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "footballField",
+   "id": "library",
    "start": 94,
    "end": 96,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "lockerRoom",
+   "id": "chemLab",
    "start": 96,
    "end": 98,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "bandRoom",
+   "id": "auditorium",
    "start": 98,
    "end": 100,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "principalOffice",
+   "id": "footballField",
    "start": 100,
    "end": 102,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "detention",
+   "id": "lockerRoom",
    "start": 102,
    "end": 104,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "nurseOffice",
+   "id": "bandRoom",
    "start": 104,
    "end": 106,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "restroom",
+   "id": "principalOffice",
    "start": 106,
    "end": 108,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "studentLot",
+   "id": "detention",
    "start": 108,
    "end": 110,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "promHall",
+   "id": "nurseOffice",
    "start": 110,
    "end": 112,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "dinerUS",
+   "id": "restroom",
    "start": 112,
    "end": 114,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "suburbStop",
+   "id": "studentLot",
    "start": 114,
    "end": 116,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "weightRoom",
+   "id": "promHall",
    "start": 116,
    "end": 118,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "climbingGym",
+   "id": "dinerUS",
    "start": 118,
    "end": 120,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "thanksgivingDinner",
+   "id": "suburbStop",
    "start": 120,
    "end": 122,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "pumpkinStreet",
+   "id": "weightRoom",
    "start": 122,
    "end": 124,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "teenBedroom",
+   "id": "climbingGym",
    "start": 124,
    "end": 126,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "homeKitchen",
+   "id": "thanksgivingDinner",
    "start": 126,
    "end": 128,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "livingRoom",
+   "id": "pumpkinStreet",
    "start": 128,
    "end": 130,
    "line": "",
    "camera": "manual"
   },
   {
-   "id": "phoneClose",
+   "id": "teenBedroom",
    "start": 130,
    "end": 132,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "homeKitchen",
+   "start": 132,
+   "end": 134,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "livingRoom",
+   "start": 134,
+   "end": 136,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "phoneClose",
+   "start": 136,
+   "end": 138,
    "line": "",
    "camera": "manual"
   }

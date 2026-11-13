@@ -145,3 +145,11 @@ Watch the motion itself with `--gif` (build/gifs/<shot>.gif, 10 fps): stills can
 - Clipping: a hand / elbow / knee / foot that only touches a surface (less than 4 cm in) is contact, not a clip. Hands now rest on
   furniture tops by themselves, so desk scenes stop showing amber clips.
 - `--thumbs`: one 1280×720 JPG per shot (+ grid.jpg) for thumbnail projects; check at 320 px that the hero's face and the labels read.
+
+## 2.0 film picture: memory and speed
+- The `cine` style needs about 1.4 GB of video memory per worker at 1080p (4096 shadow map, depth pre-pass, AO, reflections). The
+  renderer prints `GPU memory: … -> N worker(s)` and, on cards under 7 GB, encodes on the CPU. Out-of-memory errors: close other GPU
+  programs, or `--workers 1`.
+- Expect about half the frame rate of the `pearl` style. Drafts: `--scale 0.5` or `--legacy` (old picture, old speed).
+- QC additions: the sun is not behind the camera in openings, no lamp cone or headlight washes the frame, wet roads show reflections,
+  the weather named in shots.json is visible in the frame, faces are not darker than the background.

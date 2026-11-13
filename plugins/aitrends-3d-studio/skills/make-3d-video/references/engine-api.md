@@ -1,5 +1,50 @@
 # Engine reference (3D)
 
+## 2.0 film picture (style `cine`, the channel default)
+Every `T.stage({ mood })` is now a film stage: the mood (and the shot's `"look"` / `"weather"` in shots.json) picks a **look** that sets the
+sun, sky, ambient light, haze, god rays, bloom, exposure and the lens grade. Rooms are found by themselves (rays from the camera hit a
+ceiling) and keep their own lamps; they only gain contact shadows and the lens. `--legacy`, `?nocine`, `cine: false` on a stage or the
+`pearl` style give the old picture.
+
+| look | when | mood it replaces |
+|---|---|---|
+| `goldenHour` | low warm sun, long shadows, god rays | golden, sunrise |
+| `clearDay` | blue sky, white clouds | day, beach |
+| `dusk` | pink-violet sky, first stars | dusk |
+| `night` | moonlit blue, stars, lamps carry the scene | night, arctic |
+| `overcast` / `rainDay` | flat grey light; rain by day | storm |
+| `rainNight` | wet night: reflections, glowing windows | night + `"weather": "rain"` |
+| `snowDay` / `snowDusk` | bright snow; pink snowy evening with lit windows | snow |
+| `fogMorning` | thick low fog, strong sun shafts | `"weather": "fog"` |
+
+```js
+// shots.json: { "id": "s012", "look": "goldenHour", "weather": "leaves", "camera": "establish" }
+const st = T.stage({ mood: 'golden', sun: [-0.9, 0.15, -0.4], shadowSize: 28 });   // sun: direction TO the sun; put it in frame for openings
+const st = T.cine.stage(T, { look: 'rainNight', dof: { focus: 2.8, aperture: 0.0011, maxblur: 0.008 } });   // the same, look named in code
+// stage options (2.0): look, weather, sun, rays (0..1.2), ao (0..1), cover (clouds 0..1), stars, fogCine: [density, falloff, max],
+// wxAt: [x, z] (where the weather falls), wxSize, weatherFx: false (light only, no particles), indoor: true | false, sss (skin 0..1)
+```
+- **Weather** (`"weather"` in shots.json or `weather:` on the stage; particles are a pure function of time): `rain` (streaks + splash
+  rings; add `T.W.mirror(st, { w, d, z, strength: 0.7, blur: 0.9, res: 0.85 })` on the road and `wet: true` on the set), `storm` (harder rain,
+  wind, lightning), `snow` (far flakes + soft big ones near the lens), `leaves`, `wind` (many fast leaves), `fog`. By hand:
+  `T.wx.leaves(st, { area: [x0, x1, y0, y1, z0, z1], n, colors, wind: [x, 0, z] })`, `T.wx.rain`, `T.wx.snow`, `T.wx.motes` (dust in the sun).
+- **American sets with depth** (`engine/usa20.js`; people stand on the sidewalk at `y = set.heightAt(x, z)` = 0.16):
+  `T.usa.mapleStreet(st, { season: 'fall' | 'summer' | 'winter', night, wet, lit, town })` (road z 1..9, near sidewalk z -1..1, houses with
+  porches, garages, flags and pumpkins, street trees to the vanishing point, power lines, tree line, hills, water tower; returns `houses,
+  trees, lamps, xmasRuns`), `T.usa.mainStreet(st, { season, night, wet, clearX: [x0, x1] })` (brick shop fronts with awnings and signs, a
+  diner, a cinema marquee, parked cars, lamps with banners; road z 1..11, sidewalk z -2.6..1; returns `fronts, lamps, cars`),
+  `T.usa.highSchool(st, { name, season, night, buses })` (brick school with columns and steps, flag on a pole that waves, buses at the curb,
+  lawn; returns `building, buses, trees, door, flag`), `T.usa.backdrop(st, { season, z })` (far layers behind any older outdoor set),
+  pieces: `usHouse`, `storefront`, `maple`, `pine`, `mailbox`, `stopSign`, `busStopSign`, `powerPole`, `lampUS`, `waterTower`.
+  A set that calls these sets `st.outdoor`; never put a lamp's cone between the lens and the subject.
+- **Cameras**: `"camera": "establish"` (starts high and far, comes down to the subject) and `"craneDown"` for the first shot of a place.
+  On a film stage `closeup`, `xcu`, `ots`, `insert`, `medium` and `pushIn` blur the background by themselves (`{ dof: false }` keeps it
+  sharp, `{ dof: 2 }` doubles it); with a hand-made camera call `st.focusOn(hero.headWorld())` and `st.focus(dist, 0.0011)`.
+- **Characters**: unchanged design. Skin takes a warm light at the shadow edge from the sun's side, the rim light follows the sun, and
+  contact shadows sit under chins, collars and feet. Keep faces toward the sun's side or use `faceLight: 0.4` at night.
+- **Video memory**: a film stage holds a 4096 shadow map and several full-frame targets. The renderer sizes its workers from the card's free
+  memory; a shot with `T.W.mirror` renders the scene twice, so keep one mirror per shot.
+
 ## Folder layout
 ```
 aitrends-3d-studio/

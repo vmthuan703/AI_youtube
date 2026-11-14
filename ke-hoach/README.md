@@ -12,6 +12,7 @@ Tuyến đang chạy (A, B duyệt 2026-11-04; C duyệt 2026-11-10):
 Mới nhất ở trên cùng.
 
 <!-- DANH_SACH:START -->
+- [15/11–17/11/2026](2026-11-15.md): lập ngày 2026-11-14 (lập tay, không có tác vụ theo lịch), 9 video (A1–A3, B1–B3, C1–C3), snapshot 14/11, kiểm tra YouTube 14/11; B chuyển sang góc hành động vì "See Everyone's ___" bão hòa
 - [11/11–13/11/2026](2026-11-11.md): lập ngày 2026-11-10, 9 video (A1–A3, B1–B3, C1–C3), thêm tuyến C "Luật game ngoài đời" dạng thử, snapshot 10/11
 - [08/11–10/11/2026](2026-11-08.md): lập ngày 2026-11-07, 6 video (A1–A3, B1–B3), dựa trên [báo cáo đối thủ 07/11](../reports/2026-11-07_doi_thu_whatif/BAO_CAO.md) (trọng tâm Jeremy Bearimy)
 - [07/11–09/11/2026](2026-11-07.md): lập ngày 2026-11-06, 6 video (A1–A3, B1–B3), làm lại trên snapshot 06/11

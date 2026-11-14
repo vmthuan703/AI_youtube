@@ -11,6 +11,11 @@ metadata:
 Stages 1–4 of the aiTrends 3D Studio pipeline. Shared references live in `../make-3d-video/references/` (relative to
 this skill's base directory); the studio kit is `../make-3d-video/kit/`.
 
+## 0. Script depth gate (default: mức Sâu)
+Before the survey and before any voice: follow `../make-3d-video/SKILL.md` → Stage 0 (8-step Sâu process, blind council, gate:
+logic no P0, facts correct, template risk <= 3, every factor >= 7, fantasy >= 8, total >= 8). "mức chuẩn" or "bỏ qua mức" skips
+it for one video. A user-brought script is scored, not rewritten. Only a gate-passing (or user-chosen) script goes on to step 1.
+
 ## 1. Intake survey
 **Lessons first (1.0.3).** Run `node tools/retro.mjs --next` in the studio and read `channel/LESSONS.md`: the problems that
 came back in past videos and the checklist for this one. Tell the user the top 3 items in one short list and apply them while

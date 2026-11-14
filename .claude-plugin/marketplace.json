@@ -11,7 +11,7 @@
       "name": "aitrends-3d-studio",
       "source": "./plugins/aitrends-3d-studio",
       "description": "Kịch bản → giọng đọc mã nguồn mở → video hoạt hình 3D hoàn chỉnh (Three.js), tới 4K/60 fps, kèm thumbnail điện ảnh.",
-      "version": "2.1.0"
+      "version": "2.1.1"
     }
   ]
 }

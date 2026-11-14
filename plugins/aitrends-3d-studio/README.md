@@ -7,6 +7,11 @@ khung hình 2:1, sơ đồ giải thích hoạt hình.
 Mọi khung hình đều dựng bằng code (Three.js) và render từng khung một. Không dùng AI tạo ảnh/video, nên nhân vật
 giữ nguyên dáng suốt video và chữ luôn nét. Giọng đọc mặc định dùng Chatterbox (MIT, chạy máy cá nhân), dự phòng Kokoro-82M (Apache-2.0).
 
+## Mới trong 2.1.1 — cổng kịch bản mức Sâu trước khi lồng tiếng
+- **Bước 0 trong `/new-3d-video` và `/make-3d-video`:** mặc định chạy quy trình mức Sâu (30 ý, 3 bản độc lập, hội đồng chấm mù, tối đa 3 vòng sửa) trước khảo sát, `script_check` và mọi bước tạo giọng đọc.
+- **Cổng chặn:** logic không P0, kiểm chứng không sai, rủi ro khuôn mẫu ≤ 3, mọi nhân tố ≥ 7, giả tưởng ≥ 8, điểm tổng ≥ 8. Sau 3 vòng không qua thì dừng để bạn chọn bản.
+- Nói "mức chuẩn" hoặc "bỏ qua mức" để đổi cho một video. Chi tiết: `prompts/MUC_SAU_VIET_SCRIPT.md`.
+
 ## Mới trong 2.1.0 — thumbnail điện ảnh ngay trong `/make-3d-video`
 - **Mỗi video xong là có luôn thumbnail:** sau khi xuất MP4, `/make-3d-video` tự dựng 3–4 phương án thumbnail từ chính script, dàn nhân vật và bối cảnh của video, rồi gửi ảnh ghép để bạn chọn.
 - **Thumbnail là một khung hình phim:** hero to ở tiền cảnh, người phản ứng ở trung cảnh, bối cảnh thật xóa phông phía sau; ánh sáng theo cảm xúc (ngược nắng hoàng hôn, đêm mưa, sương sớm), viền sáng quanh hero.

@@ -1,6 +1,6 @@
 {
  "about": "1.0.5 catalogue of everything ready-made in the kit, so a script's places, props and actions can be matched before any shot is built (tools/set_match.py). Every set has a demo recipe; node render.mjs --catalog renders one still per set (examples/catalog). Add an entry here whenever a set, prop or action is added to the engine; tools/verify_kit.py checks that every call exists.",
- "version": "2.1.0",
+ "version": "2.1.1",
  "sets": [
   {"id": "city", "names": ["street"], "call": "T.W.city", "file": "world3d.js", "vi": "phố đêm thành phố", "aliases": ["city street", "downtown", "night street", "main street", "đường phố", "phố", "thành phố", "trung tâm thành phố"], "tags": ["outdoor", "city", "night", "street"], "anchors": ["lamps", "lane", "sidewalk"], "props": ["building", "streetLamp", "car", "neonSign"], "demo": {"stage": {"mood": "night"}, "cam": "street"}},
   {"id": "mapleStreet", "call": "T.W.mapleStreet", "file": "usa20.js", "vi": "phố ngoại ô Mỹ (2.0, có chiều sâu)", "aliases": ["suburb", "suburban street", "neighborhood", "neighbourhood", "my street", "front yard", "front porch", "driveway", "cul-de-sac", "khu ngoại ô", "khu phố nhà", "hàng xóm", "sân trước", "hiên nhà"], "tags": ["outdoor", "home", "street", "usa"], "anchors": ["houses[i]", "lamps[i]", "sidewalk y 0.16"], "props": ["usHouse", "maple", "mailbox", "stopSign", "busStopSign", "powerPole", "waterTower"], "opts": {"season": "fall"}, "demo": {"stage": {"mood": "golden"}, "cam": [[9, 1.8, 6.5], [-14, 2.6, 0.5], 40, [0.5, 0.4]]}},

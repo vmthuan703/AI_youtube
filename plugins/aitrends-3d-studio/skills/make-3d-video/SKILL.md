@@ -2,7 +2,7 @@
 name: make-3d-video
 description: "This skill should be used when the user wants a narrated 3D animated story video from a SCRIPT in the aiTrends 3D style (toy-like 3D stick characters with big round heads, a loud channel hero in a lime puffer, American sets with real depth, a film picture with sky, sun, weather, haze and god rays, a 2:1 picture, animated explainer diagrams), e.g. \"make a 3D video from this script\", \"turn my script into a 3D animation\", \"tạo video 3D từ kịch bản\", \"làm video what if 3D\", \"animate this story in 3D\", or \"do the whole 3D video\", also from a bare idea in ONE prompt (it writes the script, stops once for the script, then runs to the MP4). It runs the full pipeline: channel settings, script check, emotional voiceover (Chatterbox, with Kokoro as fallback) with word timings, story breakdown, style and palette choice, 3D scene building, rendering up to 4K/60 fps, music, SFX, scorecard, the final MP4 and cinematic thumbnail options for it.\n"
 metadata:
-  version: "2.1.0"
+  version: "2.1.1"
   author: aiTrends
 ---
 

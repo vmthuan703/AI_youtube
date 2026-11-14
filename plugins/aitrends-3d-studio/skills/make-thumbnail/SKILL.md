@@ -2,7 +2,7 @@
 name: make-thumbnail
 description: "This skill should be used when the user runs /make-thumbnail or asks to \"make a thumbnail from this script\", \"design thumbnails for this video\", \"tạo thumbnail từ script\", \"làm thumbnail cho video\", \"thiết kế thumbnail\", \"thumbnail điện ảnh\", \"redo the thumbnail\", or \"give me thumbnail options\" for an aiTrends 3D Studio video or a script on its own. It stages 3–4 moments of the script as cinematic 3D stills on the studio engine (film light, depth of field, weather, low angle, the channel hero large in the foreground, roster characters reacting, text only where the script needs it), renders 1280×720 JPGs with a picking sheet and checks. /make-3d-video already runs this as its last stage; use this skill to make or redo thumbnails on their own.\n"
 metadata:
-  version: "2.1.0"
+  version: "2.1.1"
   author: aiTrends
 ---
 

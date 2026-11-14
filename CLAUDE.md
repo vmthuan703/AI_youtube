@@ -23,6 +23,7 @@
 
 ## Viết script
 - Trước khi viết hoặc sửa script, đọc `prompts/QUY_TAC_VIET_SCRIPT_KENH.md` đầu tiên.
+- Khi người dùng nói "mức sâu" (hoặc "mức chuẩn"), làm theo `prompts/MUC_SAU_VIET_SCRIPT.md`.
 
 ## Chọn nhánh
 - Khi chưa rõ việc thuộc nhánh nào: hỏi người dùng mô tả việc, chọn nhánh,

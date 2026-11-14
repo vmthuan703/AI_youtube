@@ -67,6 +67,19 @@ voice, `cine` style, format, export quality), and stop **once**:
   for this project and could go into the plugin, and the one thing most worth changing.
 The user can still ask for any checkpoint ("show me the styles", "let me hear the voice"); then the staged flow below applies.
 
+## Stage 0: Script depth gate (default level: Sâu)
+Runs before Stage 1 and before any voice is generated (the voiceover is the costly step; never spend GPU on an unchecked script).
+The channel default is **mức Sâu**; the user can say "mức chuẩn" or "bỏ qua mức" for one video. When the repo has
+`prompts/MUC_SAU_VIET_SCRIPT.md`, follow it (and `prompts/QUY_TAC_VIET_SCRIPT_KENH.md` first):
+- **From an idea:** run the 8 steps (30 ideas -> 3 cards -> loophole check -> 3 independent drafts -> blind council -> up to 3 revision rounds).
+  Drop the "TTS editor" reviewer here (voice is Stage 3) and apply the 3D cast rule (hero boy, best friend girl, roster only).
+- **A script the user brought:** score it with the same blind reviewers and gate, show the report, never rewrite it.
+- **Gate (all must pass):** logic no P0; facts no false item; template risk <= 3; every factor >= 7; fantasy/shock >= 8; total >= 8.
+  After 3 rounds without a pass, stop and show the best version with its scores; the user picks or edits. Scores are AI-made and
+  differences under ~0.5 total are noise: say so.
+- Measure word counts and marker positions with scripts, log tokens per step to `deep/token_ledger.md`, then continue with Stage 1
+  (script_check, retention, set match) on the gate-passing script. Stage 8 of the Sâu process (retention log 48 h after posting) stays open.
+
 ## Stage 1: Intake and script check
 **Lessons first (1.0.3).** Run `node tools/retro.mjs --next` in the studio and read `channel/LESSONS.md`: the problems that
 came back in past videos and the checklist for this one. Tell the user the top 3 items in one short list and apply them while

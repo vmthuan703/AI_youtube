@@ -109,6 +109,13 @@ Neo: 9–10 không có mục sai và tối đa 3 mục sửa lời; 8 không sai
 
 Chưa bản nào qua điều kiện tổng từ 8. Dung hòa qua các điều kiện còn lại. Các file thử nghiệm nằm trong `scripts/experiment/` (draft, deep, compare, compare2), sổ token ở `scripts/experiment/deep/token_ledger.md`.
 
+## 5b. Vị trí trong workflow video 3D (từ 14/11/2026)
+- Mức Sâu là mặc định, chạy ở "Bước 0: cổng kịch bản" của `/new-3d-video` và `/make-3d-video`, trước khảo sát, `script_check` và mọi bước tạo giọng đọc.
+- Nói "mức chuẩn" hoặc "bỏ qua mức" để đổi cho một video.
+- Kịch bản người dùng mang tới chỉ được chấm và báo cáo, không viết lại.
+- Bỏ vai "biên tập giọng TTS" khỏi hội đồng ở bước này (giọng đọc kiểm ở bước thu âm). Giữ quy tắc diễn viên 3D: nhân vật chính là bé trai, bạn thân là bé gái, chỉ dùng roster kênh.
+- Không qua cổng sau 3 vòng: dừng, đưa bản tốt nhất kèm điểm để người dùng chọn hoặc tự sửa.
+
 ## 6. Ghi chú kỹ thuật cho bước thu âm
 - Chatterbox cần từ điển phát âm cho tên riêng (ví dụ "Wadlow"); viết số đo mét và xăng-ti-mét thành chữ rõ để giọng đọc không nhầm.
 - Ít hơn hoặc bằng 2 dòng quá 40 từ, mỗi giọng nhân vật phân biệt được bằng tai.

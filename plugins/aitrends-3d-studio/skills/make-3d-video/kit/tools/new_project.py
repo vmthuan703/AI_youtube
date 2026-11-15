@@ -64,4 +64,30 @@ cfg = {"title": a.title or a.name, "aspect": a.aspect, "resolution": "2160p" if 
        "music": {"enabled": True, "gainDb": -15, "duckDb": -6, "releaseS": 0.16}, "sfx": {"enabled": True, "gainDb": -6}, "loudness": -14,
        "export": {"upscale": upscale} if upscale else {}}
 save_json(os.path.join(root, "config.json"), cfg)
+# 2.3: the hand-over file between the video's sessions (A: script → breakdown, B: build the shots, C: sound → render → deliver).
+# A new session reads only this file to continue: `/make-3d-video tiếp <slug>`.
+state = os.path.join(root, "story", "STATE.md")
+if not os.path.exists(state):
+    with open(state, "w", encoding="utf-8") as fh:
+        fh.write(f"""# STATE: {cfg['title']}  (`projects/{a.name}`)
+Continue in a new session with: `/make-3d-video tiếp {a.name}`. Keep this file short (under ~60 lines); newest first in each list.
+
+## Phase
+A (script → voice → breakdown) · next: Stage 4 story breakdown
+
+## Decisions (what was chosen and why)
+- style {a.style}{', palette ' + a.palette if a.palette else ''}, {a.aspect} {cfg['resolution']} @ {a.fps} fps, quality {a.quality}
+
+## User feedback (their words, also in retro --note)
+-
+
+## Files
+- script: {cfg['script'] or '-'} · voiceover: {cfg['voiceover']} ({dur:.1f} s)
+
+## Open issues / next steps
+-
+
+## Token ledger
+- story/token_ledger.md (one line per agent run)
+""")
 print(f"created {root}  (voiceover {dur:.1f}s, {a.aspect} {cfg['resolution']} @ {a.fps}fps, quality {a.quality}, style {a.style}" + (f", palette {a.palette}" if a.palette else "") + f", bars {cfg['bars']}, subscribe gag {'on' if gag.get('enabled') else 'off'})")

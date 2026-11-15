@@ -161,10 +161,14 @@ async function runQC(quiet = false) {
   await browser.close();
   const issues = [...groups.values()].sort((a, b) => (a.sev === b.sev ? 0 : a.sev === 'red' ? -1 : 1) || a.times[0] - b.times[0]);
   const red = issues.filter(i => i.sev === 'red').length, amber = issues.length - red;
-  fs.writeFileSync(path.join(BUILD, 'qc_motion.json'), JSON.stringify({ samples: n, step: step / fps, red, amber, issues }, null, 1));
+  // 2.3: every shots.json qcIgnore in this run is named in the RESULT line, so the main conversation sees what a batch silenced
+  let ignored = []; try { const sj = JSON.parse(fs.readFileSync(path.join(PROJECT, 'story', 'shots.json'), 'utf8').replace(/^﻿/, ''));
+    ignored = (sj.shots || []).filter(s => s.qcIgnore && [].concat(s.qcIgnore).length && (!args.only || args.only.has(s.id))).map(s => `${s.id}:${[].concat(s.qcIgnore).join('+')}`); } catch {}
+  fs.writeFileSync(path.join(BUILD, 'qc_motion.json'), JSON.stringify({ samples: n, step: step / fps, red, amber, qcIgnore: ignored, issues }, null, 1));
   if (!quiet || red) { console.log(`Motion QC: ${n} samples, ${red} red, ${amber} amber  (build/qc_motion.json)`);
     for (const i of issues.slice(0, 60)) console.log(`  ${i.sev === 'red' ? 'RED  ' : 'amber'} ${String(i.shot).padEnd(14)} ${i.kind.padEnd(8)} ${i.msg}  @ ${i.times.slice(0, 5).join(', ')}${i.times.length > 5 ? ' …' : ''}s`); }
-  if (!quiet) RESULT = `${red ? 'fail' : 'ok'} motion QC${args.only ? ' (' + [...args.only].join(',') + ')' : ''}: ${red} red, ${amber} amber -> build/qc_motion.json${red ? '; first: ' + issues[0].shot + ' ' + issues[0].msg : ''}`;
+  const ign = ignored.length ? `, qcIgnore ${ignored.length} (${ignored.slice(0, 6).join(' ')}${ignored.length > 6 ? ' …' : ''})` : ', qcIgnore 0';
+  if (!quiet) RESULT = `${red ? 'fail' : 'ok'} motion QC${args.only ? ' (' + (args.only.size > 12 ? args.only.size + ' shots' : [...args.only].join(',')) + ')' : ''}: ${red} red, ${amber} amber${ign} -> build/qc_motion.json${red ? '; first: ' + issues[0].shot + ' ' + issues[0].msg : ''}`;
   return { red, amber };
 }
 // 1.0.6: checks story/shots.json before a full render: shots in order, no overlap, each shot has an id, and the

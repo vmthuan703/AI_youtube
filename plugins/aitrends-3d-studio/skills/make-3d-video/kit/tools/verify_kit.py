@@ -10,7 +10,7 @@ EXPECTED = {
     ".gitignore": "f1a9a09b226cf8e9",
     "package.json": "994a597783bea78a",
     "player.html": "5ffdd7da4a48cd4b",
-    "render.mjs": "d00a6c36bc0b03c6",
+    "render.mjs": "2ec1049dc27cdc74",
     "audio/dsp.py": "589d305d94d8acc3",
     "audio/mix.py": "cb122f7bd42e8168",
     "audio/music.py": "2fb3ce1df2fe5c7d",
@@ -142,7 +142,7 @@ EXPECTED = {
     "tools/cast_check.py": "268c33c4646b8f58",
     "tools/common.py": "e237321f2f12416e",
     "tools/doctor.py": "8d037a2b0fa634f5",
-    "tools/new_project.py": "05dca199d1ad3b42",
+    "tools/new_project.py": "2f13f16cb24a7a4b",
     "tools/new_thumbs.mjs": "9b2d5c407b5d892f",
     "tools/parse_script.py": "f33853d2823efde2",
     "tools/qc_metrics.py": "6dc8d4a3b2c4368c",
@@ -156,6 +156,8 @@ EXPECTED = {
     "tools/transcribe.py": "ecd48d05a6655d13",
     "tools/tts.py": "1985f6da7ef6f385",
     "tools/tts_chatterbox.py": "54a29460d2cb145f",
+    "engine/templates3d.js": "bb3cfc95994370ea",
+    "tools/gen_shots.py": "1b53f64dd5ce2ef9",
 }
 bad = 0
 for rel, want in EXPECTED.items():

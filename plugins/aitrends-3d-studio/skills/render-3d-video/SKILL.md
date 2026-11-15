@@ -2,7 +2,7 @@
 name: render-3d-video
 description: "This skill should be used when the user runs /render-3d-video or asks to \"build the 3D scenes\", \"check the shots\", \"show me a contact sheet\", \"preview the video\", \"render the video\", \"render in 1080p60 / 4K / 9:16\", \"export in high quality\", \"re-render after a fix\", or \"export the final MP4\" for an aiTrends 3D Studio project. It writes or repairs shot code in batches with contact-sheet QC, makes preview clips, sets the export quality, runs the full frame-by-frame render, and muxes the final video with sound.\n"
 metadata:
-  version: "0.2.0"
+  version: "0.3.0"
   author: aiTrends
 ---
 
@@ -11,9 +11,14 @@ metadata:
 Work inside `aitrends-3d-studio/` on the active project (ask if several exist). Read `engine-api.md` (core) and `render-qc.md`
 (non-negotiables + QC checklist) in `../make-3d-video/references/` before writing or fixing scenes; grep `engine-api/*.md` and
 `examples/INDEX.md` for calls instead of reading examples or engine code. Follow "Token budget" in `../make-3d-video/SKILL.md`:
-batches in subagents, long runs in the background, every `render.mjs` run ends with one `RESULT` line to read.
+batches in the plugin's agents, long runs in the background, every `render.mjs` run ends with one `RESULT` line to read.
 
-## 1. Build or repair shots (batches of 8–12)
+## 1. Build or repair shots (2.3: templates + special-shot batches)
+- **Building a whole video:** follow `../make-3d-video/SKILL.md` → Stage 6: one `aitrends-3d-studio:kit-builder` agent for the
+  kit and the template shots (`tools/gen_shots.py`, `references/templates.md`), then one `aitrends-3d-studio:shot-builder` agent
+  per batch in `story/batches.json`, each to 0 red. A repair of a few shots goes to one `shot-builder` with the shot ids.
+- Template shots (`scenes/shots/auto_*.js`) are fixed in `scenes/_places.js` or `story/tpl_spec.py` and regenerated with
+  `python tools/gen_shots.py --project projects/<slug>`, never by editing the auto files.
 - `node render.mjs --project projects/<slug> --sheet --scale 0.4 [--only id,id]` writes `build/sheets/sheet_XX.png` (or
   `sheet_only.png`); its RESULT line lists MISSING shots and errors. Fix rounds: `--sheet --changed` (only the shots edited since).
 - Write `scenes/sets/*.js` and `scenes/shots/NN_name.js` (`registerShot(id, { init, draw, overlay })`); look calls up in

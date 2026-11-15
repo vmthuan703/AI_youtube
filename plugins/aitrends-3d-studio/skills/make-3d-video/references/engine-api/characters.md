@@ -95,3 +95,27 @@ talking now and since when. The narrator is never lip-synced.
 Body: 1.75 m tall incl. a 0.54 m head (≈ ⅓); hips 0.62 m; head centre ≈ 1.45 m; a seat is 0.4 m high (`T.W.chair`),
 a table 0.76 m. Raised-arm poses (cheer, wave, pointUp) open sideways so the big head stays visible.
 
+
+## 2.2: a new role for this video (cast match ❌ / 🟡)
+`tools/cast_match.py` prints the line to start from. Write it in `projects/<slug>/scenes/roles_new.js`, one role per line, always
+spreading a roster role first, and import it in `scenes/cast.js` like a roster role:
+```js
+import { WORKER, GRANDMA } from '/channel/cast.js';
+export const ASTRONAUT = { ...WORKER, top: 'jacket', color: '#e8e8ec', legs: '#e8e8ec', head: null, hiVis: null, patch: 'NASA', scale: 1.1 };   // role: astronaut
+export const QUEEN = { ...GRANDMA, color: '#5a2a6a', skirt: '#5a2a6a', head: 'crown' };   // role: queen
+```
+Then `node render.mjs --project projects/<slug> --roles` (one still per new role: front, ¾, side, next to the hero) and open
+`build/sheets/roles.png` once. Keep the cast's muted colours: only the hero is loud. Set a key to `null` to drop what the base had.
+
+**Every outfit key** (all optional; colours are hex strings):
+- body: `top` hoodie | tshirt | jacket | puffer | suit | dress | jersey | tracksuit | trench | labcoat | scrubs | aodai · `color`, `color2`,
+  `sleeves`, `stripe`, `collar`, `shirt`, `tie`, `vee`, `yoke`, `quilt` ('puff'), `crop`, `edge`, `hood`, `strings`, `scarf`, `bow`, `bag`,
+  `skirt`, `skirtLen`, `legs`, `legCuff`, `shoes`, `shoeSole`, `shoeToe`, `shoeStripe`, `shoeCollar`, `laces`, `gloves`, `belly`, `scale`, `kid`, `build`
+- head: `hair` anime | animeLow | spiky | messy | short | curls | quiff | sidePart | slick | bob | fringe | long | sidePony | ponytail |
+  pigtails | bun | lowBun | balding · `hairColor`, `hairShade`, `head` cap | capBack | beanie | headband | hood | tophat | crown | nurseCap |
+  policeCap | chefHat | hardhat | fireHelmet · `headColor`, `face` glasses | sunglasses, `goggles`, `mustache`, `beard`, `brows`, `lashes`, `blush`, `eyes`, `skin`
+- role details (engine/costume3d.js): `apron`, `badge`, `bands`, `belt` + `radio`, `buttons`, `buttonRows`, `buttonsTop`, `capBadge`, `capCross`,
+  `lanyard` + `card`, `epaulettes`, `hiVis` + `hiVisBand`, `nameTag`, `patch` (chest text) + `patchBg` / `patchColor`, `stethoscope`, `whistle`
+- in the hand: `prop` book | cane | clipboard | medbag | mic | torch · `propColor`, `propHand`; `pose` (a default pose), `pop` (a little self-lit)
+Something no key gives (a space helmet, a cape): build it as a mesh in the shot and attach it to `ch.parts.head` / `ch.parts.chest`, and
+say so in the promote proposal (it is a costume part the plugin could add).

@@ -10,6 +10,9 @@
 //   node render.mjs --project P --gif [id,id]                         1.0.2 a small looping GIF per shot (build/gifs) to check motion
 //   node render.mjs --catalog [id,id]                                  1.0.5 one still per ready-made set -> examples/catalog/build/sheets
 //   node render.mjs --project P --qc [--every 0.5]                   1.0.2 motion QC: clipping, hidden faces, camera in walls, sliding feet, snapping joints
+//   node render.mjs --project P --sheet --changed                    2.2 only the shots whose scene files changed since the last sheet -> build/sheets/sheet_changed.png
+//   node render.mjs --project P --sheet --only s004,s007             2.2 only these shots (also with --qc and --gif) -> build/sheets/sheet_only.png
+// Every run ends with ONE line that starts with 'RESULT ' (ok|fail, what was written, problems): wait for it, don't read the progress.
 // Options: --workers N  --scale K  --fps N  --style ID  --quality draft|standard|high|max  --debug  --format png|jpeg  --crf N  --preset X
 //          --gl auto|gpu|swiftshader  --angle d3d11|gl|vulkan|metal  --encoder auto|x264|nvenc  --out FILE  --chrome PATH
 // Quality (config.json "quality", default high): draft = no anti-aliasing, fast encode; standard = FXAA, CRF 18;
@@ -30,9 +33,38 @@ if (args.catalog) { const C = JSON.parse(fs.readFileSync(path.join(ROOT, 'engine
   const sets = C.sets; args.project = path.join(ROOT, 'examples', 'catalog'); args.sheet = true; args.only = only;   // shots.json always lists every set; --catalog id,id renders only those and keeps the other stills
   fs.writeFileSync(path.join(args.project, 'story', 'shots.json'), JSON.stringify({ title: 'catalog', duration: sets.length * 2, shots: sets.map((e, i) => ({ id: e.id, start: i * 2, end: i * 2 + 2, line: '', camera: 'manual' })) }, null, 1));
   const cf = path.join(args.project, 'config.json'), cfg = JSON.parse(fs.readFileSync(cf, 'utf8')); cfg.duration = sets.length * 2; fs.writeFileSync(cf, JSON.stringify(cfg, null, 1)); }
+// 2.2: --roles renders one still per role in the project's scenes/roles_new.js (tools/roles_preview_shot.js) -> build/sheets/roles.png
+let ROLES_SRC = null;
+if (args.roles && args.project) { ROLES_SRC = path.resolve(args.project); const rn = path.join(ROLES_SRC, 'scenes', 'roles_new.js');
+  if (!fs.existsSync(rn)) { console.log('RESULT fail this project has no scenes/roles_new.js'); process.exit(1); }
+  const ids = [...fs.readFileSync(rn, 'utf8').matchAll(/^export const (\w+)/gm)].map(m => m[1]);
+  const pv = path.join(ROLES_SRC, 'build', 'roles_preview'); fs.rmSync(pv, { recursive: true, force: true });
+  fs.mkdirSync(path.join(pv, 'scenes', 'shots'), { recursive: true }); fs.mkdirSync(path.join(pv, 'story'), { recursive: true });
+  fs.copyFileSync(rn, path.join(pv, 'scenes', 'shots', '_roles_new.js'));
+  fs.copyFileSync(path.join(ROOT, 'tools', 'roles_preview_shot.js'), path.join(pv, 'scenes', 'shots', 'roles.js'));
+  const cfg = JSON.parse(fs.readFileSync(path.join(ROOT, 'examples', 'catalog', 'config.json'), 'utf8'));
+  Object.assign(cfg, { title: 'new roles', duration: ids.length * 2, style: 'cine' }); fs.writeFileSync(path.join(pv, 'config.json'), JSON.stringify(cfg, null, 1));
+  fs.writeFileSync(path.join(pv, 'story', 'shots.json'), JSON.stringify({ title: 'roles', duration: ids.length * 2, shots: ids.map((id, i) => ({ id, start: i * 2, end: i * 2 + 2, line: '', camera: 'manual' })) }, null, 1));
+  args.project = pv; args.sheet = true; }
 if (!args.project) { console.error('usage: node render.mjs --project projects/<name> [options]'); process.exit(1); }
 const PROJECT = path.resolve(args.project);
 const BUILD = path.join(PROJECT, 'build'); fs.mkdirSync(BUILD, { recursive: true });
+// 2.2: --only id,id and --changed limit --sheet / --qc / --gif to some shots, so a fix is checked on a small sheet instead of all of them.
+// --changed: the shots whose files under scenes/shots changed since the last sheet (build/sheets/.stamp); a change in scenes/sets,
+// scenes/cast.js or story/shots.json means every shot.
+const STAMP = path.join(BUILD, 'sheets', '.stamp');
+function changedShots() {
+  const since = fs.existsSync(STAMP) ? fs.statSync(STAMP).mtimeMs : 0; if (!since) return null;
+  const files = listScenes(path.join(PROJECT, 'scenes'), '').map(f => path.join(PROJECT, 'scenes', f)).concat(path.join(PROJECT, 'story', 'shots.json'));
+  const ids = new Set();
+  for (const f of files) { if (!fs.existsSync(f) || fs.statSync(f).mtimeMs <= since) continue;
+    if (!f.includes(path.join('scenes', 'shots') + path.sep)) return null;   // a set, the cast or the timeline changed: every shot
+    for (const m of fs.readFileSync(f, 'utf8').matchAll(/registerShot\(\s*['"]([^'"]+)['"]/g)) ids.add(m[1]); }
+  return ids;
+}
+const PARTIAL = !!(args.only || args.changed) && !args.catalog;
+if (typeof args.only === 'string') args.only = new Set(args.only.split(',').map(x => x.trim()).filter(Boolean));
+let RESULT = null;   // 2.2: the one closing line, set by each mode and printed in finally
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.woff2': 'font/woff2', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml' };
 
 function listScenes(dir, base) { let out = []; if (!fs.existsSync(dir)) return out; for (const f of fs.readdirSync(dir).sort()) { const p = path.join(dir, f); if (fs.statSync(p).isDirectory()) out = out.concat(listScenes(p, `${base}/${f}`)); else if (f.endsWith('.js') && !f.startsWith('_')) out.push(`${base}/${f}`); } return out; }
@@ -122,7 +154,8 @@ async function runQC(quiet = false) {
   await page.waitForFunction('typeof window.qcSample === "function"', null, { timeout: 20000 });
   const step = Math.max(1, Math.round((+args.every || 0.5) * fps)), f0 = Math.max(1, Math.round((+args.from || 0) * fps)), f1 = Math.min(total - 2, args.to ? Math.round(+args.to * fps) : total - 2);
   const groups = new Map(); let n = 0;
-  for (let f = f0; f <= f1; f += step) { const r = await page.evaluate(i => window.qcSample(i), f); n++;
+  const ranges = args.only ? (await page.evaluate('window.SHOT_LIST')).filter(s => args.only.has(s.id)).map(s => [Math.round(s.start * fps), Math.round(s.end * fps)]) : null;
+  for (let f = f0; f <= f1; f += step) { if (ranges && !ranges.some(([a, b]) => f >= a && f < b)) continue; const r = await page.evaluate(i => window.qcSample(i), f); n++;
     for (const is of r.issues) { const k = `${r.shot}|${is.kind}|${is.msg.replace(/[\d.]+/g, '#')}`; const g = groups.get(k) || { shot: r.shot, kind: is.kind, sev: is.sev, msg: is.msg, times: [] };
       if (is.sev === 'red') g.sev = 'red'; g.times.push(r.t); groups.set(k, g); } }
   await browser.close();
@@ -131,6 +164,7 @@ async function runQC(quiet = false) {
   fs.writeFileSync(path.join(BUILD, 'qc_motion.json'), JSON.stringify({ samples: n, step: step / fps, red, amber, issues }, null, 1));
   if (!quiet || red) { console.log(`Motion QC: ${n} samples, ${red} red, ${amber} amber  (build/qc_motion.json)`);
     for (const i of issues.slice(0, 60)) console.log(`  ${i.sev === 'red' ? 'RED  ' : 'amber'} ${String(i.shot).padEnd(14)} ${i.kind.padEnd(8)} ${i.msg}  @ ${i.times.slice(0, 5).join(', ')}${i.times.length > 5 ? ' …' : ''}s`); }
+  if (!quiet) RESULT = `${red ? 'fail' : 'ok'} motion QC${args.only ? ' (' + [...args.only].join(',') + ')' : ''}: ${red} red, ${amber} amber -> build/qc_motion.json${red ? '; first: ' + issues[0].shot + ' ' + issues[0].msg : ''}`;
   return { red, amber };
 }
 // 1.0.6: checks story/shots.json before a full render: shots in order, no overlap, each shot has an id, and the
@@ -186,7 +220,7 @@ async function renderVideo() {
       '-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-r', String(fps), out], { stdio: ['pipe', 'inherit', 'inherit'] });
     for (let f = a; f < b; f++) {
       const img = await shot(page, f); if (!ff.stdin.write(img)) await new Promise(r => ff.stdin.once('drain', r)); done++;
-      if (done % 48 === 0) { const el = (Date.now() - t0) / 1000, eta = (el / done) * (f1 - f0 - done); process.stdout.write(`  ${done}/${f1 - f0} frames  ${(done / el).toFixed(2)} fps  elapsed ${fmtT(el)}  eta ${fmtT(eta)}\n`); }
+      if (done % Math.max(48, Math.round((f1 - f0) / 10)) === 0) { const el = (Date.now() - t0) / 1000, eta = (el / done) * (f1 - f0 - done); process.stdout.write(`  ${done}/${f1 - f0} frames  ${(done / el).toFixed(2)} fps  elapsed ${fmtT(el)}  eta ${fmtT(eta)}\n`); }
     }
     (await page.evaluate('window.ERRORS')).forEach(e => errs.add(e));
     ff.stdin.end(); await new Promise(r => ff.on('close', r)); await browser.close(); return out;
@@ -200,6 +234,7 @@ async function renderVideo() {
   await new Promise((res, rej) => spawn('ffmpeg', ['-y', '-v', 'error', '-f', 'concat', '-safe', '0', '-i', list, '-c', 'copy', '-movflags', '+faststart', out], { stdio: 'inherit' }).on('close', c => (c ? rej(new Error('concat failed')) : res())));
   if (errs.size) { console.log(`\n${errs.size} shot error(s):`); [...errs].slice(0, 40).forEach(e => console.log('  ' + e)); }
   console.log(`\nDone: ${out}  (${fmtT((Date.now() - t0) / 1000)})`);
+  RESULT = `${errs.size ? 'fail' : 'ok'} ${path.relative(PROJECT, out)} in ${fmtT((Date.now() - t0) / 1000)}${errs.size ? `; ${errs.size} shot error(s), first: ${[...errs][0]}` : ''}`;
   // 1.0.6: a full render records its result in build/render_status.json. audio/mix.py refuses to mux a video whose
   // status is not ok (unless --force), and this run exits with code 1 when shots raised errors.
   if (fullRender) {
@@ -213,7 +248,8 @@ async function renderVideo() {
     const r = spawnSync(py, [path.join(ROOT, 'tools', 'qc_metrics.py'), '--video', out, '--project', PROJECT], { encoding: 'utf8', cwd: ROOT });
     if (r.status) console.log('Scorecard not written: ' + String(r.stderr || r.error || '').trim().split('\n').pop());
     else { const md = String(r.stdout || ''), bad = (md.match(/\| CHECK/g) || []).length; console.log(`Scorecard: ${bad ? bad + ' number(s) to check' : 'all in range'} → build/qc_scorecard.md`);
-      for (const row of md.split('\n').filter(l => l.includes('| CHECK')).slice(0, 8)) console.log('  ' + row.replace(/\s*\|\s*/g, ' | ').trim()); } }
+      for (const row of md.split('\n').filter(l => l.includes('| CHECK')).slice(0, 8)) console.log('  ' + row.replace(/\s*\|\s*/g, ' | ').trim());
+      RESULT += `; scorecard ${bad ? bad + ' to check' : 'all in range'}`; } }
   // 1.0.3: after every final render, record this video's problems in the channel lesson book (channel/LESSONS.md)
   if (!PREVIEW && !args.from && !args.to && !args.out && !args['no-lessons']) { try { const { record } = await import('./tools/retro.mjs');
     const e = record(PROJECT, { errors: [...errs], missing: missing.map(s => s.id), renderSec: Math.round((Date.now() - t0) / 1000) });
@@ -228,18 +264,24 @@ async function contactSheet(browser, items, outFile, cols = 4, cellW = 480) {
 async function renderStills() {
   const browser = await launch(); const styles = args.styles ? String(args.styles).split(',') : [args.style || null];
   const dir = path.join(BUILD, args.styles ? 'styles' : args.sheet ? 'sheets' : 'stills'); if (!args.only) fs.rmSync(dir, { recursive: true, force: true }); fs.mkdirSync(dir, { recursive: true });
-  const all = [];
+  const all = [], errs = [];
   for (const st of styles) {
     const page = await openPlayer(browser, st); const fps = FPS;
     let targets;
     if (args.sheet) targets = (await page.evaluate('window.SHOT_LIST')).filter(s => !args.only || args.only.has(s.id)).map(s => ({ t: s.start + (s.end - s.start) * 0.45, label: `${s.id}  ${s.start.toFixed(1)}s${s.ok ? '' : '  (MISSING)'}` }));
     else targets = String(args.stills || args.at || '1').split(',').map(Number).map(t => ({ t, label: `${t}s` }));
     for (const tg of targets) { const img = await shot(page, Math.round(tg.t * fps)); const name = `${st ? st + '_' : ''}${tg.label.split(' ')[0].replace(/[^\w.]/g, '')}_${tg.t.toFixed(2)}.${FORMAT}`; fs.writeFileSync(path.join(dir, name), img); all.push({ img, label: `${st ? `[${st}] ` : ''}${tg.label}`, st }); }
-    (await page.evaluate('window.ERRORS')).forEach(e => console.log('  shot error:', e)); await page.close();
+    (await page.evaluate('window.ERRORS')).forEach(e => { errs.push(e); console.log('  shot error:', e); }); await page.close();
   }
   if (args.styles) { const n = all.length / styles.length; await contactSheet(browser, all, path.join(dir, 'style_grid.png'), n, 420); }
-  else { const per = 24; for (let i = 0; i < all.length; i += per) await contactSheet(browser, all.slice(i, i + per), path.join(dir, `sheet_${String(i / per + 1).padStart(2, '0')}.png`), 4, 440); }
+  const sheets = [];
+  if (args.styles) sheets.push(path.join(dir, 'style_grid.png'));
+  else if (PARTIAL) { const f = path.join(dir, `sheet_${args.changed ? 'changed' : 'only'}.png`); if (all.length) { await contactSheet(browser, all, f, Math.min(4, all.length), +(args.cell || 440)); sheets.push(f); } }
+  else { const per = 24; for (let i = 0; i < all.length; i += per) { const f = path.join(dir, `sheet_${String(i / per + 1).padStart(2, '0')}.png`); await contactSheet(browser, all.slice(i, i + per), f, Math.min(4, all.length), +(args.cell || 440)); sheets.push(f); } }
+  if (args.sheet && !args.catalog) fs.writeFileSync(STAMP, new Date().toISOString());
   await browser.close(); console.log(`Wrote ${all.length} stills + contact sheet(s) to ${dir}`);
+  const missing = all.filter(a => /MISSING/.test(a.label)).map(a => a.label.split(' ')[0]);
+  RESULT = `${errs.length || missing.length ? 'fail' : 'ok'} ${all.length} still(s) -> ${sheets.map(f => path.relative(PROJECT, f)).join(', ') || path.relative(PROJECT, dir)}${missing.length ? `; MISSING ${missing.join(',')}` : ''}${errs.length ? `; ${errs.length} shot error(s), first: ${errs[0]}` : ''}`;
 }
 // --thumbs (1.0.3): one JPG per shot (1280×720, the frame at shotsjson "thumbAt" or just before the shot ends) + a 2×2 grid to pick from.
 async function renderThumbs() {
@@ -252,13 +294,13 @@ async function renderThumbs() {
   if (outs.length >= 2) { const n = Math.min(4, outs.length), ins = outs.slice(0, n).flatMap(f => ['-i', f]), lay = ['0_0', 'w0_0', '0_h0', 'w0_h0'].slice(0, n).join('|');
     spawnSync('ffmpeg', ['-v', 'error', '-y', ...ins, '-filter_complex', `xstack=inputs=${n}:layout=${lay}:fill=black`, '-q:v', '3', path.join(dir, 'grid.jpg')]); }
   (await page.evaluate('window.ERRORS')).forEach(e => console.log('  shot error:', e));
-  await browser.close(); console.log(`Wrote ${outs.length} thumbnail(s) + grid to ${dir}`);
+  await browser.close(); console.log(`Wrote ${outs.length} thumbnail(s) + grid to ${dir}`); RESULT = `ok ${outs.length} thumbnail(s) -> ${path.relative(PROJECT, dir)}`;
 }
 // --gif [ids] (1.0.2): a looping GIF per shot (10 fps, small) to judge motion — stills hide jerks and sliding feet.
 // ids: comma-separated shot ids, default all. --gifFps N, --scale K (default 0.35). Output build/gifs/<id>.gif.
 async function renderGifs() {
   const browser = await launch(); const page = await openPlayer(browser); const fps = FPS, gfps = +(args.gifFps || 10);
-  const list = (await page.evaluate('window.SHOT_LIST')).filter(s => args.gif === true || String(args.gif).split(',').includes(s.id));
+  const list = (await page.evaluate('window.SHOT_LIST')).filter(s => (args.gif === true || String(args.gif).split(',').includes(s.id)) && (!args.only || args.only.has(s.id)));
   const dir = path.join(BUILD, 'gifs'); fs.mkdirSync(dir, { recursive: true });
   for (const sh of list) {
     const tmp = path.join(dir, '_' + sh.id); fs.rmSync(tmp, { recursive: true, force: true }); fs.mkdirSync(tmp, { recursive: true }); let k = 0;
@@ -267,7 +309,7 @@ async function renderGifs() {
     const r = spawnSync('ffmpeg', ['-v', 'error', '-y', '-framerate', String(gfps), '-i', path.join(tmp, 'f%04d.png'), '-vf', 'split[a][b];[a]palettegen=max_colors=128[p];[b][p]paletteuse=dither=bayer:bayer_scale=4', '-loop', '0', out]);
     if (r.status) console.log('  gif failed:', sh.id, String(r.stderr).slice(0, 200)); fs.rmSync(tmp, { recursive: true, force: true });
   }
-  await browser.close(); console.log(`Wrote ${list.length} GIF(s) to ${dir}`);
+  await browser.close(); console.log(`Wrote ${list.length} GIF(s) to ${dir}`); RESULT = `ok ${list.length} GIF(s) -> ${path.relative(PROJECT, dir)}`;
 }
 // --bench: time one worker on frames spread across the video, then estimate the full render for this machine
 async function bench() {
@@ -289,24 +331,32 @@ async function bench() {
   console.log(`  per frame: ${per.toFixed(0)} ms  (3D + 2D ${(tr / k - gr / k).toFixed(0)} ms, colour grade ${(gr / k).toFixed(0)} ms, capture ${(tc / k).toFixed(0)} ms)`);
   console.log(`  one worker ≈ ${fpsW.toFixed(2)} frames/s; ${W} workers ≈ ${(fpsW * eff).toFixed(2)} frames/s (estimate)`);
   console.log(`  this video: ${total} frames ≈ ${fmtT(est)} to render (+ encode). Encoder: ${ENCODER}. CPU threads: ${cores}.`);
+  RESULT = `ok bench ${cpu ? 'CPU' : 'GPU'} ${per.toFixed(0)} ms/frame, this video ≈ ${fmtT(est)}`;
 }
 // 1.0.5: building shots needs a finished set match (every missing set decided, every shots.json set known). Projects made before
 // 1.0.5 have no story/set_match.json and pass with a note. --force renders anyway.
 function setGate() {
-  if (args.catalog || args.bench || args.force || PROJECT.startsWith(path.join(ROOT, 'examples'))) return;
+  if (args.catalog || args.roles || args.bench || args.force || PROJECT.startsWith(path.join(ROOT, 'examples'))) return;
   const py = process.env.PYTHON || (process.platform === 'win32' ? 'python' : 'python3');
   if (!fs.existsSync(path.join(PROJECT, 'story', 'set_match.json'))) console.log('set match: none for this project (made before 1.0.5), skipped');
   else {
     const r = spawnSync(py, [path.join(ROOT, 'tools', 'set_match.py'), '--project', PROJECT, '--check', '--shots', '--quiet'], { encoding: 'utf8', cwd: ROOT });
-    if (r.status) { console.error((r.stdout || '') + (r.stderr || '')); console.error('set match not ready: decide the missing sets (tools/set_match.py --decide) or render anyway with --force'); process.exit(3); }
+    if (r.status) { console.error((r.stdout || '') + (r.stderr || '')); console.error('set match not ready: decide the missing sets (tools/set_match.py --decide) or render anyway with --force'); console.log('RESULT fail set match not ready'); process.exit(3); }
   }
   // 1.0.6: every character must come from the channel roster (tools/cast_check.py), same gate as the set match.
   if (fs.existsSync(path.join(PROJECT, 'scenes', 'cast.js'))) {
     const c = spawnSync(py, [path.join(ROOT, 'tools', 'cast_check.py'), '--project', PROJECT], { encoding: 'utf8', cwd: ROOT });
-    if (c.status) { console.error((c.stdout || '') + (c.stderr || '')); console.error('cast check failed: use a roster role (tools/cast_check.py explains) or render anyway with --force'); process.exit(4); }
+    if (c.status) { console.error((c.stdout || '') + (c.stderr || '')); console.error('cast check failed: use a roster role or a project role (tools/cast_check.py explains) or render anyway with --force'); console.log('RESULT fail cast check'); process.exit(4); }
   }
 }
+if (args.changed && !args.catalog) { const c = changedShots(); args.only = c;
+  if (!c) console.log('--changed: no earlier sheet, or a set / the cast / shots.json changed: every shot');
+  else if (!c.size) { console.log('RESULT ok nothing changed since the last sheet'); server.close(); process.exit(0); }
+  else console.log(`--changed: ${[...c].join(', ')}`); }
 setGate();
-try { if (args.bench) await bench(); else if (args.qc) { const q = await runQC(); if (q.red) process.exitCode = 2; } else if (args.thumbs) await renderThumbs(); else if (args.gif) await renderGifs(); else if (args.sheet || args.stills || args.styles) await renderStills(); else await renderVideo(); }
-catch (e) { console.error('RENDER FAILED:', e.message); process.exitCode = 1; }
-finally { server.close(); }
+try { if (args.bench) await bench(); else if (args.qc) { const q = await runQC(); if (q.red) process.exitCode = 2; } else if (args.thumbs) await renderThumbs(); else if (args.gif) await renderGifs(); else if (args.sheet || args.stills || args.styles) { await renderStills();
+    if (ROLES_SRC && fs.existsSync(path.join(BUILD, 'sheets', 'sheet_01.png'))) { const to = path.join(ROLES_SRC, 'build', 'sheets', 'roles.png'); fs.mkdirSync(path.dirname(to), { recursive: true });
+      fs.copyFileSync(path.join(BUILD, 'sheets', 'sheet_01.png'), to); RESULT = RESULT.replace(/->.*?(;|$)/, `-> build/sheets/roles.png$1`); } } else await renderVideo(); }
+catch (e) { console.error('RENDER FAILED:', e.message); process.exitCode = 1; RESULT = 'fail ' + e.message; }
+finally { server.close(); const line = 'RESULT ' + (RESULT || (process.exitCode ? 'fail' : 'ok'));
+  console.log(line); try { fs.writeFileSync(path.join(BUILD, 'last_result.txt'), line + '\n'); } catch {} }

@@ -39,7 +39,7 @@ Every final encode is H.264 High, yuv420p, BT.709, GOP = fps/2, B-frames 2, with
 
 **Final:**
 ```bash
-nohup node render.mjs --project projects/<slug> > projects/<slug>/build/render.log 2>&1 &
+node render.mjs --project projects/<slug> > projects/<slug>/build/render.log 2>&1   # background; read the RESULT line when notified
 python audio/mix.py --project projects/<slug>        # music + SFX, mix, mux (+ upscale if set) -> out/<title>.mp4
 ```
 - Workers default to half the CPU threads (max 8). Each worker is a separate Chromium (≈ 1–1.5 GB RAM at 1080p). Never
@@ -61,6 +61,21 @@ expect very roughly 5–10 frames/s per worker at 1080p, i.e. 15–40 frames/s w
 offer: a 720p30 draft now, the final overnight or on a GPU machine (copy the project folder; it's self-contained).
 
 The render log prints frames, fps, elapsed time and ETA every 48 frames; report progress at sensible intervals.
+
+## Shot non-negotiables (2.2: moved here from SKILL.md Stage 6; the batch subagent reads this)
+**depth in every outdoor frame** (something near the lens, the subject, far layers: `T.usa.mapleStreet`,
+`mainStreet`, `highSchool`, or `T.usa.backdrop(st, { season })`); **the sun in or near the frame for openings** (`sun: [x, y, z]`);
+wet streets get `T.W.mirror`; at most one lamp cone between lens and subject; a camera move in every shot; expressions on the beat
+(`expr` keys), deadpan as the hero's resting comedy face; **people act, not tween** (engine-api.md → Acting recipe: `posesAt3`,
+`idle3`, `speak3` + `face({ speaker, gt })`, `lookAtSpeaker`, `walkTo`); camera accents on the words that earn them (`crashZoom`,
+`punch`, `smash`, `ramp`, `rackFocus`); hands and feet in contact, **hands rest on table tops, never through them, seated legs
+visible**; colours from `st.M`/`S()` and the cast; every number the narrator says on screen (`wordTime()`); **no empty stage: every
+explainer is a moving picture from `engine/diagrams2d.js`, mostly on the blurred scene (`backdrop`)**; text between y = 90 and
+y = 990; at least one bright or outdoor sequence when the story allows; glowing props light the faces (`FX3.fire/blade/torch/
+glowLight`); game-like powers get one HUD layer; animals are toys; big crowds are instanced; the world reacts on in-world screens;
+breaks show physics; **props read as the real thing** and **every prop the script names is visible** (at least one close-up);
+`V()` for aspect-dependent values; `draw()` a pure function of `t`; ≤ 5 real lights per shot; `dof` only on close-ups; no
+`Math.random`/`Date.now`.
 
 ## QC checklist (run on every contact sheet)
 - [ ] No `MISSING SHOT` or red `ERROR` frames, and the console printed no shot errors.

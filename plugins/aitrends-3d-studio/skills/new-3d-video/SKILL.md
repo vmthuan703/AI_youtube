@@ -25,9 +25,10 @@ one line (with the render-time estimate from `render-qc.md`), offer to change th
 
 Then `python tools/script_check.py --script <file> --title "<title>"`: show the table, answer the **Story logic** questions it lists (power rule, timeline, climax cause and effect, twist, safety, science, cast: the hero is a boy and the best friend is a girl) with the script lines that break them, say what matters most, and ask whether the user wants to edit the script first. It never changes the script, and neither do you.
 
-**Set match (1.0.5), once the script is final.** Follow `../make-3d-video/SKILL.md` → Stage 1b: write `story/needs.json` in the same read
-as the Story logic answers, run `python tools/set_match.py --project projects/<slug> --script <file>`, send its lines and `STILL`
-files (unopened), and ask the user for every ❌ (plugin / project / use:<id>). render.mjs blocks shot building until that is done.
+**Cast and set match (2.2), once the script is final.** Follow `../make-3d-video/SKILL.md` → Stage 1b: write `story/needs.json`
+(places, props, actions, fx and characters) in the same read as the Story logic answers, run `python tools/set_match.py --project
+projects/<slug> --script <file>` and `python tools/cast_match.py --project projects/<slug>`. Missing sets are built in this video and
+missing characters become roles in `scenes/roles_new.js` without asking; the promote step after the video proposes them for the plugin.
 
 ## 2. Studio
 If `aitrends-3d-studio/render.mjs` doesn't exist in the workspace, follow `../make-3d-video/references/install.md` in

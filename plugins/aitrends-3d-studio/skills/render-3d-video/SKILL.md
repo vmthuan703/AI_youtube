@@ -8,15 +8,18 @@ metadata:
 
 # /render-3d-video: build, QC, preview, export quality and final render
 
-Work inside `aitrends-3d-studio/` on the active project (ask if several exist). Read `engine-api.md`, `style-bible.md`
-and `render-qc.md` in `../make-3d-video/references/` before writing or fixing scenes.
+Work inside `aitrends-3d-studio/` on the active project (ask if several exist). Read `engine-api.md` (core) and `render-qc.md`
+(non-negotiables + QC checklist) in `../make-3d-video/references/` before writing or fixing scenes; grep `engine-api/*.md` and
+`examples/INDEX.md` for calls instead of reading examples or engine code. Follow "Token budget" in `../make-3d-video/SKILL.md`:
+batches in subagents, long runs in the background, every `render.mjs` run ends with one `RESULT` line to read.
 
 ## 1. Build or repair shots (batches of 8–12)
-- `node render.mjs --project projects/<slug> --sheet --scale 0.4` lists MISSING shots and errors and writes
-  `build/sheets/sheet_XX.png` (one still per shot).
-- Write `scenes/sets/*.js` and `scenes/shots/NN_name.js` (`registerShot(id, { init, draw, overlay })`). Study
-  `examples/speed-demo/scenes/`, `examples/look-demo/scenes/` and `examples/diagram-gallery/scenes/` for working patterns. Explainers use `engine/diagrams2d.js`, never just text.
-- After each batch, re-run the sheet and **open every sheet PNG** against the QC checklist. Repeat until clean.
+- `node render.mjs --project projects/<slug> --sheet --scale 0.4 [--only id,id]` writes `build/sheets/sheet_XX.png` (or
+  `sheet_only.png`); its RESULT line lists MISSING shots and errors. Fix rounds: `--sheet --changed` (only the shots edited since).
+- Write `scenes/sets/*.js` and `scenes/shots/NN_name.js` (`registerShot(id, { init, draw, overlay })`); look calls up in
+  `examples/INDEX.md`. Explainers use `engine/diagrams2d.js`, never just text. New roles: `scenes/roles_new.js`, checked with `--roles`.
+- After each batch: `--qc --only <ids>` to 0 red first, then open the batch's sheet **once** against the QC checklist; after a fix,
+  open only the `--changed` sheet. Repeat until clean.
 - Motion: `--gif` (1.0.2: one small looping GIF per shot in `build/gifs/`, `--gif id,id` for some) — open the GIFs of every
   shot with people moving: stills hide jerks and sliding feet. `--stills t1,t2,t3` or `--from A --to B --scale 0.5` (preview.mp4).
 - **Thumbnails (1.0.3)**: a thumbnail project (one shot per layout A–D, overlays with `T.thumb`) renders with `--thumbs` →
@@ -38,8 +41,8 @@ Switching aspect needs a fresh sheet review (9:16 framing differs).
 final render-time estimate before the long render. Fix anything marked CHECK that the user cares about first. Include the motion QC line (red / amber counts).
 
 ## 4. Final render
-`nohup node render.mjs --project projects/<slug> > projects/<slug>/build/render.log 2>&1 &`. Poll the log and report
-progress and ETA. Fewer workers if memory is tight. Output: `build/video_silent.mp4`; the end of the log lists shot
+`node render.mjs --project projects/<slug> > projects/<slug>/build/render.log 2>&1` in the background (Bash background mode);
+don't poll: wait for the notification and read the `RESULT` line (`build/last_result.txt`). Fewer workers if memory is tight. Output: `build/video_silent.mp4`; the end of the log lists shot
 errors to fix and re-render. When it finishes it records the video's QC problems in the channel lesson book (1.0.3,
 `channel/LESSONS.md`); add the user's review feedback with `node tools/retro.mjs --project projects/<slug> --note "..."`.
 

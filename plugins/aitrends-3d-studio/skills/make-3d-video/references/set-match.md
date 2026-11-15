@@ -1,4 +1,4 @@
-# Set match (1.0.5)
+# Cast and set match (1.0.5, 2.2)
 
 SKILL.md Stage 1b holds the steps. Read this file only for the needs.json schema or when adding a set to the plugin.
 
@@ -7,14 +7,18 @@ SKILL.md Stage 1b holds the steps. Read this file only for the needs.json schema
 {"places":  [{"name": "abandoned warehouse", "quote": "You hide in the old warehouse by the river.", "desc": "dark, crates, one bulb"}],
  "props":   [{"name": "pickle jar", "quote": "You open every jar in the kitchen."}],
  "actions": [{"name": "carry three people", "quote": "carrying three defenders at once"}],
- "fx":      [{"name": "rain storm", "quote": "A storm is rolling in"}]}
+ "fx":      [{"name": "rain storm", "quote": "A storm is rolling in"}],
+ "characters": [{"name": "astronaut", "quote": "An astronaut lands in your yard.", "desc": "white suit, adult man", "sex": "m", "age": "adult"}]}
 ```
+- `characters` (2.2): every person the script names or shows, extras included; `sex` m|f, `age` kid|teen|adult|old. Read by
+  `tools/cast_match.py`, which marks ✅ (a roster role), 🟡/❌ (a new role in `scenes/roles_new.js` from the suggested base).
 - One entry per distinct place (a school kitchen and a home kitchen are two), named in plain English.
 - Props the narration names or the story turns on; actions beyond walk / talk / stand; `desc` = what makes it readable on screen.
 
 ## Marks
 ✅ an alias covers most of the name (use it) · 🟡 one entry covers part of it (use it and adjust, or `use:` an alt) · ❌ nothing
-close (the user decides). The tool matches words: a ✅ can still be wrong for the story. Decisions are kept by name across re-runs.
+close. 2.2: ❌ defaults to `project` (built in this video) and 🟡 to `use:<nearest>`, without asking; `--ask` keeps them open for
+the user. The tool matches words: a ✅ can still be wrong for the story. Decisions are kept by name across re-runs.
 
 ## Commands
 `--decide "<name>=plugin|project|use:<id>"` · `--added "<name>=<id>"` (set is in the studio) · `--check` / `--shots` (render.mjs
@@ -30,6 +34,11 @@ wishlist) · `--list sets|props|actions|fx` · `--verify-catalog` (verify_kit ru
   `[[pos], [look], fov, [heroX, heroZ]]`, `hero: false`). Short names past videos used go in `names`.
 - `python tools/set_match.py --verify-catalog`, `node render.mjs --catalog <id>`; open that still yourself, fix, send it.
 - Document it in `references/engine-api.md`; add the file to `tools/verify_kit.py`.
+
+## After the video: promote (2.2)
+`python tools/promote.py --project projects/<slug>` proposes everything the video built for itself (roles, sets, props, effects),
+with uses, the past videos that needed the same, advice and stills. Only the items the user says yes to are recorded (`--accept`)
+and released: roles with `--apply-role` into the studio's and the plugin kit's `channel/cast.js`, sets by "Adding a set" above.
 
 ## Wishlist
 `channel/set_wishlist.json`: "project" choices (status wanted, with the videos that needed them), sets in the studio waiting for

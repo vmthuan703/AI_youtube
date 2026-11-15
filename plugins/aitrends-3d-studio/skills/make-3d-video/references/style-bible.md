@@ -50,7 +50,7 @@ simple characters, real staging, real light.
   `lashes`, a `skirt` under a tee or hoodie, or a `dress`. Boys: `curls`, `quiff`, `sidePart`, `slick`, short hair, caps (`cap`/`capBack`), beanies.
   Adults: `suit` + `tie`, `vest` (dealer, waiter), `labcoat`, `scale` 1.1–1.2. `blush` only on a character the story calls for, not by default.
 - **Roles read at a glance.** A nurse wears scrubs and a nurse cap, a doctor a stethoscope, a teacher a lanyard, police a cap and badge, a coach a whistle:
-  take them from the roster in `channel/cast.js` (engine-api.md → Role roster). Age shows in the body, not in white hair: older people get ash-grey hair `#8e8a94`
+  take them from the roster in `channel/cast.js` (engine-api/characters.md → Role roster). Age shows in the body, not in white hair: older people get ash-grey hair `#8e8a94`
   (mid value, never near-white), balding, grey `brows`, glasses, a stoop (`hunch`) or a cane. Whites stay dimmed (`#d2d3da` lab coats, `#bdb8b0` chef jackets) and
   hats never throw a shadow band across the face. A role's detail is small; the hero is still the loudest thing in every frame.
 - **Legs:** bare stick legs and round feet by default, hero included. Add `legs` or `shoes` only when the story needs them (a suit, a uniform, sports).

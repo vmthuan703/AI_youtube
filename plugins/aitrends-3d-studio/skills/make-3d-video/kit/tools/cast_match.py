@@ -138,7 +138,7 @@ def main():
         what = f"dùng {dec[4:]}" if dec.startswith("use:") else (f"vai mới {r['id']} (từ {defined[r['id']]['base']}) ✓ đã có trong roles_new.js" if r["id"] in defined else f"vai mới {r['id']} (từ {dec[4:]}) — cần viết")
         print(f"  {icon[r['status']]} {n:<18} {what}")
     if todo:
-        print("Viết trong scenes/roles_new.js (mỗi vai một dòng, bắt đầu từ vai gốc; trang phục: engine-api.md -> Characters):")
+        print("Viết trong scenes/roles_new.js (mỗi vai một dòng, bắt đầu từ vai gốc; trang phục: references/engine-api/characters.md):")
         print("  import { " + ", ".join(sorted({r['decision'][4:] for _, r in todo})) + " } from '/channel/cast.js';")
         for n, r in todo:
             print(f"  export const {r['id']} = {{ ...{r['decision'][4:]}, /* {r['desc'] or n} */ }};   // role: {n}")

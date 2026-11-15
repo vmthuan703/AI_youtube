@@ -4,7 +4,7 @@
 
 A character passes when it is a roster role, a role of this video in scenes/roles_new.js (2.2), or a roster role with a few changes: `{ ...BESTIE, speaker: 'LILY' }`, `BRO_2`, `[...STUDENTS]`,
 or a list whose items all start from a roster role. An outfit written from scratch (`{ top: 'hoodie', color: … }`) fails: pick the nearest role
-(engine-api.md, Role roster; a second or third girl is CLASSMATE_2 / CLASSMATE_3, background kids are STUDENTS) and change one colour or the hair.
+(references/engine-api/characters.md, Role roster; a second or third girl is CLASSMATE_2 / CLASSMATE_3, background kids are STUDENTS) and change one colour or the hair.
 Exit code 1 when something fails.
 """
 import argparse, os, re, sys
@@ -76,6 +76,6 @@ for name, expr in local.items():
     ok = base_ok(expr)
     if not ok: bad += 1
     print(f"{'PASS' if ok else 'FAIL'}  {name:<14} {expr[:70].replace(chr(10), ' ')}")
-print(f"{len(local) - bad}/{len(local)} characters come from the roster." + ("" if not bad else "  Dress the FAIL ones from a roster role (engine-api.md, Role roster)."))
+print(f"{len(local) - bad}/{len(local)} characters come from the roster." + ("" if not bad else "  Dress the FAIL ones from a roster role (references/engine-api/characters.md, Role roster)."))
 if PROJECT_ROLES: print(f"{len(PROJECT_ROLES)} project role(s) from roles_new.js: {', '.join(sorted(PROJECT_ROLES))} (promote.py offers them to the roster after the video)")
 sys.exit(1 if bad or bad_new else 0)

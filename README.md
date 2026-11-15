@@ -14,66 +14,66 @@
 <!-- DAILY:START -->
 ## Báo cáo hôm nay
 
-_Cập nhật tự động 2026-11-14. Số liệu từ YouTube Data API, đối chiếu bằng tay trước khi quyết định._
+_Cập nhật tự động 2026-11-15. Số liệu từ YouTube Data API, đối chiếu bằng tay trước khi quyết định._
 
-### Tóm tắt thu thập 2026-11-14
+### Tóm tắt thu thập 2026-11-15
 
 - Quota đã dùng: 2182 / ngân sách 6000 đơn vị
-- Kênh theo dõi: 59 · video đã chụp: 1593
+- Kênh theo dõi: 59 · video đã chụp: 1632
 
 #### What-If Fiction × Mỹ
 
 - Truy vấn đã chạy: 20 · bỏ qua: 0 · lỗi: 0
 - Kênh mới thêm vào theo dõi: The Hidden Why
-- Kênh bỏ khỏi theo dõi vì lệch ngách: The Hidden Why (25% khớp)
-- Bảng chấm nhanh (chỉ dữ liệu hôm nay): **CẦN THEO DÕI** · tuổi trung vị top 5: 57.6 tháng · video ≥ 100k: 332
+- Kênh bỏ khỏi theo dõi vì lệch ngách: The Hidden Why (33% khớp)
+- Bảng chấm nhanh (chỉ dữ liệu hôm nay): **CẦN THEO DÕI** · tuổi trung vị top 5: 57.7 tháng · video ≥ 100k: 347
 
 | Kênh mới thắng | Tuổi (ngày) | Sub | Video to nhất |
 |---|---|---|---|
-| Minute Zero | 34 | 23.300 | 2.375.898 |
-| ConChaser | 21 | 26.400 | 1.965.567 |
-|  Jeremy Bearimy | 34 | 56.500 | 1.956.590 |
-| Araragi | 126 | 24.600 | 1.514.120 |
-| The Hidden Why | 36 | 2.940 | 1.480.214 |
-| Hypo Room | 12 | 13.000 | 1.350.449 |
-| OminiAM | 39 | 7.560 | 1.236.675 |
-| IFOLOGY | 35 | 58.600 | 1.008.020 |
-| Manifesting | 30 | 5.770 | 975.721 |
-| Earth Tipping | 45 | 1.510 | 972.377 |
+| Minute Zero | 35 | 23.400 | 2.384.556 |
+| ConChaser | 22 | 27.600 | 2.056.053 |
+|  Jeremy Bearimy | 35 | 57.900 | 1.979.096 |
+| The Hidden Why | 37 | 3.130 | 1.555.191 |
+| Araragi | 127 | 24.900 | 1.532.337 |
+| Hypo Room | 13 | 17.400 | 1.391.370 |
+| OminiAM | 40 | 7.780 | 1.257.114 |
+| Questionverse | 12 | 10.500 | 1.057.902 |
+| IFOLOGY | 36 | 59.100 | 1.017.916 |
+| Manifesting | 31 | 5.800 | 976.214 |
 
-Xem thêm: [dữ liệu ngày 2026-11-14](https://github.com/vmthuan703/AI_youtube/blob/research/reports/data/2026-11-14/TOM_TAT.md)
+Xem thêm: [dữ liệu ngày 2026-11-15](https://github.com/vmthuan703/AI_youtube/blob/research/reports/data/2026-11-15/TOM_TAT.md)
 
 <!-- DAILY:END -->
 
 <!-- WEEKLY:START -->
 ## Báo cáo tuần mới nhất
 
-_Báo cáo 2026-W45 · nguồn `SO_LIEU.md`. Chỉ trích phần đầu, bản đầy đủ ở link bên dưới._
+_Báo cáo 2026-W46 · nguồn `SO_LIEU.md`. Chỉ trích phần đầu, bản đầy đủ ở link bên dưới._
 
 #### Bảng chấm ô
 
 | Điều kiện | Ngưỡng | Số đo | Kết quả |
 |---|---|---|---|
-| Có kênh ≤ 3 tháng đã có video ≥ 100k | có |  Jeremy Bearimy, ConChaser, DOOMPERK, Earth Tipping, IFANIME (+37 kênh) | đạt |
-| Tuổi trung vị 5 kênh có video to nhất | ≤ 12 tháng | 57.4 tháng (ngày tạo kênh, video cũ nhất) | không |
-| view/sub trung vị (5 kênh đó) | ≥ 10× | 77.3 | đạt |
-| Số video dài ≥ 100k | ≥ 8 (cần, không đủ) | 283 | đạt |
-| View trung vị của video ≥ 100k | 150k–600k | 248.532 | đạt |
+| Có kênh ≤ 3 tháng đã có video ≥ 100k | có |  Jeremy Bearimy, Any Minute Now, ConChaser, DOOMPERK, Earth Tipping (+44 kênh) | đạt |
+| Tuổi trung vị 5 kênh có video to nhất | ≤ 12 tháng | 57.7 tháng (ngày tạo kênh, video cũ nhất) | không |
+| view/sub trung vị (5 kênh đó) | ≥ 10× | 74.5 | đạt |
+| Số video dài ≥ 100k | ≥ 8 (cần, không đủ) | 362 | đạt |
+| View trung vị của video ≥ 100k | 150k–600k | 270.580 | đạt |
 | Kênh đúng ngách (top 5, tự động theo tiêu đề) | ≥ 80% | 2/2 kênh có đủ tiêu đề | — |
 
 5 kênh có video to nhất (dùng cho 3 dòng tuổi, view/sub, đúng ngách; **cần đọc tay xác minh đúng ngách**, kênh sai thì thêm vào `exclude_channels` trong config):
 
 | Kênh | Tuổi (ngày) | Sub | Video to nhất | Tỉ lệ tiêu đề khớp |
 |---|---|---|---|---|
-| Ifverse | 1.746 | 60.800 | 4.701.947 | chưa theo dõi |
-| Minute Zero | 29 | 22.400 | 2.321.374 | 100% |
-| Peekaboo Kidz | 4.537 | 7.920.000 | 1.910.634 | chưa theo dõi |
-| Kian Odyssey | 2.405 | 4.960 | 1.873.995 | chưa theo dõi |
-| Itadorists | 320 | 42.900 | 1.849.487 | 85% |
+| Papa Joel | 2.736 | 3.030.000 | 4.942.895 | chưa theo dõi |
+| Ifverse | 1.753 | 62.900 | 4.733.752 | chưa theo dõi |
+| Joe Bartolozzi | 2.357 | 6.250.000 | 2.496.384 | chưa theo dõi |
+| Minute Zero | 36 | 23.400 | 2.384.556 | 100% |
+| ConChaser | 22 | 27.600 | 2.056.053 | 100% |
 
 **Kết luận số: CẦN THEO DÕI.** Tuổi kênh dự báo mạnh nhất. View trung vị càng cao thì cửa càng đóng.
 
-Xem thêm: [báo cáo đầy đủ 2026-W45](https://github.com/vmthuan703/AI_youtube/blob/research/reports/reports/2026-W45/SO_LIEU.md) · [mọi báo cáo tuần](https://github.com/vmthuan703/AI_youtube/blob/research/reports/reports/INDEX.md)
+Xem thêm: [báo cáo đầy đủ 2026-W46](https://github.com/vmthuan703/AI_youtube/blob/research/reports/reports/2026-W46/SO_LIEU.md) · [mọi báo cáo tuần](https://github.com/vmthuan703/AI_youtube/blob/research/reports/reports/INDEX.md)
 
 <!-- WEEKLY:END -->
 

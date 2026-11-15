@@ -2,7 +2,7 @@
 name: make-3d-video
 description: "This skill should be used when the user wants a narrated 3D animated story video from a SCRIPT in the aiTrends 3D style (toy-like 3D stick characters with big round heads, a loud channel hero in a lime puffer, American sets with real depth, a film picture with sky, sun, weather, haze and god rays, a 2:1 picture, animated explainer diagrams), e.g. \"make a 3D video from this script\", \"turn my script into a 3D animation\", \"tạo video 3D từ kịch bản\", \"làm video what if 3D\", \"animate this story in 3D\", or \"do the whole 3D video\", also from a bare idea in ONE prompt (it writes the script, stops once for the script, then runs to the MP4). It runs the full pipeline: channel settings, script check, emotional voiceover (Chatterbox, with Kokoro as fallback) with word timings, story breakdown, cast and set match (builds what the kit lacks inside the video and proposes it for the plugin afterwards), style and palette choice, 3D scene building, rendering up to 4K/60 fps, music, SFX, scorecard, the final MP4 and cinematic thumbnail options for it.\n"
 metadata:
-  version: "2.2.0"
+  version: "2.3.0"
   author: aiTrends
 ---
 
@@ -16,7 +16,7 @@ every script; the style and the channel's hero stay fixed. Version history: the 
 `kit/channel/` holds the channel's choices (`brand.json`, `cast.js` roster) and is never overwritten by updates. References, read
 only when a stage says so: `voiceover.md`, `style-bible.md` (the look), `story-breakdown.md`, `set-match.md` (needs.json schema,
 adding a set), `engine-api.md` (core API; `engine-api/stage.md`, `characters.md`, `sets.md` are for grep, not for reading whole),
-`sound-design.md`, `render-qc.md`, `thumbnails.md`. In the studio, `examples/INDEX.md` maps every engine call to the example lines
+`sound-design.md`, `render-qc.md`, `thumbnails.md`, `templates.md` (2.3 shot templates) and `cheatsheet-template.md`. In the studio, `examples/INDEX.md` maps every engine call to the example lines
 that use it.
 
 Stage commands re-run one stage: `/new-3d-video` (1–4), `/3d-video-styles` (5), `/render-3d-video` (6, 8), `/3d-video-sound` (7),
@@ -34,20 +34,44 @@ Stage commands re-run one stage: `/new-3d-video` (1–4), `/3d-video-styles` (5)
    plugin or the channel roster without the user's yes.
 7. **Files are the truth.** Each video lives in `aitrends-3d-studio/projects/<slug>/`; `story/shots.json` owns timing.
 
-## Token budget (2.2): how to run this cheaply
-Every turn re-sends the whole conversation, so cost = turns × context. Keep both small:
+## Token budget (2.3): how to run this cheaply
+Every turn re-sends the whole conversation, so cost = turns × context. Measured on 2.1/2.2 runs: the main conversation (31%),
+hand-written shot batches (27%), a late fix-all-QC pass (24%) and the script gate (13%). Keep turns and context small:
+- **Three sessions per video** (see "Sessions and hand-over"): the main conversation never carries a finished phase.
+- **The plugin's own agents, not general-purpose** (they load 6–8 tools instead of ~50): `aitrends-3d-studio:script-gate`
+  (Stage 0), `aitrends-3d-studio:kit-builder` (Stage 6a, Stage 9), `aitrends-3d-studio:shot-builder` (each Stage 6 batch).
+  Their standing rules live in the agent; the brief is only paths, ids and what is special about this run.
+- **Templates for routine shots** (`references/templates.md`): only special shots are hand-written.
+- **0 red inside every batch**: a batch is not done with a red; there is no fix-everything pass at the end.
 - **Long commands run in the background and you wait for the notification.** Voiceover, final render, mix, thumbnails: start them
   with the Bash tool's background mode and do not poll the log. Every `render.mjs` run ends with one line `RESULT ok|fail …`
   (also in `build/last_result.txt`): read that line only. Open more of the log only when it says `fail`.
 - **Check fixes on a small sheet.** After the first full sheet, use `--sheet --changed` (only shots whose files changed) or
   `--sheet --only s004,s007`, and `--qc --only …` for motion. Run `--qc` before opening any image; open a sheet once per fix round.
   Never re-open a sheet you already looked at.
-- **Delegate the heavy stages to subagents** (Agent tool, general-purpose), one at a time (they share the GPU), each with a
-  self-contained brief (paths, shot ids, what done means) and a 5–10 line report back: Stage 0 (mức Sâu), each Stage 6 batch,
-  new roles and sets, Stage 9. The main conversation keeps the plan, the decisions and the user; it does not read engine code.
+- **Delegate the heavy stages to those agents**, one at a time (they share the GPU), each with a short brief (studio path,
+  project, plugin references folder `<this skill>/references`, ids, what done means) and a short report back. The main
+  conversation keeps the plan, the decisions and the user; it does not read engine code, shot code or sheets the agents opened.
+- **Short renders run in the foreground** (sheet, `--qc`, stills: minutes) and you read the RESULT line; no sleep/until loops.
 - **Read references by need, not up front:** `engine-api.md` core once; grep `engine-api/*.md` and `examples/INDEX.md` for a call,
   then read only those lines. Don't read example folders or engine source to find an API.
-- **One video per session.** Plugin work found along the way goes to its own session (or the promote step), not into this one.
+- **One video per session, one phase per session.** Plugin work found along the way goes to its own session (or the promote
+  step), not into this one.
+
+## Sessions and hand-over (2.3)
+A video runs in three sessions; `projects/<slug>/story/STATE.md` (made by `new_project.py`) carries everything between them.
+| Phase | Stages | Ends with |
+|---|---|---|
+| A | 0–5: script gate, check, cast/set match, voice, timeline, breakdown, style | shots.json + bible.md + STATE.md "next: Stage 6a" |
+| B | 6: kit and templates, manual batches, full QC | every shot built, `--qc` 0 red, STATE.md "next: Stage 7" |
+| C | 7–9: sound, preview, final render, mix, thumbnails, lessons, promote | the MP4, thumbnails, promote proposal |
+- **Write STATE.md as you go**, not only at the end: every decision with its reason, every piece of user feedback in their words
+  (also `retro.mjs --note`), open issues, the phase and the next step. Keep it under ~60 lines.
+- **At the end of a phase:** update STATE.md, then move on in a fresh session. In the desktop app hand the next phase off to a new
+  session (brief: `/make-3d-video tiếp <slug>`); elsewhere tell the user to open a new session and type that. In a one-prompt
+  run with nobody to answer, hand off when the app can; if it cannot, continue here.
+- **`/make-3d-video tiếp <slug>` (or "continue <slug>")**: read `projects/<slug>/story/STATE.md` and only the stage sections of
+  this skill that the next step needs; don't re-read the script, the bible or earlier reports unless STATE.md says to.
 
 ## One-prompt run: `/make-3d-video <idea or script>`
 Run every stage with the channel defaults (`channel/brand.json`: voice, `cine` style, format, export quality) and stop **once**:
@@ -64,12 +88,14 @@ Run every stage with the channel defaults (`channel/brand.json`: voice, `cine` s
 
 ## Stage 0: Script depth gate (default: mức Sâu)
 Before any voice is generated. The user can say "mức chuẩn" or "bỏ qua mức" for one video. When the repo has
-`prompts/MUC_SAU_VIET_SCRIPT.md`, **run it in one subagent** (it reads that file and `QUY_TAC_VIET_SCRIPT_KENH.md` itself) and
-get back only the passing script's path, its score table and the open issues:
+`prompts/MUC_SAU_VIET_SCRIPT.md`, **run it in one `aitrends-3d-studio:script-gate` agent** (it reads that file and
+`QUY_TAC_VIET_SCRIPT_KENH.md` itself, runs every role as an `aitrends-3d-studio:script-reviewer` agent, reuses the past-scripts
+index when no script is newer) and get back only the passing script's path, its score table and the open issues:
 - The file holds the steps and the gate (logic no P0, facts no false item, template risk ≤ 3, every factor ≥ 7, fantasy ≥ 8,
   total ≥ 8). 3D changes: no "TTS editor" reviewer; the cast rule (hero boy, best friend girl, roster roles). A script the user
   brought is scored, never rewritten. After 3 rounds without a pass, show the best version; differences under ~0.5 are noise.
-- Token use per step goes to `deep/token_ledger.md`. Then continue with Stage 1 on the passing script.
+- Token use per step goes to the work folder's `token_ledger.md` (written once at the end). Then continue with Stage 1 on the
+  passing script.
 
 ## Stage 1: Intake and script check
 - `node tools/retro.mjs --next` and read `channel/LESSONS.md`; tell the user the top 3 items and apply them.
@@ -134,19 +160,27 @@ build the 1–2 main sets and 3 shots (a wide with ≥ 2 characters, a `dof` clo
 --palette <p> --stills …`). Open `build/styles/style_grid.png` and describe each option in one line; the other styles and the
 palettes are listed in `3d-video-styles`. Save the picks in `config.json` → `style`, `palette`.
 
-## Stage 6: Build every shot (batches of 8–12, one subagent per batch)
-Brief each batch subagent with: the studio and project paths, the shot ids and their shots.json lines, `story/bible.md`, the new
-roles and project sets it must build or reuse, and this loop:
-1. Read `references/engine-api.md` (core) once; find calls in `examples/INDEX.md` and `engine-api/*.md` with grep and read only
-   those lines. Write `scenes/sets/<location>.js` (reusable builders on `T.W.*`) and `scenes/shots/NN_<name>.js` with
-   `registerShot('<id>', { init, draw, overlay? })`.
-2. `node render.mjs --project projects/<slug> --sheet --scale 0.4 --only <batch ids>` → fix every RESULT problem (MISSING, shot
-   errors), then `--qc --only <ids>` to 0 red, then open `build/sheets/sheet_only.png` once against the QC checklist in `render-qc.md`.
-3. Fix rounds use `--sheet --changed` (only the shots just edited). Motion of people: `--gif <ids>` for the shots with action.
-4. Report: shots done, the last RESULT lines, anything left open, the sheet path. The main conversation opens that sheet once.
+## Stage 6: Build every shot (phase B: templates first, then special shots in batches)
+**6a. Kit and templates: one `aitrends-3d-studio:kit-builder` agent.** Brief: studio and project paths, the plugin references
+folder, the sets and roles the set/cast match marked `project`/new, the video's signature device. It builds the project sets and
+roles, `scenes/_places.js`, `story/tpl_spec.py` (routine shots as data, special shots listed in MANUAL), runs
+`python tools/gen_shots.py --project projects/<slug> --batches`, brings every template shot to `--qc` 0 red, and writes
+`story/CHEATSHEET.md` (`references/templates.md`, `references/cheatsheet-template.md`). Expect 45–60% template shots; the hook, the
+climax, reveals, hands on props and story effects stay hand-made. Open its sheet once.
 
-The shot rules (depth, sun, acting, contact, props, explainers, light limits) are in `render-qc.md` → "Shot non-negotiables": the
-subagent reads that section; the QC checklist in the same file is what the sheet is judged against.
+**6b. Special shots: one `aitrends-3d-studio:shot-builder` agent per batch** in `story/batches.json`, one at a time. The brief
+is only: studio path, project, plugin references folder, batch id (its slice has the shots and the template shots around them),
+and anything special the user asked for in those shots. The agent's own rules cover the rest: it reads the cheat sheet, the slice
+and its bible rows, loops sheet → `--qc` 0 red → sheet once, stops at 60 tool calls, and lists every `qcIgnore` it added.
+- A batch reporting any red, or a `qcIgnore` you don't agree with, goes back to the same agent (SendMessage) with the shot ids,
+  not to a new fix-everything agent.
+- Read its report, then open its sheet once. Note the batch in STATE.md.
+
+**6c. Close phase B:** `node render.mjs --project projects/<slug> --qc` in the background (the whole video; the RESULT line
+names every `qcIgnore`), fix any red through the batch that owns the shot, then STATE.md "next: Stage 7" and hand over.
+
+The shot rules (depth, sun, acting, contact, props, explainers, light limits) are in `render-qc.md` → "Shot non-negotiables";
+the templates follow them by construction, and the QC checklist in the same file is what every sheet is judged against.
 
 ## Stage 7: Sound
 Read `sound-design.md`. Fill `story/shots.json` → `music` (contiguous mood sections), per-shot `sfx` cues and `amb` beds. Mixing
@@ -175,8 +209,8 @@ Read `render-qc.md`.
 7. Clean up once the user has the file and a thumbnail: `python tools/tidy_project.py --project projects/<slug>` (keeps `out/`,
    moves the rest to a folder for the user to delete; deletes nothing).
 
-## Stage 9: Thumbnails, always, right after the MP4 (one subagent)
-The subagent reads `thumbnails.md` and follows it (3 or 4 poster moments that differ in place, hour or reaction; the hero's face
+## Stage 9: Thumbnails, always, right after the MP4 (one `aitrends-3d-studio:kit-builder` agent)
+The agent reads `thumbnails.md` and follows it (3 or 4 poster moments that differ in place, hour or reaction; the hero's face
 fits the moment; at least one option without text; `--qc` 0 red, `--thumbs`, `thumb_sheet.mjs` with no `✗`) and reports the sheet
 path and one line per option.
 Send `build/thumbs/sheet.jpg` with the MP4 and your pick; copy the chosen JPG to `out/Thumbnail.jpg`. In a staged run, name the

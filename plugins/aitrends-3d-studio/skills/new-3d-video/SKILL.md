@@ -2,7 +2,7 @@
 name: new-3d-video
 description: "This skill should be used when the user runs /new-3d-video or asks to \"start a new 3D video\", \"set up a 3D video from this script\", \"make the voiceover for my 3D video\", \"time my script\", or \"plan the 3D shots for my script\" in the aiTrends 3D Studio. It covers channel settings and the script check, installing or checking the studio, the Chatterbox voiceover with word timings, creating the project, and the story breakdown with the shot list.\n"
 metadata:
-  version: "0.2.0"
+  version: "0.3.0"
   author: aiTrends
 ---
 
@@ -12,7 +12,9 @@ Stages 1–4 of the aiTrends 3D Studio pipeline. Shared references live in `../m
 this skill's base directory); the studio kit is `../make-3d-video/kit/`.
 
 ## 0. Script depth gate (default: mức Sâu)
-Before the survey and before any voice: follow `../make-3d-video/SKILL.md` → Stage 0 (8-step Sâu process, blind council, gate:
+This is phase A of a video (`../make-3d-video/SKILL.md` → "Sessions and hand-over"): keep `story/STATE.md` up to date and end the
+phase by handing over to a new session. Before the survey and before any voice: follow `../make-3d-video/SKILL.md` → Stage 0 in one
+`aitrends-3d-studio:script-gate` agent (8-step Sâu process, blind council, gate:
 logic no P0, facts correct, template risk <= 3, every factor >= 7, fantasy >= 8, total >= 8). "mức chuẩn" or "bỏ qua mức" skips
 it for one video. A user-brought script is scored, not rewritten. Only a gate-passing (or user-chosen) script goes on to step 1.
 
@@ -50,5 +52,5 @@ Read `../make-3d-video/references/style-bible.md` and `story-breakdown.md` fully
 `scenes/cast.js` (hero and every other character from the `/channel/cast.js` roster, extras included: `CLASSMATE_2/3`, `BRO_2`, `RIVAL_2`, `STUDENTS`; `speaker` on every speaking character; `python tools/cast_check.py --project projects/<slug>` must pass) and the rewritten `story/shots.json` (locations from `story/set_match.json`), and send a 5–10 line summary (cast with colours, locations, palette,
 signature device, shot count, highlights per act).
 
-Finish by saying the next step is `/3d-video-styles` (or continue with `make-3d-video` if the user asked for the whole
-video).
+Finish by writing STATE.md (phase A done, next: Stage 5 `/3d-video-styles` or Stage 6) and saying the next step runs in a new
+session: `/make-3d-video tiếp <slug>`.

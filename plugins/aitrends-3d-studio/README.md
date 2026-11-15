@@ -7,6 +7,13 @@ khung hình 2:1, sơ đồ giải thích hoạt hình.
 Mọi khung hình đều dựng bằng code (Three.js) và render từng khung một. Không dùng AI tạo ảnh/video, nên nhân vật
 giữ nguyên dáng suốt video và chữ luôn nét. Giọng đọc mặc định dùng Chatterbox (MIT, chạy máy cá nhân), dự phòng Kokoro-82M (Apache-2.0).
 
+## Mới trong 2.3.0 — dựng shot bằng mẫu, agent riêng, mỗi giai đoạn một phiên
+- **Mẫu cho shot thường** (`engine/templates3d.js`, `tools/gen_shots.py`, `references/templates.md`): shot thiết lập bối cảnh, toàn cảnh, đối thoại, phản ứng, cận cực, insert, đi bộ và sân khấu tím chỉ là một dòng dữ liệu trong `story/tpl_spec.py`. Mỗi video viết `scenes/_places.js` một lần (bối cảnh, vị trí đứng, nhân vật, đạo cụ, hiệu ứng); shot tự sinh vào `scenes/shots/auto_*.js`. Shot đặc biệt (mở đầu, cao trào, tiết lộ, tay cầm đạo cụ, hiệu ứng) vẫn viết tay theo batch, dùng chung bối cảnh. Đo trên "Helping the Wrong Way": 124/215 shot từ mẫu, render giống hệt từng pixel bản thử.
+- **Agent riêng của plugin** (`agents/`): `script-gate`, `script-reviewer` (mức Sâu), `kit-builder` (bộ dựng chung, mẫu, thumbnail), `shot-builder` (từng batch shot đặc biệt). Mỗi agent chỉ có 6–8 công cụ thay vì ~50, luật cố định nằm trong agent nên brief rất ngắn.
+- **0 lỗi đỏ trong từng batch**, tối đa 60 lượt gọi công cụ mỗi batch, không còn bước "sửa hết lỗi QC" cuối video; dòng `RESULT` của `--qc` liệt kê mọi `qcIgnore`.
+- **Mỗi giai đoạn một phiên:** A (script → giọng → phân cảnh), B (dựng shot), C (âm thanh → render → giao). `new_project.py` tạo `story/STATE.md` ghi quyết định, phản hồi và bước tiếp; phiên mới chỉ cần `/make-3d-video tiếp <slug>`.
+- **Cheat sheet theo video** (`references/cheatsheet-template.md`): batch chỉ đọc một trang API của video thay vì tài liệu tham chiếu.
+
 ## Mới trong 2.2.0 — ít token hơn, tự lo nhân vật và bối cảnh còn thiếu
 - **Khớp nhân vật** (`tools/cast_match.py`): kịch bản cần ai thì ghi vào `story/needs.json` → `characters`, so với roster của kênh: ✅ có sẵn, 🟡/❌ tự tạo vai mới trong `scenes/roles_new.js` từ vai gốc gần nhất. `node render.mjs --project P --roles` dựng ảnh mỗi vai mới (trước, ¾, nghiêng, cạnh hero). `cast_check.py` chấp nhận các vai này.
 - **Khớp bối cảnh không dừng hỏi:** ❌ tự dựng riêng trong video, 🟡 dùng mục gần nhất (`set_match.py --ask` để quay lại cách cũ).

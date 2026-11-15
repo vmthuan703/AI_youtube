@@ -7,6 +7,14 @@ khung hình 2:1, sơ đồ giải thích hoạt hình.
 Mọi khung hình đều dựng bằng code (Three.js) và render từng khung một. Không dùng AI tạo ảnh/video, nên nhân vật
 giữ nguyên dáng suốt video và chữ luôn nét. Giọng đọc mặc định dùng Chatterbox (MIT, chạy máy cá nhân), dự phòng Kokoro-82M (Apache-2.0).
 
+## Mới trong 2.2.0 — ít token hơn, tự lo nhân vật và bối cảnh còn thiếu
+- **Khớp nhân vật** (`tools/cast_match.py`): kịch bản cần ai thì ghi vào `story/needs.json` → `characters`, so với roster của kênh: ✅ có sẵn, 🟡/❌ tự tạo vai mới trong `scenes/roles_new.js` từ vai gốc gần nhất. `node render.mjs --project P --roles` dựng ảnh mỗi vai mới (trước, ¾, nghiêng, cạnh hero). `cast_check.py` chấp nhận các vai này.
+- **Khớp bối cảnh không dừng hỏi:** ❌ tự dựng riêng trong video, 🟡 dùng mục gần nhất (`set_match.py --ask` để quay lại cách cũ).
+- **Cuối video đề xuất thêm vào plugin** (`tools/promote.py`): bảng vai mới, bối cảnh, đạo cụ, hiệu ứng video tự tạo, kèm số cảnh dùng, video trước cũng cần, lời khuyên và ảnh. Chỉ thêm mục bạn đồng ý; vai mới vào roster bằng `--apply-role`.
+- **Giảm token:** mỗi lần chạy `render.mjs` kết thúc bằng một dòng `RESULT` (cũng ở `build/last_result.txt`); render, mix, voice chạy nền và chờ thông báo thay vì đọc log liên tục; `--sheet --changed` / `--only id,id` chỉ dựng lại cảnh vừa sửa (cả `--qc`, `--gif`); dựng cảnh, mức Sâu và thumbnail chạy trong subagent.
+- **Tài liệu gọn:** SKILL.md chính 28 KB → khoảng 19 KB; `engine-api.md` tách thành phần chính + `engine-api/stage.md`, `characters.md`, `sets.md` để tra bằng grep; `examples/INDEX.md` (sinh bằng `tools/example_index.py`) chỉ ra dòng ví dụ của từng lệnh engine; quy tắc dựng cảnh chuyển sang `render-qc.md` → "Shot non-negotiables".
+- `characters.md` có thêm cách tạo vai mới và danh sách mọi khóa trang phục.
+
 ## Mới trong 2.1.1 — cổng kịch bản mức Sâu trước khi lồng tiếng
 - **Bước 0 trong `/new-3d-video` và `/make-3d-video`:** mặc định chạy quy trình mức Sâu (30 ý, 3 bản độc lập, hội đồng chấm mù, tối đa 3 vòng sửa) trước khảo sát, `script_check` và mọi bước tạo giọng đọc.
 - **Cổng chặn:** logic không P0, kiểm chứng không sai, rủi ro khuôn mẫu ≤ 3, mọi nhân tố ≥ 7, giả tưởng ≥ 8, điểm tổng ≥ 8. Sau 3 vòng không qua thì dừng để bạn chọn bản.

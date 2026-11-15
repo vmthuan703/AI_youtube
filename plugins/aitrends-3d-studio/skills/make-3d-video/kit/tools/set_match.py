@@ -1,7 +1,8 @@
 """tools/set_match.py — 1.0.5 match a script against the kit's catalogue (engine/catalog.json) BEFORE any shot is built.
 
-The user reads the result (story/set_match.md, in Vietnamese) and decides, for every place / prop / effect the kit does not have,
-whether to add it to the plugin, build it only in this video, or use a ready-made one instead. The pipeline waits for that choice.
+2.2: nothing waits for the user. Every place / prop / effect the kit does not have is built in this video ("project"), every near
+one uses the nearest entry; tools/promote.py offers the project builds to the plugin after the video. --ask restores the 1.0.5
+checkpoint (the user picks plugin / project / use:<id> for every missing item before shots are built).
 
   python tools/set_match.py --project projects/<slug> --script <file>          scan the script for everything the catalogue knows
          [--needs projects/<slug>/story/needs.json]                             + the list Claude wrote of what the story needs
@@ -24,6 +25,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CAT_PATH = os.path.join(ROOT, "engine", "catalog.json")
 WISH_PATH = os.path.join(ROOT, "channel", "set_wishlist.json")
 QUIET = [False]
+ASK = [False]   # 2.2: --ask keeps the old checkpoint (missing items wait for the user's choice)
 KINDS = {"places": "sets", "props": "props", "actions": "actions", "fx": "fx"}
 KIND_VI = {"sets": "Bối cảnh", "props": "Đạo cụ", "actions": "Động tác", "fx": "Thời tiết / hiệu ứng"}
 STOP = set("a an the of in on at to and or with his her their my your its is are was be by for from into out up down this that it he she you they we "
@@ -177,6 +179,15 @@ def build_report(P, script, needs_path, cat):
                 pref = next((x for x in cat["sets"] if x["id"] == e["prefer"]), None)
             items.append({"kind": kind, "name": need.get("name", ""), "quote": need.get("quote", ""), "desc": need.get("desc", ""), "status": status,
                           "use": (pref or e)["id"] if e else None, "alts": [a["id"] for a in alts], "decision": old_dec.get(need.get("name", ""))})
+            it = items[-1]
+            # 2.2: no stop for the user. A missing item is built in this video ("project") and a near one uses the nearest entry,
+            # unless --ask (the 1.0.5 checkpoint). promote.py offers the project builds to the plugin after the video.
+            if not it["decision"] and not ASK[0]:
+                if status == "missing":
+                    it["decision"], it["auto"] = "project", True
+                    wish_add(it["name"], it["desc"], os.path.basename(os.path.normpath(P)), "wanted", "set_match")
+                elif status == "near" and it["use"]:
+                    it["decision"], it["auto"] = "use:" + it["use"], True
     covered = {i["use"] for i in items if i["use"]}
     found = [{"kind": h["entry"]["_kind"], "id": k, "alias": h["alias"], "quote": h["quote"], "count": h["count"], "new": k not in covered}
              for k, h in hits.items()]
@@ -230,8 +241,10 @@ def write_md(P, res, cat):
     extra = [f["id"] for f in res["found"] if f["new"] and f["kind"] == "sets"][:5]
     if extra:
         L += ["", "Script còn nhắc tới (kiểm tra lại): " + ", ".join(f"`{x}`" for x in extra)]
-    if any(i["status"] == "missing" for i in rest):
+    if any(i["status"] == "missing" and not i.get("decision") for i in rest):
         L += ["", "Chọn cho mỗi ❌: **thêm vào plugin** · **dựng riêng trong video** · **dùng bối cảnh có sẵn** (tên)."]
+    elif any(i.get("auto") for i in rest):
+        L += ["", "2.2: ❌ được dựng riêng trong video, 🟡 dùng mục gần nhất; cuối video tools/promote.py đề xuất đưa vào plugin."]
     hot = [w for w in load_json(WISH_PATH, {"items": []})["items"] if w.get("status") == "wanted" and len(w.get("videos", [])) >= 2]
     if hot:
         L += ["", "Hàng chờ (≥ 2 video, nên đưa vào plugin): " + "; ".join(f"{w['name']} ({len(w['videos'])})" for w in hot)]
@@ -440,10 +453,12 @@ def main():
     ap.add_argument("--pending", action="store_true", help="sets in the studio waiting for the plugin release")
     ap.add_argument("--released", action="store_true", help="mark them released (after the plugin update)")
     ap.add_argument("--quiet", action="store_true", help="print only problems (render.mjs uses it)")
+    ap.add_argument("--ask", action="store_true", help="2.2: leave missing items undecided for the user (default: build them in this video)")
     ap.add_argument("--list", nargs="?", const="sets")
     ap.add_argument("--root", help="another studio folder for projects/ and channel/ (default: this kit)")
     a = ap.parse_args()
     QUIET[0] = a.quiet
+    ASK[0] = a.ask
     if a.root:
         global ROOT, WISH_PATH
         ROOT = os.path.abspath(a.root); WISH_PATH = os.path.join(ROOT, "channel", "set_wishlist.json")

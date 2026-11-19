@@ -14,34 +14,34 @@
 <!-- DAILY:START -->
 ## Báo cáo hôm nay
 
-_Cập nhật tự động 2026-11-19. Số liệu từ YouTube Data API, đối chiếu bằng tay trước khi quyết định._
+_Cập nhật tự động 2026-11-20. Số liệu từ YouTube Data API, đối chiếu bằng tay trước khi quyết định._
 
-### Tóm tắt thu thập 2026-11-19
+### Tóm tắt thu thập 2026-11-20
 
 - Quota đã dùng: 2182 / ngân sách 6000 đơn vị
-- Kênh theo dõi: 59 · video đã chụp: 1764
+- Kênh theo dõi: 59 · video đã chụp: 1800
 
 #### What-If Fiction × Mỹ
 
 - Truy vấn đã chạy: 20 · bỏ qua: 0 · lỗi: 0
 - Kênh mới thêm vào theo dõi: The Hidden Why
-- Kênh bỏ khỏi theo dõi vì lệch ngách: The Hidden Why (33% khớp)
-- Bảng chấm nhanh (chỉ dữ liệu hôm nay): **CẦN THEO DÕI** · tuổi trung vị top 5: 57.8 tháng · video ≥ 100k: 362
+- Kênh bỏ khỏi theo dõi vì lệch ngách: The Hidden Why (40% khớp)
+- Bảng chấm nhanh (chỉ dữ liệu hôm nay): **CẦN THEO DÕI** · tuổi trung vị top 5: 57.8 tháng · video ≥ 100k: 378
 
 | Kênh mới thắng | Tuổi (ngày) | Sub | Video to nhất |
 |---|---|---|---|
-| ConChaser | 25 | 30.200 | 2.515.126 |
-| Minute Zero | 39 | 23.600 | 2.408.254 |
-|  Jeremy Bearimy | 38 | 60.600 | 2.012.860 |
-| The Hidden Why | 40 | 3.480 | 1.663.833 |
-| Araragi | 130 | 25.400 | 1.577.112 |
-| Hypo Room | 16 | 22.400 | 1.455.961 |
-| OminiAM | 43 | 8.120 | 1.351.209 |
-| Questionverse | 15 | 12.300 | 1.181.238 |
-| DOOMPERK | 29 | 18.800 | 1.046.599 |
-| IFOLOGY | 39 | 60.600 | 1.038.486 |
+| ConChaser | 26 | 31.000 | 2.633.000 |
+| Minute Zero | 40 | 23.700 | 2.416.037 |
+|  Jeremy Bearimy | 39 | 61.700 | 2.019.697 |
+| The Hidden Why | 41 | 3.590 | 1.699.548 |
+| Araragi | 131 | 25.500 | 1.586.497 |
+| Hypo Room | 17 | 23.900 | 1.468.345 |
+| OminiAM | 44 | 8.210 | 1.390.411 |
+| Questionverse | 16 | 12.600 | 1.198.749 |
+| DOOMPERK | 30 | 20.100 | 1.152.005 |
+| IFOLOGY | 40 | 61.000 | 1.045.809 |
 
-Xem thêm: [dữ liệu ngày 2026-11-19](https://github.com/vmthuan703/AI_youtube/blob/research/reports/data/2026-11-19/TOM_TAT.md)
+Xem thêm: [dữ liệu ngày 2026-11-20](https://github.com/vmthuan703/AI_youtube/blob/research/reports/data/2026-11-20/TOM_TAT.md)
 
 <!-- DAILY:END -->
 

@@ -1,6 +1,6 @@
 {
   "snapshot_date": "2026-11-20",
-  "started_at": "2026-11-19T17:22:43.231197+00:00",
+  "started_at": "2026-11-20T16:57:30.903378+00:00",
   "quota_budget": 6000,
   "markets": {
     "whatif-us": {
@@ -36,29 +36,29 @@
         "The Hidden Why"
       ],
       "not_added_registry_full": [
-        "Matal",
         "Born in Lore",
+        "Matal",
         "AniFacade",
-        "Puck Pukish",
-        "Just Imagine if",
-        "Red Pill POV",
-        "Any Minute Now",
-        "Nearside",
-        "Ifable",
         "Real Aside",
+        "Puck Pukish",
+        "Any Minute Now",
+        "Red Pill POV",
+        "Nearside",
         "The Clipping Files",
-        "AniRew",
+        "Ifable",
         "Velo Recap",
         "Stick Saga",
         "Mirage",
-        "IFBEYOND",
         "Stick Knows",
+        "IfDatTrue",
         "WhatVerse",
-        "The Theoretical Space",
+        "Whim Walker",
+        "ODDJECTORY",
         "Gus Maybe",
-        "Iftales",
         "What If Goggles",
-        "Evrika!"
+        "Iftales",
+        "Evrika!",
+        "Goofy Woofy"
       ]
     }
   },
@@ -66,8 +66,8 @@
     "The Hidden Why (40% khớp)"
   ],
   "tracked_channels": 59,
-  "tracked_videos": 1800,
+  "tracked_videos": 1838,
   "tracking_skipped": [],
   "quota_used": 2182,
-  "finished_at": "2026-11-19T17:23:15.495490+00:00"
+  "finished_at": "2026-11-20T16:58:03.245985+00:00"
 }

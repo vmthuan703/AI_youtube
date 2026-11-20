@@ -19,27 +19,27 @@ _Cập nhật tự động 2026-11-20. Số liệu từ YouTube Data API, đối
 ### Tóm tắt thu thập 2026-11-20
 
 - Quota đã dùng: 2182 / ngân sách 6000 đơn vị
-- Kênh theo dõi: 59 · video đã chụp: 1800
+- Kênh theo dõi: 59 · video đã chụp: 1838
 
 #### What-If Fiction × Mỹ
 
 - Truy vấn đã chạy: 20 · bỏ qua: 0 · lỗi: 0
 - Kênh mới thêm vào theo dõi: The Hidden Why
 - Kênh bỏ khỏi theo dõi vì lệch ngách: The Hidden Why (40% khớp)
-- Bảng chấm nhanh (chỉ dữ liệu hôm nay): **CẦN THEO DÕI** · tuổi trung vị top 5: 57.8 tháng · video ≥ 100k: 378
+- Bảng chấm nhanh (chỉ dữ liệu hôm nay): **CỬA MỞ** · tuổi trung vị top 5: 1.3 tháng · video ≥ 100k: 378
 
 | Kênh mới thắng | Tuổi (ngày) | Sub | Video to nhất |
 |---|---|---|---|
-| ConChaser | 26 | 31.000 | 2.633.000 |
-| Minute Zero | 40 | 23.700 | 2.416.037 |
-|  Jeremy Bearimy | 39 | 61.700 | 2.019.697 |
-| The Hidden Why | 41 | 3.590 | 1.699.548 |
-| Araragi | 131 | 25.500 | 1.586.497 |
-| Hypo Room | 17 | 23.900 | 1.468.345 |
-| OminiAM | 44 | 8.210 | 1.390.411 |
-| Questionverse | 16 | 12.600 | 1.198.749 |
-| DOOMPERK | 30 | 20.100 | 1.152.005 |
-| IFOLOGY | 40 | 61.000 | 1.045.809 |
+| ConChaser | 27 | 31.600 | 2.739.973 |
+| Minute Zero | 41 | 23.700 | 2.422.728 |
+|  Jeremy Bearimy | 40 | 62.800 | 2.025.557 |
+| The Hidden Why | 42 | 3.650 | 1.720.372 |
+| Araragi | 132 | 25.600 | 1.594.900 |
+| Born in Lore | 23 | 24.100 | 1.538.741 |
+| Hypo Room | 18 | 25.500 | 1.478.049 |
+| OminiAM | 45 | 8.250 | 1.425.610 |
+| DOOMPERK | 31 | 21.100 | 1.265.338 |
+| Questionverse | 17 | 12.900 | 1.216.157 |
 
 Xem thêm: [dữ liệu ngày 2026-11-20](https://github.com/vmthuan703/AI_youtube/blob/research/reports/data/2026-11-20/TOM_TAT.md)
 

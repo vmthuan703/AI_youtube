@@ -14,66 +14,66 @@
 <!-- DAILY:START -->
 ## Báo cáo hôm nay
 
-_Cập nhật tự động 2026-11-21. Số liệu từ YouTube Data API, đối chiếu bằng tay trước khi quyết định._
+_Cập nhật tự động 2026-11-22. Số liệu từ YouTube Data API, đối chiếu bằng tay trước khi quyết định._
 
-### Tóm tắt thu thập 2026-11-21
+### Tóm tắt thu thập 2026-11-22
 
-- Quota đã dùng: 2182 / ngân sách 6000 đơn vị
-- Kênh theo dõi: 60 · video đã chụp: 1880
+- Quota đã dùng: 2184 / ngân sách 6000 đơn vị
+- Kênh theo dõi: 60 · video đã chụp: 1923
 
 #### What-If Fiction × Mỹ
 
 - Truy vấn đã chạy: 20 · bỏ qua: 0 · lỗi: 0
-- Kênh mới thêm vào theo dõi: Born in Lore
+- Kênh mới thêm vào theo dõi: không
 - Kênh bỏ khỏi theo dõi vì lệch ngách: không
-- Bảng chấm nhanh (chỉ dữ liệu hôm nay): **CỬA MỞ** · tuổi trung vị top 5: 1.4 tháng · video ≥ 100k: 394
+- Bảng chấm nhanh (chỉ dữ liệu hôm nay): **CỬA MỞ** · tuổi trung vị top 5: 1.4 tháng · video ≥ 100k: 412
 
 | Kênh mới thắng | Tuổi (ngày) | Sub | Video to nhất |
 |---|---|---|---|
-| ConChaser | 28 | 32.400 | 2.847.335 |
-| Born in Lore | 24 | 32.100 | 2.682.824 |
-| Minute Zero | 42 | 23.800 | 2.429.476 |
-|  Jeremy Bearimy | 41 | 63.900 | 2.030.830 |
-| The Hidden Why | 43 | 3.740 | 1.737.696 |
-| IfYou Films | 27 | 7.450 | 1.681.989 |
-| Araragi | 133 | 25.700 | 1.604.185 |
-| Hypo Room | 19 | 27.300 | 1.485.698 |
-| OminiAM | 46 | 8.290 | 1.456.645 |
-| DOOMPERK | 32 | 22.100 | 1.361.519 |
+| Born in Lore | 25 | 37.300 | 3.367.483 |
+| ConChaser | 29 | 33.200 | 2.946.209 |
+| Minute Zero | 43 | 23.800 | 2.436.293 |
+|  Jeremy Bearimy | 42 | 65.100 | 2.036.327 |
+| IfYou Films | 28 | 8.110 | 2.018.638 |
+| The Hidden Why | 44 | 3.810 | 1.758.861 |
+| Araragi | 134 | 25.800 | 1.614.340 |
+| OminiAM | 47 | 8.360 | 1.505.801 |
+| Hypo Room | 20 | 28.900 | 1.496.495 |
+| DOOMPERK | 33 | 23.100 | 1.459.231 |
 
-Xem thêm: [dữ liệu ngày 2026-11-21](https://github.com/vmthuan703/AI_youtube/blob/research/reports/data/2026-11-21/TOM_TAT.md)
+Xem thêm: [dữ liệu ngày 2026-11-22](https://github.com/vmthuan703/AI_youtube/blob/research/reports/data/2026-11-22/TOM_TAT.md)
 
 <!-- DAILY:END -->
 
 <!-- WEEKLY:START -->
 ## Báo cáo tuần mới nhất
 
-_Báo cáo 2026-W46 · nguồn `SO_LIEU.md`. Chỉ trích phần đầu, bản đầy đủ ở link bên dưới._
+_Báo cáo 2026-W47 · nguồn `SO_LIEU.md`. Chỉ trích phần đầu, bản đầy đủ ở link bên dưới._
 
 #### Bảng chấm ô
 
 | Điều kiện | Ngưỡng | Số đo | Kết quả |
 |---|---|---|---|
-| Có kênh ≤ 3 tháng đã có video ≥ 100k | có |  Jeremy Bearimy, Any Minute Now, ConChaser, DOOMPERK, Earth Tipping (+44 kênh) | đạt |
-| Tuổi trung vị 5 kênh có video to nhất | ≤ 12 tháng | 57.7 tháng (ngày tạo kênh, video cũ nhất) | không |
-| view/sub trung vị (5 kênh đó) | ≥ 10× | 74.5 | đạt |
-| Số video dài ≥ 100k | ≥ 8 (cần, không đủ) | 362 | đạt |
-| View trung vị của video ≥ 100k | 150k–600k | 270.580 | đạt |
+| Có kênh ≤ 3 tháng đã có video ≥ 100k | có |  Jeremy Bearimy, Any Minute Now, Born in Lore, ConChaser, DOOMPERK (+56 kênh) | đạt |
+| Tuổi trung vị 5 kênh có video to nhất | ≤ 12 tháng | 57.9 tháng (ngày tạo kênh, video cũ nhất) | không |
+| view/sub trung vị (5 kênh đó) | ≥ 10× | 74.3 | đạt |
+| Số video dài ≥ 100k | ≥ 8 (cần, không đủ) | 438 | đạt |
+| View trung vị của video ≥ 100k | 150k–600k | 288.548 | đạt |
 | Kênh đúng ngách (top 5, tự động theo tiêu đề) | ≥ 80% | 2/2 kênh có đủ tiêu đề | — |
 
 5 kênh có video to nhất (dùng cho 3 dòng tuổi, view/sub, đúng ngách; **cần đọc tay xác minh đúng ngách**, kênh sai thì thêm vào `exclude_channels` trong config):
 
 | Kênh | Tuổi (ngày) | Sub | Video to nhất | Tỉ lệ tiêu đề khớp |
 |---|---|---|---|---|
-| Papa Joel | 2.736 | 3.030.000 | 4.942.895 | chưa theo dõi |
-| Ifverse | 1.753 | 62.900 | 4.733.752 | chưa theo dõi |
-| Joe Bartolozzi | 2.357 | 6.250.000 | 2.496.384 | chưa theo dõi |
-| Minute Zero | 36 | 23.400 | 2.384.556 | 100% |
-| ConChaser | 22 | 27.600 | 2.056.053 | 100% |
+| Papa Joel | 2.743 | 3.040.000 | 5.619.018 | chưa theo dõi |
+| Ifverse | 1.760 | 64.000 | 4.753.656 | chưa theo dõi |
+| Born in Lore | 25 | 37.300 | 3.367.483 | 100% |
+| ConChaser | 29 | 33.200 | 2.946.209 | 97% |
+| Joe Bartolozzi | 2.364 | 6.300.000 | 2.520.758 | chưa theo dõi |
 
 **Kết luận số: CẦN THEO DÕI.** Tuổi kênh dự báo mạnh nhất. View trung vị càng cao thì cửa càng đóng.
 
-Xem thêm: [báo cáo đầy đủ 2026-W46](https://github.com/vmthuan703/AI_youtube/blob/research/reports/reports/2026-W46/SO_LIEU.md) · [mọi báo cáo tuần](https://github.com/vmthuan703/AI_youtube/blob/research/reports/reports/INDEX.md)
+Xem thêm: [báo cáo đầy đủ 2026-W47](https://github.com/vmthuan703/AI_youtube/blob/research/reports/reports/2026-W47/SO_LIEU.md) · [mọi báo cáo tuần](https://github.com/vmthuan703/AI_youtube/blob/research/reports/reports/INDEX.md)
 
 <!-- WEEKLY:END -->
 

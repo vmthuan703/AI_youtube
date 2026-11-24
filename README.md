@@ -14,34 +14,34 @@
 <!-- DAILY:START -->
 ## Báo cáo hôm nay
 
-_Cập nhật tự động 2026-11-24. Số liệu từ YouTube Data API, đối chiếu bằng tay trước khi quyết định._
+_Cập nhật tự động 2026-11-25. Số liệu từ YouTube Data API, đối chiếu bằng tay trước khi quyết định._
 
-### Tóm tắt thu thập 2026-11-24
+### Tóm tắt thu thập 2026-11-25
 
-- Quota đã dùng: 2188 / ngân sách 6000 đơn vị
-- Kênh theo dõi: 60 · video đã chụp: 1958
+- Quota đã dùng: 2190 / ngân sách 6000 đơn vị
+- Kênh theo dõi: 60 · video đã chụp: 1997
 
 #### What-If Fiction × Mỹ
 
 - Truy vấn đã chạy: 20 · bỏ qua: 0 · lỗi: 0
 - Kênh mới thêm vào theo dõi: không
 - Kênh bỏ khỏi theo dõi vì lệch ngách: không
-- Bảng chấm nhanh (chỉ dữ liệu hôm nay): **CẦN THEO DÕI** · tuổi trung vị top 5: 57.9 tháng · video ≥ 100k: 421
+- Bảng chấm nhanh (chỉ dữ liệu hôm nay): **CẦN THEO DÕI** · tuổi trung vị top 5: 58.0 tháng · video ≥ 100k: 435
 
 | Kênh mới thắng | Tuổi (ngày) | Sub | Video to nhất |
 |---|---|---|---|
-| Born in Lore | 26 | 42.000 | 3.834.483 |
-| ConChaser | 31 | 34.000 | 3.016.357 |
-| Minute Zero | 44 | 23.900 | 2.445.232 |
-| IfYou Films | 30 | 8.410 | 2.162.521 |
-|  Jeremy Bearimy | 43 | 65.900 | 2.041.516 |
-| The Hidden Why | 45 | 3.930 | 1.796.522 |
-| Araragi | 135 | 25.900 | 1.626.570 |
-| OminiAM | 48 | 8.430 | 1.557.685 |
-| DOOMPERK | 34 | 23.900 | 1.541.342 |
-| Hypo Room | 22 | 30.000 | 1.506.201 |
+| Born in Lore | 27 | 45.000 | 4.120.720 |
+| ConChaser | 31 | 34.400 | 3.070.474 |
+| Minute Zero | 45 | 24.000 | 2.454.758 |
+| IfYou Films | 31 | 8.590 | 2.223.007 |
+|  Jeremy Bearimy | 44 | 66.500 | 2.045.618 |
+| The Hidden Why | 46 | 4.060 | 1.840.453 |
+| Araragi | 136 | 26.000 | 1.635.433 |
+| DOOMPERK | 35 | 24.500 | 1.595.775 |
+| OminiAM | 49 | 8.490 | 1.594.695 |
+| Miko | 38 | 18.400 | 1.540.217 |
 
-Xem thêm: [dữ liệu ngày 2026-11-24](https://github.com/vmthuan703/AI_youtube/blob/research/reports/data/2026-11-24/TOM_TAT.md)
+Xem thêm: [dữ liệu ngày 2026-11-25](https://github.com/vmthuan703/AI_youtube/blob/research/reports/data/2026-11-25/TOM_TAT.md)
 
 <!-- DAILY:END -->
 

@@ -14,34 +14,34 @@
 <!-- DAILY:START -->
 ## Báo cáo hôm nay
 
-_Cập nhật tự động 2026-11-27. Số liệu từ YouTube Data API, đối chiếu bằng tay trước khi quyết định._
+_Cập nhật tự động 2026-11-28. Số liệu từ YouTube Data API, đối chiếu bằng tay trước khi quyết định._
 
-### Tóm tắt thu thập 2026-11-27
+### Tóm tắt thu thập 2026-11-28
 
-- Quota đã dùng: 2192 / ngân sách 6000 đơn vị
-- Kênh theo dõi: 60 · video đã chụp: 2061
+- Quota đã dùng: 2194 / ngân sách 6000 đơn vị
+- Kênh theo dõi: 60 · video đã chụp: 2101
 
 #### What-If Fiction × Mỹ
 
 - Truy vấn đã chạy: 20 · bỏ qua: 0 · lỗi: 0
 - Kênh mới thêm vào theo dõi: không
 - Kênh bỏ khỏi theo dõi vì lệch ngách: không
-- Bảng chấm nhanh (chỉ dữ liệu hôm nay): **CẦN THEO DÕI** · tuổi trung vị top 5: 58.0 tháng · video ≥ 100k: 446
+- Bảng chấm nhanh (chỉ dữ liệu hôm nay): **CẦN THEO DÕI** · tuổi trung vị top 5: 58.1 tháng · video ≥ 100k: 447
 
 | Kênh mới thắng | Tuổi (ngày) | Sub | Video to nhất |
 |---|---|---|---|
-| Born in Lore | 29 | 50.800 | 4.745.298 |
-| ConChaser | 33 | 35.100 | 3.164.728 |
-| Minute Zero | 47 | 24.000 | 2.469.316 |
-| IfYou Films | 32 | 8.830 | 2.316.732 |
-|  Jeremy Bearimy | 46 | 67.400 | 2.051.180 |
-| The Hidden Why | 48 | 4.330 | 1.943.318 |
-| DOOMPERK | 37 | 25.400 | 1.689.864 |
-| OminiAM | 51 | 8.560 | 1.663.373 |
-| Araragi | 138 | 26.200 | 1.651.841 |
-| Miko | 40 | 19.200 | 1.601.774 |
+| Born in Lore | 30 | 53.800 | 5.071.952 |
+| ConChaser | 34 | 35.500 | 3.228.848 |
+| Minute Zero | 48 | 24.000 | 2.476.704 |
+| IfYou Films | 33 | 8.960 | 2.358.451 |
+|  Jeremy Bearimy | 47 | 67.700 | 2.054.035 |
+| The Hidden Why | 49 | 4.470 | 1.996.048 |
+| DOOMPERK | 38 | 25.800 | 1.723.177 |
+| OminiAM | 52 | 8.590 | 1.706.077 |
+| Araragi | 139 | 26.300 | 1.659.046 |
+| Miko | 41 | 19.600 | 1.632.146 |
 
-Xem thêm: [dữ liệu ngày 2026-11-27](https://github.com/vmthuan703/AI_youtube/blob/research/reports/data/2026-11-27/TOM_TAT.md)
+Xem thêm: [dữ liệu ngày 2026-11-28](https://github.com/vmthuan703/AI_youtube/blob/research/reports/data/2026-11-28/TOM_TAT.md)
 
 <!-- DAILY:END -->
 

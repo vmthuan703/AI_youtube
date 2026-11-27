@@ -1,0 +1,226 @@
+// engine/hair3d.js — hair for the 3D character. Every kind is a shell whose hairline is a smooth function of the angle round the head,
+// so there is no straight "swim cap" edge. A thin dark sheet under the shell draws the hairline on the face, like a cartoon ink line.
+//   outfit.hair: 'anime' | 'animeLow' | 'spiky' | 'messy' | 'short' | 'curls' | 'quiff' | 'sidePart' | 'slick' | 'bob' | 'fringe' | 'long' | 'sidePony' | 'ponytail' | 'pigtails' | 'bun'
+//   outfit.hairColor: main colour. outfit.hairShade: optional shadow colour for the anime kinds (grooves between locks).
+// 'anime' is one inflated volume cut into big pointed locks with wide chunks on top. Thin spines read as a hedgehog, so keep the chunks wide.
+import * as THREE from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+
+const D2R = Math.PI / 180;
+const smooth = (a, b, x) => { const k = Math.min(1, Math.max(0, (x - a) / (b - a))); return k * k * (3 - 2 * k); };
+const orbit = (az, pol) => [Math.sin(pol * D2R) * Math.sin(az * D2R), Math.cos(pol * D2R), Math.sin(pol * D2R) * Math.cos(az * D2R)];
+const wrap = (a) => ((a + 540) % 360) - 180;
+
+// same geometry for everyone wearing the same hair, so crowds stay cheap
+const CACHE = new Map();
+const cached = (key, make) => { let g = CACHE.get(key); if (!g) { g = make(); CACHE.set(key, g); } return g; };
+
+function grid(pos, seg, rows, col) {
+  const idx = []; for (let j = 0; j < rows; j++) for (let i = 0; i < seg; i++) { const a = j * (seg + 1) + i, b = a + seg + 1; idx.push(a, b, a + 1, b, b + 1, a + 1); }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); if (col) g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); g.setIndex(idx); g.computeVertexNormals(); return g;
+}
+// limit(az): how far the hair reaches, in degrees from the crown. az 0 faces forward, +90 is the character's left.
+function softShell(r, limit, lift = () => 0, paint = null) {
+  const seg = 160, rows = 28, pos = [], col = paint ? [] : null;
+  for (let j = 0; j <= rows; j++) for (let i = 0; i <= seg; i++) { const az = (i / seg) * 360 - 180, v = j / rows, p = orbit(az, limit(az) * v), R = r * (1 + lift(az, v)); pos.push(p[0] * R, p[1] * R, p[2] * R); if (paint) { const c = paint(limit(az) * v); col.push(c.r, c.g, c.b); } }
+  return grid(pos, seg, rows, col);
+}
+// a copy pushed out along its normals: the outline hull, drawn back faces only
+function pushOut(geo, d) { const g = geo.clone(), P = g.attributes.position, N = g.attributes.normal; for (let i = 0; i < P.count; i++) P.setXYZ(i, P.getX(i) + N.getX(i) * d, P.getY(i) + N.getY(i) * d, P.getZ(i) + N.getZ(i) * d); return g; }
+const coneGeo = (r, h, dir, hr, out = 0.28) => { const g = new THREE.ConeGeometry(r, h, 10), d = new THREE.Vector3(...dir).normalize(); g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), d)); const p = d.multiplyScalar(hr * 1.02 + h * out); g.translate(p.x, p.y, p.z); return g; };
+const blobGeo = (r, x, y, z, sx = 1, sy = 1, sz = 1, rz = 0, rx = 0) => { const g = new THREE.SphereGeometry(r, 28, 18); g.scale(sx, sy, sz); if (rx) g.rotateX(rx); if (rz) g.rotateZ(rz); g.translate(x, y, z); return g; };
+const shortLine = (front, nape, jag = 0, n = 9) => (az) => { const a = Math.abs(az), k = smooth(42, 118, a), wob = jag * Math.abs(Math.sin(az * D2R * n)), dip = 13 * Math.exp(-Math.pow((180 - a) / 44, 2)); return front * (1 - k) + nape * k + wob * (1 - 0.55 * k) + dip; };
+const softLine = (front, back, part = 0) => (az) => { const a = Math.abs(az), k = smooth(34, 92, a); return (front + part * smooth(-40, 40, az)) * (1 - k) + back * k; };
+const puff = (az, v) => 0.06 * v * v;
+
+// ---------------------------------------------------------------- anime
+const toothAt = (teeth, az) => { let best = 0, id = -1; for (let i = 0; i < teeth.length; i++) { const [c, hw, L] = teeth[i], d = Math.abs(wrap(az - c)); if (d < hw) { const v = L * Math.pow(1 - d / hw, 0.9); if (v > best) { best = v; id = i; } } } return [best, id]; };
+function animeVolume(hr, V, tones, o = {}) {
+  const { top = 1.13, edge = 1.025, bulge = 0.05, grow = 0 } = o, seg = 360, rows = 40, pos = [], col = [], [hi, mid, low] = tones;
+  for (let j = 0; j <= rows; j++) for (let i = 0; i <= seg; i++) {
+    const az = (i / seg) * 360 - 180, v = j / rows, [L, id] = toothAt(V.teeth, az), pol = (V.base(az) + grow + L) * v;
+    const ridge = id >= 0 ? 1 - Math.abs(wrap(az - V.teeth[id][0])) / V.teeth[id][1] : 0, cut = smooth(0.22, 0.75, pol / 90);
+    const R = hr * (edge + (top - edge) * (1 - Math.pow(Math.min(1, pol / 104), 3)) + bulge * (ridge - 0.45) * cut), p = orbit(az, pol); pos.push(p[0] * R, p[1] * R, p[2] * R);
+    // shading painted on: a bright mass, a soft highlight ring, cool grooves between the locks
+    const g = cut * (1 - smooth(0.05, 0.42, ridge)), ring = Math.exp(-Math.pow((pol - 40) / 9, 2)), c = mid.clone().lerp(hi, 0.55 + 0.45 * ring).lerp(low, 0.72 * g); col.push(c.r, c.g, c.b);
+  }
+  return grid(pos, seg, rows, col);
+}
+// a wide, flat, curved chunk, fat for most of its length and sharp at the tip. It starts inside the head, so no open base shows.
+function animeChunks(hr, list, tones) {
+  const pos = [], col = [], idx = [], rows = 12, sides = 8, [hi, mid, low] = tones, V = THREE.Vector3;
+  for (const { az, pol, len, w, dir, bend } of list) {
+    const n = new V(...orbit(az, pol)), P0 = n.clone().multiplyScalar(hr * 0.88), D = new V(...dir).normalize(), B = new V(...bend), base = pos.length / 3, L = len + 0.04, d = w * 0.58;
+    for (let j = 0; j <= rows; j++) {
+      const s = j / rows, C = P0.clone().addScaledVector(D, L * s).addScaledVector(B, L * s * s), T = D.clone().multiplyScalar(L).addScaledVector(B, 2 * L * s).normalize();
+      const W = new V().crossVectors(T, n); if (W.lengthSq() < 1e-4) W.set(1, 0, 0); W.normalize(); const N = new V().crossVectors(W, T).normalize(), taper = 1 - Math.pow(s, 1.45);
+      for (let i = 0; i < sides; i++) {
+        const a = (i / sides) * Math.PI * 2, c = Math.cos(a), p = C.clone().addScaledVector(W, c * w * taper).addScaledVector(N, Math.sin(a) * d * taper); pos.push(p.x, p.y, p.z);
+        const e = Math.abs(c), m = mid.clone().lerp(hi, smooth(0.25, 0.85, s) * (1 - 0.4 * e)).lerp(low, (1 - smooth(0.1, 0.45, s)) * 0.6 + 0.35 * Math.pow(e, 3)); col.push(m.r, m.g, m.b);
+      }
+    }
+    for (let j = 0; j < rows; j++) for (let i = 0; i < sides; i++) { const a = base + j * sides + i, b = base + j * sides + (i + 1) % sides, c = a + sides, e = b + sides; idx.push(a, c, b, b, c, e); }
+  }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); g.setIndex(idx); g.computeVertexNormals(); return g;
+}
+const animeLine = (front, nape) => (az) => { const a = Math.abs(az), k = smooth(38, 125, a); return front * (1 - k) + nape * k; };
+// stands up from the head: mixes the surface normal with up, back and sideways
+const rise = (az, pol, len, w, up, back = 0, side = 0, bendBack = 0.12) => { const n = orbit(az, pol); return { az, pol, len, w, dir: [n[0] * 0.55 + side, n[1] * 0.55 + up, n[2] * 0.55 - back], bend: [Math.sin(az * D2R) * 0.08, 0.02, -bendBack] }; };
+// lies down the side of the head, then the tip flicks out
+const lay = (az, pol, len, w, out = 0.2, flick = 0.2) => { const n = orbit(az, pol), t = [Math.cos(pol * D2R) * Math.sin(az * D2R), -Math.sin(pol * D2R), Math.cos(pol * D2R) * Math.cos(az * D2R)]; return { az, pol, len, w, dir: [t[0] + n[0] * out, t[1] + n[1] * out, t[2] + n[2] * out], bend: [n[0] * flick, n[1] * flick, n[2] * flick] }; };
+// a flick at the temple: reads wide from the front and swept back from the side
+const temple = (sx, len, w) => { const n = orbit(sx * 76, 62); return { az: sx * 76, pol: 62, len, w, dir: [n[0] * 0.75, n[1] * 0.75 + 0.12, n[2] * 0.75 - 0.5], bend: [sx * 0.1, 0.14, -0.1] }; };
+const layers = (k = 1) => [temple(-1, 0.25 * k, 0.092), temple(1, 0.25 * k, 0.092), lay(-112, 52, 0.2 * k, 0.115), lay(112, 52, 0.2 * k, 0.115), lay(-148, 54, 0.21 * k, 0.12), lay(148, 54, 0.21 * k, 0.12), lay(180, 58, 0.21 * k, 0.12), lay(-128, 78, 0.15 * k, 0.1, 0.24, 0.26), lay(128, 78, 0.15 * k, 0.1, 0.24, 0.26), lay(-165, 82, 0.15 * k, 0.1, 0.24, 0.26), lay(165, 82, 0.15 * k, 0.1, 0.24, 0.26)];
+const ANIME = {
+  // the hero: a tall jagged crown, a pointed fringe, wide flicks at the sides
+  anime: {
+    base: animeLine(44, 96),
+    teeth: [[-30, 17, 20], [-2, 17, 24], [28, 17, 20], [-60, 17, 26], [60, 17, 26], [-92, 18, 16], [92, 18, 16], [-122, 19, 22], [122, 19, 22], [-155, 18, 22], [155, 18, 22], [180, 15, 26]],
+    chunks: [rise(-24, 30, 0.25, 0.155, 0.7, -0.05, -0.1, 0.05), rise(26, 28, 0.27, 0.16, 0.75, -0.05, 0.1, 0.05), rise(0, 6, 0.31, 0.165, 0.85, 0.06, 0, 0.06), rise(-70, 38, 0.27, 0.15, 0.38, 0.05, -0.38, 0.04), rise(70, 38, 0.27, 0.15, 0.38, 0.05, 0.38, 0.04), rise(-112, 34, 0.27, 0.15, 0.5, 0.2, -0.3, 0.06), rise(112, 34, 0.27, 0.15, 0.5, 0.2, 0.3, 0.06), rise(-150, 26, 0.28, 0.15, 0.6, 0.3, -0.12, 0.06), rise(150, 26, 0.28, 0.15, 0.6, 0.3, 0.12, 0.06), ...layers(1.05)],
+  },
+  // lower and swept back: the same look when the tall crown is too much (a low ceiling, a hat-like silhouette in a tight close-up)
+  animeLow: {
+    base: animeLine(42, 96),
+    teeth: [[-34, 15, 21], [-11, 14, 25], [13, 14, 23], [36, 15, 19], [-64, 17, 26], [64, 17, 26], [-96, 18, 18], [96, 18, 18], [-124, 18, 20], [124, 18, 20], [-152, 17, 24], [152, 17, 24], [180, 17, 26]],
+    chunks: [rise(0, 36, 0.21, 0.16, 0.5, 0.1), rise(-46, 34, 0.22, 0.155, 0.42, 0.2, -0.22), rise(46, 34, 0.22, 0.155, 0.42, 0.2, 0.22), rise(0, 8, 0.25, 0.16, 0.55, 0.35), rise(-92, 34, 0.24, 0.15, 0.32, 0.3, -0.26), rise(92, 34, 0.24, 0.15, 0.32, 0.3, 0.26), rise(-140, 34, 0.25, 0.15, 0.3, 0.5, -0.12), rise(140, 34, 0.25, 0.15, 0.3, 0.5, 0.12), rise(180, 22, 0.27, 0.155, 0.4, 0.55), ...layers(1)],
+  },
+};
+
+// ---------------------------------------------------------------- the rest of the cast
+function softKind(kind, hr, dark) {
+  if (kind === 'bob') return { shell: softLine(64, 126, 3), r: 1.065, lift: puff };
+  if (kind === 'long') return { shell: softLine(62, 148), r: 1.065, lift: puff, extra: () => mergeGeometries([blobGeo(0.1, hr * 0.76, -hr * 0.82, -hr * 0.3, 1, 2, 0.85), blobGeo(0.1, -hr * 0.76, -hr * 0.82, -hr * 0.3, 1, 2, 0.85), blobGeo(0.14, 0, -hr * 0.95, -hr * 0.66, 1.55, 1.7, 0.7)]) };
+  if (kind === 'short') return { shell: shortLine(56, 112), r: 1.035 };
+  if (kind === 'messy') return { shell: shortLine(56, 112, 7), r: 1.035, extra: () => mergeGeometries([[-60, 28, 0.1, 0.075], [-20, 18, 0.13, 0.08], [25, 20, 0.12, 0.08], [65, 30, 0.1, 0.07], [-110, 34, 0.09, 0.07], [110, 34, 0.09, 0.07], [170, 28, 0.1, 0.075], [0, 38, 0.09, 0.07], [-38, 40, 0.08, 0.065], [38, 42, 0.08, 0.065]].map(([az, pol, h, r]) => coneGeo(r, h, orbit(az, pol), hr))) };
+  if (kind === 'spiky') return { shell: shortLine(54, 112, 9, 8), r: 1.035, extra: () => { let s = 11; const rnd = () => (s = (s * 9301 + 49297) % 233280) / 233280, out = []; for (let i = 0; i < 24; i++) { const az = (i * 137.5) % 360 - 180, pol = 8 + 76 * Math.sqrt((i + 0.5) / 24); if (Math.abs(az) < 50 && pol > 48) continue; const d = orbit(az, pol); d[1] += 0.35; out.push(coneGeo(0.075 + rnd() * 0.022, 0.12 + rnd() * 0.05, d, hr)); } for (const [az, tilt] of [[-34, -0.25], [-12, -0.1], [12, 0.1], [34, 0.25]]) { const d = orbit(az, 44); out.push(coneGeo(0.06, 0.1, [d[0] + tilt * 0.1, d[1] * 0.6, d[2]], hr, 0.1)); } return mergeGeometries(out); } };
+  // cast signatures: a round mop of curls, a clean side sweep, a blunt fringe, a high side ponytail, a slick undercut
+  if (kind === 'curls') return { shell: shortLine(50, 108), r: 1.02, extra: () => { let s = 5; const rnd = () => (s = (s * 9301 + 49297) % 233280) / 233280, out = []; for (let i = 0; i < 64; i++) { const az = (i * 137.5) % 360 - 180, pol = 6 + 92 * Math.sqrt((i + 0.5) / 64); if (Math.abs(az) < 44 && pol > 50) continue; const d = orbit(az, pol), r = 0.05 + rnd() * 0.02, k = hr * 1.05; out.push(blobGeo(r, d[0] * k, d[1] * k, d[2] * k)); } return mergeGeometries(out); } };
+  if (kind === 'quiff') return { shell: shortLine(50, 108), r: 1.03, lift: (az, v) => 0.22 * Math.exp(-Math.pow((az - 14) / 88, 2)) * Math.pow(Math.sin(Math.PI * Math.min(1, v / 0.82)), 1.2) + 0.05 * (1 - v) };
+  if (kind === 'sidePart') return { shell: (az) => shortLine(54, 110)(az) - 9 * Math.exp(-Math.pow((az + 36) / 9, 2)), r: 1.035, lift: (az, v) => 0.13 * Math.exp(-Math.pow((az - 20) / 50, 2)) * Math.sin(Math.PI * Math.min(1, v / 0.85)) };
+  if (kind === 'fringe') return { shell: (az) => { const a = Math.abs(az), k = smooth(38, 70, a); return 71 * (1 - k) + 122 * k; }, r: 1.06, lift: puff };
+  if (kind === 'sidePony') return { shell: shortLine(55, 104), r: 1.04, extra: () => mergeGeometries([blobGeo(0.09, hr * 0.74, hr * 0.56, -hr * 0.46, 1, 1, 1), blobGeo(0.1, hr * 0.98, hr * 0.1, -hr * 0.5, 0.82, 1.9, 0.82, -0.2), blobGeo(0.062, hr * 1.14, -hr * 0.46, -hr * 0.5, 0.8, 1.7, 0.8, -0.3)]) };
+  if (kind === 'slick') return { shell: shortLine(56, 108), r: 1.035, lift: (az, v) => 0.08 * (1 - v * v), fade: true };
+  if (kind === 'ponytail' || kind === 'pigtails' || kind === 'bun') return dark ? { tails: true } : { shell: shortLine(58, 106), r: 1.04, tails: true };
+  return null;
+}
+
+// ---------------------------------------------------------------- signature hair (Ink 2026-11-27): named characters whose hair IS the identity
+// A cap (shell) plus big clumps ("strands"). Each strand is a quadratic curve through three head points [az, pol, r] (r in head radii):
+// root (inside the cap), control (pulls the bulge out), tip. Cross-section is a flat lens w wide, tapering to a point at the tip.
+const sp = (hr, [az, pol, r]) => { const o = orbit(az, pol); return new THREE.Vector3(o[0] * hr * r, o[1] * hr * r, o[2] * hr * r); };
+function strandsGeo(hr, list, tones) {
+  // the curve is a quadratic Bezier in (az, pol, r) space, so a strand follows the head at the radii given instead of cutting through it
+  const pos = [], col = [], idx = [], rows = 16, sides = 8, [hi, mid, low] = tones, V = THREE.Vector3;
+  const at = (s0, s) => { const u = 1 - s, q = [0, 1, 2].map(k => u * u * s0.a[k] + 2 * u * s * s0.c[k] + s * s * s0.b[k]); return sp(hr, q); };
+  for (const s0 of list) {
+    const w = s0.w, d = w * (s0.t ?? 0.5), base = pos.length / 3, tp = s0.taper ?? 1.3;
+    for (let j = 0; j <= rows; j++) {
+      const s = j / rows, C = at(s0, s), T = at(s0, Math.min(1, s + 0.01)).sub(at(s0, Math.max(0, s - 0.01))).normalize(), n = C.clone().normalize();
+      const W = new V().crossVectors(T, n); if (W.lengthSq() < 1e-5) W.set(1, 0, 0); W.normalize(); const N = new V().crossVectors(W, T).normalize();
+      const taper = Math.max(0.012, 1 - Math.pow(s, tp)) * (0.75 + 0.25 * Math.min(1, s * 4));
+      for (let i = 0; i < sides; i++) {
+        const a = (i / sides) * Math.PI * 2, c = Math.cos(a), p = C.clone().addScaledVector(W, c * w * taper).addScaledVector(N, Math.sin(a) * d * taper); pos.push(p.x, p.y, p.z);
+        const e = Math.abs(c), m = mid.clone().lerp(hi, smooth(0.3, 0.8, s) * 0.55 * (1 - 0.5 * e) * (Math.sin(a) > 0 ? 1 : 0.3)).lerp(low, 0.5 * Math.pow(e, 3) + (Math.sin(a) < 0 ? 0.25 : 0)); col.push(m.r, m.g, m.b);
+      }
+    }
+    for (let j = 0; j < rows; j++) for (let i = 0; i < sides; i++) { const a = base + j * sides + i, b = base + j * sides + (i + 1) % sides, c = a + sides, e = b + sides; idx.push(a, c, b, b, c, e); }
+  }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); g.setIndex(idx); g.computeVertexNormals(); return g;
+}
+// mirror helper: the same strand on both sides of the face
+const both = (s) => [s, { ...s, a: [-s.a[0], s.a[1], s.a[2]], c: [-s.c[0], s.c[1], s.c[2]], b: [-s.b[0], s.b[1], s.b[2]] }];
+const S_ = (a, c, b, w, t, taper) => ({ a, c, b, w, t, taper });
+export const SIG = {
+  // curtainBowl: straight hair parted in the middle, bangs to the brows, thick curtains over the ears to the jaw
+  curtainBowl: {
+    shell: (az) => { const a = Math.abs(az); return 50 + 70 * smooth(28, 80, a); }, r: 1.05, lift: (az, v) => 0.05 * v * v,
+    strands: [
+      ...both(S_([4, 6, 1.0], [10, 50, 1.14], [15, 86, 1.07], 0.075, 0.45)),
+      ...both(S_([14, 14, 1.0], [26, 54, 1.15], [32, 90, 1.07], 0.08, 0.45)),
+      ...both(S_([28, 20, 1.0], [44, 62, 1.15], [50, 96, 1.07], 0.085, 0.45)),
+      ...both(S_([48, 22, 1.0], [64, 84, 1.17], [66, 130, 1.1], 0.1, 0.5)),
+      ...both(S_([76, 22, 1.0], [88, 90, 1.18], [90, 134, 1.1], 0.105, 0.5)),
+      ...both(S_([106, 22, 1.0], [114, 92, 1.17], [116, 132, 1.08], 0.105, 0.5)),
+      ...both(S_([136, 20, 1.0], [140, 90, 1.15], [142, 128, 1.07], 0.105, 0.5)),
+      ...both(S_([162, 20, 1.0], [164, 90, 1.14], [166, 126, 1.06], 0.105, 0.5)),
+    ],
+  },
+  // spikyLock: short spikes standing up and out, one lock hanging over the forehead
+  spikyLock: {
+    shell: shortLine(50, 104, 6, 7), r: 1.04,
+    strands: [
+      S_([10, 22, 0.95], [18, 12, 1.42], [32, 10, 1.74], 0.1, 0.5, 1.1), S_([-22, 22, 0.95], [-28, 14, 1.42], [-42, 14, 1.70], 0.1, 0.5, 1.1),
+      S_([70, 30, 0.95], [78, 24, 1.4], [88, 24, 1.66], 0.095, 0.5, 1.1), S_([-75, 30, 0.95], [-82, 26, 1.4], [-92, 28, 1.61], 0.095, 0.5, 1.1),
+      S_([118, 34, 0.95], [122, 30, 1.4], [128, 32, 1.66], 0.1, 0.5, 1.1), S_([-118, 34, 0.95], [-122, 30, 1.4], [-128, 34, 1.61], 0.1, 0.5, 1.1),
+      S_([155, 40, 0.95], [156, 42, 1.38], [158, 50, 1.61], 0.1, 0.5, 1.1), S_([-155, 40, 0.95], [-156, 44, 1.38], [-158, 52, 1.57], 0.1, 0.5, 1.1),
+      S_([180, 60, 0.95], [180, 72, 1.3], [180, 88, 1.49], 0.1, 0.5, 1.1),
+      S_([40, 42, 0.97], [44, 38, 1.32], [50, 40, 1.45], 0.08, 0.5, 1.1), S_([-40, 42, 0.97], [-46, 38, 1.32], [-54, 40, 1.45], 0.08, 0.5, 1.1),
+      S_([100, 60, 0.97], [104, 62, 1.25], [110, 70, 1.45], 0.075, 0.5, 1.1), S_([-100, 60, 0.97], [-104, 62, 1.25], [-110, 70, 1.45], 0.075, 0.5, 1.1),
+      S_([6, 32, 1.0], [12, 62, 1.1], [18, 86, 1.06], 0.06, 0.45), S_([-8, 36, 1.0], [-12, 58, 1.1], [-16, 76, 1.06], 0.05, 0.45),
+    ],
+  },
+  // centerCurtain: straight hair, centre part, flat on top, curtains framing the face and hanging straight down to the shoulders
+  centerCurtain: {
+    shell: (az) => { const a = Math.abs(az); return 48 + 62 * smooth(40, 120, a); }, r: 1.04, lift: (az, v) => 0.02 * v,
+    strands: [
+      ...both(S_([4, 4, 1.0], [34, 72, 1.12], [50, 134, 1.62], 0.085, 0.42, 1.8)),
+      ...both(S_([24, 12, 1.0], [62, 86, 1.14], [68, 138, 1.7], 0.095, 0.42, 1.8)),
+      ...both(S_([60, 14, 1.0], [90, 96, 1.14], [92, 140, 1.72], 0.105, 0.42, 1.8)),
+      ...both(S_([100, 14, 1.0], [118, 98, 1.13], [120, 140, 1.7], 0.105, 0.42, 1.8)),
+      ...both(S_([140, 14, 1.0], [146, 100, 1.12], [148, 138, 1.62], 0.11, 0.42, 1.8)),
+      S_([180, 14, 1.0], [180, 100, 1.11], [180, 136, 1.58], 0.11, 0.42, 1.8),
+    ],
+  },
+  // sweptBob: straight bob to the jaw, parted on her left, a fringe sweeping across to her right, tips turned in
+  sweptBob: {
+    shell: (az) => { const a = Math.abs(az); return 48 + 70 * smooth(40, 110, a); }, r: 1.045, lift: (az, v) => 0.04 * v * v,
+    strands: [
+      S_([30, 8, 1.0], [6, 54, 1.13], [-26, 86, 1.07], 0.1, 0.45), S_([26, 18, 1.0], [2, 62, 1.12], [-12, 90, 1.06], 0.085, 0.45),
+      S_([34, 22, 1.0], [20, 66, 1.12], [10, 88, 1.06], 0.07, 0.45), S_([40, 14, 1.0], [54, 68, 1.14], [58, 100, 1.07], 0.085, 0.45),
+      S_([-40, 18, 1.0], [-58, 86, 1.16], [-56, 132, 1.06], 0.105, 0.5), S_([-72, 20, 1.0], [-86, 94, 1.17], [-82, 134, 1.06], 0.11, 0.5),
+      S_([66, 18, 1.0], [76, 90, 1.16], [72, 132, 1.06], 0.105, 0.5), S_([96, 20, 1.0], [100, 94, 1.17], [96, 134, 1.06], 0.11, 0.5),
+      ...both(S_([125, 18, 1.0], [128, 94, 1.16], [126, 132, 1.06], 0.11, 0.5)),
+      ...both(S_([155, 18, 1.0], [156, 94, 1.15], [155, 130, 1.06], 0.11, 0.5)),
+      S_([180, 18, 1.0], [180, 94, 1.14], [180, 129, 1.05], 0.11, 0.5),
+    ],
+  },
+};
+
+// c: { head, hr, MAT, add, hull, olM, olW, color, shade, dark, ghost }. Everything is added to c.head.
+export function buildHair(kind, c) {
+  const { head, hr, MAT, add, hull, olM, olW = 0.012, color, shade, dark, ghost } = c;
+  const lineM = olM ? new THREE.MeshBasicMaterial({ color: olM.color, side: THREE.FrontSide, fog: true }) : null;
+  const put = (geo, m, key) => { const mesh = add(new THREE.Mesh(geo, m), head); if (olM) { const h = new THREE.Mesh(cached(key + '/hull' + olW, () => pushOut(geo, olW * 0.92)), olM); h.castShadow = false; h.receiveShadow = false; head.add(h); } return mesh; };
+  const under = (geo) => { if (!lineM) return; const l = new THREE.Mesh(geo, lineM); l.castShadow = false; l.receiveShadow = false; head.add(l); };
+
+  if (SIG[kind]) {
+    const V = SIG[kind], main = new THREE.Color(color), hi = main.clone().lerp(new THREE.Color('#ffffff'), 0.28), low = shade ? new THREE.Color(shade) : main.clone().multiplyScalar(0.6).lerp(new THREE.Color('#5a64b0'), 0.25), tones = [hi, main, low], tag = `sig/${kind}/${color}/${shade || ''}/${hr}`;
+    const m = MAT('#ffffff', { rough: 0.7, rim: 0.35, side: THREE.DoubleSide, clearcoat: 0.25, clearcoatRough: 0.5, sheen: 0, emissive: main.clone().multiplyScalar(0.06) }); if (m !== ghost) { m.vertexColors = true; m.needsUpdate = true; }
+    under(cached(tag + '/line', () => softShell(hr * V.r * 0.992, (a) => V.shell(a) + 1.6, V.lift)));
+    put(cached(tag + '/shell', () => softShell(hr * V.r, V.shell, V.lift, (pol) => main.clone().lerp(hi, 0.35 * Math.exp(-Math.pow((pol - 32) / 12, 2))).lerp(low, 0.25 * smooth(70, 120, pol)))), m, tag + '/shell');
+    put(cached(tag + '/strands', () => strandsGeo(hr, V.strands, tones)), m, tag + '/strands');
+    return;
+  }
+
+  if (ANIME[kind]) {
+    const V = ANIME[kind], main = new THREE.Color(color), hi = main.clone().lerp(new THREE.Color('#ffffff'), 0.85), low = shade ? new THREE.Color(shade) : main.clone().multiplyScalar(0.58).lerp(new THREE.Color('#5a64b0'), 0.3), tones = [hi, main, low], tag = `${kind}/${color}/${shade || ''}/${hr}`;
+    const m = MAT('#ffffff', { rough: 0.55, rim: 0.45, limit: 0.985, clearcoat: 0.35, clearcoatRough: 0.4, sheen: 0, emissive: main.clone().multiplyScalar(0.16), side: THREE.DoubleSide }); if (m !== ghost) { m.vertexColors = true; m.needsUpdate = true; }
+    under(cached(tag + '/line', () => animeVolume(hr, V, tones, { grow: 1.7, top: 1.11, edge: 1.012, bulge: 0.04 })));
+    put(cached(tag + '/vol', () => animeVolume(hr, V, tones)), m, tag + '/vol');
+    put(cached(tag + '/chunks', () => animeChunks(hr, V.chunks, tones)), m, tag + '/chunks');
+    return;
+  }
+  const S = softKind(kind, hr, dark); if (!S) return;
+  const cc = new THREE.Color(color), hairLum = 0.2126 * cc.r + 0.7152 * cc.g + 0.0722 * cc.b, hairRim = 0.14 + 0.5 * Math.min(1, hairLum * 2.2); const m = MAT(color, { rough: 0.78, rim: hairRim, side: THREE.DoubleSide, clearcoat: 0.35, clearcoatRough: 0.4, sheen: 0 }), tag = `${kind}/${hr}`;
+  if (S.shell) {
+    under(cached(tag + '/line', () => softShell(hr * S.r * 0.992, (a) => S.shell(a) + 1.6, S.lift ? (az, v) => S.lift(az, Math.min(1, (v * (S.shell(az) + 1.6)) / S.shell(az))) : undefined)));
+    if (S.fade) { const hi = new THREE.Color(color), lo = hi.clone().multiplyScalar(0.5), fm = MAT('#ffffff', { rough: 0.78, rim: hairRim, side: THREE.DoubleSide }); if (fm !== ghost) { fm.vertexColors = true; fm.needsUpdate = true; } const key = `${tag}/${color}/fade`; put(cached(key, () => softShell(hr * S.r, S.shell, S.lift, (pol) => hi.clone().lerp(lo, smooth(50, 70, pol)))), fm, key); }
+    else put(cached(tag + '/shell', () => softShell(hr * S.r, S.shell, S.lift)), m, tag + '/shell');
+  }
+  if (S.extra) put(cached(tag + '/extra', S.extra), m, tag + '/extra');
+  if (S.tails) for (const sx of kind === 'pigtails' ? [-1, 1] : [0]) {
+    const tail = add(new THREE.Mesh(new THREE.CapsuleGeometry(0.07, kind === 'bun' ? 0.01 : 0.22, 6, 12), m), head);
+    if (kind === 'bun') tail.position.set(0, hr * 0.98, -hr * 0.35); else if (sx) { tail.position.set(sx * hr * 0.95, -hr * 0.05, -hr * 0.35); tail.rotation.z = sx * 0.35; } else { tail.position.set(0, hr * 0.05, -hr * 1.0); tail.rotation.x = -0.5; }
+    hull(tail, 1.08);
+  }
+}

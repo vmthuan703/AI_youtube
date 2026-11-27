@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # Đóng gói plugin thành file zip để tải lên claude.ai (Plugins) hoặc gửi cho người khác.
-#   bash plugins/build_zip.sh            -> dist/aitrends-3d-studio-<version>.zip
+#   bash plugins/build_zip.sh                       -> dist/aitrends-3d-studio-<version>.zip
+#   bash plugins/build_zip.sh aitrends-ink-studio   -> dist/aitrends-ink-studio-<version>.zip
 set -euo pipefail
 cd "$(dirname "$0")"
-name=aitrends-3d-studio
+name=${1:-aitrends-3d-studio}
 ver=$(python3 -c "import json;print(json.load(open('$name/.claude-plugin/plugin.json'))['version'])")
 mkdir -p ../dist
 out="../dist/$name-$ver.zip"

@@ -1,0 +1,780 @@
+{
+ "videos": [
+  {
+   "project": "memory-100x-remake",
+   "date": "2026-11-06",
+   "qc": null,
+   "byKind": {},
+   "worstShots": [],
+   "errors": [],
+   "missing": [],
+   "feedback": [
+    {
+     "date": "2026-11-06",
+     "text": "Kịch bản: lỗi logic, mốc thời gian và nhân quả ở cao trào (bạn chấm 6,5/10)",
+     "cats": [
+      "story"
+     ]
+    },
+    {
+     "date": "2026-11-06",
+     "text": "Máy quay cảnh s101 sai, phải render lại",
+     "cats": [
+      "camera"
+     ]
+    }
+   ]
+  },
+  {
+   "project": "shrink-anything",
+   "date": "2026-11-06",
+   "qc": null,
+   "byKind": {},
+   "worstShots": [],
+   "errors": [],
+   "missing": [],
+   "feedback": [
+    {
+     "date": "2026-11-06",
+     "text": "Giọng đọc: số 212 đọc thành chữ số, 911 cần thêm vào lexicon",
+     "cats": [
+      "sound"
+     ]
+    }
+   ]
+  },
+  {
+   "project": "demo-1.0.1",
+   "date": "2026-11-12",
+   "qc": null,
+   "byKind": {},
+   "worstShots": [],
+   "errors": [],
+   "missing": [],
+   "feedback": [
+    {
+     "date": "2026-11-12",
+     "text": "Chuyển động rất giật, không tự nhiên",
+     "cats": [
+      "jerk"
+     ]
+    },
+    {
+     "date": "2026-11-12",
+     "text": "Nhân vật ngồi xuyên qua ghế, đứng xuyên qua bục",
+     "cats": [
+      "clip"
+     ]
+    },
+    {
+     "date": "2026-11-12",
+     "text": "Tay nhân vật bị gập ở cảnh đầu",
+     "cats": [
+      "hands"
+     ]
+    },
+    {
+     "date": "2026-11-12",
+     "text": "Ném bóng và mở tủ đồ vẫn cứng",
+     "cats": [
+      "jerk"
+     ]
+    }
+   ]
+  },
+  {
+   "project": "hero-outfit",
+   "date": "2026-11-12",
+   "qc": null,
+   "byKind": {},
+   "worstShots": [],
+   "errors": [],
+   "missing": [],
+   "feedback": [
+    {
+     "date": "2026-11-12",
+     "text": "Nhân vật chính thiếu quần và giày, cần trang phục theo mùa",
+     "cats": [
+      "cloth"
+     ]
+    }
+   ]
+  },
+  {
+   "project": "body-healed",
+   "date": "2026-11-06",
+   "qc": null,
+   "byKind": {},
+   "sets": [
+    "room",
+    "poster",
+    "house",
+    "tree",
+    "streetLamp",
+    "bench",
+    "neonSign",
+    "gym",
+    "bed",
+    "desk",
+    "ceilingLamp",
+    "table",
+    "chair",
+    "tv",
+    "explainer",
+    "phone",
+    "ball",
+    "car"
+   ],
+   "fx": [
+    "shake",
+    "frozen",
+    "dust",
+    "rain",
+    "bokeh"
+   ],
+   "look": {
+    "luma": 0.217,
+    "sat": 0.472,
+    "median": 2.85
+   },
+   "worstShots": [],
+   "errors": [],
+   "missing": [],
+   "feedback": [
+    {
+     "date": "2026-11-06",
+     "text": "Nhịp: trung vị độ dài cảnh 2,85 s, dài hơn mục tiêu 2,7 s",
+     "cats": [
+      "story"
+     ]
+    },
+    {
+     "date": "2026-11-06",
+     "text": "Bối cảnh: màu quá rực (độ bão hòa 0,47)",
+     "cats": [
+      "set"
+     ]
+    }
+   ],
+   "renderSec": null
+  },
+  {
+   "project": "every-hit-stronger",
+   "date": "2026-11-08",
+   "qc": null,
+   "byKind": {},
+   "sets": [
+    "phone",
+    "tree",
+    "room",
+    "poster",
+    "gym",
+    "neonSign",
+    "table",
+    "chair",
+    "fridge",
+    "ceilingLamp",
+    "counter",
+    "trashCan",
+    "stadium",
+    "suburb",
+    "car",
+    "feedDraw",
+    "boxingRing",
+    "stand",
+    "city",
+    "explainer",
+    "dog",
+    "money"
+   ],
+   "fx": [
+    "glowLight",
+    "smoke",
+    "sparks",
+    "fire",
+    "aura",
+    "punch",
+    "shockwave",
+    "speedLines",
+    "debris",
+    "pov",
+    "dust",
+    "shake",
+    "bokeh",
+    "crashZoom",
+    "dutch"
+   ],
+   "look": null,
+   "worstShots": [],
+   "errors": [],
+   "missing": [],
+   "feedback": [
+    {
+     "date": "2026-11-08",
+     "text": "Cảnh bước xuống xe buýt bị cứng, giật",
+     "cats": [
+      "jerk"
+     ]
+    },
+    {
+     "date": "2026-11-08",
+     "text": "Dây đài boxing xuyên qua nhân vật",
+     "cats": [
+      "clip"
+     ]
+    }
+   ],
+   "renderSec": null
+  },
+  {
+   "project": "game-over",
+   "date": "2026-11-11",
+   "qc": null,
+   "byKind": {},
+   "sets": [
+    "car",
+    "court",
+    "ball",
+    "lockerHall",
+    "cafeteria",
+    "suburb",
+    "house",
+    "room",
+    "table",
+    "chair",
+    "ceilingLamp",
+    "schoolFront",
+    "busStop",
+    "city",
+    "pool",
+    "stand",
+    "park",
+    "snow",
+    "poster",
+    "phone",
+    "feedDraw",
+    "explainer",
+    "cat"
+   ],
+   "fx": [
+    "glowLight",
+    "debris",
+    "shake",
+    "splash",
+    "dust",
+    "bokeh",
+    "crashZoom",
+    "punch",
+    "dutch"
+   ],
+   "look": null,
+   "worstShots": [],
+   "errors": [],
+   "missing": [],
+   "feedback": [
+    {
+     "date": "2026-11-11",
+     "text": "Tay giơ ngược hướng do sai dấu góc tay",
+     "cats": [
+      "hands"
+     ]
+    },
+    {
+     "date": "2026-11-11",
+     "text": "schoolFront bus:false làm lỗi render (crash)",
+     "cats": [
+      "render"
+     ]
+    }
+   ],
+   "renderSec": null
+  },
+  {
+   "project": "who-would-date-you",
+   "date": "2026-11-08",
+   "qc": null,
+   "byKind": {},
+   "sets": [
+    "laptop",
+    "tree",
+    "streetLamp",
+    "room",
+    "ceilingLamp",
+    "counter",
+    "poster",
+    "table",
+    "chair",
+    "fridge",
+    "desk",
+    "deskLamp",
+    "gym",
+    "crowd",
+    "explainer",
+    "money",
+    "phone"
+   ],
+   "fx": [
+    "dutch",
+    "burst",
+    "shake",
+    "dust",
+    "rain",
+    "bokeh",
+    "crashZoom",
+    "punch"
+   ],
+   "look": {
+    "luma": 0.3,
+    "sat": 0.394,
+    "murky": 0.15,
+    "empty": 0,
+    "still": 0.033,
+    "median": 2.3
+   },
+   "worstShots": [],
+   "errors": [],
+   "missing": [],
+   "feedback": [
+    {
+     "date": "2026-11-08",
+     "text": "Nhân vật phụ phải lấy trang phục từ roster của kênh",
+     "cats": [
+      "cloth"
+     ]
+    }
+   ],
+   "renderSec": null
+  },
+  {
+   "project": "borrow-strength",
+   "date": "2026-11-12",
+   "qc": {
+    "samples": 1164,
+    "red": 0,
+    "amber": 49
+   },
+   "byKind": {
+    "slide": {
+     "red": 0,
+     "amber": 30,
+     "n": 44
+    },
+    "hands": {
+     "red": 0,
+     "amber": 12,
+     "n": 55
+    },
+    "clip": {
+     "red": 0,
+     "amber": 7,
+     "n": 35
+    }
+   },
+   "sets": [
+    "schoolYard",
+    "tractorTire",
+    "bottle",
+    "cafeteria",
+    "footballField",
+    "pickup",
+    "bleachers",
+    "lightTower",
+    "weightRoom",
+    "climbingGym",
+    "lockerRoom",
+    "pumpkinStreet",
+    "fallDay",
+    "room",
+    "phone",
+    "feedDraw",
+    "explainer",
+    "car",
+    "tray",
+    "football"
+   ],
+   "fx": [
+    "rain",
+    "glowLight",
+    "dust",
+    "bokeh",
+    "crashZoom",
+    "punch",
+    "dutch",
+    "shake"
+   ],
+   "look": {
+    "luma": 0.287,
+    "sat": 0.38,
+    "murky": 0.024,
+    "gloss": 0.012,
+    "empty": 0,
+    "still": 0.04,
+    "median": 3.133
+   },
+   "worstShots": [
+    "s105",
+    "s106",
+    "s123",
+    "s094",
+    "s124"
+   ],
+   "errors": [],
+   "missing": [],
+   "feedback": [
+    {
+     "date": "2026-11-12",
+     "text": "s037, s042: tay xuyên qua bàn căng tin; QC không bắt được vì chỉ kiểm khớp (sửa 1.0.4: kiểm cả đoạn chi; tư thế ngồi bàn cao dùng IK, không dùng sitDesk)",
+     "cats": [
+      "clip",
+      "hands"
+     ]
+    }
+   ],
+   "renderSec": 1267
+  },
+  {
+   "project": "who-muted-you",
+   "date": "2026-11-13",
+   "qc": {
+    "samples": 1245,
+    "red": 0,
+    "amber": 40
+   },
+   "byKind": {
+    "jerk": {
+     "red": 0,
+     "amber": 1,
+     "n": 1
+    },
+    "slide": {
+     "red": 0,
+     "amber": 20,
+     "n": 28
+    },
+    "hands": {
+     "red": 0,
+     "amber": 10,
+     "n": 50
+    },
+    "clip": {
+     "red": 0,
+     "amber": 9,
+     "n": 40
+    }
+   },
+   "sets": [
+    "cafeteria",
+    "lockerHall",
+    "classroom",
+    "court",
+    "footballField",
+    "homeKitchen",
+    "teenBedroom",
+    "livingRoom",
+    "house",
+    "tree",
+    "streetLamp",
+    "fireTruck",
+    "alarmLight",
+    "ladder",
+    "ambulance",
+    "door",
+    "phoneClose",
+    "explainer",
+    "stairs",
+    "car",
+    "skateboard",
+    "phone"
+   ],
+   "fx": [
+    "fire",
+    "smoke",
+    "dust",
+    "glowLight",
+    "debris",
+    "bokeh",
+    "crashZoom",
+    "punch",
+    "dutch",
+    "shake"
+   ],
+   "look": {
+    "luma": 0.241,
+    "sat": 0.445,
+    "murky": 0.084,
+    "gloss": 0.008,
+    "empty": 0.006,
+    "still": 0.059,
+    "median": 2.933
+   },
+   "worstShots": [
+    "s180",
+    "s195",
+    "s057",
+    "s164",
+    "s022"
+   ],
+   "errors": [],
+   "missing": [],
+   "feedback": [
+    {
+     "date": "2026-11-12",
+     "text": "Bản xem trước 40 s: tay vẫn xuyên bàn căng tin; QC có bắt (172 đỏ) nhưng chỉ chạy lúc render cuối, preview gửi đi khi chưa chạy --qc",
+     "cats": [
+      "clip",
+      "hands"
+     ]
+    }
+   ],
+   "renderSec": 1530
+  },
+  {
+   "project": "see-who-needs-help",
+   "date": "2026-11-15",
+   "qc": {
+    "samples": 1276,
+    "red": 0,
+    "amber": 143
+   },
+   "byKind": {
+    "hands": {
+     "red": 0,
+     "amber": 28,
+     "n": 78
+    },
+    "clip": {
+     "red": 0,
+     "amber": 65,
+     "n": 289
+    },
+    "slide": {
+     "red": 0,
+     "amber": 50,
+     "n": 75
+    }
+   },
+   "sets": [
+    "teenBedroom",
+    "door",
+    "homeKitchen",
+    "mapleStreet",
+    "schoolBus",
+    "cafeteria",
+    "crowd",
+    "lockerHall",
+    "stairwell",
+    "busInside",
+    "classroom",
+    "mainStreet",
+    "car",
+    "gym",
+    "tree",
+    "explainer",
+    "phone"
+   ],
+   "fx": [
+    "dust",
+    "bokeh",
+    "crashZoom",
+    "punch",
+    "dutch",
+    "shake"
+   ],
+   "look": {
+    "luma": 0.293,
+    "sat": 0.421,
+    "murky": 0.06,
+    "gloss": 0.011,
+    "empty": 0,
+    "still": 0.004,
+    "median": 3.733
+   },
+   "worstShots": [
+    "s011",
+    "s019",
+    "s100",
+    "s010",
+    "s012"
+   ],
+   "errors": [],
+   "missing": [],
+   "feedback": [],
+   "renderSec": 2303
+  },
+  {
+   "project": "quan-ca-phe-6h",
+   "date": "2026-11-15",
+   "qc": {
+    "samples": 38,
+    "red": 0,
+    "amber": 0
+   },
+   "byKind": {},
+   "sets": [
+    "streetLamp",
+    "bench"
+   ],
+   "fx": [],
+   "look": {
+    "luma": 0.068,
+    "sat": 0.772,
+    "murky": 1,
+    "gloss": 0.002,
+    "empty": 0,
+    "still": 0.057,
+    "median": 6.333
+   },
+   "worstShots": [],
+   "errors": [],
+   "missing": [],
+   "feedback": [],
+   "renderSec": 12
+  },
+  {
+   "project": "tau-sang-som",
+   "date": "2026-11-15",
+   "qc": {
+    "samples": 24,
+    "red": 0,
+    "amber": 0
+   },
+   "byKind": {},
+   "sets": [],
+   "fx": [],
+   "look": {
+    "luma": 0.05,
+    "sat": 0.781,
+    "murky": 1,
+    "gloss": 0,
+    "empty": 0,
+    "still": 0,
+    "median": 5.95
+   },
+   "worstShots": [],
+   "errors": [],
+   "missing": [],
+   "feedback": [],
+   "renderSec": 10
+  },
+  {
+   "project": "helping-the-wrong-way",
+   "date": "2026-11-16",
+   "qc": {
+    "samples": 1228,
+    "red": 0,
+    "amber": 54
+   },
+   "byKind": {
+    "clip": {
+     "red": 0,
+     "amber": 21,
+     "n": 80
+    },
+    "slide": {
+     "red": 0,
+     "amber": 22,
+     "n": 23
+    },
+    "hands": {
+     "red": 0,
+     "amber": 11,
+     "n": 36
+    }
+   },
+   "sets": [
+    "mirror",
+    "aoStrip",
+    "flicker",
+    "deskLamp",
+    "officeChair",
+    "chair",
+    "plant",
+    "wallClock",
+    "trashCan",
+    "dog",
+    "car",
+    "cart",
+    "wheelchair",
+    "city",
+    "cafe",
+    "explainer",
+    "teenBedroom",
+    "room",
+    "hospitalHall",
+    "phone"
+   ],
+   "fx": [
+    "smoke",
+    "shockwave",
+    "burst",
+    "debris",
+    "sparks",
+    "punch",
+    "rackFocus",
+    "shake",
+    "ghosts",
+    "dust",
+    "crashZoom"
+   ],
+   "look": {
+    "luma": 0.264,
+    "sat": 0.418,
+    "murky": 0.15,
+    "gloss": 0.009,
+    "empty": 0.013,
+    "still": 0.021,
+    "median": 1.967
+   },
+   "worstShots": [
+    "s096",
+    "s182",
+    "s048",
+    "s185",
+    "s199"
+   ],
+   "errors": [],
+   "missing": [],
+   "feedback": [],
+   "renderSec": 2759
+  },
+  {
+   "project": "trunks_ep01_demo",
+   "date": "2026-11-26",
+   "qc": {
+    "samples": 80,
+    "red": 0,
+    "amber": 6
+   },
+   "byKind": {
+    "slide": {
+     "red": 0,
+     "amber": 6,
+     "n": 14
+    }
+   },
+   "sets": [],
+   "fx": [
+    "shake",
+    "punch",
+    "smoke"
+   ],
+   "look": {
+    "luma": 0.477,
+    "sat": 0.197,
+    "murky": 0.05,
+    "gloss": 0.012,
+    "empty": 0.05,
+    "still": 0.05,
+    "median": 2.492
+   },
+   "worstShots": [
+    "s15",
+    "s18"
+   ],
+   "errors": [],
+   "missing": [],
+   "feedback": [],
+   "renderSec": 75
+  }
+ ]
+}

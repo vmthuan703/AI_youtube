@@ -1,0 +1,97 @@
+{
+ "title": "v103-demo",
+ "duration": 42.5,
+ "shots": [
+  {
+   "id": "talk",
+   "start": 0,
+   "end": 4,
+   "line": "",
+   "camera": "twoShot"
+  },
+  {
+   "id": "talkClose",
+   "start": 4,
+   "end": 7,
+   "line": "",
+   "camera": "closeup"
+  },
+  {
+   "id": "count",
+   "start": 7,
+   "end": 10.5,
+   "line": "",
+   "camera": "medium"
+  },
+  {
+   "id": "gestures",
+   "start": 10.5,
+   "end": 13.5,
+   "line": "",
+   "camera": "wide"
+  },
+  {
+   "id": "deskRest",
+   "start": 13.5,
+   "end": 16.5,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "walkStart",
+   "start": 16.5,
+   "end": 19.5,
+   "line": "",
+   "camera": "full"
+  },
+  {
+   "id": "scarfRun",
+   "start": 19.5,
+   "end": 22.5,
+   "line": "",
+   "camera": "track"
+  },
+  {
+   "id": "hoodBack",
+   "start": 22.5,
+   "end": 25.5,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "sitBench",
+   "start": 25.5,
+   "end": 28.5,
+   "line": "",
+   "camera": "medium"
+  },
+  {
+   "id": "thanksgiving",
+   "start": 28.5,
+   "end": 32.5,
+   "line": "",
+   "camera": "manual"
+  },
+  {
+   "id": "pumpkinStreet",
+   "start": 32.5,
+   "end": 36,
+   "line": "",
+   "camera": "wide"
+  },
+  {
+   "id": "leafGust",
+   "start": 36,
+   "end": 39.5,
+   "line": "",
+   "camera": "full"
+  },
+  {
+   "id": "fridayNight",
+   "start": 39.5,
+   "end": 42.5,
+   "line": "",
+   "camera": "lowHero"
+  }
+ ]
+}

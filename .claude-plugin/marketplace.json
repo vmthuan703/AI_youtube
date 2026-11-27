@@ -4,7 +4,7 @@
     "name": "vmthuan703"
   },
   "metadata": {
-    "description": "Plugin làm video cho kênh YouTube What If: dựng video 3D từ kịch bản."
+    "description": "Plugin làm video cho kênh YouTube What If: dựng video 3D và Ink Pastel từ kịch bản."
   },
   "plugins": [
     {
@@ -12,6 +12,12 @@
       "source": "./plugins/aitrends-3d-studio",
       "description": "Kịch bản → giọng đọc mã nguồn mở → video hoạt hình 3D hoàn chỉnh (Three.js), tới 4K/60 fps, kèm thumbnail điện ảnh.",
       "version": "2.3.0"
+    },
+    {
+      "name": "aitrends-ink-studio",
+      "source": "./plugins/aitrends-ink-studio",
+      "description": "Kịch bản → giọng đọc mã nguồn mở → video What If phong cách Ink Pastel (viền mực mọi vật, màu pastel, HUD trên đầu), 25 cắt/phút, 4K/60 fps. Không làm thumbnail.",
+      "version": "0.1.0"
     }
   ]
 }

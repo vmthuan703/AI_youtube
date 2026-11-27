@@ -1,0 +1,82 @@
+{
+ "title": "Ink Pastel demo: the life clock",
+ "duration": 15.0,
+ "shots": [
+  {
+   "id": "s001",
+   "start": 0,
+   "end": 2.6,
+   "line": "You open your eyes in a ruined city.",
+   "scene": "WIDE ruined street, hero and a neighbour, pills over heads",
+   "set": "RUIN",
+   "camera": "wide",
+   "look": "inkRuin",
+   "rules": []
+  },
+  {
+   "id": "s002",
+   "start": 2.6,
+   "end": 4.8,
+   "line": "Over his head, a clock: forty-one years.",
+   "scene": "HUD close-up on the neighbour, pill big",
+   "set": "RUIN",
+   "camera": "hud",
+   "look": "inkRuin",
+   "rules": [
+    "R04"
+   ]
+  },
+  {
+   "id": "s003",
+   "start": 4.8,
+   "end": 7.2,
+   "line": "Then a beam cuts across the street.",
+   "scene": "beam sweeps into the facades (R01)",
+   "set": "RUIN",
+   "camera": "wide",
+   "look": "inkRuin",
+   "rules": [
+    "R01"
+   ]
+  },
+  {
+   "id": "s004",
+   "start": 7.2,
+   "end": 9.6,
+   "line": "The road behind you explodes.",
+   "scene": "impact on the road + scars on the walls (R01 R02)",
+   "set": "RUIN",
+   "camera": "med",
+   "look": "inkRuin",
+   "rules": [
+    "R01",
+    "R02"
+   ]
+  },
+  {
+   "id": "s005",
+   "start": 9.6,
+   "end": 12.2,
+   "line": "Underground, Mom waits by the radio.",
+   "scene": "BUNKER medium, mom sitting, her pill",
+   "set": "BUNKER",
+   "camera": "med",
+   "look": "inkWarm",
+   "rules": [
+    "R04"
+   ]
+  },
+  {
+   "id": "s006",
+   "start": 12.2,
+   "end": 15.0,
+   "line": "She was a scientist, once.",
+   "scene": "sepia flashback card",
+   "set": "CARD",
+   "camera": "card",
+   "look": null,
+   "rules": []
+  }
+ ],
+ "music": []
+}

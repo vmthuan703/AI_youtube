@@ -1,0 +1,14 @@
+{
+ "title": "Reference look demo",
+ "aspect": "16:9",
+ "resolution": "720p",
+ "fps": 30,
+ "quality": "high",
+ "style": "soft",
+ "voiceover": null,
+ "duration": 16,
+ "captions": false,
+ "bars": null,
+ "fadeIn": 0,
+ "fadeOut": 0
+}

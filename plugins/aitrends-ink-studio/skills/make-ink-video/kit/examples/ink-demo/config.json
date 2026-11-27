@@ -1,0 +1,21 @@
+{
+ "title": "Ink Pastel demo: the life clock",
+ "aspect": "16:9",
+ "resolution": "1080p",
+ "fps": 60,
+ "quality": "high",
+ "style": "inkpastel",
+ "voiceover": null,
+ "script": null,
+ "duration": 15.0,
+ "captions": false,
+ "bars": null,
+ "fadeIn": 0.0,
+ "fadeOut": 0.6,
+ "speechBubbles": false,
+ "music": { "enabled": false },
+ "sfx": { "enabled": false },
+ "loudness": -14,
+ "handheld": 0.2,
+ "export": {}
+}

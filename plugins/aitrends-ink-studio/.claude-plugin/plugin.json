@@ -1,0 +1,18 @@
+{
+  "name": "aitrends-ink-studio",
+  "version": "0.1.0",
+  "description": "Turn a script into a narrated What If video in the Ink Pastel style: sphere-headed characters with decal faces and thick brows, a dark ink line round every object, pastel colours with lavender shadows, a HUD pill over people's heads, sepia flashback cards, 25 cuts per minute landing mid-sentence. Three phases (A voice + shot plan + rulebook, B cast/sets/shots + QC, C sound + preview + director's notes + 4K/60 render). Engine copied from aiTrends 3D Studio 2.3.0 (Three.js, Chatterbox voice), plus the Ink Pastel style and ink-line pass, the engine/ink library (auto() table-driven shots, HUD pills, ready-made sets), rulebook helpers for hits and damage, a plan-to-shots tool, a rule checker and a director's notes page. No thumbnails.",
+  "author": {
+    "name": "aiTrends"
+  },
+  "keywords": [
+    "video",
+    "3d animation",
+    "what if",
+    "ink outline",
+    "pastel",
+    "three.js",
+    "tts",
+    "chatterbox"
+  ]
+}

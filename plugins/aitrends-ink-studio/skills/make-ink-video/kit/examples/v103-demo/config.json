@@ -1,0 +1,5 @@
+{
+ "title": "1.0.3 demo: lip-sync, fingers, resting hands, planted feet, cloth, November sets",
+ "aspect": "16:9", "resolution": "1080p", "fps": 30, "quality": "high", "style": "pearl", "palette": null, "voiceover": null,
+ "duration": 42.5, "captions": false, "bars": "cine", "fadeIn": 0, "fadeOut": 0.4, "speechBubbles": false, "handheld": 0.25
+}

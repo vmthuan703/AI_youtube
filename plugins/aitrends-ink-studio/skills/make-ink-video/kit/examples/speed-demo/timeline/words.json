@@ -1,0 +1,551 @@
+{
+ "source": "script:words.json",
+ "words": [
+  {
+   "word": "What",
+   "start": 0.0,
+   "end": 0.26,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "if",
+   "start": 0.26,
+   "end": 0.415,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "you",
+   "start": 0.415,
+   "end": 0.623,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "were",
+   "start": 0.623,
+   "end": 0.883,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "ten",
+   "start": 0.883,
+   "end": 1.09,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "times",
+   "start": 1.09,
+   "end": 1.402,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "faster",
+   "start": 1.402,
+   "end": 1.765,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "than",
+   "start": 1.765,
+   "end": 2.025,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "everyone",
+   "start": 2.025,
+   "end": 2.492,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "else?",
+   "start": 2.492,
+   "end": 2.752,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "You",
+   "start": 3.252,
+   "end": 3.52,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "wake",
+   "start": 3.52,
+   "end": 3.855,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "up",
+   "start": 3.855,
+   "end": 4.057,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "at",
+   "start": 4.057,
+   "end": 4.258,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "seven.",
+   "start": 4.258,
+   "end": 4.66,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "Your",
+   "start": 4.81,
+   "end": 5.08,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "alarm",
+   "start": 5.08,
+   "end": 5.403,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "hasn't",
+   "start": 5.403,
+   "end": 5.727,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "even",
+   "start": 5.727,
+   "end": 5.996,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "finished",
+   "start": 5.996,
+   "end": 6.482,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "its",
+   "start": 6.482,
+   "end": 6.697,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "first",
+   "start": 6.697,
+   "end": 7.021,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "beep,",
+   "start": 7.021,
+   "end": 7.291,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "and",
+   "start": 7.291,
+   "end": 7.506,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "you're",
+   "start": 7.506,
+   "end": 7.83,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "already",
+   "start": 7.83,
+   "end": 8.261,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "dressed.",
+   "start": 8.261,
+   "end": 8.693,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "On",
+   "start": 9.193,
+   "end": 9.388,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "the",
+   "start": 9.388,
+   "end": 9.647,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "way",
+   "start": 9.647,
+   "end": 9.907,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "to",
+   "start": 9.907,
+   "end": 10.102,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "school,",
+   "start": 10.102,
+   "end": 10.557,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "a",
+   "start": 10.557,
+   "end": 10.687,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "car",
+   "start": 10.687,
+   "end": 10.947,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "runs",
+   "start": 10.947,
+   "end": 11.272,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "a",
+   "start": 11.272,
+   "end": 11.402,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "red",
+   "start": 11.402,
+   "end": 11.662,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "light.",
+   "start": 11.662,
+   "end": 12.051,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "To",
+   "start": 12.201,
+   "end": 12.383,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "everyone",
+   "start": 12.383,
+   "end": 12.93,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "else,",
+   "start": 12.93,
+   "end": 13.234,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "it",
+   "start": 13.234,
+   "end": 13.416,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "happens",
+   "start": 13.416,
+   "end": 13.901,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "in",
+   "start": 13.901,
+   "end": 14.084,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "a",
+   "start": 14.084,
+   "end": 14.205,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "blink.",
+   "start": 14.205,
+   "end": 14.569,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "To",
+   "start": 14.719,
+   "end": 14.921,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "you,",
+   "start": 14.921,
+   "end": 15.19,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "it's",
+   "start": 15.19,
+   "end": 15.459,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "crawling.",
+   "start": 15.459,
+   "end": 16.063,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "You",
+   "start": 16.563,
+   "end": 16.803,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "stroll",
+   "start": 16.803,
+   "end": 17.222,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "across",
+   "start": 17.222,
+   "end": 17.641,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "the",
+   "start": 17.641,
+   "end": 17.88,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "street,",
+   "start": 17.88,
+   "end": 18.299,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "grab",
+   "start": 18.299,
+   "end": 18.598,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "a",
+   "start": 18.598,
+   "end": 18.718,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "soda,",
+   "start": 18.718,
+   "end": 19.017,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "and",
+   "start": 19.017,
+   "end": 19.257,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "you're",
+   "start": 19.257,
+   "end": 19.616,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "back",
+   "start": 19.616,
+   "end": 19.915,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "on",
+   "start": 19.915,
+   "end": 20.095,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "the",
+   "start": 20.095,
+   "end": 20.334,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "sidewalk",
+   "start": 20.334,
+   "end": 20.873,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "before",
+   "start": 20.873,
+   "end": 21.292,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "the",
+   "start": 21.292,
+   "end": 21.532,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "driver",
+   "start": 21.532,
+   "end": 21.951,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "even",
+   "start": 21.951,
+   "end": 22.25,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "notices.",
+   "start": 22.25,
+   "end": 22.729,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "Dude...",
+   "start": 23.229,
+   "end": 23.911,
+   "speaker": "JAKE"
+  },
+  {
+   "word": "how",
+   "start": 24.061,
+   "end": 24.273,
+   "speaker": "JAKE"
+  },
+  {
+   "word": "did",
+   "start": 24.273,
+   "end": 24.485,
+   "speaker": "JAKE"
+  },
+  {
+   "word": "you",
+   "start": 24.485,
+   "end": 24.697,
+   "speaker": "JAKE"
+  },
+  {
+   "word": "get",
+   "start": 24.697,
+   "end": 24.908,
+   "speaker": "JAKE"
+  },
+  {
+   "word": "over",
+   "start": 24.908,
+   "end": 25.173,
+   "speaker": "JAKE"
+  },
+  {
+   "word": "there?",
+   "start": 25.173,
+   "end": 25.491,
+   "speaker": "JAKE"
+  },
+  {
+   "word": "But",
+   "start": 25.991,
+   "end": 26.223,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "here's",
+   "start": 26.223,
+   "end": 26.572,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "the",
+   "start": 26.572,
+   "end": 26.805,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "thing",
+   "start": 26.805,
+   "end": 27.154,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "nobody",
+   "start": 27.154,
+   "end": 27.562,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "tells",
+   "start": 27.562,
+   "end": 27.911,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "you",
+   "start": 27.911,
+   "end": 28.143,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "about",
+   "start": 28.143,
+   "end": 28.492,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "super",
+   "start": 28.492,
+   "end": 28.842,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "speed.",
+   "start": 28.842,
+   "end": 29.191,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "Stopping",
+   "start": 29.341,
+   "end": 29.909,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "is",
+   "start": 29.909,
+   "end": 30.099,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "the",
+   "start": 30.099,
+   "end": 30.352,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "hard",
+   "start": 30.352,
+   "end": 30.667,
+   "speaker": "NARRATOR"
+  },
+  {
+   "word": "part.",
+   "start": 30.667,
+   "end": 30.983,
+   "speaker": "NARRATOR"
+  }
+ ]
+}

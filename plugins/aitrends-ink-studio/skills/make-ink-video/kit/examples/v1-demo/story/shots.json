@@ -1,0 +1,54 @@
+{
+ "title": "v1-demo",
+ "duration": 28.0,
+ "shots": [
+  {
+   "id": "stairs",
+   "start": 0,
+   "end": 4,
+   "line": ""
+  },
+  {
+   "id": "classroom",
+   "start": 4,
+   "end": 7.5,
+   "line": ""
+  },
+  {
+   "id": "busstop",
+   "start": 7.5,
+   "end": 11.0,
+   "line": ""
+  },
+  {
+   "id": "shopstreet",
+   "start": 11.0,
+   "end": 15.0,
+   "line": ""
+  },
+  {
+   "id": "stoop",
+   "start": 15.0,
+   "end": 18.0,
+   "line": ""
+  },
+  {
+   "id": "streetfood",
+   "start": 18.0,
+   "end": 21.5,
+   "line": ""
+  },
+  {
+   "id": "cafe",
+   "start": 21.5,
+   "end": 25.0,
+   "line": ""
+  },
+  {
+   "id": "gloss",
+   "start": 25.0,
+   "end": 28.0,
+   "line": ""
+  }
+ ]
+}

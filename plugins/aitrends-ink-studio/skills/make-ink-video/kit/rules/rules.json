@@ -1,0 +1,76 @@
+{
+ "_note": "Machine side of rules/RULES.md. triggers = regex (case-insensitive) on the words spoken in a shot + its 'scene' text; helper = a call the shot code must contain (any one of them). Rules without triggers are checked by eye (listed by --plan for every shot).",
+ "rules": [
+  {
+   "id": "R01",
+   "name": "Every hit leaves a mark",
+   "triggers": [
+    "\\bbeam\\b",
+    "\\bblast",
+    "explod",
+    "\\bfires?\\b",
+    "\\bpunch",
+    "\\bstrike",
+    "\\bsmash",
+    "\\bki\\b.*\\bground",
+    "slams?"
+   ],
+   "must": "flash -> breach/chunks burst out -> rubble falls -> dust lingers 2-3 s -> camera shake",
+   "helper": [
+    "T.CQ.impact",
+    "T.CQ.beamSweep"
+   ]
+  },
+  {
+   "id": "R02",
+   "name": "Damage stays",
+   "after": "R01",
+   "must": "later shots in the same set show the hole, thin smoke, rubble",
+   "helper": [
+    "T.CQ.scar"
+   ]
+  },
+  {
+   "id": "R03",
+   "name": "Character size",
+   "global": true,
+   "must": "hero within 5% of adult height incl. hair (a lineup shot: roles side by side, print ch.headWorld().y)"
+  },
+  {
+   "id": "R04",
+   "name": "HUD inside frame",
+   "triggers": [
+    "clock",
+    "seconds",
+    "minutes",
+    "hours",
+    "years",
+    "number"
+   ],
+   "must": "the clock pill over the head is fully inside the frame",
+   "helper": [
+    "clockAt",
+    "headPill",
+    "pill(",
+    "auto("
+   ]
+  },
+  {
+   "id": "R05",
+   "name": "No lip-sync on narration",
+   "global": true,
+   "must": "only the speaking character moves its mouth"
+  },
+  {
+   "id": "R06",
+   "name": "Flying reads as flying",
+   "triggers": [
+    "\\bfl(y|ies|ying|ew)\\b",
+    "drifts? down",
+    "hover",
+    "float"
+   ],
+   "must": "gap under the feet, small far shadow, hair/cloth flutter, bob"
+  }
+ ]
+}

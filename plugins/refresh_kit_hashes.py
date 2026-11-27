@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Maintainer tool: after editing any file in the 3D studio kit, refresh the hash table in tools/verify_kit.py.
+"""Maintainer tool: after editing any file in a studio kit, refresh the hash table in that kit's tools/verify_kit.py.
 
-  python3 plugins/refresh_kit_hashes.py
+  python3 plugins/refresh_kit_hashes.py            # aitrends-3d-studio (make-3d-video)
+  python3 plugins/refresh_kit_hashes.py ink        # aitrends-ink-studio (make-ink-video)
 """
-import hashlib, os, re
+import hashlib, os, re, sys
 
-KIT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "aitrends-3d-studio", "skills", "make-3d-video", "kit")
+PLUGIN, SKILL = ("aitrends-ink-studio", "make-ink-video") if sys.argv[1:2] == ["ink"] else ("aitrends-3d-studio", "make-3d-video")
+KIT = os.path.join(os.path.dirname(os.path.abspath(__file__)), PLUGIN, "skills", SKILL, "kit")
 SKIP_DIRS = {"node_modules", "build", "__pycache__", "out", "channel"}   # channel/ is the user's own settings: never verified
 files = []
 for root, dirs, names in os.walk(KIT):

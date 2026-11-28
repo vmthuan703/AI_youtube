@@ -19,27 +19,27 @@ _Cập nhật tự động 2026-11-28. Số liệu từ YouTube Data API, đối
 ### Tóm tắt thu thập 2026-11-28
 
 - Quota đã dùng: 2194 / ngân sách 6000 đơn vị
-- Kênh theo dõi: 60 · video đã chụp: 2101
+- Kênh theo dõi: 60 · video đã chụp: 2131
 
 #### What-If Fiction × Mỹ
 
 - Truy vấn đã chạy: 20 · bỏ qua: 0 · lỗi: 0
 - Kênh mới thêm vào theo dõi: không
 - Kênh bỏ khỏi theo dõi vì lệch ngách: không
-- Bảng chấm nhanh (chỉ dữ liệu hôm nay): **CẦN THEO DÕI** · tuổi trung vị top 5: 58.1 tháng · video ≥ 100k: 447
+- Bảng chấm nhanh (chỉ dữ liệu hôm nay): **CẦN THEO DÕI** · tuổi trung vị top 5: 58.1 tháng · video ≥ 100k: 451
 
 | Kênh mới thắng | Tuổi (ngày) | Sub | Video to nhất |
 |---|---|---|---|
-| Born in Lore | 30 | 53.800 | 5.071.952 |
-| ConChaser | 34 | 35.500 | 3.228.848 |
-| Minute Zero | 48 | 24.000 | 2.476.704 |
-| IfYou Films | 33 | 8.960 | 2.358.451 |
-|  Jeremy Bearimy | 47 | 67.700 | 2.054.035 |
-| The Hidden Why | 49 | 4.470 | 1.996.048 |
-| DOOMPERK | 38 | 25.800 | 1.723.177 |
-| OminiAM | 52 | 8.590 | 1.706.077 |
-| Araragi | 139 | 26.300 | 1.659.046 |
-| Miko | 41 | 19.600 | 1.632.146 |
+| Born in Lore | 31 | 56.700 | 5.387.560 |
+| ConChaser | 35 | 35.900 | 3.284.335 |
+| Minute Zero | 49 | 24.100 | 2.482.483 |
+| IfYou Films | 34 | 9.120 | 2.407.604 |
+|  Jeremy Bearimy | 48 | 68.100 | 2.056.643 |
+| The Hidden Why | 50 | 4.620 | 2.029.676 |
+| DOOMPERK | 39 | 26.200 | 1.758.317 |
+| OminiAM | 53 | 8.620 | 1.722.543 |
+| Araragi | 140 | 26.300 | 1.665.979 |
+| Miko | 42 | 19.900 | 1.653.305 |
 
 Xem thêm: [dữ liệu ngày 2026-11-28](https://github.com/vmthuan703/AI_youtube/blob/research/reports/data/2026-11-28/TOM_TAT.md)
 

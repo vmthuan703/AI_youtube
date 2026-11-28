@@ -1,6 +1,6 @@
 {
   "snapshot_date": "2026-11-28",
-  "started_at": "2026-11-27T18:11:12.224258+00:00",
+  "started_at": "2026-11-28T16:52:34.931728+00:00",
   "quota_budget": 6000,
   "markets": {
     "whatif-us": {
@@ -30,7 +30,7 @@
       ],
       "queries_skipped": [],
       "errors": [],
-      "discovery_rows": 957,
+      "discovery_rows": 958,
       "seeded": [],
       "added": [],
       "not_added_registry_full": [
@@ -40,21 +40,25 @@
         "Matal",
         "Real Aside",
         "Any Minute Now",
+        "Possiblo",
         "Ifvincible",
+        "What if City",
+        "Just Imagine if",
         "Velo Recap",
         "CurioMundo",
         "AniFacade",
+        "What If Jar",
         "The Clipping Files",
-        "Possiblo",
         "WhatVerse",
+        "Plot Jutsu",
         "IfDatTrue",
         "Puck Pukish",
-        "Plot Jutsu",
+        "IFBEYOND",
         "Red Pill POV",
         "Ifable",
-        "Nearside",
-        "Mirage",
         "Shankists",
+        "Mirage",
+        "Nearside",
         "Stick Saga",
         "The What If Files",
         "Stick Knows",
@@ -67,16 +71,16 @@
         "Untold Mythos",
         "Gus Maybe",
         "If Ball Tales",
-        "Evrika!",
         "Hypothetical Humans",
-        "Iftales"
+        "Iftales",
+        "What If Marcel"
       ]
     }
   },
   "pruned_off_niche": [],
   "tracked_channels": 60,
-  "tracked_videos": 2101,
+  "tracked_videos": 2131,
   "tracking_skipped": [],
   "quota_used": 2194,
-  "finished_at": "2026-11-27T18:11:48.113752+00:00"
+  "finished_at": "2026-11-28T16:53:09.513566+00:00"
 }
